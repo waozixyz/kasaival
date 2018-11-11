@@ -8,10 +8,10 @@ function Animation.new(spritesheet)
   return setmetatable(obj, Animation)
 end
 
-function Animation:draw(x, y)
+function Animation:draw(...)
   local quad=self.frames[self.currentFrame]
   if quad then
-    lg.draw(self.parent.img, quad, x, y)
+    lg.draw(self.parent.img, quad, ...)
   end
 end
 
