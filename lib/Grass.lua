@@ -1,10 +1,10 @@
-local grass = {}
+local Grass = {}
 
 
 
 
-function grass:draw(obj)
+function Grass:draw(obj)
   
 end
 
-return grass
+return Grass

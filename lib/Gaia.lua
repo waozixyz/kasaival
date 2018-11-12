@@ -2,7 +2,7 @@ require 'class'
 
 local lg=love.graphics
 
-local grass = require 'lib/grass'
+local Grass = require 'lib/Grass'
 local Tree = require 'lib/Tree'
 
 local Gaia = class(function(self)
