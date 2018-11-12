@@ -13,7 +13,7 @@ local Ocean = {
 function Ocean:attack(obj)
   if obj.element == 'fire' then
     return 23 * self.level
-  end
+  else return 0 end
 end
   
 
