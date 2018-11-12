@@ -1,3 +1,5 @@
+require 'class'
+
 local lg=love.graphics
 
 local Animation={}
@@ -62,18 +64,18 @@ function Animation:isPaused()
   return self.playing==false
 end
   
-local SpriteSheet={}
-SpriteSheet.__index=SpriteSheet
-
-function SpriteSheet.new(img, w, h)
+local SpriteSheet=class(function(self, img, w, h)
   if type(img)=='string' then
     img=lg.newImage(img)
-  end
-  local obj={img=img, w=w, h=h, Animations={}}
-  obj.imgw=img:getWidth()
-  obj.imgh=img:getHeight()
-  return setmetatable(obj, SpriteSheet)
-end
+  end 
+  if img == nil then return end
+
+  self.img=img
+  self.w=w or 64
+  self.h=h or 64
+  self.imgw=img:getWidth()
+  self.imgh=img:getHeight()
+end)
 
 function SpriteSheet:createAnimation(...)
   local a=Animation.new(self)
