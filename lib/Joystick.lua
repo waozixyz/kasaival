@@ -40,8 +40,7 @@ function Joystick:update()
       dy = (ty - y) / 10
     end
   end
-  self.dx = dx
-  self.dy = dy
+  self.dx, self.dy = dx, dy
 end  
 
 function Joystick:draw()

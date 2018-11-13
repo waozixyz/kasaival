@@ -12,8 +12,15 @@ local Gaia = class(function(self)
   self.height = 400
   self.color = {0.2, 0.4, 0.3}
   self.trees = {}
-  table.insert(self.trees, Tree())
 end)
+
+function Gaia:addTree(...)
+ table.insert(self.trees, Tree(...))
+end
+
+function Gaia:load()
+  self:addTree()
+end
 
 function Gaia:update(dt)
   for i,v in ipairs(self.trees) do

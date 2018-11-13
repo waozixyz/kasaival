@@ -38,7 +38,7 @@ function love.load()
   lw.setIcon(li.newImageData('icon.png'))
   local W,H = lg.getDimensions()
    -- miuuuuu
-  miu = miu(self)
+  miu = miu()
   Pink = miu.pink
   Cyan = miu.cyan
 
@@ -72,12 +72,13 @@ function love.update(dt)
   movePad:update(dt)
   do -- move Camera and Pink
     local dx,dy = movePad.dx, movePad.dy
-    Pink:move(dx,dy)
-
+    dx,dy = Pink:regulateSpeed(dx, dy)
     if moveInArea(-Camera.x, dx, Cyan.base.x, Portal.x - W*.5) and moveInArea(Pink.x, -dx, W*.8 - Camera.x, W*.2 - Camera.x)
  then
      Camera.x = Camera.x - dx
     end
+
+    Pink:move(dx,dy)
   end
 
  

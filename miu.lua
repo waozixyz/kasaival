@@ -36,6 +36,13 @@ local miu = class(function(self)
   dharma(mao, self.cyan)
 
   self.mao = mao
+
+ -- draw ao
+  for i,v in ipairs(self.mao) do
+    if v.load then
+      v:load()
+    end
+  end
 end)
 
 

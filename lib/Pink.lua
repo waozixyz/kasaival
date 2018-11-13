@@ -37,16 +37,16 @@ local Pink=class(function(self, img, w, h, x, y, sx, sy)
 end)
 
 function Pink:regulateSpeed(dx, dy, speed)
-  local s = speed
+  if not speed then speed = self.walkSpeed end 
   if math.abs(dx) + math.abs(dy) ~= 0 then
-    s = speed / (math.abs(dx) + math.abs(dy))
+    speed = speed / (math.abs(dx) + math.abs(dy))
   end 
-  return dx * s, dy * s
+  return dx * speed, dy * speed
 end
 
 function Pink:move(dx,dy)
   local W,H = lg.getDimensions()
-  dx, dy = self:regulateSpeed(dx, dy, self.walkSpeed)
+ 
   if (self.x < self.portal.x or dx < 0) then
     self.x = self.x + dx
   end
