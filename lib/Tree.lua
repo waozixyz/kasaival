@@ -10,7 +10,7 @@ local random=love.math.random
 -- leaf color, branch color
 -- scale size of tree
 -- rate of growth
-local Tree = class(function(self, x, y, scale, growStage, growRate, branchColor, leafColor, branchLimit, spread)
+local Tree = class(function(self, x, y, scale, growStage, growRate, branchColor, leafColor, branchLimit, branchWidth, spread)
   local W,H = lg.getDimensions()
   self.leafIndex = 1
   self.elapsed = 0
@@ -28,25 +28,20 @@ local Tree = class(function(self, x, y, scale, growStage, growRate, branchColor,
   self.scale = scale or .5
   self.growStage = growStage or 0
   self.growRate = growRate or .2
-  self.maxBranchWidth = 10 * self.scale
-  -- store values for the most left x value and most right x value
-  self.initX = self.x
-  self.initY = self.y
+ 
 
   self.branches = {
     { self.x, self.y, self.x, self.y - 30 }
   }
- 
   self.branchLimit = branchLimit or 10
   self.drawLeaves = drawLeaves or true
   self.leavesColor = {
     leafColor or {.2,.6,.1}
   }
-  self.startLeavesColor = self.leavesColor[1]
-  self.branchColor = branchColor or {.7,.3,0.1}
-  self.firstBranchWidth = random(4, self.maxBranchWidth)
+  self.branchColor = branchColor or {.7,.3,.1}
+ self.maxBranchWidth = 10 * self.scale
   self.branchWidth = {
-    self.firstBranchWidth,
+    branchWidth or random(4, self.maxBranchWidth)
   }
 end)
 
@@ -83,17 +78,17 @@ end
 function Tree:genTempLeaves(x1, y1)
   local size = (3 + self.branchWidth[#self.branches]) * self.scale
   local circle = { x1, y1, size }
-  table.insert(self.leavesColor, self.startLeavesColor)
+  table.insert(self.leavesColor, self.leavesColor[1])
   table.insert(self.leaves, circle)
 
-  local randomizePosition = random(1, 4)
-  if randomizePosition == 1 then
+  local pos = random(1, 4)
+  if pos == 1 then
     circle = { x1*0.99, y1*1.01, size }
-  elseif randomizePosition == 2 then
+  elseif pos == 2 then
     circle = { x1*1.01, y1*0.99, size }
-  elseif randomizePosition == 3 then
+  elseif pos == 3 then
     circle = { x1*0.99, y1*0.99, size }
-  elseif randomizePosition == 4 then
+  elseif pos == 4 then
     circle = { x1*1.01, y1*1.01, size }
   end
 
