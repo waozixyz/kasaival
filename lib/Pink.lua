@@ -104,7 +104,7 @@ function Pink:update(dt)
   for i,s in ipairs(self.shurikens) do
     s:update(dt)
   end
-  self:burnUp(.1)
+  self:burnUp(.05)
 
     
   self.speed = self.sx 

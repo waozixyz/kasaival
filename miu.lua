@@ -54,7 +54,8 @@ function miu:ao(dt, mao)
       v:update(dt, self)
     end
     if v.hp and v.hp <= 0 then
-      nirvana(self, i)
+      -- lettin go
+      nirvana(mao, i)
     end
     if v.y and v.sx then
       -- v.sx = 1 - H / (H + v.y)
@@ -96,7 +97,11 @@ function miu:draw()
    miu:now(self.mao)
 
   -- print
-  lg.print(#self.gaia.mao)
+  lg.print(self.pink.sx)
+  lg.print(self.pink.hp, 0, 20)
+  lg.print(self.pink.hp / self.pink.hpMax,0,40)
+
+  lg.print(self.pink.y / self.gaia.height,0,60)
 end
 
 return miu
