@@ -15,9 +15,6 @@ local nirvana = table.remove
 local miu = class(function(self)
   local mao = {}
 
-  -- bring mao to life
-  local dharma = table.insert
- 
   for i,v in ipairs(mao) do
     if v.load then
       v:load(self)
@@ -32,20 +29,33 @@ local miu = class(function(self)
   self.cyan = Cyan()
   self.cyan.base = Ocean
 
+  -- bring mao to life
+  local dharma = table.insert
   -- throw to dharma
   dharma(mao, self.gaia)
   dharma(mao, self.pink)
   dharma(mao, self.cyan)
 
   self.mao = mao
+end)
 
- -- draw ao
-  for i,v in ipairs(self.mao) do
+function miu:paradox(mao)
+ -- load ao
+  for i,v in ipairs(mao) do
     if v.load then
       v:load()
     end
+     if v.mao then
+      self:paradox(v.mao)
+    end
   end
-end)
+end
+
+
+function miu:load()
+  -- i'm confused
+  self:paradox(self.mao)
+end
 
 function miu:ao(dt, mao)
   -- update ao
@@ -97,11 +107,8 @@ function miu:draw()
    miu:now(self.mao)
 
   -- print
-  lg.print(self.pink.sx)
-  lg.print(self.pink.hp, 0, 20)
-  lg.print(self.pink.hp / self.pink.hpMax,0,40)
-
-  lg.print(self.pink.y / self.gaia.height,0,60)
+  lg.print(#self.gaia.mao)
+  
 end
 
 return miu

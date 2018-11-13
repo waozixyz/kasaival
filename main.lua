@@ -39,6 +39,8 @@ function love.load()
   local W,H = lg.getDimensions()
    -- miuuuuu
   miu = miu()
+  miu:load()
+
   Pink = miu.pink
   Cyan = miu.cyan
 

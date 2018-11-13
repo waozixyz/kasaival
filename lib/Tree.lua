@@ -13,7 +13,7 @@ local random=love.math.random
 local Tree = class(function(self, x, y, scale, growStage, growRate, branchColor, leafColor, branchLimit, spread)
   local W,H = lg.getDimensions()
   self.leafIndex = 1
-  self.elapsedTime = 0
+  self.elapsed = 0
   self.deg_to_rad = math.pi / 180
   self.burn = false
   self.leaves = {}
@@ -26,18 +26,17 @@ local Tree = class(function(self, x, y, scale, growStage, growRate, branchColor,
   self.y = y or H - 20
   self.spread = spread or 20
   self.scale = scale or .5
-  self.rate = growRate or .2
+  self.growStage = growStage or 0
+  self.growRate = growRate or .2
   self.maxBranchWidth = 10 * self.scale
   -- store values for the most left x value and most right x value
   self.initX = self.x
   self.initY = self.y
 
- 
   self.branches = {
     { self.x, self.y, self.x, self.y - 30 }
   }
  
-  self.startDepth = 0
   self.branchLimit = branchLimit or 10
   self.drawLeaves = drawLeaves or true
   self.leavesColor = {
@@ -98,10 +97,69 @@ function Tree:genTempLeaves(x1, y1)
     circle = { x1*1.01, y1*1.01, size }
   end
 
-  table.insert(self.leavesColor, self.startLeavesColor)
+  table.insert(self.leavesColor, self.leavesColor[1])
   table.insert(self.leaves, circle)
 end
 
+function Tree:removeLeaves()
+  if self.leavesColor[self.leafIndex] ~= nil then
+    local lr = self.leavesColor[self.leafIndex][1]
+    local lg = self.leavesColor[self.leafIndex][2]
+    local lb = self.leavesColor[self.leafIndex][3]
+    local lr = lr * 0.1
+    local lg = lg * 0.1
+    local lb = lb * 0.1
+    if lr < 40 and lg < 40 and lb < 40 then
+      table.remove(self.leaves, self.leafIndex)
+    else
+      self.leavesColor[self.leafIndex] = {lr, lg, lb}
+    end
+  end
+  if self.leafIndex > #self.leavesColor then
+    self.leafIndex = 0
+  else
+    self.leafIndex = self.leafIndex + 1
+  end
+end
+
+
+function Tree:grow()
+  local branches = self.branches
+  local length = #self.branches
+  -- if spread is more than the random number generate two branches, else generate 1
+  --for i = 1, length do
+    --if self.spread > love.math.random(0, 100) then
+  if length < self.branchLimit then
+  --  for i = 1, self.levels[length] do
+    self:removeLeaves()
+    self:removeLeaves()
+    self:removeLeaves()
+    self:removeLeaves()
+    self:removeLeaves()
+    self:removeLeaves()
+
+    if random(0, 80) > self.spread then
+      self:genBranch(self.lastIndex[length], self.depth[length] + 1, -20)
+      self:genBranch(self.lastIndex[length], self.depth[length] + 1, 20)
+    else
+      self:genBranch(self.lastIndex[length], self.depth[length], 0)
+    end
+  end
+end
+
+function Tree:load()
+  for i=0, self.growStage do
+    self:grow()
+  end
+end
+
+function Tree:update(dt)
+  self.elapsed = self.elapsed + self.growRate * dt
+  if self.elapsed > 10 then
+    self:grow()
+		  self.elapsed  = 0
+	end
+end
 
 function Tree:draw()
   local W = lg.getWidth()
@@ -130,66 +188,6 @@ function Tree:draw()
       end
     end
   end
-end
-
-
-function Tree:removeLeaves()
-  if self.leavesColor[self.leafIndex] ~= nil then
-    local lr = self.leavesColor[self.leafIndex][1]
-    local lg = self.leavesColor[self.leafIndex][2]
-    local lb = self.leavesColor[self.leafIndex][3]
-    local lr = lr * 0.1
-    local lg = lg * 0.1
-    local lb = lb * 0.1
-    if lr < 40 and lg < 40 and lb < 40 then
-      table.remove(self.leaves, self.leafIndex)
-    else
-      self.leavesColor[self.leafIndex] = {lr, lg, lb}
-    end
-  end
-  if self.leafIndex > #self.leavesColor then
-    self.leafIndex = 0
-  else
-    self.leafIndex = self.leafIndex + 1
-  end
-end
-
-function Tree:grow()
-  local branches = self.branches
-  local length = #self.branches
-  local leavesLength = #self.leaves
-  -- if spread is more than the random number generate two branches, else generate 1
-  --for i = 1, length do
-    --if self.spread > love.math.random(0, 100) then
-  if length < self.branchLimit then
-  --  for i = 1, self.levels[length] do
-    self:removeLeaves()
-    self:removeLeaves()
-    self:removeLeaves()
-    self:removeLeaves()
-    self:removeLeaves()
-    self:removeLeaves()
-
-    if random(0, 80) > self.spread then
-      self:genBranch(self.lastIndex[length], self.depth[length] + 1, -20)
-      self:genBranch(self.lastIndex[length], self.depth[length] + 1, 20)
-    else
-      self:genBranch(self.lastIndex[length], self.depth[length], 0)
-    end
-  end
-end
-
-
-function Tree:update(dt)
-  local l = #self.branches
-  while(self.depth[l] < self.startDepth and l < self.branchLimit) do
-    self:grow()
-  end
-	self.elapsedTime = self.elapsedTime + dt
-	if self.elapsedTime > self.rate then
-    self:grow()
-		  self.elapsedTime = 0
-	end
 end
 
 return Tree

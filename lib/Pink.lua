@@ -100,7 +100,7 @@ end
 
 function Pink:update(dt)
   self.animation:update(dt)
-  self.attackCharge = self.attackCharge + 3
+  self.attackCharge = self.attackCharge + 3*dt
   for i,s in ipairs(self.shurikens) do
     s:update(dt)
   end
