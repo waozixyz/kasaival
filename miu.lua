@@ -8,6 +8,8 @@ local Cyan = require 'lib/Cyan'
 
 -- ali
 local lg=love.graphics
+-- go to nirvana
+local nirvana = table.remove
 
 -- For Planet Miu a miu!
 local miu = class(function(self)
@@ -45,15 +47,9 @@ local miu = class(function(self)
   end
 end)
 
-
-function miu:update(dt)
-  local W,H = lg.getDimensions()
-  -- go to nirvana
-  nirvana = table.remove
-
-
+function miu:ao(dt, mao)
   -- update ao
-  for i,v in ipairs(self.mao) do
+  for i,v in ipairs(mao) do
     if v.update then
       v:update(dt, self)
     end
@@ -61,19 +57,46 @@ function miu:update(dt)
       nirvana(self, i)
     end
     if v.y and v.sx then
-      v.sx = v.sx - H / (H + v.y)
+      -- v.sx = 1 - H / (H + v.y)
+      if v.hp then
+        local hpMax = v.hpMax or 100
+        v.sx = (v.y / self.gaia.height) * (v.hp/hpMax)
+      else
+        v.sx = v.y / self.gaia.height
+      end
       v.sy = v.sx
+    end
+    if v.mao then
+      self:ao(dt, v.mao)
+    end
+  end
+end
+
+function miu:update(dt)
+  local W,H = lg.getDimensions()
+  
+  -- life is suffering
+  self:ao(dt, self.mao)
+end
+
+-- ein augenblick (eyes symbol)
+function miu:now(mao)
+  -- draw ao
+  for i,v in ipairs(mao) do
+    if v.draw then
+      v:draw( )
+    end
+    if v.mao then
+      self:now(v.mao)
     end
   end
 end
 
 function miu:draw()
-  -- draw ao
-  for i,v in ipairs(self.mao) do
-    if v.draw then
-      v:draw(1, self)
-    end
-  end
+   miu:now(self.mao)
+
+  -- print
+  lg.print(#self.gaia.mao)
 end
 
 return miu

@@ -10,7 +10,7 @@ local random=love.math.random
 -- leaf color, branch color
 -- scale size of tree
 -- rate of growth
-local Tree = class(function(self, x, y, startDepth, leavesColor, branchColor, scale, rate, branchLimit, spread)
+local Tree = class(function(self, x, y, scale, growStage, growRate, branchColor, leafColor, branchLimit, spread)
   local W,H = lg.getDimensions()
   self.leafIndex = 1
   self.elapsedTime = 0
@@ -25,8 +25,8 @@ local Tree = class(function(self, x, y, startDepth, leavesColor, branchColor, sc
   self.x = x or 40
   self.y = y or H - 20
   self.spread = spread or 20
-  self.scale = scale or 1
-  self.rate = rate or .2
+  self.scale = scale or .5
+  self.rate = growRate or .2
   self.maxBranchWidth = 10 * self.scale
   -- store values for the most left x value and most right x value
   self.initX = self.x
@@ -37,11 +37,11 @@ local Tree = class(function(self, x, y, startDepth, leavesColor, branchColor, sc
     { self.x, self.y, self.x, self.y - 30 }
   }
  
-  self.startDepth = startDepth or 0
+  self.startDepth = 0
   self.branchLimit = branchLimit or 10
   self.drawLeaves = drawLeaves or true
   self.leavesColor = {
-    leavesColor or {.2,.6,.1}
+    leafColor or {.2,.6,.1}
   }
   self.startLeavesColor = self.leavesColor[1]
   self.branchColor = branchColor or {.7,.3,0.1}
@@ -104,12 +104,12 @@ end
 
 
 function Tree:draw()
-  local width = lg.getWidth()
+  local W = lg.getWidth()
   local leftLimit = self.rightX - self.x
   local rightLimit = self.leftX - self.x
 
   -- do not draw trees out of bound
-  if rightLimit < width and leftLimit > 0 then
+  if rightLimit < W and leftLimit > 0 then
     for i,b in ipairs(self.branches) do
       local x = b[1]
       lg.setColor(self.branchColor)
@@ -124,7 +124,7 @@ function Tree:draw()
         if self.leavesColor[i] ~= nil then
           lg.setColor(self.leavesColor[i])
         else
-          lg.setColor(self.startLeavesColor)
+          lg.setColor(self.leavesColor[1])
         end
         lg.rectangle( "fill", x + self.x, self.leaves[i][2], self.leaves[i][3], self.leaves[i][3] )
       end
@@ -181,9 +181,6 @@ end
 
 
 function Tree:update(dt)
-  local gameWidth = lg.getWidth()
-
-
   local l = #self.branches
   while(self.depth[l] < self.startDepth and l < self.branchLimit) do
     self:grow()
@@ -193,7 +190,6 @@ function Tree:update(dt)
     self:grow()
 		  self.elapsedTime = 0
 	end
-
 end
 
 return Tree

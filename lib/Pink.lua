@@ -14,6 +14,7 @@ local Pink=class(function(self, img, w, h, x, y, sx, sy)
   self.sx = sx or 1
   self.sy = sy or 1
   self.hp = 100
+  self.hpMax = 100
   self.speed = 3
   self.element = 'fire'
   self.walkSpeed = 3
@@ -103,10 +104,8 @@ function Pink:update(dt)
   for i,s in ipairs(self.shurikens) do
     s:update(dt)
   end
-  self:burnUp(.01)
-  
-  self.sx = self.hp / 100
-  self.sy = self.sx
+  self:burnUp(.1)
+
     
   self.speed = self.sx 
 end
