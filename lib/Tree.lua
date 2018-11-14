@@ -2,6 +2,7 @@ require 'class'
 
 local lg=love.graphics
 local random=love.math.random
+local deg_to_rad=math.pi/180
 
 -- x position, y position
 -- maximum branches
@@ -14,7 +15,6 @@ local Tree = class(function(self, x, y, scale, growStage, growRate, branchColor,
   local W,H = lg.getDimensions()
   self.leafIndex = 1
   self.elapsed = 0
-  self.deg_to_rad = math.pi / 180
   self.burn = false
   self.leaves = {}
   self.angle = { -90 }
@@ -53,8 +53,8 @@ function Tree:genBranch(index, depth, angle)
   local y1 = self.branches[index][4]
 
   angle = self.angle[index] + angle
-  local x2 = x1 + (math.cos(angle * self.deg_to_rad) * depth * self.branchWidth[length] * 4 * self.scale);
-  local y2 = y1 + (math.sin(angle * self.deg_to_rad) * depth * self.branchWidth[length] * 4 * self.scale);
+  local x2 = x1 + (math.cos(angle * deg_to_rad) * depth * self.branchWidth[length] * 4 * self.scale);
+  local y2 = y1 + (math.sin(angle * deg_to_rad) * depth * self.branchWidth[length] * 4 * self.scale);
 
 
   if x2 < self.leftX then
@@ -179,7 +179,7 @@ function Tree:draw()
         else
           lg.setColor(self.leavesColor[1])
         end
-        lg.rectangle( "fill", x + self.x, self.leaves[i][2], self.leaves[i][3], self.leaves[i][3] )
+        lg.rectangle( "fill", self.x + x, self.leaves[i][2], self.leaves[i][3], self.leaves[i][3] )
       end
     end
   end

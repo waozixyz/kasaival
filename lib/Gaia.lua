@@ -2,8 +2,10 @@ require 'class'
 
 local lg=love.graphics
 local random=love.math.random
+local plant=table.insert
 
-local Grass = require 'lib/Grass'
+
+local Seed = require 'lib/Seed'
 local Tree = require 'lib/Tree'
 
 local Gaia = class(function(self)
@@ -16,43 +18,40 @@ local Gaia = class(function(self)
   self.elapsed = 0
 end)
 
-function Gaia:addTree(...)
- table.insert(self.mao, Tree(...))
-end
-
-function rC(i,j)
-  return random(i,j) / 255
-end
-
-function genColor(r1, r2, g1, g2, b1, b2)
-  return {rC(r1,r2), rC(g1,g2), rC(b1,b2)}
-end
-
 function Gaia:addTrees(noOfTrees, growStage)
   for i = 1, noOfTrees do
     local x = random(self.x, self.width)
     local y = random(self.y, self.height)
-    local scale = y / self.height
-	   local branchColor = genColor(120,170,10,60,10,80)
-    local leafColor = genColor(0,60,120,200,0,60)
+    local scale = (y / self.height)*.5
+	   local branchColor =  {
+      random(3, 6)*.1,
+      random(3, 6)*.1,
+      random(3, 6)*.1
+    }
+    local leafColor = {
+      random(3, 6)*.1,
+      random(3, 6)*.1,
+      random(3, 6)*.1
+    }
     growStage = growStage or random(0,10)
 	   local growRate = random(1, 3)
     local branchLimit = random(20,120)
+    local branchWidth = random(1,4)
+    local spread = random(0, 10)
 
-    local spread = random(10, 20)
-
-    self:addTree(x, y, scale, growStage, growRate, branchColor, leafColor, branchLimit, spread)
+    plant(self.mao, Tree(x, y, scale, growStage, growRate, branchColor, leafColor, branchLimit, branchWidth, spread))
   end
 end
 
 function Gaia:load()
-  self:addTrees(34)
+  -- self:addTrees(34)
+  plant(self.mao, Seed())
 end
 
 function Gaia:update(dt)
   self.elapsed = self.elapsed + dt
   if self.elapsed > 1 then
-    self:addTrees(1, 0)
+    -- self:addTrees(1, 0)
     self.elapsed = 0
   end 
 end
