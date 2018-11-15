@@ -1,6 +1,5 @@
 require 'class'
 
-
 local Gaia = require 'lib/Gaia'
 local Ocean = require 'lib/Ocean'
 local Pink = require 'lib/Pink'

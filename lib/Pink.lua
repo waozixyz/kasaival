@@ -58,7 +58,7 @@ function Pink:move(dx,dy)
 end
 
 function Pink:attack(dx, dy)
-  if self.attackCharge > 99 then
+  if self.attackCharge > 1 then
     dx, dy = self:regulateSpeed(dx, dy, self.attackSpeed)
 
     table.insert(self.shurikens, Shuriken(self.x, self.y, dx, dy))
@@ -100,7 +100,7 @@ end
 
 function Pink:update(dt)
   self.animation:update(dt)
-  self.attackCharge = self.attackCharge + 3*dt
+  self.attackCharge = self.attackCharge + dt
   for i,s in ipairs(self.shurikens) do
     s:update(dt)
   end

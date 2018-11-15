@@ -1,4 +1,7 @@
 -- Kasaival
+
+-- with lyra you can go anywhere
+local lyra = require 'lyra'
 -- this is a start of a magical journey
 local miu = require 'miu'
 
@@ -7,6 +10,7 @@ local lg=love.graphics
 local lw=love.window
 local li=love.image
 
+local state=0
 -- yin and yang, there is no good and evil, there is a balance we can decide to try and reach, only through this balance can we try to escape certain cycles and achieve higher cycles. nirvana is our goal, yet is not for seeking, it is for being.
 -- be the flow, be yourself, be free
 local Pink, Cyan
@@ -32,26 +36,34 @@ function moveInArea(x, dx, min, max)
   return (x > min or dx > 0) and (x < max or dx < 0)
 end
 
+function loadState(x)
+  if x == 0 then
+    lyra:load()
+  elseif x == 1 then
+    local W,H = lg.getDimensions()
+    -- miuuuuu
+    miu = miu()
+    miu:load()
+
+    Pink = miu.pink
+    Cyan = miu.cyan
+
+    do -- joysticks
+      local x,y,r=W*0.85,H*0.75,64
+      local c1={.2,.1,.8,.5}
+      local c2={.8,.1,.2,.5}
+    
+      movePad=Joystick(W-x, y, r, c1)
+      attackPad=Joystick(x, y, r, c2)
+    end
+  end
+end
+
 
 -- load love
 function love.load()
   lw.setIcon(li.newImageData('icon.png'))
-  local W,H = lg.getDimensions()
-   -- miuuuuu
-  miu = miu()
-  miu:load()
-
-  Pink = miu.pink
-  Cyan = miu.cyan
-
-  do -- joysticks
-    local x,y,r=W*0.85,H*0.75,64
-    local c1={.2,.1,.8,.5}
-    local c2={.8,.1,.2,.5}
-    
-    movePad=Joystick(W-x, y, r, c1)
-    attackPad=Joystick(x, y, r, c2)
-  end
+  loadState(state)
 end
  
 function collision(pink, cyan)
@@ -70,50 +82,51 @@ end
 -- update love
 function love.update(dt)
   local W,H = lg.getDimensions()
-
-  movePad:update(dt)
-  do -- move Camera and Pink
-    local dx,dy = movePad.dx, movePad.dy
+  if state == 0 then
+    lyra:update()
+  elseif state == 1 then
+    local dx, dy
+    movePad:update(dt)
+    -- move Camera and Pink
+    dx,dy = movePad.dx, movePad.dy
     dx,dy = Pink:regulateSpeed(dx, dy)
-    if moveInArea(-Camera.x, dx, Cyan.base.x, Portal.x - W*.5) and moveInArea(Pink.x, -dx, W*.8 - Camera.x, W*.2 - Camera.x)
- then
-     Camera.x = Camera.x - dx
+    if moveInArea(-Camera.x, dx, Cyan.base.x, Portal.x - W*.5) and moveInArea(Pink.x, -dx, W*.8 - Camera.x, W*.2 - Camera.x) then
+      Camera.x = Camera.x - dx
     end
 
     Pink:move(dx,dy)
-  end
 
- 
-  do -- collisions
+    -- collisions
     local phb=Pink:getHitbox()
     local ohb=Cyan.base:getHitbox()
     if collision(phb, ohb) then
       Pink:defend(Cyan.base:attack(Pink))
     end
-  end
 
-  attackPad:update(dt)
-  do -- attack
-    local dx,dy = attackPad.dx, attackPad.dy
+    attackPad:update(dt)
+    -- attack
+    dx,dy = attackPad.dx, attackPad.dy
     if dx ~= 0 or dy ~= 0 then
       Pink:attack(dx, dy)
     end
- end
+    miu:update(dt)
+  end
 
   if love.keyboard.isDown('escape') then
     love.event.quit()
   end
-
-  miu:update(dt)
 end
 
 -- draw love
 function love.draw()
-  lg.translate(Camera.x, Camera.y)
-  lg.scale(Camera.scale) 
-  miu:draw()
-  lg.reset()
-   
-  movePad:draw()
-  attackPad:draw()
+  if state == 0 then
+    lyra:draw()
+  elseif state == 1 then
+    lg.translate(Camera.x, Camera.y)
+    lg.scale(Camera.scale) 
+    miu:draw()
+    lg.reset()
+    movePad:draw()
+    attackPad:draw()
+  end
 end
