@@ -6,7 +6,8 @@ function Menu:load(miu)
   self.miu = miu
   self.flames=lg.newImage('assets/menu.png')
   self.sun=lg.newImage('assets/sun_5.png')
-  self.backgroundColor = {.7,.3,.4}
+
+
 end
 
 function Menu:update(dt, miu, w, h)
