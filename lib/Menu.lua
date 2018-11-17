@@ -20,6 +20,16 @@ function Menu:load()
     local margin = 4
     table.insert(self.ui, Button(x, y, w, h, text, color, bckgColor, margin))
   end
+
+  do -- exit button
+    local w,h = 128,32
+    local x,y = self.w*.5-w,self.h*.8
+    local text = 'Evaporate'
+    local color = {0,.3,.7}
+    local bckgColor = {.5,.7,.7}
+    local margin = 4
+    table.insert(self.ui, Button(x, y, w, h, text, color, bckgColor, margin))
+  end
 end
 
 function Menu:update(dt, miu, w, h)
@@ -29,6 +39,8 @@ function Menu:update(dt, miu, w, h)
     if v.hit then
       if i == 1 then 
         state.newState = 1
+      elseif i == 2 then
+        love.event.quit()
       end
     end
   end

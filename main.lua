@@ -37,7 +37,7 @@ function moveInArea(x, dx, min, max)
   return (x > min or dx > 0) and (x < max or dx < 0)
 end
 
-local currentState = 1
+local currentState = 0
 function loadState(x)
   if x == 0 then
     lyra:load(x)
