@@ -1,5 +1,4 @@
-local Menu = require '/lib/Menu'
-
+local Menu = require 'lib/Menu'
 local lyra = {}
 
 local lg=love.graphics
@@ -14,7 +13,7 @@ function invThree(t)
   return {1-t[1],1-t[2],1-t[3] }
 end
 
-function lyra:load()
+function lyra:load(x)
   --self.backgroundColor = {.7,.3,.4} 
   self.bckgColor = three(0,4,.1)
 
@@ -23,7 +22,7 @@ function lyra:load()
   }
 
   self.ao = lg.newImage('alpega.png')
-  Menu:load(miu)
+  Menu:load(x)
 end
 
 function lyra:update(dt)
@@ -34,7 +33,7 @@ function lyra:update(dt)
   self.w = W - W*sf - W*.02
 end
 
-function calc(img, x, w, offy)
+function drawCalc(img, x, w, offy)
   local W,H = lg.getDimensions()
   local scale=w / img:getWidth() 
   local h=img:getHeight() * scale
@@ -53,9 +52,9 @@ function lyra:draw()
   Menu:draw()
   lg.setColor(invThree(self.bckgColor))
   for i,v in ipairs(self.apps) do
-    lg.draw(calc(v, self.x, self.w, i*self.w))
+    lg.draw(drawCalc(v, self.x, self.w, i*self.w))
   end
-  lg.draw(calc(self.ao, self.x, self.w))
+  lg.draw(drawCalc(self.ao, self.x, self.w))
 end
 
 return lyra

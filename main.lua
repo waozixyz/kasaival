@@ -4,13 +4,14 @@
 local lyra = require 'lyra'
 -- this is a start of a magical journey
 local miu = require 'miu'
+-- state
+local state = require 'state'
 
 -- aliases
 local lg=love.graphics
 local lw=love.window
 local li=love.image
 
-local state=0
 -- yin and yang, there is no good and evil, there is a balance we can decide to try and reach, only through this balance can we try to escape certain cycles and achieve higher cycles. nirvana is our goal, yet is not for seeking, it is for being.
 -- be the flow, be yourself, be free
 local Pink, Cyan
@@ -36,9 +37,11 @@ function moveInArea(x, dx, min, max)
   return (x > min or dx > 0) and (x < max or dx < 0)
 end
 
+local currentState = 1
 function loadState(x)
   if x == 0 then
-    lyra:load()
+    lyra:load(x)
+    currentState = 0
   elseif x == 1 then
     local W,H = lg.getDimensions()
     -- miuuuuu
@@ -56,14 +59,15 @@ function loadState(x)
       movePad=Joystick(W-x, y, r, c1)
       attackPad=Joystick(x, y, r, c2)
     end
+    currentState = 1
   end
 end
 
-
 -- load love
 function love.load()
+  state.newState = currentState
   lw.setIcon(li.newImageData('icon.png'))
-  loadState(state)
+  loadState(state.newState)
 end
  
 function collision(pink, cyan)
@@ -81,10 +85,13 @@ end
 
 -- update love
 function love.update(dt)
+  if state.newState ~= currentState then
+    loadState(state.newState)
+  end
   local W,H = lg.getDimensions()
-  if state == 0 then
+  if currentState == 0 then
     lyra:update()
-  elseif state == 1 then
+  elseif currentState == 1 then
     local dx, dy
     movePad:update(dt)
     -- move Camera and Pink
@@ -119,9 +126,9 @@ end
 
 -- draw love
 function love.draw()
-  if state == 0 then
+  if currentState == 0 then
     lyra:draw()
-  elseif state == 1 then
+  elseif currentState == 1 then
     lg.translate(Camera.x, Camera.y)
     lg.scale(Camera.scale) 
     miu:draw()
