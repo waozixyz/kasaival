@@ -60,15 +60,13 @@ end
 function Pink:attack(dx, dy)
   if self.attackCharge > 1 then
     dx, dy = self:regulateSpeed(dx, dy, self.attackSpeed)
-
-    table.insert(self.shurikens, Shuriken(self.x, self.y, dx, dy))
     
     local atkSpeed = self.attackSpeed
-    local x = self.x - self.w * .2
-    local y = self.y - self.h * .25
-    x = x + (dx / atkSpeed) * (self.w * .1)
-    y = y + (dy /atkSpeed) * (self.h  * .1)
- 
+    local px = self.x - self.w * .2
+    local py = self.y - self.h * .25
+    x = px + (dx / atkSpeed) * (self.w * .1)
+    y = py + (dy /atkSpeed) * (self.h  * .1)
+   table.insert(self.shurikens, Shuriken(x,  y, dx, dy))
     self.attackCharge = 0
   end
 end
@@ -106,7 +104,6 @@ function Pink:update(dt)
   end
   self:burnUp(.05)
 
-    
   self.speed = self.sx 
 end
 
