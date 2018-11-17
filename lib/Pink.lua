@@ -108,11 +108,12 @@ function Pink:update(dt)
 end
 
 function Pink:draw()
+  lg.setColor(1,.9,1,.95)
+  self.animation:draw(self.x, self.y, 0, self.sx, self.sy, self.w*.5, self.h-0)
+  lg.setColor(1,1,0)
   for i,s in ipairs(self.shurikens) do
     s:draw()
   end
-  lg.setColor(1,.9,1,.95)
-  self.animation:draw(self.x, self.y, 0, self.sx, self.sy, self.w*.5, self.h-0)
 end
 
 return Pink

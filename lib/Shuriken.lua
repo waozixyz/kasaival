@@ -23,7 +23,6 @@ function Shuriken:update()
 end
 
 function Shuriken:draw()
-  lg.setColor(1,1,1)
   lg.draw(self.img, self.x, self.y, 0, self.osx, self.sy)
 end
 
