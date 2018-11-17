@@ -10,6 +10,8 @@ local Cyan = require 'lib/Cyan'
 local lg=love.graphics
 -- go to nirvana
 local nirvana = table.remove
+-- bring mao to life
+local dharma = table.insert
 
 -- For Planet Miu a miu!
 local miu = class(function(self)
@@ -30,35 +32,52 @@ local miu = class(function(self)
   self.cyan = Cyan()
   self.cyan.base = Ocean
 
-  -- bring mao to life
-  local dharma = table.insert
-  -- throw to dharma
-  dharma(mao, self.gaia)
-  dharma(mao, self.pink)
-  dharma(mao, self.cyan)
 
-  self.mao = mao
 end)
 
-function miu:paradox(mao)
- -- load ao
+function miu:toMao(mao)
   for i,v in ipairs(mao) do
-    if v.load then
-      v:load()
+    if v.mao then
+      self:toMao(v.mao)
     end
-     if v.mao then
-      self:paradox(v.mao)
-    end
+    table.insert(self.mao, v)
   end
 end
 
 
 function miu:load()
-  -- i'm confused
-  self:paradox(self.mao)
+  self.mao = {}
+  self:toMao({self.gaia, self.pink, self.cyan})
+ 
+  
+  for i,v in ipairs(self.mao) do
+    if v.load then
+      v:load()
+    end
+  end
 end
 
 function miu:ao(dt, mao)
+  -- sort ao
+  local tmp
+  local actions = 1
+  while actions > 0 do
+    local a = 0
+    local i = 1
+    while i < #mao - 1 do
+      local tmp
+      if mao[i].y > mao[i+1].y then
+        a = a + 1
+        tmp=mao[i+1]
+        mao[i+1]=mao[i]
+        mao[i]=tmp
+      end
+      i = i + 2
+    end
+    actions = a
+  end
+        
+
   -- update ao
   for i,v in ipairs(mao) do
     if v.update then
@@ -77,9 +96,6 @@ function miu:ao(dt, mao)
         v.sx = v.y / self.ground.height
       end
       v.sy = v.sx
-    end
-    if v.mao then
-      self:ao(dt, v.mao)
     end
   end
 end
