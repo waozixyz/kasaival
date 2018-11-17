@@ -1,7 +1,7 @@
 require 'class'
 
 
-
+local Gaia = require 'lib/Gaia'
 local Ocean = require 'lib/Ocean'
 local Pink = require 'lib/Pink'
 local Cyan = require 'lib/Cyan'
@@ -20,7 +20,8 @@ local miu = class(function(self)
       v:load(self)
     end
   end
-  
+  -- load gaia
+  self.gaia = Gaia()
   self.ground = {}
   self.ground.height = 400
   -- load harmony
@@ -32,6 +33,7 @@ local miu = class(function(self)
   -- bring mao to life
   local dharma = table.insert
   -- throw to dharma
+  dharma(mao, self.gaia)
   dharma(mao, self.pink)
   dharma(mao, self.cyan)
 
@@ -104,6 +106,7 @@ end
 
 function miu:draw()
    miu:now(self.mao)
+
   
 end
 
