@@ -1,6 +1,7 @@
 require 'class'
 
-local Gaia = require 'lib/Gaia'
+
+
 local Ocean = require 'lib/Ocean'
 local Pink = require 'lib/Pink'
 local Cyan = require 'lib/Cyan'
@@ -19,9 +20,9 @@ local miu = class(function(self)
       v:load(self)
     end
   end
-  -- load gaia
-  self.gaia = Gaia()
-
+  
+  self.ground = {}
+  self.ground.height = 400
   -- load harmony
   local W,H = lg.getDimensions()
   self.pink = Pink('assets/flame_1.png', 128, 256, W*.5, H*.5, 1, 1)
@@ -31,7 +32,6 @@ local miu = class(function(self)
   -- bring mao to life
   local dharma = table.insert
   -- throw to dharma
-  dharma(mao, self.gaia)
   dharma(mao, self.pink)
   dharma(mao, self.cyan)
 
@@ -70,9 +70,9 @@ function miu:ao(dt, mao)
       -- v.sx = 1 - H / (H + v.y)
       if v.hp then
         local hpMax = v.hpMax or 100
-        v.sx = (v.y / self.gaia.height) * (v.hp/hpMax)
+        v.sx = (v.y / self.ground.height) * (v.hp/hpMax)
       else
-        v.sx = v.y / self.gaia.height
+        v.sx = v.y / self.ground.height
       end
       v.sy = v.sx
     end
@@ -104,9 +104,6 @@ end
 
 function miu:draw()
    miu:now(self.mao)
-
-  -- print
-  lg.print(#self.gaia.mao)
   
 end
 
