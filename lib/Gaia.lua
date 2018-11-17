@@ -4,7 +4,7 @@ local lg=love.graphics
 local random=love.math.random
 local plant=table.insert
 
-
+local Sky = require 'lib/Sky'
 local Seed = require 'lib/Seed'
 local Tree = require 'lib/Tree'
 
@@ -46,6 +46,7 @@ end
 function Gaia:load()
   -- self:addTrees(34)
   plant(self.mao, Seed())
+  plant(self.mao, Sky())
 end
 
 function Gaia:update(dt)
