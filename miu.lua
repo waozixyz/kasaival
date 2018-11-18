@@ -51,39 +51,39 @@ end
 
 function miu:load()
   local s=self
-  self:dharma({s.gaia,s.pink,s.cyan})
+  self:dharma({s.gaia})
+end
+
+function miu:sort(ao, i)
+  local tmp
+  if ao[i].y > ao[i+1].y then 
+    tmp=ao[i+1]
+    ao[i+1]=ao[i]
+    ao[i]=tmp
+    if i > 1 then
+      self:sort(ao, i-1)
+    end
+  end
+  return ao
 end
 
 function miu:update(dt)
   local W,H = lg.getDimensions()
-  local mao = self.mao
-    -- sort ao
-  local tmp
-  local j=true
-  while j do
-    j=false
-    local i=1
-    while i < #mao - 1 do
-      local tmp
-      if mao[i].y > mao[i+1].y then
-        j=true
-        tmp=mao[i+1]
-        mao[i+1]=mao[i]
-        mao[i]=tmp
-      end
-      i = i + 1
-    end
-  end
-        
+  local ao = self.mao
+
+  -- sort ao
+  for i=1,#ao-1 do
+    ao = self:sort(ao,i)
+  end      
 
   -- update ao
-  for i,v in ipairs(mao) do
+  for i,v in ipairs(ao) do
     if v.update then
       v:update(dt, self)
     end
     if v.hp and v.hp <= 0 then
       -- lettin go
-      nirvana(mao, i)
+      nirvana(ao, i)
     end
     if v.y and v.sx then
       -- v.sx = 1 - H / (H + v.y)
