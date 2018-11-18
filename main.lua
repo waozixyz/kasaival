@@ -4,39 +4,9 @@ require 'fun'()
 local lyra = require 'lyra'
 -- state
 local state = require 'state'
-
 -- this is a start of a magical journey
 local Miu = require 'lib/Miu'
 
--- aliases
-local lg=love.graphics
-local lw=love.window
-local li=love.image
-
--- yin and yang, there is no good and evil, there is a balance we can decide to try and reach, only through this balance can we try to escape certain cycles and achieve higher cycles. nirvana is our goal, yet is not for seeking, it is for being.
--- be the flow, be yourself, be free
-local Pink, Cyan
-
--- Only through the portal can we get an updatte to the game
-local Portal = {
-  x = 2000
-}
-
--- Joysticks
-local Joystick = require 'lib/Joystick'
-local movePad, attackPad
-
-
--- Camera
-local Camera = {
-  x = 0,
-  y = 0,
-  scale = 1,
-}
-
-function moveInArea(x, dx, min, max)
-  return (x > min or dx > 0) and (x < max or dx < 0)
-end
 
 local currentState = 1
 function loadState(x)
@@ -44,26 +14,14 @@ function loadState(x)
     lyra:load(x)
     currentState = 0
   elseif x == 1 then
-    local W,H = lg.getDimensions()
     -- miuuuuu
     Miu = Miu()
     Miu:load()
-
-    Pink = Miu.Pink
-    Cyan = Miu.Cyan
-
-    do -- joysticks
-      local x,y,r=W*0.85,H*0.75,64
-      local c1={.2,.1,.8,.5}
-      local c2={.8,.1,.2,.5}
-    
-      movePad=Joystick(W-x, y, r, c1)
-      attackPad=Joystick(x, y, r, c2)
-    end
     currentState = 1
   end
 end
-
+local lw=love.window
+local li=love.image
 -- load love
 function love.load()
   state.newState = currentState
@@ -71,52 +29,15 @@ function love.load()
   loadState(state.newState)
 end
  
-function collision(pink, cyan)
-  local flag = false
-  if #pink % 2 == 1 then return end
-  
-  if pink[1] < cyan[2] and pink[2] > cyan[1] then
-      flag = true
-    else
-      flag = false
-    end
-   
-  return flag
-end
-
 -- update love
 function love.update(dt)
   if state.newState ~= currentState then
     loadState(state.newState)
   end
-  local W,H = lg.getDimensions()
+ 
   if currentState == 0 then
     lyra:update()
   elseif currentState == 1 then
-    local dx, dy
-    movePad:update(dt)
-    -- move Camera and Pink
-    dx,dy = movePad.dx, movePad.dy
-    dx,dy = Pink:regulateSpeed(dx, dy)
-    if moveInArea(-Camera.x, dx, Cyan.base.x, Portal.x - W*.5) and moveInArea(Pink.x, -dx, W*.8 - Camera.x, W*.2 - Camera.x) then
-      Camera.x = Camera.x - dx
-    end
-
-    Pink:move(dx,dy)
-
-    -- collisions
-    local phb=Pink:getHitbox()
-    local ohb=Cyan.base:getHitbox()
-    if collision(phb, ohb) then
-      Pink:defend(Cyan.base:attack(Pink))
-    end
-
-    attackPad:update(dt)
-    -- attack
-    dx,dy = attackPad.dx, attackPad.dy
-    if dx ~= 0 or dy ~= 0 then
-      Pink:attack(dx, dy)
-    end
     Miu:update(dt)
   end
 
@@ -130,11 +51,6 @@ function love.draw()
   if currentState == 0 then
     lyra:draw()
   elseif currentState == 1 then
-    lg.translate(Camera.x, Camera.y)
-    lg.scale(Camera.scale) 
     Miu:draw()
-    lg.reset()
-    movePad:draw()
-    attackPad:draw()
   end
 end
