@@ -2,10 +2,11 @@
 
 -- with lyra you can go anywhere
 local lyra = require 'lyra'
--- this is a start of a magical journey
-local miu = require 'miu'
 -- state
 local state = require 'state'
+
+-- this is a start of a magical journey
+local Miu = require 'lib/Miu'
 
 -- aliases
 local lg=love.graphics
@@ -45,11 +46,11 @@ function loadState(x)
   elseif x == 1 then
     local W,H = lg.getDimensions()
     -- miuuuuu
-    miu = miu()
-    miu:load()
+    Miu = Miu()
+    Miu:load()
 
-    Pink = miu.pink
-    Cyan = miu.cyan
+    Pink = Miu.Pink
+    Cyan = Miu.Cyan
 
     do -- joysticks
       local x,y,r=W*0.85,H*0.75,64
@@ -116,7 +117,7 @@ function love.update(dt)
     if dx ~= 0 or dy ~= 0 then
       Pink:attack(dx, dy)
     end
-    miu:update(dt)
+    Miu:update(dt)
   end
 
   if love.keyboard.isDown('escape') then
@@ -131,7 +132,7 @@ function love.draw()
   elseif currentState == 1 then
     lg.translate(Camera.x, Camera.y)
     lg.scale(Camera.scale) 
-    miu:draw()
+    Miu:draw()
     lg.reset()
     movePad:draw()
     attackPad:draw()
