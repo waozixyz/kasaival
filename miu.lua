@@ -32,49 +32,47 @@ local miu = class(function(self)
   self.cyan = Cyan()
   self.cyan.base = Ocean
 
-
+  self.mao = {}
 end)
 
-function miu:toMao(mao)
-  for i,v in ipairs(mao) do
-    if v.mao then
-      self:toMao(v.mao)
-    end
-    table.insert(self.mao, v)
-  end
-end
-
-
-function miu:load()
-  self.mao = {}
-  self:toMao({self.gaia, self.pink, self.cyan})
- 
-  
-  for i,v in ipairs(self.mao) do
+function miu:dharma(t)
+  for i,v in ipairs(t) do
+    table.insert(self.mao,v)
     if v.load then
       v:load()
     end
+    if v.mao then
+      self:dharma(v.mao)
+    end
   end
 end
 
-function miu:ao(dt, mao)
-  -- sort ao
+
+
+function miu:load()
+  local s=self
+  self:dharma({s.gaia,s.pink,s.cyan})
+end
+
+function miu:update(dt)
+  local W,H = lg.getDimensions()
+  local mao = self.mao
+    -- sort ao
   local tmp
-  local actions = 1
-  while actions > 0 do
-    local a = 0
-    local i = 1
+  local j=true
+  while j do
+    j=false
+    local i=1
     while i < #mao - 1 do
       local tmp
       if mao[i].y > mao[i+1].y then
-        a = a + 1
+        j=true
         tmp=mao[i+1]
         mao[i+1]=mao[i]
         mao[i]=tmp
       end
-      i = i + 2
+      i = i + 1
     end
-    actions = a
   end
         
 
@@ -100,30 +98,23 @@ function miu:ao(dt, mao)
   end
 end
 
-function miu:update(dt)
-  local W,H = lg.getDimensions()
-  
-  -- life is suffering
-  self:ao(dt, self.mao)
-end
-
--- ein augenblick (eyes symbol)
-function miu:now(mao)
-  -- draw ao
-  for i,v in ipairs(mao) do
+function miu:draw() 
+ for i,v in ipairs(self.mao) do
     if v.draw then
-      v:draw( )
-    end
-    if v.mao then
-      self:now(v.mao)
+      v:draw()
     end
   end
-end
 
-function miu:draw()
-   miu:now(self.mao)
+  lg.print(self.mao[1].y, 0, 0)
+  lg.print(self.mao[1].label, 0, 30)
 
-  
+
+  lg.print(self.mao[2].y, 40, 0)
+  lg.print(self.mao[2].label, 40, 30)
+
+
+  lg.print(self.mao[3].y, 80, 0)
+  lg.print(self.mao[3].label, 80 , 30)
 end
 
 return miu

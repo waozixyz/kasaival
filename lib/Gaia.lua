@@ -9,6 +9,7 @@ local Seed = require 'lib/Seed'
 local Tree = require 'lib/Tree'
 
 local Gaia = class(function(self)
+  self.label='gaia'
   self.x = -2000
   self.y = 200
   self.width = 4000

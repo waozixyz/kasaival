@@ -5,7 +5,7 @@ local Shuriken = require('lib/Shuriken')
 
 local Pink=class(function(self, img, w, h, x, y, sx, sy)
   local W,H = lg.getDimensions()
-
+  self.label='pink'
   self.img = img or 'assets/player.png'
   self.w = w or 64
   self.h = h or 128

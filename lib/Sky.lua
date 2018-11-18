@@ -7,10 +7,11 @@ local rand=love.math.random
 local portal=table.insert
 
 local Sky = class(function(self)
+  self.label='sky'
   self.x = -1000
   self.y = -1000
   self.width = 2000
-  self.height = 200
+  self.height = 2000
   self.stardust = {}
   for i=1, 100 do
     local img = lg.newImage('assets/sky/' .. (i % 11 + 1 ) .. '.png')

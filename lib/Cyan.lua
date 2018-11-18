@@ -4,6 +4,7 @@ local Blob = require 'lib/Blob'
 local random=love.math.random
 
 Cyan=class(function(self)
+  self.id='cyan'
   self.objs = {}
 
   for i = 1, 2 do

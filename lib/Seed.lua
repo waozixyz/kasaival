@@ -46,13 +46,19 @@ end
 
 local Seed = class(function(self, x, y, dna,  hp, xp, level)
   local W,H = lg.getDimensions()
-  self.x = x or W*.5
-  self.y = y or H*.5
+  self.x = x or W*.6
+  self.y = y or H*.6
   self.growRate=2  
   self.color=rThree(2,4,2,4,2,4,.1)
   self.hp = hp or 100
   self.xp = xp or 0
   self.level = level or 0
+
+  self.label='seed'
+  self.elapsed = 0
+
+  self.lines = {}
+  self.shapes = {}
 end)
 
 function Seed:grow()
@@ -75,13 +81,6 @@ function Seed:grow()
   end
 end
 
-
-function Seed:load()
-  self.elapsed = 0
-
-  self.lines = {}
-  self.shapes = {}
-end
 
 
 function Seed:update(dt)
