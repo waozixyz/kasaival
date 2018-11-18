@@ -4,7 +4,6 @@ local Blob = require 'lib/Blob'
 local random=love.math.random
 
 Cyan=class(function(self)
-  self.id='cyan'
   self.objs = {}
 
   for i = 1, 2 do
@@ -14,14 +13,14 @@ Cyan=class(function(self)
   end 
 end)
 
-function Cyan:update(dt, miu)
+function Cyan:update(dt, Miu)
   for i, v in ipairs(self.objs) do
     v:update(dt)
     if v.hp <= 0 then
       table.remove(self.objs, i)
     end
 
-    v:follow(miu.pink, 2000)
+    v:follow(Miu.Pink, 2000)
 
   end
 end

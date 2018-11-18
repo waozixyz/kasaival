@@ -1,5 +1,5 @@
 -- Kasaival
-
+require 'fun'() 
 -- with lyra you can go anywhere
 local lyra = require 'lyra'
 -- state

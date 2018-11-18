@@ -1,3 +1,9 @@
+--[[
+Miu Planet (Amy, Pink)
+
+todo:
+ + add joystick
+]]--
 require 'class'
 
 local Gaia = require 'lib/Gaia'
@@ -13,10 +19,7 @@ local nirvana = table.remove
 local dharma = table.insert
 
 local Miu = class(function(self)
-  self.ground = {}
-  self.ground.y = 00
-  self.ground.h = 400
-
+  
   -- add gaia
   self.Gaia = Gaia()
 
@@ -27,6 +30,8 @@ local Miu = class(function(self)
   self.Cyan.base = Ocean
 
   self.mao = {}
+  -- visible mao's
+  self.ao = {}
 end)
 
 function Miu:dharma(t)
@@ -44,33 +49,15 @@ end
 
 function Miu:load()
   local s=self
-  self:dharma({s.Gaia})
-end
-
-function Miu:sort(ao, i)
-  local tmp
-  if ao[i].y > ao[i+1].y then 
-    tmp=ao[i+1]
-    ao[i+1]=ao[i]
-    ao[i]=tmp
-    if i > 1 then
-      self:sort(ao, i-1)
-    end
-  end
-  return ao
+  self:dharma({s.Gaia,s.Pink,s.Cyan}) 
+  self.Ground = self.Gaia.Ground
 end
 
 function Miu:update(dt)
   local W,H = lg.getDimensions()
-  local ao = self.mao
 
-  -- sort ao
-  for i=1,#ao-1 do
-    ao = self:sort(ao,i)
-  end      
-
-  -- update ao
-  for i,v in ipairs(ao) do
+  -- update mao
+  for i,v in ipairs(self.mao) do
     if v.update then
       v:update(dt, self)
     end
@@ -82,32 +69,63 @@ function Miu:update(dt)
       -- v.sx = 1 - H / (H + v.y)
       if v.hp then
         local hpMax = v.hpMax or 100
-        v.sx = (v.y / self.ground.height) * (v.hp/hpMax)
+        v.sx = (v.y / self.Ground.h) * (v.hp/hpMax)
       else
-        v.sx = v.y / self.ground.height
+        v.sx = v.y / self.Ground.h
       end
       v.sy = v.sx
     end
   end
 end
 
-function Miu:draw() 
- for i,v in ipairs(self.mao) do
-    if v.draw then
-      v:draw()
+function getIndex(obj, options)
+  for i,k in ipairs(options) do
+    if obj[k] == nil then
+      return i-1
     end
   end
+  return #options
+end
 
-  lg.print(self.mao[1].y, 0, 0)
-  lg.print(self.mao[1].label, 0, 30)
+function Miu:sort(ao, i)
+  local tmp
+  local a = ao[i].y or -9999
+  local b = ao[i+1].y or -9999
+  if a > b then 
+    tmp=ao[i+1]
+    ao[i+1]=ao[i]
+    ao[i]=tmp
+    if i > 1 then
+      self:sort(ao, i-1)
+    end
+  end
+  return ao
+end
 
+function Miu:eye(m)
+  local W,H=lg.getDimensions()
+  local ao = {}
+  for i,v in ipairs(m) do
+    if v.draw then
+      if v.x and v.y then
+        if v.x > 0 and v.x < W and v.y > 0 and v.y < H then
+          table.insert(ao,v)
+        end
+      else
+        table.insert(ao,v)
+      end
+    end
+  end 
+  return ao
+end
 
-  lg.print(self.mao[2].y, 40, 0)
-  lg.print(self.mao[2].label, 40, 30)
+function Miu:draw() 
+  local ao = Miu:eye(self.mao)
 
-
-  lg.print(self.mao[3].y, 80, 0)
-  lg.print(self.mao[3].label, 80 , 30)
+  for i,v in ipairs(ao) do
+    v:draw()
+    lg.print(#ao)
+  end
 end
 
 return Miu

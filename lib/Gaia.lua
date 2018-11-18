@@ -7,13 +7,10 @@ local plant=table.insert
 local Sky = require 'lib/Sky'
 local Seed = require 'lib/Seed'
 local Tree = require 'lib/Tree'
+local Ground = require 'lib/Ground'
 
 local Gaia = class(function(self)
   self.label='gaia'
-  self.x = -2000
-  self.y = 200
-  self.width = 4000
-  self.height = 400
   self.color = {0.2, 0.4, 0.3}
   self.mao = {}
   self.elapsed = 0
@@ -46,21 +43,18 @@ end
 
 function Gaia:load()
   -- self:addTrees(34)
-  plant(self.mao, Seed())
-  plant(self.mao, Sky())
+  self.Ground = Ground()
+  plant(self.mao, self.Ground)
+ -- plant(self.mao, Seed())
+ -- plant(self.mao, Sky())
 end
-
+--[[--
 function Gaia:update(dt)
   self.elapsed = self.elapsed + dt
   if self.elapsed > 1 then
     -- self:addTrees(1, 0)
     self.elapsed = 0
   end 
-end
-
-function Gaia:draw()
-  lg.setColor(self.color)
-  lg.rectangle('fill', self.x, self.y, self.width, self.height)
-end
+end]]--
 
 return Gaia
