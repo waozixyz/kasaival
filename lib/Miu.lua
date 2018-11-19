@@ -129,7 +129,7 @@ function Miu:update(dt)
     end
     if v.hp and v.hp <= 0 then
       -- lettin go
-      nirvana(ao, i)
+      nirvana(self.mao, i)
     end
     if v.y and v.sx then
       -- v.sx = 1 - H / (H + v.y)
@@ -168,13 +168,23 @@ function Miu:sort(ao, i)
   return ao
 end
 
-function Miu:eye(m)
+function Miu:eye(m, offsetX, offsetY)
+  local x,y = offsetX or 0
+  local y = offsetY or 0
   local W,H=lg.getDimensions()
   local ao = {}
+ 
   for i,v in ipairs(m) do
     if v.draw then
+      local offX,offY = 0,0
+      if v.w then
+        offX = v.w
+      end
+      if v.h then
+        offY = v.h
+      end
       if v.x and v.y then
-        if v.x > 0 and v.x < W and v.y > 0 and v.y < H then
+        if v.x >= x-offX and v.x <= x+W+offX and v.y >= y-offY and v.y <= y+H+offY then
           table.insert(ao,v)
         end
       else
@@ -184,18 +194,20 @@ function Miu:eye(m)
   end 
   return ao
 end
-
+local lastX
 function Miu:draw() 
   lg.translate(Camera.x, Camera.y)
   lg.scale(Camera.scale) 
-    
-  local ao = Miu:eye(self.mao)
-
-  for i,v in ipairs(ao) do
-    v:draw()
-    lg.print(#ao)
+  if lastX ~= Camera.x then
+    self.ao = Miu:eye(self.mao, -Camera.x)
+    lastX = Camera.x
   end
+  for i,v in ipairs(self.ao) do
+    v:draw()
 
+  end
+  lg.print(#self.ao, -Camera.x)
+  lg.print(#self.mao, -Camera.x, 20)
   lg.reset()
   movePad:draw()
   attackPad:draw()

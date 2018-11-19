@@ -15,31 +15,24 @@ function Ground:addTile(shape,color)
 end
 
 function Ground:loadTiles()
-	local t, shape
-	local x = 0
-	local y = 200
-	local offset = {}
-	local scale = 1
+	 local color,shape
+ 	local scale = 1
+  local w,h = 32,32
 
-	while y < self.w do
-		scale = y / 200 
-		offset.y = y
-		while x < self.w do
-			offset.x = x - 16
-   
-   color={.2,.2,.6}
-			shape = {offset.x, offset.y, offset.x + 32*scale, offset.y, offset.x + 16*scale, offset.y + 32*scale}
-	self:addTile(shape,color)
- 
-   color={.6,.6,.2}
-			shape = {offset.x + 16 * scale, offset.y + 32*scale, offset.x + 48*scale, offset.y + 32*scale, offset.x + 32*scale, offset.y}
-		self:addTile(shape,color)
-			
-
-			x = x + 32*scale
+ 	local y = self.y
+	 while y < self.h do
+    local x = self.x
+		  while x < self.w do
+		    scale = y / 400
+      color={.2,.3,.6}
+	    	shape = {x, y, x + w*scale, y, x + 16*scale, y + h*scale}
+	     self:addTile(shape,color,w,h)
+      color={.2,.6,.2}
+			   shape = {x + 16 * scale, y + h*scale, x + (w+16)*scale, y + h*scale, x + w*scale, y}
+		    self:addTile(shape,color,w,h)
+		    x = x + w*scale
 		end
-		x = 0
-		y = y + 32*scale
+	 y = y + h*scale
 	end
 end
 
