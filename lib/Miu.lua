@@ -33,6 +33,7 @@ local movePad, attackPad
 local Camera = {
   x = 0,
   y = 0,
+  prevX=-9999,
   scale = 1,
 }
 
@@ -41,7 +42,6 @@ function moveInArea(x, dx, min, max)
 end
 
 local Miu = class(function(self)
-  
   -- add gaia
   self.Gaia = Gaia()
 
@@ -54,6 +54,8 @@ local Miu = class(function(self)
   self.mao = {}
   -- visible mao's
   self.ao = {}
+  -- collidaes
+  self.dao = {}
 end)
 
 function Miu:dharma(t)
@@ -84,6 +86,7 @@ function Miu:load()
     attackPad=Joystick(x, y, r, c2)
   end
 end
+
 function collision(pink, cyan)
   local flag = false
   if #pink % 2 == 1 then return end
@@ -96,8 +99,54 @@ function collision(pink, cyan)
    
   return flag
 end
+
+function Miu:eye(m, offsetX, offsetY)
+  local x,y = offsetX or 0
+  local y = offsetY or 0
+  local W,H=lg.getDimensions()
+  local ao = {}
+ 
+  for i,v in ipairs(m) do
+    if v.draw then
+      local offX,offY = 0,0
+      if v.w then
+        offX = v.w
+      end
+      if v.h then
+        offY = v.h
+      end
+      if v.x and v.y then
+        if v.x >= x-offX and v.x <= x+W+offX and v.y >= y-offY and v.y <= y+H+offY then
+          table.insert(ao,v)
+        end
+      else
+        table.insert(ao,v)
+      end
+    end
+  end 
+  return ao
+end
+
+
+
 function Miu:update(dt)
-  local Pink,Cyan =self.Pink,self.Cyan
+  local Pink,Cyan=self.Pink,self.Cyan
+  local Ground=self.Ground
+
+  if Camera.prevX ~= Camera.x then
+    self.ao = Miu:eye(self.mao, -Camera.x)
+    Camera.prevX = Camera.x
+  end
+  self.ao = lume.sort(self.ao, 'y')
+ 
+  self.coli = lume.collision(Pink, Ground.mao)
+  if #self.coli > 0 then
+    for i,c in ipairs(self.coli) do
+      Pink:collide(c)
+      c:collide(Pink)
+    end
+  end
+  
   local W,H = lg.getDimensions()
  
   local dx, dy
@@ -112,11 +161,11 @@ function Miu:update(dt)
   Pink:move(dx,dy)
 
   -- collisions
-  local phb=Pink:getHitbox()
+  --local phb=Pink:getHitbox()
   local ohb=Cyan.base:getHitbox()
-  if collision(phb, ohb) then
-    Pink:defend(Cyan.base:attack(Pink))
-  end
+ --if collision(phb, ohb) then
+ --   Pink:defend(Cyan.base:attack(Pink))
+  --end
 
   attackPad:update(dt)
   -- attack
@@ -155,66 +204,18 @@ function getIndex(obj, options)
   return #options
 end
 
-function Miu:sort(ao, i)
-  local tmp
-  local a = ao[i].y or -9999
-  local b = ao[i+1].y or -9999
-  if a > b then 
-    tmp=ao[i+1]
-    ao[i+1]=ao[i]
-    ao[i]=tmp
-    if i > 1 then
-      self:sort(ao, i-1)
-    end
-  end
-  return ao
-end
 
-function Miu:eye(m, offsetX, offsetY)
-  local x,y = offsetX or 0
-  local y = offsetY or 0
-  local W,H=lg.getDimensions()
-  local ao = {}
- 
-  for i,v in ipairs(m) do
-    if v.draw then
-      local offX,offY = 0,0
-      if v.w then
-        offX = v.w
-      end
-      if v.h then
-        offY = v.h
-      end
-      if v.x and v.y then
-        if v.x >= x-offX and v.x <= x+W+offX and v.y >= y-offY and v.y <= y+H+offY then
-          table.insert(ao,v)
-        end
-      else
-        table.insert(ao,v)
-      end
-    end
-  end 
-  return ao
-end
-local lastX
 function Miu:draw() 
   lg.translate(Camera.x, Camera.y)
   lg.scale(Camera.scale) 
-  if lastX ~= Camera.x then
-    self.ao = Miu:eye(self.mao, -Camera.x)
-    lastX = Camera.x
-  end
-  self.ao = lume.sort(self.ao, 'y')
   for i,v in ipairs(self.ao) do
     v:draw()
-
   end
   lg.print(#self.ao, -Camera.x)
-  lg.print(#self.mao, -Camera.x, 20)
+  lg.print(#self.coli, -Camera.x, 20)
   lg.reset()
   movePad:draw()
   attackPad:draw()
-
 end
 
 return Miu

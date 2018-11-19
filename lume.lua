@@ -76,8 +76,21 @@ local iteratee = function(x)
   end
   return function(z) return z[x] end
 end
-
-
+--[[ tasks available
+check table
+only check tiles close to player
+]]--
+function lume.collision(a,b)
+  local t = {}
+  ha = a:getHitbox()
+  for i,v in ipairs(b) do
+   ht = v:getHitbox()
+   if ha[1] < ht[2] and ha[2] > ht[1] and ha[3] < ht[4] and ha[4] > ht[4] then
+     table.insert(t, v)
+   end
+  end
+  return t
+end
 
 function lume.clamp(x, min, max)
   return x < min and min or (x > max and max or x)

@@ -71,13 +71,19 @@ function Pink:attack(dx, dy)
   end
 end
 
-
+function Pink:collide(o)
+  if o.element == 'plant' then
+    self.hp = self.hp + .01
+  elseif o.element == 'water' then
+    self.hp = self.hp - .01
+  end
+end
 function Pink:getHitbox()
   local t = {}
-  t[1] = self.x + self.w * 0.5
-  t[2] = self.x - self.w * 0.5
-  t[3] = self.h - 20
-  t[4] = self.h
+  t[1] = self.x - self.w * .2
+  t[2] = self.x + self.w * .2
+  t[3] = self.y
+  t[4] = self.y + self.h*.2
   return t
 end
 
@@ -109,7 +115,7 @@ end
 
 function Pink:draw()
   lg.setColor(1,.9,1,.95)
-  self.animation:draw(self.x, self.y, 0, self.sx, self.sy, self.w*.5, self.h-0)
+  self.animation:draw(self.x, self.y, 0, self.sx, self.sy, self.w*.5, self.h)
   lg.setColor(1,1,0)
   for i,s in ipairs(self.shurikens) do
     s:draw()
