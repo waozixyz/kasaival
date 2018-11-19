@@ -3,6 +3,8 @@ Miu Planet (Amy, Pink)
 ]]--
 
 require 'class'
+local lume = require 'lume'
+
 
 local Gaia = require 'lib/Gaia'
 local Ocean = require 'lib/Ocean'
@@ -202,6 +204,7 @@ function Miu:draw()
     self.ao = Miu:eye(self.mao, -Camera.x)
     lastX = Camera.x
   end
+  self.ao = lume.sort(self.ao, 'y')
   for i,v in ipairs(self.ao) do
     v:draw()
 
