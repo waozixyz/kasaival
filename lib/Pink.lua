@@ -73,7 +73,7 @@ end
 
 function Pink:collide(o)
   if o.element == 'plant' then
-    self.hp = self.hp + .01
+    self.hp = self.hp + .001
   elseif o.element == 'water' then
     self.hp = self.hp - .01
   end
@@ -83,7 +83,7 @@ function Pink:getHitbox()
   t[1] = self.x - self.w * .2
   t[2] = self.x + self.w * .2
   t[3] = self.y
-  t[4] = self.y + self.h*.2
+  t[4] = self.y + self.h * .2
   return t
 end
 
