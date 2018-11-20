@@ -12,8 +12,8 @@ local Ground = class(function(self, x, y, w, h)
   self.mao = {}
 end)
 
-function Ground:addTile(shape,color)
-  local t = Tile(shape,color)
+function Ground:addTile(shape,r,g,b)
+  local t = Tile(shape,r,g,b)
   table.insert(self.mao, t)
 end
 
@@ -27,9 +27,8 @@ function Ground:load()
     local x = self.x
 		  while x < self.w do
 		    scale = y / 400 
-      color={.2,.6,.2}
 			   shape = {x + 16 * scale, y + h*scale, x + (w+16)*scale, y + h*scale, x + w*scale, y}
-		    self:addTile(shape,color,w,h)
+		    self:addTile(shape,.2,.6,.2,w,h)
 		    x = x + w*scale
 		end
 	 y = y + h*scale
