@@ -12,6 +12,7 @@ end
 
 function Animation:draw(...)
   local quad=self.frames[self.currentFrame]
+ 
   if quad then
     lg.draw(self.parent.img, quad, ...)
   end
@@ -27,6 +28,9 @@ function Animation:update(dt)
       self.currentFrame=1
     end
   end
+
+  self.w = self.parent.w
+  self.h = self.parent.h
 end
 
 function Animation:addFrame(col, row)

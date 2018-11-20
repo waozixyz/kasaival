@@ -35,8 +35,8 @@ function Ground:load()
 	end
 end
 
-function Ground:draw()
-  lg.setColor(.2,.3,.6)
+function Ground:draw(camera)
+  lg.setColor(.2,.3,.6) 
   lg.rectangle('fill', self.x,self.y,self.w,self.h)
 end
 
