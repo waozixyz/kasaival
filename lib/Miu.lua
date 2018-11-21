@@ -24,18 +24,11 @@ local Portal = {
   x = 2000
 }
 
+
+local Camera = require 'lib/Camera'
 -- Joysticks
 local Joystick = require 'lib/Joystick'
 local movePad, attackPad
-
-
--- Camera
-local Camera = {
-  x = 0,
-  y = 0,
-  prevX=-9999,
-  scale = 1,
-}
 
 function moveInArea(x, dx, min, max)
   return (x > min or dx > 0) and (x < max or dx < 0)

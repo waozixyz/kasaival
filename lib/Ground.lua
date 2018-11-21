@@ -1,5 +1,6 @@
 require 'class'
 
+local Camera = require 'lib/Camera'
 local Tile = require 'lib/Tile'
 
 local lg=love.graphics
@@ -23,6 +24,7 @@ function Ground:load()
  	local scale = 1
   local w,h = 32,32
  	local y = self.y
+  y = y - (h-2 )*y/400
 	 while y < self.h do
     local x = self.x
 		  while x < self.w do
@@ -35,9 +37,25 @@ function Ground:load()
 	end
 end
 
-function Ground:draw(camera)
-  lg.setColor(.2,.3,.6) 
+
+function Ground:draw()
+  local r,g,b = .2,.3,.3
+  local a = self.x
+  local o = self.x + self.w
+  b = (-Camera.x)/a *.7
+
+  r = (-Camera.x)/o * .7
+  g = .5 - math.abs(Camera.x)/a * .2 
+  if r < 0 then
+    r = r * -1
+    if r > .2 then
+      r = .2
+    end
+  end
+  
+  lg.setColor(r,g,b)  
   lg.rectangle('fill', self.x,self.y,self.w,self.h)
+  lg.print(Camera.x, 50,50)
 end
 
 
