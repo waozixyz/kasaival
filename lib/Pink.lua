@@ -17,7 +17,7 @@ local Pink=class(function(self, img, w, h, x, y, sx, sy)
   self.hpMax = 100
   self.speed = 3
   self.element = 'fire'
-  self.walkSpeed = 3
+  self.walkSpeed = 8
   self.atk = 1
   self.def = 0
   self.hitBox = {}
@@ -112,7 +112,7 @@ function Pink:update(dt, Miu)
   do --burnUp
     local G = Miu.Ground
 
-    local b = G.b - (G.r*.1 + G.g*.1) + 0.05
+    local b = (.1+G.b) - (G.r+G.g)*.5*.08
     if G.b > .5 then
       b = b + G.b
     end

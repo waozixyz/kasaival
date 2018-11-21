@@ -1,5 +1,6 @@
 require 'class'
 
+local lume = require 'lume'
 local Camera = require 'lib/Camera'
 local Tile = require 'lib/Tile'
 
@@ -29,7 +30,7 @@ function Ground:load()
   y = y - y/400
 	 while y < self.h do
     local x = self.x
-		  while x < self.w do
+		  while x < self.w*.5 do
       local r=0
       if x<0 then
         r=lm.random(self.x,x)
@@ -53,14 +54,18 @@ function Ground:draw()
   r = (-Camera.x)/o * .7
   g = .5 - math.abs(Camera.x)/a * .2 
   b = (-Camera.x)/a *.7
-
+  
   if r < 0 then
     r = r * -1
     if r > .2 then
       r = .2
     end
   end
-  
+
+  r=lume.clamp(r,0,1)
+  g=lume.clamp(g,0,1)
+  b=lume.clamp(b,0,1)
+
   lg.setColor(r,g,b)  
   lg.rectangle('fill', self.x,self.y,self.w,self.h)
   
