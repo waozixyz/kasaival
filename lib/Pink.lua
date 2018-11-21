@@ -102,14 +102,22 @@ function Pink:defend(attack)
 end
 
 
-function Pink:update(dt)
+function Pink:update(dt, Miu)
   self.animation:update(dt)
   self.attackCharge = self.attackCharge + dt
   for i,s in ipairs(self.shurikens) do
     s:update(dt)
   end
-  self:burnUp(.05)
+  
+  do --burnUp
+    local G = Miu.Ground
 
+    local b = G.b - (G.r*.1 + G.g*.1) + 0.05
+    if G.b > .5 then
+      b = b + G.b
+    end
+    self:burnUp(b)
+  end
   self.speed = self.sx 
 end
 
