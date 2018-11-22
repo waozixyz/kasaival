@@ -31,11 +31,13 @@ function Ground:load()
 	 while y < self.h do
     local x = self.x
 		  while x < self.w*.5 do
-      local r=0
+      local a,b=0,0
       if x<0 then
-        r=lm.random(self.x,x)
+        a=lm.random(self.x,x)
+      elseif x > 1200 then
+        b=lm.random(x,self.w-self.x)
       end
-      if r > -1500 then
+      if a > -1500 and b < 1900 then
 		      scale = y / 400 
 		      shape = {x + 16 * scale, y + h*scale, x + (w+16)*scale, y + h*scale, x + w*scale, y}
 		      self:addTile(shape,.2,.6,.2,w,h)

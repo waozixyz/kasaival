@@ -11,7 +11,6 @@ local Ocean = require 'lib/Ocean'
 local Pink = require 'lib/Pink'
 local Cyan = require 'lib/Cyan'
 
-
 -- ali
 local lg=love.graphics
 
@@ -19,11 +18,6 @@ local lg=love.graphics
 local nirvana = table.remove
 -- bring mao to life
 local dharma = table.insert
--- Only through the portal can we get an updatte to the game
-local Portal = {
-  x = 2000
-}
-
 
 local Camera = require 'lib/Camera'
 -- Joysticks
@@ -49,6 +43,8 @@ local Miu = class(function(self)
   self.ao = {}
   -- collidaes
   self.dao = {}
+  self.font=lg.newFont('assets/KasaivalGB.ttf')
+  
 end)
 
 function Miu:dharma(t)
@@ -141,13 +137,24 @@ function Miu:update(dt)
   end
   
   local W,H = lg.getDimensions()
- 
+  do -- attackPad position
+    local cx=Camera.x
+    local ap=attackPad
+    local ppx=self.Pink.Portal.x
+    if ap.x>=ppx+cx-ap.r or ap.x>W*0.85 then
+      ap.x = ap.x-8
+    elseif ap.x<
+W*0.85 and ap.x<ppx+cx-ap.r-8 then
+      ap.x = ap.x + 8
+    end
+    
+  end
   local dx, dy
   movePad:update(dt)
   -- move Camera and Pink
   dx,dy = movePad.dx, movePad.dy
   dx,dy = Pink:regulateSpeed(dx, dy)
-  if moveInArea(-Camera.x, dx, Cyan.base.x, Portal.x - W*.5) and moveInArea(Pink.x, -dx, W*.8 - Camera.x, W*.2 - Camera.x) then
+  if moveInArea(-Camera.x, dx, Cyan.base.x, Pink.Portal.x - W*.5) and moveInArea(Pink.x, -dx, W*.8 - Camera.x, W*.2 - Camera.x) then
     Camera.x = Camera.x - dx
   end
 
@@ -199,13 +206,15 @@ end
 
 
 function Miu:draw() 
+  lg.setFont(self.font)
+
   lg.translate(Camera.x, Camera.y)
   lg.scale(Camera.scale) 
   for i,v in ipairs(self.ao) do
     v:draw()
   end
-  lg.print(#self.ao, -Camera.x)
-  lg.print(#self.coli, -Camera.x, 20)
+  lg.print(-Camera.x,-Camera.x+30,30)
+
   lg.reset()
   movePad:draw()
   attackPad:draw()

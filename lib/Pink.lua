@@ -1,11 +1,13 @@
 require 'class'
+
 local SpriteSheet = require 'lib/SpriteSheet'
 local lg=love.graphics
-local Shuriken = require('lib/Shuriken')
+local Shuriken = require 'lib/Shuriken'
+local Portal = require 'lib/Portal'
 
 local Pink=class(function(self, img, w, h, x, y, sx, sy)
   local W,H = lg.getDimensions()
-  self.label='pink'
+  self.label = 'pink'
   self.img = img or 'assets/player.png'
   self.w = w or 64
   self.h = h or 128
@@ -24,9 +26,8 @@ local Pink=class(function(self, img, w, h, x, y, sx, sy)
   self.shurikens = {}
   self.attackSpeed = 5
   self.attackCharge = 100
-  self.portal = {
-    x = 2000
-  }
+  self.Portal = Portal(2000)
+  self.mao={self.Portal}
   -- add animation
   local S=SpriteSheet(self.img, self.w, self.h)
   local a=S:createAnimation()
@@ -48,7 +49,7 @@ end
 function Pink:move(dx,dy)
   local W,H = lg.getDimensions()
  
-  if (self.x < self.portal.x or dx < 0) then
+  if (self.x < self.Portal.x or dx < 0) then
     self.x = self.x + dx
   end
 
