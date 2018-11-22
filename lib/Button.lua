@@ -44,12 +44,15 @@ function coly(p, cy)
   end
 end
 
-function Button:update(dt)
+function Button:update(dt,offsetX,offsetY)
+  local fx=offsetX or 0
+  local fy=offsetY or 0
   self.hit = false
   local touches = lt.getTouches()
   for i, id in ipairs(touches) do
     local tx, ty = lt.getPosition(id)
-    local x, y = self.x,self.y
+    local x = self.x+fx
+    local y =  self.y+fy
     local w, h = self.w,self.h
     if coly({x,y,x+w,y+h}, {tx,ty}) then
       self.hit = true
