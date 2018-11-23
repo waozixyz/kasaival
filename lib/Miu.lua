@@ -45,6 +45,7 @@ local Miu = class(function(self)
   self.dao = {}
   self.font=lg.newFont('assets/KasaivalGB.ttf')
   
+  
 end)
 
 function Miu:dharma(t)
@@ -207,7 +208,7 @@ end
 
 function Miu:draw() 
   lg.setFont(self.font)
-
+  lg.setNewFont(12)
   lg.translate(Camera.x, Camera.y)
   lg.scale(Camera.scale) 
   for i,v in ipairs(self.ao) do
