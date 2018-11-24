@@ -1,15 +1,17 @@
+require 'class'
 
+local lg=love.graphics
 
-local Ocean = {  
-  x = -2000,
-  y = 200,
-  width = 200,
-  height = 400,
-  color = {0.1, 0.05, 0.4},
-  level = 1,
-  xp = 0,
-  hitBox = {},
-}
+local Ocean = class(function(self)
+  self.x = -2000
+  self.y = 200
+  self.w = 200
+  self.h = 400
+  self.color = {0.1, 0.05, 0.4}
+  self.level = 1
+  self.xp = 0 
+end)
+
 function Ocean:attack(obj)
   if obj.element == 'fire' then
     return 23 * self.level
@@ -33,9 +35,10 @@ function Ocean:update(dt, stage)
  
 end
 
-function Ocean:draw(phi)
-  love.graphics.setColor(self.color)
-  love.graphics.rectangle('fill', self.x * phi, self.y * phi, self.width * phi, self.height * phi)
+function Ocean:draw()
+ 
+  lg.setColor(self.color)
+  lg.rectangle('fill', self.x, self.y, self.w, self.h)
   
 end
 return Ocean

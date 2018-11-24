@@ -130,7 +130,7 @@ function Blob:update(dt, base)
   self.sx = self.hp / 100
   self.sy = self.sx
 
-  if self.x < base.x + base.width and self.hp < self.hpMax then
+  if self.x < base.x + base.w and self.hp < self.hpMax then
     self.hp = self.hp + 1
   end
   self.hp = self.hp + 0.02

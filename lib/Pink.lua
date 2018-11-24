@@ -128,6 +128,7 @@ function Pink:update(dt, Miu)
     self:burnUp(b)
   end
   self.speed = self.sx 
+  self.hp=100--tmphack
 end
 
 function Pink:draw()
