@@ -25,7 +25,7 @@ local Sky = class(function(self)
 end)
 
 function Sky:update(dt, gr)
-  self.ashX=self.w/gr.w+1
+  self.ashX=1-self.w/gr.w
   for i, s in ipairs(self.stardust) do
     if s.update then
       s:update(dt)
