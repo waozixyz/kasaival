@@ -43,18 +43,23 @@ end
 
 function Gaia:load()
   -- self:addTrees(34)
-  self.Ground = Ground()
+  self.Ground=Ground()
   plant(self.mao, self.Ground)
  -- plant(self.mao, Seed())
- -- plant(self.mao, Sky())
+  self.Sky=Sky()
 end
---[[--
+
 function Gaia:update(dt)
+  self.Sky:update(dt,self.Ground)
   self.elapsed = self.elapsed + dt
   if self.elapsed > 1 then
     -- self:addTrees(1, 0)
     self.elapsed = 0
   end 
-end]]--
+end
+
+function Gaia:draw(eye)
+  self.Sky:draw(eye)
+end
 
 return Gaia

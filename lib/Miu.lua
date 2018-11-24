@@ -72,6 +72,7 @@ function Miu:load()
   s.mao={}
   -- visible mao's
   s.ao = {}
+
   s:dharma({s.Gaia,s.Pink,s.Cyan}) 
 end
 
@@ -219,7 +220,7 @@ function Miu:draw()
   lg.translate(Camera.x, Camera.y)
   lg.scale(Camera.scale) 
   for i,v in ipairs(self.ao) do
-    v:draw()
+    v:draw(Camera)
   end
   lg.print(tostring(GameOver),-Camera.x+30,30)
 

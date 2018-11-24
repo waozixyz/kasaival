@@ -12,9 +12,11 @@ local Star = class(function(self,img,x,y,r,scale,color)
 end)
 
 
-function Star:draw() 
+function Star:draw(offsetX) 
+  local x=self.x+offsetX
+  local y=self.y
   lg.setColor(self.color)
-  lg.draw(self.img, self.x, self.y, self.r, self.scale, self.scale)
+  lg.draw(self.img, x, y, self.r, self.scale, self.scale)
 end
 
 return Star
