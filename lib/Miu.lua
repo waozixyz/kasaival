@@ -58,26 +58,21 @@ end
 
 
 function Miu:load()
+  local s=self
   Camera.x,Camera.y=0,0
   -- add gaia
-  self.Gaia = Gaia()
+  s.Gaia = Gaia()
 
   -- add harmony
   local W,H = lg.getDimensions()
-  self.Pink = Pink('assets/flame_1.png', 128, 256, W*.5, H*.5, 1, 1)
-  self.Pink.hp=100
-  self.Cyan = Cyan()
+  s.Pink = Pink('assets/flame_1.png', 128, 256, W*.5, H*.5, 1, 1)
+  s.Pink.hp=100
+  s.Cyan = Cyan()
 
-
-  local s=self
-  self.mao={}
+  s.mao={}
   -- visible mao's
-  self.ao = {}
-  -- collidaes
-  self.dao = {}
-  self:dharma({s.Gaia,s.Pink,s.Cyan}) 
-
-
+  s.ao = {}
+  s:dharma({s.Gaia,s.Pink,s.Cyan}) 
 end
 
 function collision(pink, cyan)
@@ -121,10 +116,10 @@ function Miu:eye(m, offsetX, offsetY)
 end
 
 function Miu:update(dt)
+  local W,H = lg.getDimensions()
   local P,C,G=self.Pink,self.Cyan,self.Gaia
   local Po,Oc,Gr=P.Portal,C.Ocean,G.Ground
 
-  movePad:update(dt); attackPad:update(dt)
   if P.hp and math.floor(P.hp) <= 0 then
     GameOver=true
     local touches = lt.getTouches()
@@ -148,23 +143,9 @@ function Miu:update(dt)
     end
   end
 
-  local W,H = lg.getDimensions()
-  do -- attackPad position
-    local cx=Camera.x
-    local ap=attackPad
-    local ppx=Po.x
-
-    if ap.x>=ppx+cx-ap.r or ap.x>W*0.85 then
-      ap.x = ap.x-8
-    elseif ap.x<
-W*0.85 and ap.x<ppx+cx-ap.r-8 then
-      ap.x = ap.x + 8
-    end
-    
-  end
-  local dx, dy
+  movePad:update(dt)
   -- move Camera and Pink
-  dx,dy = movePad.dx, movePad.dy
+  local dx,dy = movePad.dx, movePad.dy
   dx,dy = P:regulateSpeed(dx, dy)
   if moveInArea(-Camera.x, dx, Oc.x, P.x, Po.x - W*.5) and moveInArea(P.x, -dx, W*.8 - Camera.x, W*.2 - Camera.x) then
     Camera.x = Camera.x - dx
@@ -179,6 +160,21 @@ W*0.85 and ap.x<ppx+cx-ap.r-8 then
  --   P:defend(Oc:attack(P))
   --end
 
+
+  do -- attackPad position
+    local cx=Camera.x
+    local ap=attackPad
+    local ppx=Po.x
+
+    if ap.x>=ppx+cx-ap.r or ap.x>W*0.85 then
+      ap.x = ap.x-8
+    elseif ap.x<
+W*0.85 and ap.x<ppx+cx-ap.r-8 then
+      ap.x = ap.x + 8
+    end
+  end
+
+  attackPad:update(dt)
   -- attack
   dx,dy = attackPad.dx, attackPad.dy
   if dx ~= 0 or dy ~= 0 then
