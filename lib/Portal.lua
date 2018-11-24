@@ -58,9 +58,8 @@ Text(datetime,self.x,self.y+47,self.w)
     c={0,.8,.9}
     bc={.4,0,.4}
     local firestorm='launch firestorm ($10)'
-    local feedback='give feedback'  
     b.firestorm=Button(x, y-h*2.2, w, h, firestorm, c, bc) 
-    b.feedback=Button(x, y-h, w, h, feedback, c, bc)
+    b.feedback=Button(x, y-h, w, h, 'give feedback', c, bc)
 
     self.b=b
   end
@@ -71,6 +70,9 @@ function Portal:update(dt)
   for k,v in pairs(self.b) do
     if v.update then
       v:update(dt, Camera.x)
+      if v.hit then
+        -- switch scene with v.text as arg
+      end
     end
   end
   if self.b.feedback.hit then

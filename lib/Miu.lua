@@ -7,12 +7,12 @@ local lume = require 'lume'
 
 
 local Gaia = require 'lib/Gaia'
-local Ocean = require 'lib/Ocean'
 local Pink = require 'lib/Pink'
 local Cyan = require 'lib/Cyan'
 
 -- ali
 local lg=love.graphics
+local lt=love.touch
 
 -- go to nirvana
 local nirvana = table.remove
@@ -23,28 +23,24 @@ local Camera = require 'lib/Camera'
 -- Joysticks
 local Joystick = require 'lib/Joystick'
 local movePad, attackPad
+local GameOver=false
 
 function moveInArea(x, dx, min, max)
   return (x > min or dx > 0) and (x < max or dx < 0)
 end
 
 local Miu = class(function(self)
-  -- add gaia
-  self.Gaia = Gaia()
-
-  -- add harmony
   local W,H = lg.getDimensions()
-  self.Pink = Pink('assets/flame_1.png', 128, 256, W*.5, H*.5, 1, 1)
-  self.Cyan = Cyan()
-  self.Cyan.base = Ocean
-
-  self.mao = {}
-  -- visible mao's
-  self.ao = {}
-  -- collidaes
-  self.dao = {}
-  self.font=lg.newFont('assets/KasaivalGB.ttf')
-  
+  self.font=lg.newFont('assets/KasaivalGB.ttf',13)
+  self.bigFont=lg.newFont('assets/KasaivalGB.ttf',17)
+  do -- joysticks
+    local x,y,r=W*0.85,H*0.75,64
+    local c1={.2,.1,.8,.5}
+    local c2={.8,.1,.2,.5}
+    
+    movePad=Joystick(W-x, y, r, c1)
+    attackPad=Joystick(x, y, r, c2)
+  end
   
 end)
 
@@ -62,19 +58,26 @@ end
 
 
 function Miu:load()
-  local W,H = lg.getDimensions()
-  local s=self
-  self:dharma({s.Gaia,s.Pink,s.Cyan}) 
-  self.Ground = self.Gaia.Ground
+  Camera.x,Camera.y=0,0
+  -- add gaia
+  self.Gaia = Gaia()
 
-  do -- joysticks
-    local x,y,r=W*0.85,H*0.75,64
-    local c1={.2,.1,.8,.5}
-    local c2={.8,.1,.2,.5}
-    
-    movePad=Joystick(W-x, y, r, c1)
-    attackPad=Joystick(x, y, r, c2)
-  end
+  -- add harmony
+  local W,H = lg.getDimensions()
+  self.Pink = Pink('assets/flame_1.png', 128, 256, W*.5, H*.5, 1, 1)
+  self.Pink.hp=100
+  self.Cyan = Cyan()
+
+
+  local s=self
+  self.mao={}
+  -- visible mao's
+  self.ao = {}
+  -- collidaes
+  self.dao = {}
+  self:dharma({s.Gaia,s.Pink,s.Cyan}) 
+
+
 end
 
 function collision(pink, cyan)
@@ -117,11 +120,19 @@ function Miu:eye(m, offsetX, offsetY)
   return ao
 end
 
-
-
 function Miu:update(dt)
-  local Pink,Cyan=self.Pink,self.Cyan
-  local Ground=self.Ground
+  local P,C,G=self.Pink,self.Cyan,self.Gaia
+  local Po,Oc,Gr=P.Portal,C.Ocean,G.Ground
+
+  movePad:update(dt); attackPad:update(dt)
+  if P.hp and math.floor(P.hp) <= 0 then
+    GameOver=true
+    local touches = lt.getTouches()
+    if #touches > 0 then
+      self:load()
+      GameOver=false
+    end
+  else 
 
   if Camera.prevX ~= Camera.x then
     self.ao = Miu:eye(self.mao, -Camera.x)
@@ -129,19 +140,20 @@ function Miu:update(dt)
   end
   self.ao = lume.sort(self.ao, 'y')
  
-  self.coli = lume.collision(Pink, Ground.mao)
+  self.coli = lume.collision(P, Gr.mao)
   if #self.coli > 0 then
     for i,c in ipairs(self.coli) do
-      Pink:collide(c)
-      c:collide(Pink)
+      P:collide(c)
+      c:collide(P)
     end
   end
-  
+
   local W,H = lg.getDimensions()
   do -- attackPad position
     local cx=Camera.x
     local ap=attackPad
-    local ppx=self.Pink.Portal.x
+    local ppx=Po.x
+
     if ap.x>=ppx+cx-ap.r or ap.x>W*0.85 then
       ap.x = ap.x-8
     elseif ap.x<
@@ -151,28 +163,26 @@ W*0.85 and ap.x<ppx+cx-ap.r-8 then
     
   end
   local dx, dy
-  movePad:update(dt)
   -- move Camera and Pink
   dx,dy = movePad.dx, movePad.dy
-  dx,dy = Pink:regulateSpeed(dx, dy)
-  if moveInArea(-Camera.x, dx, Cyan.base.x, Pink.Portal.x - W*.5) and moveInArea(Pink.x, -dx, W*.8 - Camera.x, W*.2 - Camera.x) then
+  dx,dy = P:regulateSpeed(dx, dy)
+  if moveInArea(-Camera.x, dx, Oc.x, P.x, Po.x - W*.5) and moveInArea(P.x, -dx, W*.8 - Camera.x, W*.2 - Camera.x) then
     Camera.x = Camera.x - dx
   end
 
-  Pink:move(dx,dy)
+  P:move(dx,dy)
 
   -- collisions
-  --local phb=Pink:getHitbox()
-  local ohb=Cyan.base:getHitbox()
+  --local phb=P:getHitbox()
+ -- local ohb=C:getHitbox()
  --if collision(phb, ohb) then
- --   Pink:defend(Cyan.base:attack(Pink))
+ --   P:defend(Oc:attack(P))
   --end
 
-  attackPad:update(dt)
   -- attack
   dx,dy = attackPad.dx, attackPad.dy
   if dx ~= 0 or dy ~= 0 then
-    Pink:attack(dx, dy)
+    P:attack(dx, dy)
   end
   -- update mao
   for i,v in ipairs(self.mao) do
@@ -187,12 +197,13 @@ W*0.85 and ap.x<ppx+cx-ap.r-8 then
       -- v.sx = 1 - H / (H + v.y)
       if v.hp then
         local hpMax = v.hpMax or 100
-        v.sx = (v.y / self.Ground.h) * (v.hp/hpMax)
+        v.sx = (v.y / Gr.h) * (v.hp/hpMax)
       else
-        v.sx = v.y / self.Ground.h
+        v.sx = v.y / Gr.h
       end
       v.sy = v.sx
     end
+  end
   end
 end
 
@@ -207,18 +218,24 @@ end
 
 
 function Miu:draw() 
+  local W,H=lg.getDimensions()
   lg.setFont(self.font)
-  lg.setNewFont(12)
   lg.translate(Camera.x, Camera.y)
   lg.scale(Camera.scale) 
   for i,v in ipairs(self.ao) do
     v:draw()
   end
-  lg.print(-Camera.x,-Camera.x+30,30)
+  lg.print(tostring(GameOver),-Camera.x+30,30)
 
   lg.reset()
   movePad:draw()
   attackPad:draw()
+  
+  if GameOver then
+    lg.setFont(self.bigFont)
+    lg.setColor(1,.6,.6)
+    lg.printf('Game Over',50, H*.5,W,'center')
+  end
 end
 
 return Miu

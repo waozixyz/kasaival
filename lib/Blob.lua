@@ -1,8 +1,9 @@
 require 'class'
-local Ocean = require 'lib/Ocean'
+
 local SpriteSheet = require 'lib/SpriteSheet'
+
 local lg=love.graphics
-local random=love.math.random
+local lm=love.math
 
 local Blob=class(function(self, img, w, h, x, y, sx, sy)
   local W,H = lg.getDimensions()
@@ -21,10 +22,9 @@ local Blob=class(function(self, img, w, h, x, y, sx, sy)
   self.level = 1
   self.xp = 0
   self.r = 0
-  self.base = Ocean
   self.seed = {
-    random(7, 13),
-    random(4, 7),
+    lm.random(7, 13),
+    lm.random(4, 7),
   }
    -- add animation
   local S=SpriteSheet(self.img, self.w, self.h)
@@ -38,9 +38,9 @@ local Blob=class(function(self, img, w, h, x, y, sx, sy)
 end)
 
 function Blob:getColor()
-  local r = random(0, 20) / 100
-  local g = random(30, 40 ) / 100
-  local b = random(50, 80) / 100
+  local r = lm.random(0, 20) / 100
+  local g = lm.random(30, 40 ) / 100
+  local b = lm.random(50, 80) / 100
   return r, g, b
 end
 
@@ -59,7 +59,7 @@ function Blob:getHitbox()
 end
 
 function move(x, y)
-  return x + love.math.random(-1,1), y + love.math.random(-1, 1) 
+  return x+lm.random(-1,1), y+lm.random(-1, 1) 
 end
 
 function followObj(x1, x2, speed)
@@ -75,7 +75,7 @@ end
 function Blob:follow(obj, stageWidth)
 	 local dx, dy = 0, 0
   -- rotating
-	 local sp_r = random(-13, 42) * 0.01 
+	 local sp_r = lm.random(-13, 42) * 0.01 
 	 -- speed
   local sp_c = stageWidth / (self.x - obj.x + 1)
   if sp_c < 0 then sp_c =  sp_c * -1 end
@@ -92,7 +92,7 @@ function Blob:follow(obj, stageWidth)
       dx = followObj(self.x, self.base.x, speed)
     end   end
 
-  local joker = random(0.4, -0.6)   if self.y < obj.y then	    dy = speed * joker
+  local joker = lm.random(0.4, -0.6)   if self.y < obj.y then	    dy = speed * joker
  	elseif self.y > obj.y then
     dy = -speed * joker
   end
@@ -119,7 +119,7 @@ function Blob:updateLevel()
     atk = atk + 1
   end
 end
-function Blob:update(dt)
+function Blob:update(dt, base)
   self:updateLevel()
   self.animation:update(dt)
   if self.hp <= 0 then
@@ -129,7 +129,7 @@ function Blob:update(dt)
   self.sx = self.hp / 100
   self.sy = self.sx
 
-  if self.x < self.base.x + self.base.width and self.hp < self.hpMax then
+  if self.x < base.x + base.width and self.hp < self.hpMax then
     self.hp = self.hp + 1
   end
   self.hp = self.hp + 0.02

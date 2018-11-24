@@ -111,7 +111,7 @@ function Pink:update(dt, Miu)
   end
   
   do --burnUp
-    local G = Miu.Ground
+    local G = Miu.Gaia.Ground
 
     local b = (.1+G.b) - (G.r+G.g)*.5*.08
     if G.b > .5 then
