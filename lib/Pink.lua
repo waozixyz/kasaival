@@ -31,9 +31,14 @@ local Pink=class(function(self, img, w, h, x, y, sx, sy)
   -- add animation
   local S=SpriteSheet(self.img, self.w, self.h)
   local a=S:createAnimation()
-  for col=1,20 do
-    a:addFrame(col, 1)
+  for row=1,8 do
+    local limit=22
+    if row==8 then limit=19 end
+    for col=1,limit do
+      a:addFrame(col, row)
+    end
   end
+
   a:setDelay(0.08)
   self.animation=a
 end)
@@ -43,7 +48,7 @@ function Pink:regulateSpeed(dx, dy, speed)
   if math.abs(dx) + math.abs(dy) ~= 0 then
     speed = speed / (math.abs(dx) + math.abs(dy))
   end 
-  return dx * speed, dy * speed
+  return dx*speed, dy*speed
 end
 
 function Pink:move(dx,dy)
@@ -81,8 +86,8 @@ function Pink:collide(o)
 end
 function Pink:getHitbox()
   local t = {}
-  t[1] = self.x - self.w * .5 * self.sx
-  t[2] = self.x
+  t[1] = self.x - self.w * .3 * self.sx
+  t[2] = self.x + self.w * .3 * self.sx
   t[3] = self.y
   t[4] = self.y + self.h * .2
   return t
@@ -126,8 +131,8 @@ function Pink:update(dt, Miu)
 end
 
 function Pink:draw()
-  lg.setColor(1,.9,1,.95)
-  self.animation:draw(self.x, self.y, 0, self.sx, self.sy, self.w*.5, self.h)
+  lg.setColor(1,1,1,.92)
+  self.animation:draw(self.x, self.y, 0, self.sx, self.sy, self.w*.5, self.h-7)
   lg.setColor(1,1,0)
   for i,s in ipairs(self.shurikens) do
     s:draw()
