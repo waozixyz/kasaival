@@ -86,10 +86,10 @@ function Pink:collide(o)
 end
 function Pink:getHitbox()
   local t = {}
-  t[1] = self.x - self.w * .3 * self.sx
-  t[2] = self.x + self.w * .3 * self.sx
-  t[3] = self.y
-  t[4] = self.y + self.h * .2
+  t[1] = self.x - self.w * .2 * self.sx
+  t[2] = self.x + self.w * .2 * self.sx
+  t[3] = self.y + self.h * .1
+  t[4] = self.y + self.h * .3
   return t
 end
 
