@@ -148,8 +148,10 @@ function Miu:update(dt)
   -- move Camera and Pink
   local dx,dy = movePad.dx, movePad.dy
   dx,dy = P:regulateSpeed(dx, dy)
+
   if moveInArea(-Camera.x, dx, Oc.x, P.x, Po.x - W*.5) and moveInArea(P.x, -dx, W*.8 - Camera.x, W*.2 - Camera.x) then
     Camera.x = Camera.x - dx
+
   end
 
   P:move(dx,dy)
@@ -181,6 +183,8 @@ W*0.85 and ap.x<ppx+cx-ap.r-8 then
   if dx ~= 0 or dy ~= 0 then
     P:attack(dx, dy)
   end
+
+
   -- update mao
   for i,v in ipairs(self.mao) do
     if v.update then

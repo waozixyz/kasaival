@@ -108,6 +108,9 @@ function Pink:update(dt, Miu)
   self.attackCharge = self.attackCharge + dt
   for i,s in ipairs(self.shurikens) do
     s:update(dt)
+    if s.sx <=0 or s.sy<=0 then
+      table.remove(self.shurikens,i)
+    end
   end
   
   do --burnUp
