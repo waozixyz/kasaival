@@ -60,23 +60,24 @@ function Button:update(dt,offsetX,offsetY)
   end
 end
 
-function brighten(color, lum)
+function Button:lum(color, lum)
+  if self.hit then lum=lum*-1 end
   return color[1]+lum, color[2]+lum, color[3]+lum
 end
 
 function Button:draw()
+  local s=self
   local m = self.margin
-
   -- top, bottom margin
-  lg.setColor(brighten(self.bckgColor, .1))
+  lg.setColor(s:lum(self.bckgColor, .1))
   lg.rectangle('fill', self.x, self.y, self.w, m, 2)
-  lg.setColor(brighten(self.bckgColor, -.1))
+  lg.setColor(s:lum(self.bckgColor, -.1))
   lg.rectangle('fill', self.x, self.y+self.h, self.w, -m, 2)
 
   -- left, right margin
-  lg.setColor(brighten(self.bckgColor, .1))
+  lg.setColor(s:lum(self.bckgColor, .1))
   lg.rectangle('fill', self.x, self.y, m, self.h, 2)
-  lg.setColor(brighten(self.bckgColor, -.1))
+  lg.setColor(s:lum(self.bckgColor, -.1))
   lg.rectangle('fill', self.x + self.w, self.y, -m, self.h, 2)
 
   -- inner button
