@@ -5,7 +5,6 @@ Miu Planet (Amy, Pink)
 require 'class'
 local lume = require 'lume'
 
-
 local Gaia = require 'lib/Gaia'
 local Pink = require 'lib/Pink'
 local Cyan = require 'lib/Cyan'
@@ -41,7 +40,6 @@ local Miu = class(function(self)
     movePad=Joystick(W-x, y, r, c1)
     attackPad=Joystick(x, y, r, c2)
   end
-  
 end)
 
 function Miu:dharma(t)

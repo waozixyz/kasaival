@@ -92,7 +92,8 @@ function Blob:follow(obj, stageWidth)
       dx = followObj(self.x, self.base.x, speed)
     end   end
 
-  local joker = lm.random(0.4, -0.6)   if self.y < obj.y then	    dy = speed * joker
+  local joker = lm.random(0.4, -0.4)
+  if self.y < (obj.y +obj.h) then	    dy = speed * joker
  	elseif self.y > obj.y then
     dy = -speed * joker
   end

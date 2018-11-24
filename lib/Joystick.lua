@@ -11,7 +11,6 @@ local Joystick=class(function(self, x, y, r, c)
   self.x = x or self.r
   self.y = y or self.r
   self.c = c or {.8,.1,.7,.5}
-  self.tx,self.ty=0,0
 end)
 
 function Joystick:touching(tx, ty)
@@ -19,12 +18,11 @@ function Joystick:touching(tx, ty)
   local d=self.r*2
   if tx > x - d and tx < x + d and ty > y - d and ty < y + d then
     return true
-  else 
-    return false
   end
 end
 
 function Joystick:update()
+  self.tx,self.ty=nil,nil
   local W,H = lg.getDimensions()
   local x,y,r = self.x,self.y,self.r
   local dx,dy = 0,0
@@ -51,11 +49,9 @@ function Joystick:draw()
   lg.circle('fill', x, y, r)
   
   -- inner circle
-  local nx,ny = x, y
-  if self.active then
-     nx = self.tx
-     ny = self.ty
-  end
+  nx = self.tx or x
+  ny = self.ty or y
+ 
   lg.setColor(c[3], 0.5, c[1], 0.2)
   lg.circle('fill', nx, ny, r * 0.6)
 end
