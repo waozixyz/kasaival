@@ -1,14 +1,17 @@
 require 'class'
 
 local SpriteSheet = require 'lib/SpriteSheet'
+
 local lg=love.graphics
+local lm=love.math
+
 local Shuriken = require 'lib/Shuriken'
 local Portal = require 'lib/Portal'
 
 local Pink=class(function(self, img, w, h, x, y, sx, sy)
   local W,H = lg.getDimensions()
   self.label = 'pink'
-  self.img = img or 'assets/player.png'
+  self.img = 'assets/flame.png'
   self.w = w or 64
   self.h = h or 128
   self.x = x or W*.5
@@ -27,6 +30,8 @@ local Pink=class(function(self, img, w, h, x, y, sx, sy)
   self.attackSpeed = 5
   self.attackCharge = 100
   self.Portal = Portal(2000)
+  self.r,self.g,self.b=1,1,1 
+  self.invinsible=false
   self.mao={self.Portal}
   -- add animation
   local S=SpriteSheet(self.img, self.w, self.h)
@@ -109,11 +114,27 @@ end
 
 
 function Pink:update(dt, Miu)
+  local r,g,b = self.r,self.g,self.b
+  if self.invincible then  
+    r = lm.random(-.05,.1)
+    if r>1 then r=0 elseif r<0 then r=1 end
+    g = g + lm.random(-.05,.1)
+    if g>1 then g=0 elseif g<0 then g=1 end
+    b = b + lm.random(-.05,.1)
+    if b>1 then b=0 elseif b<0 then b=1 end
+    
+  else
+    if r < 1 then r=r+.01 end
+    if g < 1 then g=g+.01 end
+    if b < 1 then b=b+.01 end
+  end
+self.r,self.g,self.b=r,g,b
+
   self.animation:update(dt)
   self.attackCharge = self.attackCharge + dt
   for i,s in ipairs(self.shurikens) do
     s:update(dt)
-    if s.sx <=0 or s.sy<=0 then
+    if s.sx <=0 or s.sy <=0 then
       table.remove(self.shurikens,i)
     end
   end
@@ -128,11 +149,11 @@ function Pink:update(dt, Miu)
     self:burnUp(b)
   end
   self.speed = self.sx 
-  self.hp=100--tmphack
 end
 
 function Pink:draw()
-  lg.setColor(1,1,1,.92)
+  local r,g,b=self.r,self.g,self.b
+  lg.setColor(r,g,b)
   self.animation:draw(self.x, self.y, 0, self.sx, self.sy, self.w*.5, self.h-7)
   lg.setColor(1,1,0)
   for i,s in ipairs(self.shurikens) do

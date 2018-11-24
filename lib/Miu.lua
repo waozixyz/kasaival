@@ -63,7 +63,7 @@ function Miu:load()
 
   -- add harmony
   local W,H = lg.getDimensions()
-  s.Pink = Pink('assets/flame_2.png', 96, 192,   W*.5, H*.7)
+  s.Pink = Pink('assets/flame_1.png', 96, 192,   W*.5, H*.7)
   s.Pink.hp=100
   s.Cyan = Cyan()
 
