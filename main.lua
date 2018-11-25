@@ -1,22 +1,29 @@
 -- Kasaival
--- with lyra you can go anywhere
-local lyra = require 'lyra'
 -- state
 local state = require 'state'
--- this is a start of a magical journey
+-- 0, life starts with a Menu
+local Menu = require 'lib/Menu'
+-- 1, this is a start of a magical journey
 local Miu = require 'lib/Miu'
+-- 2, a portal to discover
+local Portal = require 'lib/Portal'
 
-
-local currentState = 1
+local currentState = 0
 function loadState(x)
-  if x == 0 then
-    lyra:load(x)
+  if x == nil or x == -1 then
+    love.event.quit()
+  elseif x == 0 then
+    Menu:load(x)
     currentState = 0
   elseif x == 1 then
     -- miuuuuu
     Miu = Miu()
     Miu:load()
     currentState = 1
+  elseif x == 2 then
+    --load portal
+    Portal = Portal()
+    currentState = 2
   end
 end
 local lw=love.window
@@ -35,9 +42,11 @@ function love.update(dt)
   end
  
   if currentState == 0 then
-    lyra:update()
+    Menu:update()
   elseif currentState == 1 then
     Miu:update(dt)
+  elseif currentState == 2 then
+    Portal:update(dt)
   end
 
   if love.keyboard.isDown('escape') then
@@ -48,8 +57,10 @@ end
 -- draw love
 function love.draw()
   if currentState == 0 then
-    lyra:draw()
+    Menu:draw()
   elseif currentState == 1 then
     Miu:draw()
+  elseif currentState == 2 then
+    Portal:draw()
   end
 end
