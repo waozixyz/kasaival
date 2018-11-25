@@ -29,9 +29,9 @@ local Pink=class(function(self, img, w, h, x, y, sx, sy)
   self.shurikens = {}
   self.attackSpeed = 5
   self.attackCharge = 100
-  self.Portal = Portal(2000)
+  self.Portal = {x=2000,y=0}
   self.r,self.g,self.b=1,1,1 
-  self.invinsible=false
+  self.invincible=false
   self.mao={self.Portal}
   -- add animation
   local S=SpriteSheet(self.img, self.w, self.h)

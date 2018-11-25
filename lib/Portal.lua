@@ -21,7 +21,7 @@ end
 
 local Portal = class(function(self,x,y,w,h)
   local W,H=lg.getDimensions()
-  self.x=x or 2000
+  self.x=x or 0
   self.y=y or 0
   self.w=w or 150
   self.h=h or H
@@ -69,7 +69,7 @@ end)
 function Portal:update(dt)
   for k,v in pairs(self.b) do
     if v.update then
-      v:update(dt, Camera.x)
+      v:update(dt)
       if v.hit then
         -- switch scene with v.text as arg
       end
