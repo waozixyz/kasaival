@@ -24,7 +24,7 @@ function Menu:load()
 
   do -- start button
     local x,y = self.w*.5-w,100
-    local text = 'Continue Journey'
+    local text = 'Start Journey'
     table.insert(self.ui, Button(x, y, w, 42, text, color, bckgColor, margin))
   end
 
