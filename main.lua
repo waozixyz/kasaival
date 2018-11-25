@@ -49,9 +49,6 @@ function love.update(dt)
     Portal:update(dt)
   end
 
-  if love.keyboard.isDown('escape') then
-    love.event.quit()
-  end
 end
 
 -- draw love

@@ -4,7 +4,7 @@ Miu Planet (Amy, Pink)
 
 require 'class'
 local lume = require 'lume'
-
+local state = require 'state'
 local Gaia = require 'lib/Gaia'
 local Pink = require 'lib/Pink'
 local Cyan = require 'lib/Cyan'
@@ -203,6 +203,10 @@ W*0.85 and ap.x<ppx+cx-ap.r-8 then
       v.sy = v.sx
     end
   end
+  end
+
+  if love.keyboard.isDown('escape') then
+    state.newState=0
   end
 end
 

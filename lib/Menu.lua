@@ -4,6 +4,7 @@ local Button = require 'lib/Button'
 local Menu = {}
 
 local lg=love.graphics
+local lk=love.keyboard
 
 function Menu:load()
   self.flames=lg.newImage('assets/menu.png')
@@ -24,7 +25,7 @@ function Menu:load()
 
   do -- start button
     local x,y = self.w*.5-w,100
-    local text = 'Start Journey'
+    local text = 'Start , Journey'
     table.insert(self.ui, Button(x, y, w, 42, text, color, bckgColor, margin))
   end
 
@@ -47,8 +48,11 @@ function Menu:update(dt)
   for k,v in pairs(self.ui) do
     v:update(dt,W)
     if v.hit then
-      state.newState = k 
+      state.newState=k 
     end
+  end
+  if lk.isDown('escape')  then
+    state.newState=1
   end
 end
 

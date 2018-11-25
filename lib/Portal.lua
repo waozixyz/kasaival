@@ -19,6 +19,13 @@ function Text:draw()
   lg.setColor(self.color) lg.printf(self.val,self.x,self.y,self.w,self.ta)
 end
 
+function timeToString(x)
+  local d = math.ceil(x / 86400)
+  local h = math.ceil((x % 86400) / 3600)
+  local m = math.ceil((x % 86400 % 3600) / 60)
+  return tostring(d) .. 'D-' .. tostring(h) .. 'H-' .. tostring(m) .. 'M'
+end
+
 local Portal = class(function(self,x,y,w,h)
   local W,H=lg.getDimensions()
   self.x=x or 0
@@ -26,31 +33,39 @@ local Portal = class(function(self,x,y,w,h)
   self.w=w or 150
   self.h=h or H
   self.color={.2,.2,.2 }
-  local t={}
-  t.d=99
-  t.h=23
-  t.m=56
+  
+  self.time=8639760
+ 
   do --b
     local b,x,y,w,h,c,bc
-    local datetime=tostring(t.d) .. 'D-' .. tostring(t.h) .. 'H-' .. tostring(t.m) .. 'M'
     b = {
 Text('Kasaival 2.0',self.x,self.y+10,self.w,{.7,.2,.4},17),
-Text(datetime,self.x,self.y+47,self.w)
 }
+b.time = Text(timeToString(self.time),self.x,self.y+47,self.w)
 
     w,h=57,32
   
-    local t={'3D','9H','3H','56M', '21M','7M','3M'}
+    local t={
+  [-259200] = '-3D', 
+  [-32400] = '-9H',
+  [-10800] = '3H',
+  [-3360] = '-56M',
+  [-1260] = '-21M',
+  [-420] = '-7M',
+  [-180] = '-3M',
 
-    for i,v in ipairs(t) do
-      local xtra=0
-      if i==#t and #t%2==1 then
-        xtra=(w+10)*.5
-      end
-      x=self.x+10+(i%2)*(w+10)-xtra
-      y=self.y+80+math.floor((i-1)*.5)*(h+10)
-      table.insert(b, Button(x, y, w, h, '-' .. v, c, bc))
+}
+  local i = 1
+  for k,v in pairs(t) do
+    local xtra=0
+    if i==#t and #t%2==1 then
+      xtra=(w+10)*.5
     end
+    x=self.x+10+(i%2)*(w+10)-xtra
+    y=self.y+80+math.floor((i-1)*.5)*(h+10)
+    table.insert(b, Button(x, y, w, h, v, c, bc,0,k))
+    i = i + 1
+  end
 
     w,h=128,48
     x=self.x+10
@@ -63,7 +78,6 @@ Text(datetime,self.x,self.y+47,self.w)
 
     self.b=b
   end
-  self.time=t
 end) 
 
 function Portal:update(dt)
@@ -71,7 +85,9 @@ function Portal:update(dt)
     if v.update then
       v:update(dt)
       if v.hit then
-        -- switch scene with v.text as arg
+        if v.val then
+          self.time = self.time + v.val
+        end
       end
     end
   end
@@ -80,13 +96,16 @@ function Portal:update(dt)
   elseif self.b.firestorm.hit then
     --generate cryptowallet and how to transfer + advanced settings, faircoin?
   end
+
+  self.b.time.val = timeToString(self.time)
 end
 
 function Portal:draw()
   local s=self
   lg.setColor(self.color)
   lg.rectangle('fill',s.x,s.y,s.w,s.h)
- 
+ -- lg.setColor(1,1,1)
+ -- lg.print(self.test,200,47)
   for k,v in pairs(self.b) do
     if v.draw then
       if v.fontSize then
