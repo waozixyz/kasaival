@@ -5,14 +5,15 @@ local lg=love.graphics
 local Camera=require 'lib/Camera'     
 local Button=require 'lib/Button'
 
-local Text=class(function(self, val,x,y,w,color,fontSize,ta)
+local Text=class(function(self, val,x,y,w,font,color,ta)
   self.val=val or 'empty text'
   self.x=x or 0
   self.y=y or 0
   self.w=w or 150
   self.color=color or {.8,.2,.7}
-  self.fontSize=fontSize or 13
   self.ta=ta or 'center'
+
+  self.font=font
 end)
 
 function Text:draw()
@@ -35,13 +36,17 @@ local Portal = class(function(self,x,y,w,h)
   self.color={.2,.2,.2 }
   
   self.time=8639760
- 
+
+ self.font=lg.newFont('assets/KasaivalGB.ttf',13)
+  self.titleFont=lg.newFont('assets/KasaivalGB.ttf',17)
+  self.timeFont=lg.newFont('assets/KasaivalGB.ttf',11)
+
   do --b
     local b,x,y,w,h,c,bc
     b = {
-Text('Kasaival 2.0',self.x,self.y+10,self.w,{.7,.2,.4},17),
+Text('Kasaival 2.0',self.x,self.y+10,self.w,self.font,{.7,.2,.4}),
 }
-b.time = Text(timeToString(self.time),self.x,self.y+47,self.w)
+b.time = Text(timeToString(self.time),self.x,self.y+47,self.w,self.timeFont)
 
     w,h=57,32
   
@@ -72,7 +77,7 @@ b.time = Text(timeToString(self.time),self.x,self.y+47,self.w)
     y=self.y+self.h-10
     c={0,.8,.9}
     bc={.4,0,.4}
-    local firestorm='launch firestorm ($10)'
+    local firestorm='start firestorm'
     b.firestorm=Button(x, y-h*2.2, w, h, firestorm, c, bc) 
     b.feedback=Button(x, y-h, w, h, 'give feedback', c, bc)
 
@@ -108,8 +113,8 @@ function Portal:draw()
  -- lg.print(self.test,200,47)
   for k,v in pairs(self.b) do
     if v.draw then
-      if v.fontSize then
-        lg.setNewFont(v.fontSize)
+      if v.font then
+        lg.setFont(v.font)
       end
       v:draw()
     end

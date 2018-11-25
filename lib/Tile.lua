@@ -3,7 +3,7 @@ require 'class'
 local lume = require 'lume'
 
 local lg=love.graphics
-local random=love.math.random
+local lm=love.math
 
 local Tile = class(function(self,shape,r,g,b,w,h)
   self.element=element or 'plant'
@@ -32,38 +32,40 @@ end
 
 
 function Tile:update()
-  local r,g,b = self.r,self.g,self.b
+  local d=100 -- rgb divider
+  local r,g,b = self.r*d,self.g*d,self.b*d
   local el  = self.element
 
-  if r > .6 then
-    r = r - .02
-    g = g - .03
-  elseif r > .4 then
-    r = r - .01
-    g = g - .02
-  elseif r > .2 then
-    r = r - .005
-    g = g - .01
+  if r > 60 then
+    r = r - 17
+    g = g - 14
+  elseif r > 40 then
+    r = r - 8
+    g = g - 6
+  elseif r > 20 then
+    r = r - 4
+    g = g - 3
   end
   
   if self.burn then
-    r = r + .02
+    r = r + 20-b/d
   else
-    if g > .6 then
-    elseif g > .4 then
-      g = g + .005
+    if g > 60 then
+      g = g + lm.random(-.027,.03)
+    elseif g > 40 then
+      g = g + .1
     else
-      g = g + .01
+      g = g + .3
     end
   end
 
-  if g > .1 then
+  if g > 10 then
     self.burnable = true
   else
     self.burnable = false
   end
-
-  self.r,self.g,self.b = r,g,b
+  
+  self.r,self.g,self.b = r/d,g/d,b/d
   self.burn = false
 end
 
