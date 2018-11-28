@@ -71,7 +71,7 @@ function Miu:load()
   -- visible mao's
   s.ao = {}
 
-  s:dharma({s.Gaia,s.Pink,s.Cyan}) 
+  s:dharma({s.Gaia, s.Cyan, s.Pink}) 
 end
 
 function collision(pink, cyan)
@@ -133,12 +133,13 @@ function Miu:update(dt)
     Camera.prevX = Camera.x
   end
   self.ao = lume.sort(self.ao, 'y')
- 
-  self.coli = lume.collision(P, Gr.mao)
-  if #self.coli > 0 then
-    for i,c in ipairs(self.coli) do
-      P:collide(c)
-      c:collide(P)
+  if Gr and Gr.mao then
+    self.coli = lume.collision(P, Gr.mao)
+    if #self.coli > 0 then
+      for i,c in ipairs(self.coli) do
+        P:collide(c)
+        c:collide(P)
+      end
     end
   end
 
@@ -181,8 +182,10 @@ W*0.85 and ap.x<ppx+cx-ap.r-8 then
   if dx ~= 0 or dy ~= 0 then
     P:attack(dx, dy)
   end
-
-
+  
+  local h=H
+  if Gr and Gr.h then h=Gr.h end
+  
   -- update mao
   for i,v in ipairs(self.mao) do
     if v.update then
@@ -192,13 +195,16 @@ W*0.85 and ap.x<ppx+cx-ap.r-8 then
       -- lettin go
       nirvana(self.mao, i)
     end
+
     if v.y and v.sx then
       -- v.sx = 1 - H / (H + v.y)
       if v.hp then
         local hpMax = v.hpMax or 100
-        v.sx = (v.y / Gr.h) * (v.hp/hpMax)
+    
+        
+        v.sx = (v.y / h) * (v.hp/hpMax)
       else
-        v.sx = v.y / Gr.h
+        v.sx = v.y / h
       end
       v.sy = v.sx
     end

@@ -39,12 +39,15 @@ function Tile:update()
   if r > 60 then
     r = r - 17
     g = g - 14
+    b = b - 10
   elseif r > 40 then
     r = r - 8
     g = g - 6
+    b = b - 2
   elseif r > 20 then
     r = r - 4
     g = g - 3
+    b = b - .4
   end
   
   if self.burn then

@@ -40,7 +40,7 @@ function Ground:load()
       if a > -1500 and b < 1900 then
 		      scale = y / 400 
 		      shape = {x + 16 * scale, y + h*scale, x + (w+16)*scale, y + h*scale, x + w*scale, y}
-        local r = lm.random(0,1)
+        local r = lm.random(0,1)/10
         local g = lm.random(0,1)
         local b = lm.random(0,1)
 		      self:addTile(shape,r,g,b,w,h)

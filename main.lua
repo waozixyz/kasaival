@@ -8,7 +8,7 @@ local Miu = require 'lib/Miu'
 -- 2, a portal to discover
 local Portal = require 'lib/Portal'
 
-local currentState = 0
+local currentState = 1
 function loadState(x)
   if x == nil or x == -1 then
     love.event.quit()

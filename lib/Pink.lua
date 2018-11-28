@@ -7,11 +7,11 @@ local lm=love.math
 
 local Shuriken = require 'lib/Shuriken'
 local Portal = require 'lib/Portal'
+local Flame=require 'lib/Flame'
 
 local Pink=class(function(self, img, w, h, x, y, sx, sy)
   local W,H = lg.getDimensions()
   self.label = 'pink'
-  self.img = 'assets/flame.png'
   self.w = w or 64
   self.h = h or 128
   self.x = x or W*.5
@@ -31,21 +31,14 @@ local Pink=class(function(self, img, w, h, x, y, sx, sy)
   self.attackCharge = 100
   self.Portal = {x=2000,y=0}
   self.r,self.g,self.b=1,1,1 
+  
   self.invincible=false
-  self.mao={self.Portal}
-  -- add animation
-  local S=SpriteSheet(self.img, self.w, self.h)
-  local a=S:createAnimation()
-  for row=1,8 do
-    local limit=22
-    if row==8 then limit=19 end
-    for col=1,limit do
-      a:addFrame(col, row)
-    end
-  end
+  
+  local s=self
+  self.Flame=Flame(s.x,s.y,s.sx,{s.r,s.g,s.b})
+  
 
-  a:setDelay(0.08)
-  self.animation=a
+  self.mao={self.Portal,self.Flame}
 end)
 
 function Pink:regulateSpeed(dx, dy, speed)
@@ -66,6 +59,8 @@ function Pink:move(dx,dy)
   if (self.y > H*.5 + 3 or dy > 0) and (self.y < H or dy < 0) then
     self.y = self.y + dy
   end
+  self.Flame.Position.x=self.x
+  self.Flame.Position.y=self.y
 end
 
 function Pink:attack(dx, dy)
@@ -128,9 +123,9 @@ function Pink:update(dt, Miu)
     if g < 1 then g=g+.01 end
     if b < 1 then b=b+.01 end
   end
-self.r,self.g,self.b=r,g,b
+  self.r,self.g,self.b=r,g,b
 
-  self.animation:update(dt)
+  
   self.attackCharge = self.attackCharge + dt
   for i,s in ipairs(self.shurikens) do
     s:update(dt)
@@ -139,22 +134,24 @@ self.r,self.g,self.b=r,g,b
     end
   end
   
-  do --burnUp
+  --burnUp
+  if Miu.Gaia and Miu.Gaia.Grouns then
     local G = Miu.Gaia.Ground
 
     local b = (.1+G.b) - (G.r+G.g)*.5*.08
     if G.b > .5 then
       b = b + G.b
     end
-    self:burnUp(b)
   end
+  self:burnUp(.1)
+ 
   self.speed = self.sx 
 end
 
 function Pink:draw()
   local r,g,b=self.r,self.g,self.b
   lg.setColor(r,g,b)
-  self.animation:draw(self.x, self.y, 0, self.sx, self.sy, self.w*.5, self.h-7)
+  
   lg.setColor(1,1,0)
   for i,s in ipairs(self.shurikens) do
     s:draw()
