@@ -158,7 +158,7 @@ end
 function Pink:draw()
   local r,g,b=self.r,self.g,self.b
   lg.setColor(r,g,b)
-  self.animation:draw(self.x, self.y+20, 0, self.sx, self.sy, self.w*.5, self.h)
+  self.animation:draw(self.x, self.y+20, 0, self.sx, self.sy, self.w*.5, self.h+26)
   lg.setColor(1,1,0)
   for i,s in ipairs(self.shurikens) do
     s:draw()
