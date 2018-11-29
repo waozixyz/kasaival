@@ -82,8 +82,7 @@ local SpriteSheet=class(function(self, img, w, h)
 end)
 
 function SpriteSheet:createAnimation(...)
-  local a=Animation.new(self)
-  return a
+  return Animation.new(self)
 end
 
 return SpriteSheet
