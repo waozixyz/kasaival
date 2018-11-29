@@ -56,18 +56,6 @@ function Pink:regulateSpeed(dx, dy, speed)
   return dx*speed, dy*speed
 end
 
-function Pink:move(dx,dy)
-  local W,H = lg.getDimensions()
- 
-  if (self.x < self.Portal.x or dx < 0) then
-    self.x = self.x + dx
-  end
-
-  if (self.y > H*.5 + 3 or dy > 0) and (self.y < H or dy < 0) then
-    self.y = self.y + dy
-  end
-end
-
 function Pink:attack(dx, dy)
   if self.attackCharge > 1 then
     dx,dy = self:regulateSpeed(dx,dy,self.attackSpeed)
@@ -158,7 +146,7 @@ end
 function Pink:draw()
   local r,g,b=self.r,self.g,self.b
   lg.setColor(r,g,b)
-  self.animation:draw(self.x, self.y+20, 0, self.sx, self.sy, self.w*.5, self.h+26)
+  self.animation:draw(self.x, self.y, 0, self.sx, self.sy, self.w*.5, self.h-13)
   lg.setColor(1,1,0)
   for i,s in ipairs(self.shurikens) do
     s:draw()

@@ -151,10 +151,16 @@ function Miu:update(dt)
 
   if moveInArea(-Camera.x, dx, Oc.x, P.x, Po.x - W*.5) and moveInArea(P.x, -dx, W*.8 - Camera.x, W*.2 - Camera.x) then
     Camera.x = Camera.x - dx
-
   end
 
-  P:move(dx,dy)
+  if (P.x<Po.x or dx<0) then
+    P.x = P.x + dx
+  end
+
+  if (P.y>Gr.y or dy>0) and (P.y<Gr.y+Gr.h-4 or dy<0) then
+    P.y = P.y + dy
+  end
+ 
 
   -- collisions
   --local phb=P:getHitbox()
@@ -201,9 +207,7 @@ W*0.85 and ap.x<ppx+cx-ap.r-8 then
       -- v.sx = 1 - H / (H + v.y)
       if v.hp then
         local hpMax = v.hpMax or 100
-    
-        
-        v.sx = (v.y / h) * (v.hp/hpMax)
+        v.sx = (v.y / (Gr.y+Gr.h) * (v.hp/hpMax))
       else
         v.sx = v.y / h
       end

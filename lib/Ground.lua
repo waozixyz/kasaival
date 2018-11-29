@@ -8,11 +8,12 @@ local lg=love.graphics
 local lm=love.math
 
 local Ground = class(function(self, x, y, w, h)
+  local W,H=lg.getDimensions()
   self.r,self.g,self.b=0,0,0
   self.x = x or -2000
   self.y = y or 200
   self.w = w or 4000
-  self.h = h or 400
+  self.h = h or H-self.y
   self.mao = {}
 end)
 
@@ -27,8 +28,9 @@ function Ground:load()
  	local scale = 1
   local w,h = 32,32
  	local y = self.y
-  y = y - y/400
-	 while y < self.h do
+  local yh=self.y+self.h
+
+	 while y < yh do
     local x = self.x
 		  while x < self.w*.5 do
       local a,b=0,0
@@ -38,8 +40,8 @@ function Ground:load()
         b=lm.random(x,self.w-self.x)
       end
       if a > -1500 and b < 1900 then
-		      scale = y / 400 
-		      shape = {x + 16 * scale, y + h*scale, x + (w+16)*scale, y + h*scale, x + w*scale, y}
+		      scale = y / yh
+		      shape = {x + w*.5 * scale, y + h*scale, x + (w*1.5)*scale, y + h*scale, x + w*scale, y}
         local r = lm.random(0,1)/10
         local g = lm.random(0,1)
         local b = lm.random(0,1)
