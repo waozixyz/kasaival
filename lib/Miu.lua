@@ -12,6 +12,7 @@ local Cyan = require 'lib/Cyan'
 -- ali
 local lg=love.graphics
 local lt=love.touch
+local lk=love.keyboard
 
 -- go to nirvana
 local nirvana = table.remove
@@ -211,7 +212,7 @@ W*0.85 and ap.x<ppx+cx-ap.r-8 then
   end
   end
 
-  if love.keyboard.isDown('escape') then
+  if lk.isDown('escape') then
     state.newState=0
   end
 end

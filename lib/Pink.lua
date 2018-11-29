@@ -70,8 +70,8 @@ function Pink:attack(dx, dy)
     local atkSpeed = self.attackSpeed
     local px = self.x - self.w * .2
     local py = self.y - self.h * .25
-    x = px + (dx / atkSpeed) * (self.w * .1)
-    y = py + (dy /atkSpeed) * (self.h  * .1)
+    x=px+(dx/atkSpeed)*(self.w*.1)
+    y=py+(dy/atkSpeed)*(self.h*.1)
    table.insert(self.shurikens, Shuriken(x,  y, dx, dy))
     self.attackCharge = 0
   end

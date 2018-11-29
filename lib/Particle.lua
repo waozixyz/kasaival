@@ -21,10 +21,9 @@ function M:update(dt, parentPosition)
   self.elapsed=self.elapsed+dt
   local diff=self.startPosition-parentPosition
   local pos=self.Position
-  self.Position=pos-diff+self.Velocity*dt
+ self.Position=pos-diff+self.Velocity*dt
   self.startPosition=self.startPosition-diff
   self.Velocity=self.Velocity:rotate(lm.random(-30, 10))
-  self.Velocity.y=self.Velocity.y-dt
   if self.elapsed>=self.livetime then
     self.dead=true
   end
@@ -38,7 +37,7 @@ function M:draw()
   local alpha=math.ceil(1.1-1*(self.elapsed/self.livetime))
   if alpha<0 then alpha=0 end
   lg.setColor(self.R, self.G, self.B, alpha)
-  lg.circle('fill', self.Position.x, self.Position.y, 3, 3)
+  lg.circle('fill', self.Position.x, self.Position.y-13, 3, 3)
 end
 return M
 
