@@ -146,8 +146,8 @@ end
 
 function Portal:update(dt)
   if self.b then
-    self.time=self.bb(self.b,self.time)
-    self.b.time.val = timeToString(self.time)
+  self.time=self.bb(self.b,self.time)
+  self.b.time.val = timeToString(self.time)
   end
   if state.current==1 then
   self.hit = false

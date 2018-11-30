@@ -22,7 +22,7 @@ function loadState(x)
   elseif x == 1 then
     state.current = 1
     -- miuuuuu
-    if not _M then
+    if _M == nil then
       _M=Miu()
     end
     _M:load()
@@ -35,8 +35,8 @@ end
 
 -- load love
 function love.load()
-  state.new = 0
-  lw.setIcon(li.newImageData('icon.png'))
+  state.new = 1
+  loadState(state.new) lw.setIcon(li.newImageData('icon.png'))
 end
  
 -- update love

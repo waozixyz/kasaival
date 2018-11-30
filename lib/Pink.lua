@@ -11,7 +11,8 @@ local Shuriken = require 'lib/Shuriken'
 local Pink=class(function(self, img, w, h, x, y, sx, sy)
   local W,H = lg.getDimensions()
   self.label = 'pink'
-  self.img = 'assets/flame.png'--replace me with particles
+  self.img = 'assets/chi.png'
+  
   self.w = w or 64
   self.h = h or 128
   self.x = x or W*.5
@@ -25,7 +26,6 @@ local Pink=class(function(self, img, w, h, x, y, sx, sy)
   self.walkSpeed = 8
   self.atk = 1
   self.def = 0
-  self.hitBox = {}
   self.shurikens = {}
   self.attackSpeed = 5
   self.attackCharge = 100
@@ -146,11 +146,17 @@ end
 function Pink:draw()
   local r,g,b=self.r,self.g,self.b
   lg.setColor(r,g,b)
-  self.animation:draw(self.x, self.y, 0, self.sx, self.sy, self.w*.5, self.h-13)
+  local x,y=self.x,self.y
+  local sx,sy=self.sx,self.sy
+  local w,h=self.w,self.h
+  local offX,offY=w*.5,h-13
+  self.animation:draw(x, y, 0, sx, sy, offX,offY)
+
   lg.setColor(1,1,0)
   for i,s in ipairs(self.shurikens) do
     s:draw()
   end
+
 end
 
 return Pink
