@@ -141,12 +141,13 @@ function Portal.bb(c,time)
     --generate cryptowallet and how to transfer + advanced settings, faircoin?
   end
 
-  c.time.val = timeToString(time)
+  return time
 end
 
 function Portal:update(dt)
   if self.b then
-    self.bb(self.b,self.time)
+    self.time=self.bb(self.b,self.time)
+    self.b.time.val = timeToString(self.time)
   end
   if state.current==1 then
   self.hit = false
