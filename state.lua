@@ -1,5 +1,6 @@
 local state = {
-  newState = 0
+  new = 1,
+  current = 1,
 }
 
 return state

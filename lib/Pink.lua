@@ -6,7 +6,7 @@ local lg=love.graphics
 local lm=love.math
 
 local Shuriken = require 'lib/Shuriken'
-local Portal = require 'lib/Portal'
+
 
 local Pink=class(function(self, img, w, h, x, y, sx, sy)
   local W,H = lg.getDimensions()
@@ -29,7 +29,7 @@ local Pink=class(function(self, img, w, h, x, y, sx, sy)
   self.shurikens = {}
   self.attackSpeed = 5
   self.attackCharge = 100
-  self.Portal = {x=2000,y=0}
+  self.Portal = { x=2000, y=0}
   self.r,self.g,self.b=1,1,1 
   self.invincible=false
   self.mao={self.Portal}

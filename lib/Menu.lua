@@ -48,11 +48,11 @@ function Menu:update(dt)
   for k,v in pairs(self.ui) do
     v:update(dt,W)
     if v.hit then
-      state.newState=k 
+      state.new=k 
     end
   end
   if lk.isDown('escape')  then
-    state.newState=1
+    state.new=1
   end
 end
 

@@ -1,7 +1,10 @@
 require 'class'
 
+local lt=love.touch
 local lg=love.graphics
+local lm=love.math
 
+local state=require 'state'
 local Camera=require 'lib/Camera'     
 local Button=require 'lib/Button'
 
@@ -27,21 +30,41 @@ function timeToString(x)
   return tostring(d) .. 'D-' .. tostring(h) .. 'H-' .. tostring(m) .. 'M'
 end
 
-local Portal = class(function(self,x,y,w,h)
+local Portal = class(function(self,t,h,c,w,h)
   local W,H=lg.getDimensions()
-  self.x=x or 0
-  self.y=y or 0
-  self.w=w or 150
-  self.h=h or H
-  self.color={.2,.2,.2 }
+  self.x,self.y=32,32
+
+  if type(t) == 'table' then
+    for i,v in ipairs(t) do
+      self[v]=1
+    end
+  elseif type(t) == 'number' then
+    self.x=t
+  end
   
-  self.time=8639760
+  if type(h) == 'number' then
+    if self.x then
+     self.y=h
+    else
+     self.x=h
+    end
+  end
+ 
+  if type(c) == 'number' then
+    if not self.y then
+      self.y=c
+    end
+  end
+  
+  if state.current == 2 then
+    self.w=w or 150
+    self.h=h or H
+    self.color={.2,.2,.2 } 
+    self.time=8639760
+    self.font=lg.newFont('assets/KasaivalGB.ttf',13)
+    self.titleFont=lg.newFont('assets/KasaivalGB.ttf',17)
+   self.timeFont=lg.newFont('assets/KasaivalGB.ttf',11)
 
- self.font=lg.newFont('assets/KasaivalGB.ttf',13)
-  self.titleFont=lg.newFont('assets/KasaivalGB.ttf',17)
-  self.timeFont=lg.newFont('assets/KasaivalGB.ttf',11)
-
-  do --b
     local b,x,y,w,h,c,bc
     b = {
 Text('Kasaival 2.0',self.x,self.y+10,self.w,self.font,{.7,.2,.4}),
@@ -83,29 +106,76 @@ b.time = Text(timeToString(self.time),self.x,self.y+47,self.w,self.timeFont)
 
     self.b=b
   end
+
+  if self.img then
+    self.img=lg.newImage('assets/Portal-1.png')
+ end
 end) 
 
-function Portal:update(dt)
-  for k,v in pairs(self.b) do
+function Portal:getHitbox()
+  local x,y=self.x,self.y
+  local w=self.w or 0
+  local h=self.h or 0
+  if self.img then
+   w=self.img:getWidth()
+   h=self.img:getHeight()
+  end
+    
+  return {x, x+w, y, y+h}
+end
+
+function Portal.bb(c,time)
+ for k,v in pairs(c) do
     if v.update then
       v:update(dt)
       if v.hit then
         if v.val then
-          self.time = self.time + v.val
+          time = time + v.val
         end
       end
     end
   end
-  if self.b.feedback.hit then
+  if c.feedback.hit then
     --open web link to mailto friend cateye
-  elseif self.b.firestorm.hit then
+  elseif c.firestorm.hit then
     --generate cryptowallet and how to transfer + advanced settings, faircoin?
   end
 
-  self.b.time.val = timeToString(self.time)
+  c.time.val = timeToString(time)
 end
 
+function Portal:update(dt)
+  if self.b then
+    self.bb(self.b,self.time)
+  end
+
+  self.hit = false
+  local touches = lt.getTouches()
+  for i, id in ipairs(touches) do
+    local tx, ty = lt.getPosition(id)
+    local b = self:getHitbox()
+    local l,r,u,d=b[1],b[2],b[3],b[4]
+    
+    if tx>=l and tx<=r and ty>=u and ty<=d then
+      state.new=0
+    end
+  end
+end
+
+function red(m)
+  return {lm.random(6,8)*m,lm.random(3,4)*m,lm.random(6,8)*m}
+end
+function green(m)
+  return {lm.random(6,8)*m,lm.random(6,8)*m,lm.random(3,4)*m}
+end
+function blue(m)
+  return {lm.random(3,4)*m,lm.random(6,8)*m,lm.random(6,8)*m}
+end
+
+
+
 function Portal:draw()
+  if state.current==2 then
   local s=self
   lg.setColor(self.color)
   lg.rectangle('fill',s.x,s.y,s.w,s.h)
@@ -119,6 +189,18 @@ function Portal:draw()
       v:draw()
     end
   end
+  end
+  if self.img then
+  if state.current == 1 then
+    lg.setColor(red(.1),.8)
+    lg.draw(self.img,self.x-7,self.y)
+    lg.setColor(green(.1),.8)
+lg.draw(self.img,self.x,self.y-7)
+    lg.setColor(blue(.1),.8)
+    lg.draw(self.img,self.x,self.y)
+  end
+  end
+ 
 end
 
 return Portal

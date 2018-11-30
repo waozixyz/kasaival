@@ -8,6 +8,7 @@ local state = require 'state'
 local Gaia = require 'lib/Gaia'
 local Pink = require 'lib/Pink'
 local Cyan = require 'lib/Cyan'
+local Portal = require 'lib/Portal'
 
 -- ali
 local lg=love.graphics
@@ -41,6 +42,7 @@ local Miu = class(function(self)
     movePad=Joystick(W-x, y, r, c1)
     attackPad=Joystick(x, y, r, c2)
   end
+  self.Portal = Portal({'img'},6,6)
 end)
 
 function Miu:dharma(t)
@@ -55,24 +57,33 @@ function Miu:dharma(t)
   end
 end
 
+function Miu:reload()
+ local s=self
+ Camera.x,Camera.y=0,0
 
-function Miu:load()
-  local s=self
-  Camera.x,Camera.y=0,0
-  -- add gaia
-  s.Gaia = Gaia()
-
-  -- add harmony
-  local W,H = lg.getDimensions()
-  s.Pink = Pink('assets/flame_1.png', 96, 192,   W*.5, H*.7)
-  s.Pink.hp=100
+ s.Gaia = Gaia()
+ -- add harmony
+ local W,H = lg.getDimensions()
+ 
+ s.Pink = Pink('assets/flame_1.png', 96, 192,   W*.5, H*.7)
+ s.Pink.hp=100
   s.Cyan = Cyan()
+
 
   s.mao={}
   -- visible mao's
-  s.ao = {}
+  s.ao={}
 
-  s:dharma({s.Gaia, s.Cyan, s.Pink}) 
+  s:dharma({s.Gaia, s.Cyan, s.Pink})
+end
+
+function Miu:load()
+  local s=self
+  
+  if not s.Gaia or not s.Pink or not s.Cyan or GameOver then
+   self:reload()
+  end
+
 end
 
 function collision(pink, cyan)
@@ -186,7 +197,7 @@ W*0.85 and ap.x<ppx+cx-ap.r-8 then
   attackPad:update(dt)
   -- attack
   dx,dy = attackPad.dx, attackPad.dy
-  if dx ~= 0 or dy ~= 0 then
+  if dx~=0 or dy~=0 then
     P:attack(dx, dy)
   end
   
@@ -217,8 +228,9 @@ W*0.85 and ap.x<ppx+cx-ap.r-8 then
   end
 
   if lk.isDown('escape') then
-    state.newState=0
+    state.new=0
   end
+  self.Portal:update(dt)
 end
 
 function getIndex(obj, options)
@@ -239,8 +251,7 @@ function Miu:draw()
   for i,v in ipairs(self.ao) do
     v:draw(Camera)
   end
-  lg.print(tostring(GameOver),-Camera.x+30,30)
-
+  
   lg.reset()
   movePad:draw()
   attackPad:draw()
@@ -250,6 +261,7 @@ function Miu:draw()
     lg.setColor(1,.6,.6)
     lg.printf('Game Over',50, H*.5,W,'center')
   end
+  self.Portal:draw()
 end
 
 return Miu

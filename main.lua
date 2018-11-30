@@ -8,56 +8,59 @@ local Miu = require 'lib/Miu'
 -- 2, a portal to discover
 local Portal = require 'lib/Portal'
 
-local currentState = 1
+local le=love.event
+local li=love.image
+local lw=love.window
+
+local _M,_P
 function loadState(x)
   if x == nil or x == -1 then
-    love.event.quit()
+    le.quit()
   elseif x == 0 then
+    state.current = 0
     Menu:load(x)
-    currentState = 0
   elseif x == 1 then
+    state.current = 1
     -- miuuuuu
-    Miu = Miu()
-    Miu:load()
-    currentState = 1
+    if not _M then
+      _M=Miu()
+    end
+    _M:load()
   elseif x == 2 then
+    state.current = 2
     --load portal
-    Portal = Portal()
-    currentState = 2
+    _P=Portal()
   end
 end
-local lw=love.window
-local li=love.image
+
 -- load love
 function love.load()
-  state.newState = currentState
+  state.new = 0
   lw.setIcon(li.newImageData('icon.png'))
-  loadState(state.newState)
 end
  
 -- update love
 function love.update(dt)
-  if state.newState ~= currentState then
-    loadState(state.newState)
+  if state.new ~= state.current then
+    loadState(state.new)
   end
  
-  if currentState == 0 then
-    Menu:update()
-  elseif currentState == 1 then
-    Miu:update(dt)
-  elseif currentState == 2 then
-    Portal:update(dt)
+  if state.current == 0 then
+    Menu:update(dt)
+  elseif state.current == 1 then
+    _M:update(dt)
+  elseif state.current == 2 then
+    _P:update(dt)
   end
-
 end
 
 -- draw love
 function love.draw()
-  if currentState == 0 then
+  if state.current == 0 then
     Menu:draw()
-  elseif currentState == 1 then
-    Miu:draw()
-  elseif currentState == 2 then
-    Portal:draw()
+  elseif state.current == 1 then
+    _M:draw()
+  elseif state.current == 2 then
+    _P:draw()
   end
 end
