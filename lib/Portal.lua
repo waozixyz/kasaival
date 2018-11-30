@@ -148,7 +148,7 @@ function Portal:update(dt)
   if self.b then
     self.bb(self.b,self.time)
   end
-
+  if state.current==1 then
   self.hit = false
   local touches = lt.getTouches()
   for i, id in ipairs(touches) do
@@ -159,6 +159,7 @@ function Portal:update(dt)
     if tx>=l and tx<=r and ty>=u and ty<=d then
       state.new=0
     end
+  end
   end
 end
 
