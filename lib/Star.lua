@@ -8,7 +8,7 @@ local Star = class(function(self,img,x,y,r,scale,color)
   self.y = y or 50
   self.r = r or 0
   self.scale = scale or 1
-  self.color = color
+  self.color = color or {1,1,1}
 end)
 
 

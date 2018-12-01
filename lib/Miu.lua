@@ -259,7 +259,7 @@ function Miu:draw()
   if GameOver then
     lg.setFont(self.bigFont)
     lg.setColor(1,.6,.6)
-    lg.printf('Game Over',50, H*.5,W,'center')
+    lg.printf('Game Over',0, H*.5,W,'center')
   end
   self.Portal:draw()
 end
