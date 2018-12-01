@@ -107,8 +107,9 @@ b.time = Text(timeToString(self.time),self.x,self.y+47,self.w,self.timeFont)
     self.b=b
   end
 
-  if self.img then
+  if self.img and state.current==1 then
     self.img=lg.newImage('assets/Portal-1.png')
+    self.scale=4
  end
 end) 
 
@@ -117,8 +118,7 @@ function Portal:getHitbox()
   local w=self.w or 0
   local h=self.h or 0
   if self.img then
-   w=self.img:getWidth()
-   h=self.img:getHeight()
+   w,h=self.img:getDimensions()
   end
     
   return {x, x+w, y, y+h}
@@ -150,17 +150,22 @@ function Portal:update(dt)
   self.b.time.val = timeToString(self.time)
   end
   if state.current==1 then
-  self.hit = false
-  local touches = lt.getTouches()
-  for i, id in ipairs(touches) do
-    local tx, ty = lt.getPosition(id)
-    local b = self:getHitbox()
-    local l,r,u,d=b[1],b[2],b[3],b[4]
-    
-    if tx>=l and tx<=r and ty>=u and ty<=d then
-      state.new=0
+
+   local sc=self.scale
+   local w,h=self.img:getDimensions()
+   w,h=w*sc,h*sc
+   local x,y=-w*.5,-h*.5
+
+   self.hit = false
+   local touches = lt.getTouches()
+   for i, id in ipairs(touches) do
+     local tx, ty = lt.getPosition(id)
+ 
+     if tx>=x and tx<=x+w and ty>=y and ty<=y+h then
+       state.new=0
+     end
     end
-  end
+    self.x,self.y=x,y
   end
 end
 
@@ -193,14 +198,12 @@ function Portal:draw()
     end
   end
   end
-  if self.img then
-  if state.current == 1 then
-    lg.setColor(red(.1),.8)
-   local scale=4 lg.draw(self.img,-8,-8,0,scale)
-
+  if self.img and state.current==1 then
+   lg.setColor(green(.1),.8)
+   local img,scale=self.img,self.scale
+   local x,y=self.x,self.y
+   lg.draw(img,x,y,0,scale)
   end
-  end
- 
 end
 
 return Portal
