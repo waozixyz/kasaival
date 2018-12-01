@@ -27,7 +27,22 @@ function timeToString(x)
   local d = math.ceil(x / 86400)
   local h = math.ceil((x % 86400) / 3600)
   local m = math.ceil((x % 86400 % 3600) / 60)
-  return tostring(d) .. 'D-' .. tostring(h) .. 'H-' .. tostring(m) .. 'M'
+  
+  if d < 10 then
+    d='00' .. tostring(d)
+  elseif d < 100 then
+    d='0' .. tostring(d)
+  else d=tostring(d) end
+  
+  if h < 10 then
+    h='0' .. tostring(h)
+  else h=tostring(h) end
+
+  if m < 10 then
+    m='0' .. tostring(m)
+  else m=tostring(m) end
+
+  return  d .. 'D-' .. h .. 'H-' .. m .. 'M'
 end
 
 local Portal = class(function(self,t,h,c,w,h)
@@ -96,21 +111,20 @@ b.time = Text(timeToString(self.time),self.x,self.y+47,self.w,self.timeFont)
   end
 
     w,h=128,48
-    x=self.x+10
-    y=self.y+self.h-10
+    x=W-w-16
+    y=self.y
     c={0,.8,.9}
     bc={.4,0,.4}
     local firestorm='start firestorm'
-    b.firestorm=Button(x, y-h*2.2, w, h, firestorm, c, bc) 
-    b.feedback=Button(x, y-h, w, h, 'give feedback', c, bc)
+    b.firestorm=Button(x, y, w, h, firestorm, c, bc) 
+    b.feedback=Button(x, y+h, w, h, 'give feedback', c, bc)
 
     self.b=b
   end
 
-  if self.img and state.current==1 then
-    self.img=lg.newImage('assets/Portal-1.png')
-    self.scale=4
- end
+
+  self.img=lg.newImage('assets/Portal-1.png')
+  self.scale=4
 end) 
 
 function Portal:getHitbox()
@@ -147,10 +161,21 @@ end
 function Portal:update(dt)
   if self.b then
   self.time=self.bb(self.b,self.time)
-  self.b.time.val = timeToString(self.time)
+  if self.time > 0 then
+    self.b.time.val = timeToString(self.time)
+  else
+    local str='Updating'
+    if not self.dots then self.dots=0 end
+    self.dots=self.dots+dt
+    if self.dots>3 then self.dots=0 end
+    local dots=''
+    for i=1,math.floor(self.dots) do
+      dots=dots .. '.'
+    end
+    self.b.time.val = str .. dots
   end
-  if state.current==1 then
-
+  end
+  if true then
    local sc=self.scale
    local w,h=self.img:getDimensions()
    w,h=w*sc,h*sc
@@ -185,8 +210,8 @@ function Portal:draw()
   local W,H=lg.getDimensions() 
   if state.current==2 then
   local s=self
-  lg.setColor(self.color)
-  lg.rectangle('fill',s.x,s.y,s.w,s.h)
+ -- lg.setColor(self.color)
+  --lg.rectangle('fill',s.x,s.y,s.w,s.h)
  -- lg.setColor(1,1,1)
  -- lg.print(self.test,200,47)
   for k,v in pairs(self.b) do
@@ -198,7 +223,7 @@ function Portal:draw()
     end
   end
   end
-  if self.img and state.current==1 then
+  if self.img then
    lg.setColor(green(.1),.8)
    local img,scale=self.img,self.scale
    local x,y=self.x,self.y

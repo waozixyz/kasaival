@@ -12,6 +12,9 @@ local le=love.event
 local li=love.image
 local lw=love.window
 
+-- set start stage
+state.new = 2
+
 local _M,_P
 function loadState(x)
   if x == nil or x == -1 then
@@ -35,7 +38,6 @@ end
 
 -- load love
 function love.load()
-  state.new = 1
   loadState(state.new) lw.setIcon(li.newImageData('icon.png'))
 end
  
