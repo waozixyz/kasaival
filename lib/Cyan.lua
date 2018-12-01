@@ -1,7 +1,7 @@
 require 'class'
 
 local Ocean = require 'lib/Ocean'
-local Blob = require 'lib/Blob'
+local Bat= require 'lib/Bat'
 
 local lg=love.graphics
 local lm=love.math
@@ -13,7 +13,7 @@ local Cyan=class(function(self)
   for i = 1, 2 do
     local x = lm.random(-400, -40)
     local y = lm.random(200, 600)
-    table.insert(self.mao, Blob('assets/Bat.png', 24, 17, x, y))
+    table.insert(self.mao, Bat('assets/Bat.png', 24, 17, x, y))
   end 
   self.Ocean=Ocean()
   
