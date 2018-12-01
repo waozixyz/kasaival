@@ -142,7 +142,7 @@ end
 
 function Blob:draw()
   lg.setColor(self:getColor())
-  self.animation:draw(self.x, self.y, self.r, self.sx, self.sy, self.w*.5, self.h)
+  self.animation:draw(self.x, self.y, self.r, self.sx, self.sy, self.w*.5, self.h*.5)
 end
 
 return Blob

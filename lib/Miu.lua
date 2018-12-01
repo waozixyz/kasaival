@@ -59,28 +59,25 @@ end
 
 function Miu:reload()
  local s=self
- Camera.x,Camera.y=0,0
+  Camera.x,Camera.y=0,0
 
- s.Gaia = Gaia()
- -- add harmony
- local W,H = lg.getDimensions()
+  s._G=Gaia()
+  -- add harmony
+  local W,H = lg.getDimensions()
  
- s.Pink = Pink('assets/flame_1.png', 96, 192,   W*.5, H*.7)
- s.Pink.hp=100
-  s.Cyan = Cyan()
-
+  s._P = Pink('assets/flame_1.png', 96, 192,   W*.5, H*.7)
+  s._P.hp=100
+  s._C = Cyan()
 
   s.mao={}
   -- visible mao's
   s.ao={}
 
-  s:dharma({s.Gaia, s.Cyan, s.Pink})
+  s:dharma({s._G, s._C, s._P})
 end
 
 function Miu:load()
-  local s=self
-  
-  if not s.Gaia or not s.Pink or not s.Cyan or GameOver then
+  if not self._G or not self._P or not self._C or GameOver then
    self:reload()
   end
 
@@ -128,7 +125,7 @@ end
 
 function Miu:update(dt)
   local W,H = lg.getDimensions()
-  local P,C,G=self.Pink,self.Cyan,self.Gaia
+  local P,C,G=self._P,self._C,self._G
   local Po,Oc,Gr=P.Portal,C.Ocean,G.Ground
 
   if P.hp and math.floor(P.hp) <= 0 then
@@ -198,7 +195,7 @@ W*0.85 and ap.x<ppx+cx-ap.r-8 then
   -- attack
   dx,dy = attackPad.dx, attackPad.dy
   if dx~=0 or dy~=0 then
-    P:attack(dx, dy)
+     P:attack(dx, dy)
   end
   
   local h=H

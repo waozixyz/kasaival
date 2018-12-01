@@ -242,10 +242,10 @@ function lume.sort(t, comp)
     if type(comp) == "string" then
      
       table.sort(rtn, function(a, b)
-        local a = a[comp] or -9999
-        local b = b[comp] or -9999
+        local o=a[comp] or -9999
+        local e=b[comp] or -9999
 
-        return a < b
+        return o < e
       end)
     else
       table.sort(rtn, comp)
