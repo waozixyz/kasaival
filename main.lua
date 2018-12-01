@@ -13,7 +13,7 @@ local li=love.image
 local lw=love.window
 
 -- set start stage
-state.new = 2
+state.new = 1
 
 local _M,_P
 function loadState(x)
