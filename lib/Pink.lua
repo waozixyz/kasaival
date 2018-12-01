@@ -136,7 +136,7 @@ self.r,self.g,self.b=r,g,b
       b = b + G.b
     end
 
-    --self:burnUp(b)
+    self:burnUp(b)
   end
   
  

@@ -177,6 +177,7 @@ end
 
 
 function Portal:draw()
+  local W,H=lg.getDimensions() 
   if state.current==2 then
   local s=self
   lg.setColor(self.color)
@@ -195,11 +196,8 @@ function Portal:draw()
   if self.img then
   if state.current == 1 then
     lg.setColor(red(.1),.8)
-    lg.draw(self.img,self.x-7,self.y)
-    lg.setColor(green(.1),.8)
-lg.draw(self.img,self.x,self.y-7)
-    lg.setColor(blue(.1),.8)
-    lg.draw(self.img,self.x,self.y)
+   local scale=4 lg.draw(self.img,-8,-8,0,scale)
+
   end
   end
  
