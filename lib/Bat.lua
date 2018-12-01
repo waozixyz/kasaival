@@ -6,6 +6,7 @@ local lg=love.graphics
 local lm=love.math
 
 local Blob=class(function(self, img, w, h, x, y, sx, sy)
+  self.hpsize=true
   local W,H = lg.getDimensions()
   self.img = img or 'assets/Bat.png'
   self.x = x or 30

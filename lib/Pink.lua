@@ -9,6 +9,7 @@ local Shuriken = require 'lib/Shuriken'
 
 
 local Pink=class(function(self, img, w, h, x, y, sx, sy)
+  self.hpsize=true
   local W,H = lg.getDimensions()
   self.label = 'pink'
   self.img = 'assets/chi.png'

@@ -74,6 +74,7 @@ function Ground:draw()
   b=lume.clamp(b,0,1)
 
   local alpha=1-(-Camera.x)/o
+  if alpha > 1 then alpha=1 end
   lg.setColor(r,g,b,alpha)  
   lg.rectangle('fill', self.x,self.y,self.w,self.h)
   

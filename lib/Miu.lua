@@ -210,16 +210,17 @@ W*0.85 and ap.x<ppx+cx-ap.r-8 then
       -- lettin go
       nirvana(self.mao, i)
     end
-
+    if v.scale and not v.sx then v.sx=v.scale end
     if v.y and v.sx then
       -- v.sx = 1 - H / (H + v.y)
-      if v.hp then
+      if v.hp and v.hpsize then
         local hpMax = v.hpMax or 100
         v.sx = (v.y / (Gr.y+Gr.h) * (v.hp/hpMax))
       else
-        v.sx = v.y / h
+        v.sx = v.y / (Gr.y+Gr.h)
       end
       v.sy = v.sx
+      if v.scale then v.scale=v.sx end
     end
   end
   end
