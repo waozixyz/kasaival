@@ -10,16 +10,16 @@ local Ground = require 'lib/Ground'
 
 local Gaia = class(function(self)
   self.label='gaia'
-  self.color={0.2, 0.4, 0.3}
+  self.color={.2,.4,.3}
   self.mao={}
   self.elapsed=0
 end)
 
 function addTree(G)  
-  local x=lm.random(G.x,G.x+G.w)
+  local x=lm.random(G.x+800,G.x+G.w)
   local y=lm.random(G.y,G.y+G.h)
   local boost=lm.random(0,100)
-  local img=lm.random(1,16)
+  local img=lm.random(1,17)
   return Tree(img,x,y,boost)
 end
 
@@ -35,10 +35,11 @@ function Gaia:load()
 end
 
 function Gaia:update(dt)
-  self.Sky:update(dt,self.Ground)
+  local G=self.Ground
+  self.Sky:update(dt,G)
   self.elapsed = self.elapsed + dt
   if self.elapsed > 1 then
-    -- self:addTrees(1, 0)
+    plant(self.mao,addTree(G))
     self.elapsed = 0
   end 
 end

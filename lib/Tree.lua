@@ -20,7 +20,6 @@ local Tree = class(function(self,img,x,y,boost)
 end)
 
 function Tree:grow(dt) 
---  self.scale=self.scale+.01*dt*(self.y.
   self.size=self.size+dt
 end
 
