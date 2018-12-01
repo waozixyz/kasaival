@@ -73,7 +73,8 @@ function Ground:draw()
   g=lume.clamp(g,0,1)
   b=lume.clamp(b,0,1)
 
-  lg.setColor(r,g,b)  
+  local alpha=1-(-Camera.x)/o
+  lg.setColor(r,g,b,alpha)  
   lg.rectangle('fill', self.x,self.y,self.w,self.h)
   
   self.r,self.g,self.b=r,g,b

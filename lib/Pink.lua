@@ -116,7 +116,7 @@ function Pink:update(dt, Miu)
     if g < 1 then g=g+.01 end
     if b < 1 then b=b+.01 end
   end
-self.r,self.g,self.b=r,g,b
+  self.r,self.g,self.b=r,g,b
 
   self.animation:update(dt)
   self.attackCharge = self.attackCharge + dt
@@ -138,7 +138,6 @@ self.r,self.g,self.b=r,g,b
 
     self:burnUp(b)
   end
-  
  
   self.speed = self.sx 
 end
@@ -156,7 +155,6 @@ function Pink:draw()
   for i,s in ipairs(self.shurikens) do
     s:draw()
   end
-
 end
 
 return Pink
