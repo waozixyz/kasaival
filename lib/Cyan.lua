@@ -13,7 +13,7 @@ local Cyan=class(function(self)
   for i = 1, 2 do
     local x = lm.random(-400, -40)
     local y = lm.random(200, 600)
-    table.insert(self.objs, Blob('assets/blob.png', 64, 64, x, y))
+    table.insert(self.objs, Blob('assets/Bat.png', 24, 17, x, y))
   end 
   self.Ocean=Ocean()
   
@@ -27,7 +27,7 @@ function Cyan:update(dt, Miu)
       table.remove(self.objs, i)
     end
 
-    v:follow(Miu.Pink, Miu.Gaia.Ground.w)
+    v:follow(dt, Miu.Pink, Miu.Gaia.Ground.w)
   end
 end
 

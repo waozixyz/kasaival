@@ -7,8 +7,9 @@ local lm=love.math
 local portal=table.insert
 
 local Sky = class(function(self,x,y)
-  self.img=lg.newImage('assets/sky.jpg')
-  self.nebula=lg.newImage('assets/nebula.png') 
+  local bckg=1
+  self.img=lg.newImage('assets/sky/bckg-' .. bckg .. '.jpg')
+  self.nebula=lg.newImage('assets/sky/nebula.png') 
   self.speed=3
   self.label='sky'
   self.w = 800
@@ -17,12 +18,22 @@ local Sky = class(function(self,x,y)
   self.y = y or -self.h*.5
   self.startY=self.y
   self.stardust = {}
+  for i=1, 50 do
+    local img = lg.newImage('assets/sky/' .. (i % 11 + 1) .. '.png')
+    local x = lm.random(self.x,self.w)
+    local y = lm.random(self.y,self.h)
+    local scale = lm.random(1, 4) * .08  
+    local color = {lm.random(1,10)*.1,lm.random(1,10)*.1,lm.random(1,10)*.1}
+    portal(self.stardust, Star(path,x,y,0,scale,color))
+  end
+
+
   for i=1, 10 do
     local img = lg.newImage('assets/sky/' .. (i % 3 + 14) .. '.png')
     local x = lm.random(self.x,self.w)
     local y = lm.random(self.y,self.h)
     local scale = lm.random(5, 10) * .1 
-  --  local color = {rand(4,10)*.1,rand(3,10)*.1,rand(4,10)*.1}
+
     portal(self.stardust, Star(path,x,y,0,scale))
   end 
 end)

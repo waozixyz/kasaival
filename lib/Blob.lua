@@ -7,13 +7,13 @@ local lm=love.math
 
 local Blob=class(function(self, img, w, h, x, y, sx, sy)
   local W,H = lg.getDimensions()
-  self.img = img or 'assets/blob.png'
+  self.img = img or 'assets/Bat.png'
   self.x = x or 30
   self.y = y or 300
   self.w = 64
   self.h = 64 
-  self.sx = sx or .5
-  self.sy = sy or .5
+  self.sx = sx or 1
+  self.sy = sy or 1
   self.atk = 0.1
   self.maxSpeed = 4
   self.closerFaster = 1
@@ -29,19 +29,19 @@ local Blob=class(function(self, img, w, h, x, y, sx, sy)
    -- add animation
   local S=SpriteSheet(self.img, self.w, self.h)
   local a=S:createAnimation()
-  for col=1,2 do
+  for col=1,1 do
     a:addFrame(col, 1)
   end
   a:setDelay(0.08)
   self.animation=a
-
+  self.base={x=-2000}
 end)
 
 function Blob:getColor()
-  local r = lm.random(0, 20) / 100
-  local g = lm.random(30, 40 ) / 100
-  local b = lm.random(50, 80) / 100
-  return r, g, b
+  local r = lm.random(90, 100) / 100
+  local g = lm.random(60, 100) / 100
+  local b = lm.random(50, 800) / 100
+  return {r, g, b}
 end
 
 
@@ -53,53 +53,57 @@ function Blob:attack(obj, collision)
 end
 
 function Blob:getHitbox()
-  local x, y, width, height = self.x, self.y, self.width, self.height
+  local x, y, w, h  = self.x, self.y, self.w, self.h
 
-  return {x + width * 0.5, x - width * 0.5, y - height * 0.5, y + height * 0.5}
+  return {x + w * 0.5, x - w * 0.5, y - h * 0.5, y + h * 0.5}
 end
 
 function move(x, y)
   return x+lm.random(-1,1), y+lm.random(-1, 1) 
 end
 
-function followObj(x1, x2, speed)
-  if x1 < x2 then
+function followObj(o,a,e,u,speed)
+  if o < e then
 	   return speed
-  elseif x1 > x2 then
+  elseif a > u then
 	   return -speed
 	 else
     return 0
   end
 end
 
-function Blob:follow(obj, stageWidth)
+function Blob:follow(dt,obj, stageWidth)
 	 local dx, dy = 0, 0
   -- rotating
-	 local sp_r = lm.random(-13, 42) * 0.01 
+	 local sp_r = lm.random(-42, 42) * 0.01 
 	 -- speed
   local sp_c = stageWidth / (self.x - obj.x + 1)
   if sp_c < 0 then sp_c =  sp_c * -1 end
 	 if sp_c > self.maxSpeed then sp_c = self.maxSpeed end
 	
-  local speed = (sp_r + sp_c) * 0.5
-	  
-  if self.level == 0 then
-	   dx = followObj(self.x, obj.x, speed)
-  elseif self.level == 1 then
-    if self.hp > 50 then
-      dx = followObj(self.x, obj.x, speed)
-    else
-      dx = followObj(self.x, self.base.x, speed)
-    end   end
-
-  local joker = lm.random(0.4, -0.4)
-  if self.y < (obj.y +obj.h) then	    dy = speed * joker
- 	elseif self.y > obj.y then
-    dy = -speed * joker
+  local speed = (sp_r + sp_c) * 5 
+  local p=obj:getHitbox()
+  local c=self:getHitbox()
+  
+  if self.level == 1 then
+    if self.hp <50 then
+      p[1]=self.base.x
+      p[2]=p[1]
+    end  
   end
- 
-  self.x = self.x + dx
-	 self.y = self.y + dy
+  dx = followObj(c[1],c[2],p[1],p[2], speed)
+
+  c=self.y
+  p=obj.y
+  
+  if c<(p-sp_r) then	       
+    dy = speed
+ 	elseif c>(p+sp_r) then
+    dy = -speed
+  end
+
+  self.x=self.x+dx*dt*4
+	 self.y=self.y+dy*dt*4
 end
 
 function Blob:destroy()
@@ -130,14 +134,15 @@ function Blob:update(dt, base)
   self.sx = self.hp / 100
   self.sy = self.sx
 
-  if self.x < base.x + base.w and self.hp < self.hpMax then
+  if self.x < self.base.x and self.hp < self.hpMax then
     self.hp = self.hp + 1
   end
-  self.hp = self.hp + 0.02
+  self.hp = self.hp-0.06 
 end
 
 function Blob:draw()
-  self.animation:draw(self.x, self.y, self.r, self.sx, self.sy, self.w*.5, self.h*5)
+  lg.setColor(self:getColor())
+  self.animation:draw(self.x, self.y, self.r, self.sx, self.sy, self.w*.5, self.h)
 end
 
 return Blob
