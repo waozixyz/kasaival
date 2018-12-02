@@ -258,7 +258,7 @@ function Miu:draw()
   movePad:draw()
   attackPad:draw()
   lg.setColor(1,0,0)
-  lg.print(#self.ao,60,70)
+ -- lg.print(#self.ao,60,70)
   if GameOver then
     lg.setFont(self.bigFont)
     lg.setColor(1,.6,.6)
