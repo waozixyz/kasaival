@@ -44,7 +44,7 @@ function Menu:load()
     self.ui[-1] = Button(x, y, w, h, text, color, bckgColor, margin)
   end
 
-  local img=lg.newImage('alpega.png')
+  local img=lg.newImage('ao.png')
   local sc,r=.1,8
   local W,H=lg.getDimensions()
   local w,h=img:getDimensions()
