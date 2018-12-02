@@ -9,7 +9,6 @@ local Shuriken = require 'lib/Shuriken'
 
 
 local Pink=class(function(self, img, w, h, x, y, sx, sy)
-  self.hpsize=true
   local W,H = lg.getDimensions()
   self.label = 'pink'
   self.img = 'assets/chi.png'
@@ -21,13 +20,14 @@ local Pink=class(function(self, img, w, h, x, y, sx, sy)
   self.sx = sx or 1
   self.sy = sy or 1
   self.hp = 100
+  self.hpsize=true
   self.hpMax = 100
   self.speed = 3
   self.element = 'fire'
   self.walkSpeed = 8
   self.atk = 1
   self.def = 0
-  self.shurikens = {}
+  
   self.attackSpeed = 5
   self.attackCharge = 100
   self.Portal = { x=2000, y=0}
@@ -66,7 +66,7 @@ function Pink:attack(dx, dy)
     local py=self.y-self.h*.25
     x=px+(dx/atkSpeed)*(self.w*.1)
     y=py+(dy/atkSpeed)*(self.h*.1)
-table.insert(self.shurikens, Shuriken(x,y,dx,dy))
+table.insert(self.mao, Shuriken(x,y,dx,dy))
     self.attackCharge=0
   end
 end
@@ -121,12 +121,7 @@ function Pink:update(dt, Miu)
 
   self.animation:update(dt)
   self.attackCharge = self.attackCharge + dt
-  for i,s in ipairs(self.shurikens) do
-    s:update(dt)
-    if s.sx <=0 or s.sy <=0 then
-      table.remove(self.shurikens,i)
-    end
-  end
+ 
   
   --burnUp
   if Miu.Gaia and Miu.Gaia.Ground then
@@ -151,11 +146,6 @@ function Pink:draw()
   local w,h=self.w,self.h
   local offX,offY=w*.5,h-13
   self.animation:draw(x, y, 0, sx, sy, offX,offY)
-
-  lg.setColor(1,1,0)
-  for i,s in ipairs(self.shurikens) do
-    s:draw()
-  end
 end
 
 return Pink

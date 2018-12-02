@@ -19,6 +19,7 @@ local Blob=class(function(self, img, w, h, x, y, sx, sy)
   self.maxSpeed = 4
   self.closerFaster = 1
   self.hp = 100
+  self.hpsize=true
   self.hpMax = 100
   self.level = 1
   self.xp = 0
@@ -128,12 +129,6 @@ end
 function Blob:update(dt, base)
   self:updateLevel()
   self.animation:update(dt)
-  if self.hp <= 0 then
-    self.deaths = self.deaths + 1
-    self.alive = false
-  end
-  self.sx = self.hp / 100
-  self.sy = self.sx
 
   if self.x < self.base.x and self.hp < self.hpMax then
     self.hp = self.hp + 1
