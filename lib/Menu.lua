@@ -82,9 +82,11 @@ function Menu:update(dt)
   for i, id in ipairs(touches) do
     local tx, ty = lt.getPosition(id)
     local aru=self.aruga
-    local x,y=aru.x,aru.y+aru.yshift
-    local w,h,r=aru.w,aru.h+aru.yshift,aru.r   
-    if x-r<tx and x+w+r>tx and y-r<ty and y+h+r>ty then
+    local ysh=aru.yshift
+
+    local x,y=aru.x,aru.y+ysh
+    local w,h,r=aru.w,aru.h,aru.r   
+    if x-r<tx and x+w+r>tx and y-r-10<ty and y+h+r>ty then
       ls.openURL('https://alpega.space')
     end
   end
@@ -139,7 +141,7 @@ function Menu:draw()
     lg.setColor(1,0,0,.1)     
     lg.rectangle('fill',x,y,w,h,20)
   end
-
+  lg.print(self.aruga.yshift,60,60)
 
 end
 
