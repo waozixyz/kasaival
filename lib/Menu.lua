@@ -9,7 +9,8 @@ local lt=love.touch
 local ls=love.system
 
 function Menu:load()
-  self.flames=lg.newImage('assets/menu.png')
+  self.title=lg.newImage('assets/title.png')
+  self.flames=lg.newImage('assets/menu.jpg')
  -- self.sun=lg.newImage('assets/sun_5.png')
   
   self.font=lg.newFont('assets/KasaivalGB.ttf',13)
@@ -91,10 +92,9 @@ function Menu:draw()
   local W,H=lg.getDimensions()
   lg.setColor(1,1,1)
   self:go(self.flames)
-
+  lg.draw(self.title,20,20,0,.3)
   lg.setFont(self.titleFont)
   lg.printf('Kasaival',0,20,self.w,'center')
-
   lg.setFont(self.versionFont)
   lg.printf('v.1',0,40,self.w,'center')
 
