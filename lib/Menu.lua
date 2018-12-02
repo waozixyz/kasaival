@@ -1,14 +1,17 @@
 local state = require 'state'
 local Button = require 'lib/Button'
-
+local lume = require 'lume'
 local Menu = {}
 
 local lg=love.graphics
 local lk=love.keyboard
 local lt=love.touch
 local ls=love.system
+local lm=love.math
 
 function Menu:load()
+  self.elapsed=0
+  self.alef=1
   self.title=lg.newImage('assets/title.png')
   self.flames=lg.newImage('assets/menu.jpg')
  -- self.sun=lg.newImage('assets/sun_5.png')
@@ -54,6 +57,16 @@ function Menu:load()
 end
 
 function Menu:update(dt)
+  self.elapsed=self.elapsed+dt
+
+  if math.floor(self.elapsed)%8>3 then
+    self.alef=self.alef+.01
+  else
+    self.alef=self.alef-.01
+  end
+  self.alef=lume.clamp(self.alef,0,1)
+  self.aruga.yshift=(self.alef-.5)*100
+
   local W,H=lg.getDimensions()
   for k,v in pairs(self.ui) do
     v:update(dt,W)
@@ -69,8 +82,8 @@ function Menu:update(dt)
   for i, id in ipairs(touches) do
     local tx, ty = lt.getPosition(id)
     local aru=self.aruga
-    local x,y=aru.x,aru.y
-    local w,h,r=aru.w,aru.h,aru.r   
+    local x,y=aru.x,aru.y+aru.yshift
+    local w,h,r=aru.w,aru.h+aru.yshift,aru.r   
     if x-r<tx and x+w+r>tx and y-r<ty and y+h+r>ty then
       ls.openURL('https://alpega.space')
     end
@@ -90,14 +103,22 @@ end
 
 function Menu:draw()
   local W,H=lg.getDimensions()
+
+
   lg.setColor(1,1,1)
   self:go(self.flames)
+  lg.setColor(1,1,1,self.alef)
   lg.draw(self.title,20,20,0,.3)
-  lg.setFont(self.titleFont)
+
+  lg.setColor(self.alef+.5,self.alef+lm.random(.7,.8),(self.alef%7))
+  lg.setFont(self.font)
   lg.printf('Kasaival',0,20,self.w,'center')
+
+  
   lg.setFont(self.versionFont)
   lg.printf('v.1',0,40,self.w,'center')
 
+ 
   lg.setFont(self.font)
   for k ,v in pairs(self.ui) do
      v:draw()
@@ -106,14 +127,20 @@ function Menu:draw()
   do -- aruga
     local aru=self.aruga
     local img=aru.img
-    local x,y=aru.x,aru.y
-    local w,h=aru.w,aru.h
+    local yshift=aru.yshift
+    local x,y=aru.x,aru.y+yshift
+    local w,h=aru.w,aru.h+yshift
     local sc,r=aru.sc,aru.r
     lg.setColor(1,1,1,.8)
     lg.draw(img,x,y,0,sc)
 
-    lg.setColor(1,0,0,.1)   lg.rectangle('fill',x-r,y-r,w+r*2,h+r*2,20)
+    x,y=x-r,y-r
+    w,h=w+r*2,h+r*2
+    lg.setColor(1,0,0,.1)     
+    lg.rectangle('fill',x,y,w,h,20)
   end
+
+
 end
 
 return Menu
