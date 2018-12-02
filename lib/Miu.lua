@@ -10,7 +10,6 @@ local Pink = require 'lib/Pink'
 local Cyan = require 'lib/Cyan'
 local Portal = require 'lib/Portal'
 
--- ali
 local lg=love.graphics
 local lt=love.touch
 local lk=love.keyboard
@@ -46,41 +45,38 @@ local Miu = class(function(self)
 end)
 
 function Miu:dharma(t)
-  for i,v in ipairs(t) do
-    table.insert(self.mao,v)
-    if v.load then
-      v:load()
-    end
-    if v.mao then
-      self:dharma(v.mao)
+  local mao={}
+  for i,a in ipairs(t) do
+    table.insert(mao,a)
+    if a.mao then
+      local ao = self:dharma(a.mao)
+      for i,o in ipairs(ao) do
+        table.insert(mao,o)
+      end
     end
   end
+  return mao
 end
 
 function Miu:reload()
- local s=self
+  local W,H = lg.getDimensions()
+  local s=self
   Camera.x,Camera.y=0,0
 
   s._G=Gaia()
   -- add harmony
-  local W,H = lg.getDimensions()
  
-  s._P = Pink('assets/flame_1.png', 96, 192,   W*.5, H*.7)
+  s._P = Pink('assets/flame_1.png',96, 192,W*.5,H*.7)
   s._P.hp=100
   s._C = Cyan()
 
-  s.mao={}
-  -- visible mao's
-  s.ao={}
-
-  s:dharma({s._G, s._C, s._P})
+  self.mao={s._G, s._C, s._P}
 end
 
 function Miu:load()
   if not self._G or not self._P or not self._C or GameOver then
    self:reload()
   end
-
 end
 
 function collision(pink, cyan)
@@ -97,9 +93,10 @@ function collision(pink, cyan)
 end
 
 function Miu:eye(m, offsetX, offsetY)
-  local x,y = offsetX or 0
-  local y = offsetY or 0
   local W,H=lg.getDimensions()
+  local x,y=offsetX or 0
+  local y=offsetY or 0
+  
   local ao = {}
  
   for i,v in ipairs(m) do
@@ -126,7 +123,7 @@ end
 function Miu:update(dt)
   local W,H = lg.getDimensions()
   local P,C,G=self._P,self._C,self._G
-  local Po,Oc,Gr=P.Portal,C.Ocean,G.Ground
+  local Po,Oc,Gr = P.Portal,C.Ocean,G.Ground
 
   if P.hp and math.floor(P.hp) <= 0 then
     GameOver=true
@@ -136,11 +133,43 @@ function Miu:update(dt)
       GameOver=false
     end
   else 
+  local mao=self:dharma(self.mao)
+  
+  do --mao
+  self.ao = Miu:eye(mao, -Camera.x)
+  
+  
+  if Gr and Gr.h then h=Gr.h end
+  -- update mao
+  for i,v in ipairs(mao) do
+    if v.load and not v.loaded then
+      v:load()
+      v.loaded=true
+    end
 
-  if Camera.prevX ~= Camera.x then
-    self.ao = Miu:eye(self.mao, -Camera.x)
-    Camera.prevX = Camera.x
+    if v.update then
+      v:update(dt, self)
+    end
+    if v.hp and v.hp <= 0 then
+      -- lettin go
+      nirvana(mao, i)
+    end
+    if v.scale and not v.sx then v.sx=v.scale end
+    if v.y and v.sx then
+      -- v.sx = 1 - H / (H + v.y)
+      if v.hp and v.hpsize then
+        local hpMax = v.hpMax or 100
+        v.sx = (v.y / (Gr.y+Gr.h) * (v.hp/hpMax))
+      else
+        v.sx = v.y / (Gr.y+Gr.h)
+      end
+      v.sy = v.sx
+      if v.scale then v.scale=v.sx end
+    end
+    end
   end
+  end
+
   self.ao = lume.sort(self.ao, 'y')
   if Gr and Gr.mao then
     self.coli = lume.collision(P, Gr.mao)
@@ -197,33 +226,6 @@ W*0.85 and ap.x<ppx+cx-ap.r-8 then
   if dx~=0 or dy~=0 then
      P:attack(dx, dy)
   end
-  
-  local h=H
-  if Gr and Gr.h then h=Gr.h end
-  
-  -- update mao
-  for i,v in ipairs(self.mao) do
-    if v.update then
-      v:update(dt, self)
-    end
-    if v.hp and v.hp <= 0 then
-      -- lettin go
-      nirvana(self.mao, i)
-    end
-    if v.scale and not v.sx then v.sx=v.scale end
-    if v.y and v.sx then
-      -- v.sx = 1 - H / (H + v.y)
-      if v.hp and v.hpsize then
-        local hpMax = v.hpMax or 100
-        v.sx = (v.y / (Gr.y+Gr.h) * (v.hp/hpMax))
-      else
-        v.sx = v.y / (Gr.y+Gr.h)
-      end
-      v.sy = v.sx
-      if v.scale then v.scale=v.sx end
-    end
-  end
-  end
 
   if lk.isDown('escape') then
     state.new=0
@@ -253,7 +255,8 @@ function Miu:draw()
   lg.reset()
   movePad:draw()
   attackPad:draw()
-  
+  lg.setColor(1,0,0)
+  lg.print(#self.ao,60,70)
   if GameOver then
     lg.setFont(self.bigFont)
     lg.setColor(1,.6,.6)

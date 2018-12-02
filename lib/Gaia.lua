@@ -11,31 +11,31 @@ local Ground = require 'lib/Ground'
 local Gaia = class(function(self)
   self.label='gaia'
   self.color={.2,.4,.3}
-  self.mao={}
   self.elapsed=0
+  local G=Ground()
+  self.Sky=Sky()
+  self.Ground=G 
+  self.mao={G}
 end)
 
-function addTree(G)  
+function addTree(G,boost)  
   local x=lm.random(G.x+800,G.x+G.w)
   local y=lm.random(G.y,G.y+G.h)
-  local boost=lm.random(0,100)
+  
   local img=lm.random(1,17)
-  return Tree(img,x,y,boost)
+  return Tree(img,x,y,boost or 0)
 end
 
 function Gaia:load()
-  local G=Ground()
-  plant(self.mao, G)
-
-  for i=1,34 do
-    plant(self.mao,addTree(G))
+  for i=1,74 do
+    local b=lm.random(0,200)
+    plant(self.mao,addTree(self.Ground,b))
   end
-  self.Sky=Sky()
-  self.Ground=G 
 end
 
 function Gaia:update(dt)
   local G=self.Ground
+  
   self.Sky:update(dt,G)
   self.elapsed = self.elapsed + dt
   if self.elapsed > 1 then
@@ -46,6 +46,7 @@ end
 
 function Gaia:draw(eye)
   self.Sky:draw(eye)
+  lg.print(#self.mao,30,20)
 end
 
 return Gaia

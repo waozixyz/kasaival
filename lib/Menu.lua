@@ -16,7 +16,6 @@ function Menu:load()
   self.titleFont=lg.newFont('assets/KasaivalGB.ttf',17)
   self.versionFont=lg.newFont('assets/KasaivalGB.ttf',7)
 
-
   self.w, self.h = lg.getDimensions()
   self.ui = {}
 

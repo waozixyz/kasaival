@@ -35,7 +35,7 @@ function Tree:draw()
   lg.setColor(1,1,1)
   local w,h=self.img:getDimensions()
   -- scale is managed by miu position
-  local scale=self.scale+self.size/400
+  local scale=self.scale*self.size*.005
   lg.draw(self.img,self.x,self.y,0,scale,scale, w*.5,h)
 end
 
