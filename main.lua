@@ -9,11 +9,11 @@ local Miu = require 'lib/Miu'
 local Portal = require 'lib/Portal'
 
 local le=love.event
+local lg=love.graphics
 local li=love.image
-local lw=love.window
 
 -- set start stage
-state.new = 1
+state.new = 0
 
 local _M,_P
 function loadState(x)
@@ -38,7 +38,7 @@ end
 
 -- load love
 function love.load()
-  loadState(state.new) lw.setIcon(li.newImageData('icon.png'))
+  loadState(state.new) 
 end
  
 -- update love

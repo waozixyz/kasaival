@@ -3,6 +3,7 @@ require 'class'
 local lt=love.touch
 local lg=love.graphics
 local lm=love.math
+local ls=love.system
 
 local state=require 'state'
 local Camera=require 'lib/Camera'     
@@ -150,7 +151,7 @@ function Portal.bb(c,time)
     end
   end
   if c.feedback.hit then
-    --open web link to mailto friend cateye
+ ls.openURL('mailto:cateye@tuta.io')
   elseif c.firestorm.hit then
     --generate cryptowallet and how to transfer + advanced settings, faircoin?
   end

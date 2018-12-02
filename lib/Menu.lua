@@ -5,6 +5,8 @@ local Menu = {}
 
 local lg=love.graphics
 local lk=love.keyboard
+local lt=love.touch
+local ls=love.system
 
 function Menu:load()
   self.flames=lg.newImage('assets/menu.png')
@@ -41,6 +43,14 @@ function Menu:load()
     local text = 'Evaporate'
     self.ui[-1] = Button(x, y, w, h, text, color, bckgColor, margin)
   end
+
+  local img=lg.newImage('alpega.png')
+  local sc,r=.1,8
+  local W,H=lg.getDimensions()
+  local w,h=img:getDimensions()
+  w,h=w*sc,h*sc
+  local x,y=W-w-r,H-h-r
+  self.aruga={img=img,sc=sc,r=r,x=x,y=y,w=w,h=h}
 end
 
 function Menu:update(dt)
@@ -53,6 +63,17 @@ function Menu:update(dt)
   end
   if lk.isDown('escape')  then
     state.new=1
+  end
+ 
+  local touches = lt.getTouches()
+  for i, id in ipairs(touches) do
+    local tx, ty = lt.getPosition(id)
+    local aru=self.aruga
+    local x,y=aru.x,aru.y
+    local w,h,r=aru.w,aru.h,aru.r   
+    if x-r<tx and x+w+r>tx and y-r<ty and y+h+r>ty then
+      ls.openURL('https://alpega.space')
+    end
   end
 end
 
@@ -81,6 +102,18 @@ function Menu:draw()
   lg.setFont(self.font)
   for k ,v in pairs(self.ui) do
      v:draw()
+  end
+
+  do -- aruga
+    local aru=self.aruga
+    local img=aru.img
+    local x,y=aru.x,aru.y
+    local w,h=aru.w,aru.h
+    local sc,r=aru.sc,aru.r
+    lg.setColor(1,1,1,.8)
+    lg.draw(img,x,y,0,sc)
+
+    lg.setColor(1,0,0,.1)   lg.rectangle('fill',x-r,y-r,w+r*2,h+r*2,20)
   end
 end
 
