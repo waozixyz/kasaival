@@ -12,15 +12,16 @@ local Shuriken=class(function(self, x, y, dx, dy)
   self.atk = 18
   self.sx=1
   self.size=.2
+  self.r=0
   self.hpsize=true
 end)
 
 function Shuriken:update(dt)
   local sc=self.sx*self.size*8 
-  self.x = self.x + self.dx*sc
-  self.y = self.y + self.dy*sc
-  self.hp = self.hp - 2
-  
+  self.x=self.x + self.dx*sc
+  self.y=self.y + self.dy*sc
+  self.hp=self.hp - 2
+  self.r=self.r+8*dt
 end
 
 
@@ -28,7 +29,8 @@ function Shuriken:draw()
   lg.setColor(1,1,1)
   local w,h=self.img:getDimensions()
   local sc=self.sx*self.size 
-  lg.draw(self.img, self.x, self.y, 0, sc, sc, nil,h)
+  local r=self.r
+  lg.draw(self.img, self.x, self.y, r, sc, sc, w*.5,h*.5)
 end
 
 return Shuriken

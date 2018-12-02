@@ -68,6 +68,7 @@ function Pink:attack(dx, dy)
     y=py+(dy/atkSpeed)*(self.h*.1)
 table.insert(self.mao, Shuriken(x,y,dx,dy))
     self.attackCharge=0
+    self.hp=self.hp-3
   end
 end
 
