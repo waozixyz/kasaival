@@ -4,16 +4,16 @@ local lg=love.graphics
 local lt=love.touch
 
 local Button=class(function(self, x, y, w, h, text, color, bckgColor, margin,val)
-  self.x = x or 200
-  self.y = y or 100
-  self.w = w or 128
-  self.h = h or 32
-  self.text = text or 'Start Journey'
+  self.x=x or 200
+  self.y=y or 100
+  self.w=w or 128
+  self.h=h or 32
+  self.text=text or 'Start Journey'
   self.val=val or nil
-  self.color = color or {0,.3,.7}
-  self.bckgColor = bckgColor or {.5,.7,.7}
-  self.margin = 4
-  self.hit = false 
+  self.color=color or {0,.3,.7}
+  self.bckgColor=bckgColor or {.5,.7,.7}
+  self.margin=4
+  self.hit=false 
 end)
 
 function therapy(x)

@@ -12,27 +12,25 @@ local le=love.event
 local lg=love.graphics
 local li=love.image
 
--- set start stage
-state.new = 0
+state.new=0
+local lyra={}
+lyra[0] = Menu
+lyra[1] = Miu
+lyra[2] = Portal
 
-local _M,_P
 function loadState(x)
-  if x == nil or x == -1 then
+  if x == nil or x == -1 or lyra[x] == nil then
     le.quit()
-  elseif x == 0 then
-    state.current = 0
-    Menu:load(x)
-  elseif x == 1 then
-    state.current = 1
-    -- miuuuuu
-    if _M == nil then
-      _M=Miu()
+  else
+    local ao=state.mao[x]
+    state.current = x
+    if ao == nil then
+      ao=lyra[x]()
+      if ao.load then
+        ao:load()
+      end
+     state.mao[x]=ao
     end
-    _M:load()
-  elseif x == 2 then
-    state.current = 2
-    --load portal
-    _P=Portal()
   end
 end
 
@@ -41,28 +39,24 @@ function love.load()
   loadState(state.new) 
 end
  
+
 -- update love
 function love.update(dt)
-  if state.new ~= state.current then
+  -- update state
+  if state.new ~= state.current then     
     loadState(state.new)
   end
- 
-  if state.current == 0 then
-    Menu:update(dt)
-  elseif state.current == 1 then
-    _M:update(dt)
-  elseif state.current == 2 then
-    _P:update(dt)
+  -- update mao
+  local ao=state.mao[state.current]
+  if ao and ao.update then
+    ao:update(dt)
   end
 end
 
 -- draw love
 function love.draw()
-  if state.current == 0 then
-    Menu:draw()
-  elseif state.current == 1 then
-    _M:draw()
-  elseif state.current == 2 then
-    _P:draw()
+  local ao=state.mao[state.current]
+  if ao and ao.draw then
+    ao:draw()
   end
 end

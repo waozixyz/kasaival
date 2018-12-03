@@ -1,7 +1,8 @@
+require 'class'
+
 local state = require 'state'
 local Button = require 'lib/Button'
 local lume = require 'lume'
-local Menu = {}
 
 local lg=love.graphics
 local lk=love.keyboard
@@ -9,18 +10,13 @@ local lt=love.touch
 local ls=love.system
 local lm=love.math
 
-function Menu:load()
+local Menu=class(function(self)
+  local W,H=lg.getDimensions()
+  self.w=W
+  self.h=H
   self.elapsed=0
-  self.alef=1
   self.title=lg.newImage('assets/title.png')
-  self.flames=lg.newImage('assets/menu.jpg')
- -- self.sun=lg.newImage('assets/sun_5.png')
-  
-  self.font=lg.newFont('assets/KasaivalGB.ttf',13)
-  self.titleFont=lg.newFont('assets/KasaivalGB.ttf',17)
-  self.versionFont=lg.newFont('assets/KasaivalGB.ttf',7)
-
-  self.w, self.h = lg.getDimensions()
+  self.bckg=lg.newImage('assets/menu.jpg')
   self.ui = {}
 
   local w,h = 128,28
@@ -46,17 +42,25 @@ function Menu:load()
     local text = 'Evaporate'
     self.ui[-1] = Button(x, y, w, h, text, color, bckgColor, margin)
   end
+  
+  self.font=lg.newFont('assets/KasaivalGB.ttf',13)
+  self.titleFont=lg.newFont('assets/KasaivalGB.ttf',17)
+  self.versionFont=lg.newFont('assets/KasaivalGB.ttf',7)
 
-  local img=lg.newImage('ao.png')
-  local sc,r=.1,8
+  local a={}
+  a.img=lg.newImage('ao.png')
+  a.sc,a.r=.1,8
   local W,H=lg.getDimensions()
-  local w,h=img:getDimensions()
-  w,h=w*sc,h*sc
-  local x,y=W-w-r,H-h-r
-  self.aruga={img=img,sc=sc,r=r,x=x,y=y,w=w,h=h}
-end
+  local w,h=a.img:getDimensions()
+  a.w,a.h=w*a.sc,h*a.sc
+  a.x,a.y=W-w-a.r,H-h-a.r
+  self.aruga=a
+
+  self.alef=1
+end)
 
 function Menu:update(dt)
+  self.alef=1
   self.elapsed=self.elapsed+dt
 
   if math.floor(self.elapsed)%8>3 then
@@ -105,23 +109,30 @@ end
 
 function Menu:draw()
   local W,H=lg.getDimensions()
-
-
   lg.setColor(1,1,1)
-  self:go(self.flames)
-  lg.setColor(1,1,1,self.alef)
-  lg.draw(self.title,20,20,0,.3)
+  local bckg=self.bckg
+  if bckg then
+    local w,h=bckg:getDimensions()
+    lg.draw(bckg,0,0,0,w/W,h/H)
+  end
 
-  lg.setColor(self.alef+.5,self.alef+lm.random(.7,.8),(self.alef%7))
-  lg.setFont(self.font)
-  lg.printf('Kasaival',0,20,self.w,'center')
+  local alef=self.alef or .4
+  local title=self.title
+  local font=self.font
+  lg.setColor(1,.4,1,alef*.4)
+  lg.draw(title,20,20,0,.3)
+
+  local w,h=self.w,self.h
+  lg.setColor(alef+.5,alef+lm.random(.7,.8),(alef%7))
+  lg.setFont(font)
+  lg.printf('Kasaival',0,20,w,'center')
 
   
   lg.setFont(self.versionFont)
-  lg.printf('v.1',0,40,self.w,'center')
+  lg.printf('v.1',0,40,w,'center')
 
  
-  lg.setFont(self.font)
+  lg.setFont(font)
   for k ,v in pairs(self.ui) do
      v:draw()
   end
@@ -137,7 +148,7 @@ function Menu:draw()
     lg.draw(img,x,y,0,sc)
 
   end
-
 end
 
 return Menu
+
