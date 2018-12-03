@@ -65,7 +65,7 @@ function Menu:update(dt)
     self.alef=self.alef-.01
   end
   self.alef=lume.clamp(self.alef,0,1)
-  self.aruga.yshift=(self.alef-.5)*100
+  self.aruga.yshift=(self.alef)*10
 
   local W,H=lg.getDimensions()
   for k,v in pairs(self.ui) do
@@ -136,12 +136,7 @@ function Menu:draw()
     lg.setColor(1,1,1,.8)
     lg.draw(img,x,y,0,sc)
 
-    x,y=x-r,y-r
-    w,h=w+r*2,h+r*2
-    lg.setColor(1,0,0,.1)     
-    lg.rectangle('fill',x,y,w,h,20)
   end
-  lg.print(self.aruga.yshift,60,60)
 
 end
 
