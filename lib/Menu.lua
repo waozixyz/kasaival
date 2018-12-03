@@ -111,12 +111,8 @@ end
 
 function Menu:draw()
   local W,H=lg.getDimensions()
-  lg.setColor(1,1,1)
-  local bckg=self.bckg
-  if bckg then
-    local w,h=bckg:getDimensions()
-    lg.draw(bckg,0,0,0,w/W,h/H)
-  end
+  local w,h=self.bckg:getDimensions()
+  lg.draw(self.bckg,0,0,0,W/w,H/h)
 
   local alef=self.alef or .4
   local title=self.title
