@@ -12,8 +12,8 @@ local lm=love.math
 
 local Menu=class(function(self)
   local W,H=lg.getDimensions()
-  self.w=W
-  self.h=H
+  self.static=true
+  self.w,self.h=W,H
   self.elapsed=0
   self.title=lg.newImage('assets/title.png')
   self.bckg=lg.newImage('assets/menu.jpg')
@@ -60,7 +60,9 @@ local Menu=class(function(self)
 end)
 
 function Menu:update(dt)
-  self.alef=1
+  if self.static then
+    self.alef=1
+  end
   self.elapsed=self.elapsed+dt
 
   if math.floor(self.elapsed)%8>3 then
