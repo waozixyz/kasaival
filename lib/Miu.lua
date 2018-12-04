@@ -49,10 +49,8 @@ function Miu:dharma(t)
   for i,a in ipairs(t) do
     if a.hp and a.hp <= 0 or a.sx and a.sx < 0 or a.scale and a.scale < 0 then
       table.remove(t,i)
-    
     else
     table.insert(mao,a)
-
 
     if a.mao then
       local ao = self:dharma(a.mao)
@@ -143,7 +141,6 @@ function Miu:update(dt)
   local mao=self:dharma(self.mao)
   
   do --mao
-
   if Gr and Gr.h then h=Gr.h end
   -- update mao
   for i,v in ipairs(mao) do
@@ -172,7 +169,7 @@ function Miu:update(dt)
   self.ao = Miu:eye(mao, -Camera.x)
   end
   
-  self.ao = lume.sort(self.ao, 'y')
+  self.ao = lume.sort(self.ao, 'z', 'y')
   if Gr and Gr.mao then
     self.coli = lume.collision(P, Gr.mao)
     if #self.coli > 0 then

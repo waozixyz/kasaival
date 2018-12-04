@@ -12,7 +12,7 @@ local le=love.event
 local lg=love.graphics
 local li=love.image
 
-state.new=0
+state.new=1
 local lyra={}
 lyra[0] = Menu
 lyra[1] = Miu

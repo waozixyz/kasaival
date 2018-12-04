@@ -1,12 +1,12 @@
 require 'class'
-
-local SpriteSheet = require 'lib/SpriteSheet'
+local lume=require 'lume'
+local SpriteSheet=require 'lib/SpriteSheet'
 
 local lg=love.graphics
 local lm=love.math
 
 local Shuriken = require 'lib/Shuriken'
-
+local Dopamine=require('lib/Dopamine')
 
 local Pink=class(function(self, img, w, h, x, y, sx, sy)
   local W,H = lg.getDimensions()
@@ -47,6 +47,7 @@ local Pink=class(function(self, img, w, h, x, y, sx, sy)
 
   a:setDelay(0.08)
   self.animation=a
+  self.lvl=0
 end)
 
 function Pink:regulateSpeed(dx, dy, speed)
@@ -88,6 +89,18 @@ function Pink:getHitbox()
   return t
 end
 
+function Pink:addDopamine(txt,val,c)
+  c=c or {.5,.2,.7}
+ 
+  if val < 0 then
+    c={1-c[1],1-c[2],1-c[3]}
+  end
+  local x=self.x
+  local y=self.y-self.h*.3
+
+  table.insert(self.mao, Dopamine(txt,val,x,y,c))
+end
+
 function Pink:burnUp(x)
   self.hp = self.hp - x
 end
@@ -102,8 +115,26 @@ function Pink:defend(attack)
   self.hp = self.hp - attack
 end
 
+function Pink:lvlup(a)
+  a=a or 1
+  self.lvl=self.lvl+a
+  self.hpMax=self.hpMax+10*a
+  if a > 0 then
+   
+  elseif a < 0 then
+    self.hp=self.hpMax
+  end
+  self:addDopamine('lvl',a)
+end
+
+function Pink:lvldown(a)
+  a=a or 1
+  self:lvlup(-a)
+end
 
 function Pink:update(dt, Miu)
+  local G=Miu._G
+  local GG=G.Ground
   local r,g,b = self.r,self.g,self.b
   if self.invincible then  
     r = lm.random(-.05,.1)
@@ -112,7 +143,6 @@ function Pink:update(dt, Miu)
     if g>1 then g=0 elseif g<0 then g=1 end
     b = b + lm.random(-.05,.1)
     if b>1 then b=0 elseif b<0 then b=1 end
-    
   else
     if r < 1 then r=r+.01 end
     if g < 1 then g=g+.01 end
@@ -125,18 +155,24 @@ function Pink:update(dt, Miu)
  
   
   --burnUp
-  if Miu.Gaia and Miu.Gaia.Ground then
-    local G = Miu.Gaia.Ground
-
-    local b= (.1+G.b)-(G.r+G.g)*.5*.08
-    if G.b > .5 then
-      b = b + G.b
+  if GG then
+    local b= (.1+GG.b)-(GG.r+GG.g)*.5
+    if GG.b > .5 then
+      b = b + GG.b
     end
-
+    if GG.b > .7 then
+      b = b + 10
+    end
     self:burnUp(b)
   end
- 
+  
   self.speed = self.sx 
+  self.hp=lume.clamp(self.hp,0,self.hpMax)
+  if self.hp == self.hpMax then
+    self:lvlup()
+  elseif self.hp < 60 then
+    self:lvldown()
+  end
 end
 
 function Pink:draw()

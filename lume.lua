@@ -236,20 +236,18 @@ function lume.shuffle(t)
 end
 
 
-function lume.sort(t, comp)
+function lume.sort(t, a, b)
   local rtn = lume.clone(t)
-  if comp then
-    if type(comp) == "string" then
-     
-      table.sort(rtn, function(a, b)
-        local o=a[comp] or -9999
-        local e=b[comp] or -9999
-
-        return o < e
-      end)
-    else
-      table.sort(rtn, comp)
-    end
+  if a then
+  if type(a) == "string" or type(b) == "string" then
+    table.sort(rtn, function(mu,nu)
+    local mi=mu[a] or mu[b] or -9999
+    local ni=nu[a] or nu[b] or -9999
+    return mi < ni
+    end)
+  else
+    table.sort(rtn,a,b)
+  end
   else
     table.sort(rtn)
   end
