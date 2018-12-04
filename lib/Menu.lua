@@ -20,29 +20,36 @@ local Menu=class(function(self)
   self.bckg=lg.newImage('assets/menu.jpg')
   self.ui = {}
 
-  local w,h = 128,28
+
   local color={0,.6,.7}
   local bckgColor = {.3,.1,.7}
-  local margin = 4
+  local margin = 10
+  local x,y,w,h,text
 
-  do -- start button
-    local x,y = self.w*.5-w,100
-    local text = 'Start , Journey'
-    table.insert(self.ui, Button(x, y, w, 42, text, color, bckgColor, margin))
-  end
+  -- start journey
+  w,h=128,42
+  x,y = self.w*.5-w,H*.35
+  text = 'Start , Journey'
+  table.insert(self.ui, Button(x, y, w, h, text, color, bckgColor, margin))
+  
 
-  do -- portal button
-    local x,y = self.w*.5-w,100+64
-    local text = 'Portal'
-    table.insert(self.ui, Button(x, y, w, h, text, color, bckgColor, margin))
-  end
+  -- portal button
+  y = y+h+margin
+  h=24
+  text = 'Portal'
+  table.insert(self.ui, Button(x, y, w, h, text, color, bckgColor, margin))
 
 
-  do -- exit button
-    local x,y = self.w*.5-w,self.h*.8
-    local text = 'Evaporate'
-    self.ui[-1] = Button(x, y, w, h, text, color, bckgColor, margin)
-  end
+  -- exit button
+  local addToY=H-(y+h+margin)
+  if addToY>0 then
+    addToY=addToY*.8
+  else addToY=0 end
+  
+  y = y+h+margin+addToY 
+  local text = 'Evaporate'
+  self.ui[-1] = Button(x, y, w, h, text, color, bckgColor, margin)
+  
   
   self.font=lg.newFont('assets/KasaivalGB.ttf',13)
   self.titleFont=lg.newFont('assets/KasaivalGB.ttf',17)
