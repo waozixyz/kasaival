@@ -21,7 +21,7 @@ local Pink=class(function(self, img, w, h, x, y, sx, sy)
   self.sy = sy or 1
   self.hp = 100
   self.hpsize=true
-  self.hpMax = 100
+  self.hpMax = 200
   self.speed = 3
   self.element = 'fire'
   self.walkSpeed = 8
@@ -120,9 +120,9 @@ function Pink:lvlup(a)
   self.lvl=self.lvl+a
   self.hpMax=self.hpMax+10*a
   if a > 0 then
-   
+    self.hp=self.hpMax*.5
   elseif a < 0 then
-    self.hp=self.hpMax
+    self.hp=self.hpMax*.5
   end
   self:addDopamine('lvl',a)
 end
@@ -153,7 +153,6 @@ function Pink:update(dt, Miu)
   self.animation:update(dt)
   self.attackCharge = self.attackCharge + dt
  
-  
   --burnUp
   if GG then
     local b= (.1+GG.b)-(GG.r+GG.g)*.5

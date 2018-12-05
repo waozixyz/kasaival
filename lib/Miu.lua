@@ -41,7 +41,7 @@ local Miu = class(function(self)
     movePad=Joystick(W-x, y, r, c1)
     attackPad=Joystick(x, y, r, c2)
   end
-  self.Portal = Portal({'img'},6,6)
+  self.Portal = Portal({'img'},6,6,false)
 end)
 
 function Miu:dharma(t)
@@ -227,7 +227,7 @@ W*0.85 and ap.x<ppx+cx-ap.r-8 then
   end
 
   if lk.isDown('escape') then
-    state.new=0
+    state.n=0
   end
   self.Portal:update(dt)
 end

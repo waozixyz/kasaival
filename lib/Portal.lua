@@ -46,7 +46,7 @@ function timeToString(x)
   return  d .. 'D-' .. h .. 'H-' .. m .. 'M'
 end
 
-local Portal = class(function(self,t,h,c,w,h)
+local Portal = class(function(self,t,h,c,market)
   local W,H=lg.getDimensions()
   self.x,self.y=32,32
 
@@ -57,7 +57,6 @@ local Portal = class(function(self,t,h,c,w,h)
   elseif type(t) == 'number' then
     self.x=t
   end
-  
   if type(h) == 'number' then
     if self.x then
      self.y=h
@@ -65,14 +64,13 @@ local Portal = class(function(self,t,h,c,w,h)
      self.x=h
     end
   end
- 
   if type(c) == 'number' then
     if not self.y then
       self.y=c
     end
   end
-  
-  if state.current == 2 then
+  self.market=market or true
+  if self.market then
     self.w=w or 150
     self.h=h or H
     self.color={.2,.2,.2 } 
@@ -188,7 +186,7 @@ function Portal:update(dt)
      local tx, ty = lt.getPosition(id)
  
      if tx>=x and tx<=x+w and ty>=y and ty<=y+h then
-       state.new=0
+       state.n=0
      end
     end
     self.x,self.y=x,y
@@ -209,7 +207,7 @@ end
 
 function Portal:draw()
   local W,H=lg.getDimensions() 
-  if state.current==2 then
+  if self.market then 
   local s=self
  -- lg.setColor(self.color)
   --lg.rectangle('fill',s.x,s.y,s.w,s.h)

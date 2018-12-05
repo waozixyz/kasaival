@@ -1,25 +1,24 @@
 require 'class'
 
-local state = require 'state'
-local Button = require 'lib/Button'
-local lume = require 'lume'
-
 local lg=love.graphics
 local lk=love.keyboard
 local lt=love.touch
 local ls=love.system
 local lm=love.math
 
+local state = require 'state'
+local lume = require 'lume'
+local Button = require 'lib/Button'
+
 local Menu=class(function(self)
   local W,H=lg.getDimensions()
   self.w,self.h=W,H
-  self.static=true
+  self.animated=false
  
   self.elapsed=0
   self.title=lg.newImage('assets/title.png')
   self.bckg=lg.newImage('assets/menu.jpg')
   self.ui = {}
-
 
   local color={0,.6,.7}
   local bckgColor = {.3,.1,.7}
@@ -29,16 +28,14 @@ local Menu=class(function(self)
   -- start journey
   w,h=128,42
   x,y = self.w*.5-w,H*.35
-  text = 'Start , Journey'
+  text = 'Start Journey'
   table.insert(self.ui, Button(x, y, w, h, text, color, bckgColor, margin))
   
-
   -- portal button
   y = y+h+margin
   h=24
   text = 'Portal'
   table.insert(self.ui, Button(x, y, w, h, text, color, bckgColor, margin))
-
 
   -- exit button
   local addToY=H-(y+h+margin)
@@ -49,7 +46,6 @@ local Menu=class(function(self)
   y = y+h+margin+addToY 
   local text = 'Evaporate'
   self.ui[-1] = Button(x, y, w, h, text, color, bckgColor, margin)
-  
   
   self.font=lg.newFont('assets/KasaivalGB.ttf',13)
   self.titleFont=lg.newFont('assets/KasaivalGB.ttf',17)
@@ -66,22 +62,22 @@ local Menu=class(function(self)
 end)
 
 function Menu:update(dt)
-  if self.static then
-    self.alef=1
-  else
-    self.elapsed=self.elapsed+dt
-  end
-
   local W,H=lg.getDimensions()
   if W ~= self.w or H ~= self.h then
     self.w,self.h=W,H
  
     local a=self.aruga
-    local  w,h=a.img:getDimensions()
+    local w,h=a.img:getDimensions()
     a.w,a.h=w*a.sc,h*a.sc
     a.x=W-a.w-a.r
     a.y=H-a.h-a.r
     self.aruga=a
+  end
+
+  if self.animated then
+    self.elapsed=self.elapsed+dt  
+  else
+    self.alef=1
   end
 
   if math.floor(self.elapsed)%8>3 then
@@ -89,18 +85,18 @@ function Menu:update(dt)
   else
     self.alef=self.alef-.01
   end
-  self.alef=lume.clamp(self.alef,0,1)
-  self.aruga.yshift=(self.alef)
 
-  local W,H=lg.getDimensions()
+  self.alef=lume.clamp(self.alef,0,1)
+  self.aruga.yshift=self.alef
+
   for k,v in pairs(self.ui) do
     v:update(dt,W)
     if v.hit then
-      state.new=k 
+      state.n=k
     end
   end
   if lk.isDown('escape')  then
-    state.new=1
+    state.n=-1
   end
  
   local touches = lt.getTouches()
@@ -111,7 +107,7 @@ function Menu:update(dt)
     local x,y=aru.x,aru.y+ysh
     local w,h,r=aru.w,aru.h,aru.r   
     if x-r<tx and x+w+r>tx and y-r-10<ty and y+h+r>ty then
-      ls.openURL('https://alpega.space')
+      state.openLink('ao')
     end
   end
 end
