@@ -44,8 +44,8 @@ local Menu=class(function(self)
   else addToY=0 end
   
   y = y+h+margin+addToY 
-  local text = 'Evaporate'
-  self.ui[-1] = Button(x, y, w, h, text, color, bckgColor, margin)
+  local text='Evaporate'
+  self.ui[-1]=Button(x, y, w, h, text, color, bckgColor, margin)
   
   self.font=lg.newFont('assets/KasaivalGB.ttf',13)
   self.titleFont=lg.newFont('assets/KasaivalGB.ttf',17)
@@ -107,7 +107,7 @@ function Menu:update(dt)
     local x,y=aru.x,aru.y+ysh
     local w,h,r=aru.w,aru.h,aru.r   
     if x-r<tx and x+w+r>tx and y-r-10<ty and y+h+r>ty then
-      state.openLink('ao')
+      state.n='ao'
     end
   end
 end
@@ -165,4 +165,3 @@ function Menu:draw()
 end
 
 return Menu
-

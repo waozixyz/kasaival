@@ -1,24 +1,33 @@
 local state=require 'state'
 
 local le=love.event
+local lm=love.math
 
-local Menu = require 'lib/Menu'
-local Miu = require 'lib/Miu'
-local Portal = require 'lib/Portal'
-
+local Menu=require 'lib/Menu'
+local Miu=require 'lib/Miu'
+local Portal=require 'lib/Portal'
+local Voyager=require 'lib/Voyager'
 local ctrl={}
 
 local lyra={
   [0]= Menu,
   [1]= Miu,
   [2]= Portal,
+  ['ao']=Voyager,
 }
 
 function ctrl.now(x)
   if x == nil then
     return
   elseif x == -1 or lyra[x] == nil then
-    le.quit()
+   local lol=lm.random(0,8)
+   local olo=lm.random(0,13)
+   local x=(lol+olo)*.5
+   if lol > 6 and x > 9 then
+     ctrl.now(1)
+   else
+     le.quit()
+   end
   else
     state.c=lyra[x]()
     if state.c.load then
