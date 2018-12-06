@@ -4,7 +4,7 @@ local state = require 'state'
 
 -- load love
 function love.load()
-  state.n=0
+  state.n=1
 end
  
 -- update love

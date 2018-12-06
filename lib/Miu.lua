@@ -1,9 +1,10 @@
 require 'class'
 
+local World=require 'lib/World'
 
 local Miu=class(function(self)
   
-  self.mao={ }
+  self.mao={World()}
 end)
 
 return Miu
