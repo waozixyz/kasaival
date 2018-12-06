@@ -1,6 +1,7 @@
 local state=require 'state'
 
 local le=love.event
+local lg=love.graphics
 local lm=love.math
 
 local Chi=require 'lib/Chi'
@@ -10,9 +11,11 @@ local Voyager=require 'lib/Voyager'
 local ctrl={}
 
 local lyra={
-  [0]= Chi,
-  [1]= Miu,
-  ['ao']=Voyager,
+  [0]=Chi,
+  [1]=Miu,
+  [2]=Voyager,
+  mao={},
+  ao={},
   x=0,
   y=0,
 }
@@ -39,23 +42,50 @@ function ctrl.now(x)
 end
 
 
-function getActiveMao(t)
-  local mao={}
-  for i,a in ipairs(t) do
-    if a.hp and a.hp <= 0 or a.sx and a.sx < 0 or a.scale and a.scale < 0 then
-      table.remove(t,i)
+function getActive()
+  local mao=lyra.mao
+  for i,ao in ipairs(mao) do
+    if ao.hp and ao.hp<0 or ao.sx and ao.sx<0 or ao.scale and ao.scale<0 then
+      table.remove(mao,i)
     else
-    table.insert(mao,a)
 
-    if a.mao then
-      local ao = self:dharma(a.mao)
-      for i,o in ipairs(ao) do
+    if not ao.added and ao.mao then
+      for i,o in ipairs(ao.mao) do
         table.insert(mao,o)
       end
+      ao.added=true
     end
     end
   end
-  return mao
+  lyra.mao=mao
+end
+
+function getVisible(m,x,y)
+  local W,H=lg.getDimensions()
+  x=x or 0
+  y=y or 0
+  
+  local ao = lyra.ao
+ 
+  for i,v in ipairs(m) do
+    if v.draw then
+      local offX,offY = 0,0
+      if v.w then
+        offX = v.w
+      end
+      if v.h then
+        offY = v.h
+      end
+      if v.x and v.y then
+        if v.x >= x-offX and v.x <= x+W+offX and v.y >= y-offY and v.y <= y+H+offY then
+          table.insert(ao,v)
+        end
+      else
+        table.insert(ao,v)
+      end
+    end
+  end 
+  return ao
 end
 
 function ctrl.dharma(dt)
@@ -64,9 +94,9 @@ function ctrl.dharma(dt)
   if x and x.update then
     x:update(dt)
   end
-
-  local mao=getActiveMao(lyra[state.now])
-  self.ao = Miu:eye(mao, lyra.x)
+  local x,y=lyra.x,lyra.y
+  local m=getActive({lyra[state.n]})
+  lyra.ao=getVisible(m,x,y)
 
 end
 
