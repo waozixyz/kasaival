@@ -49,7 +49,7 @@ end
 local Portal = class(function(self,t,h,c,market)
   local W,H=lg.getDimensions()
   self.x,self.y=32,32
-
+  
   if type(t) == 'table' then
     for i,v in ipairs(t) do
       self[v]=1
@@ -105,7 +105,7 @@ b.time = Text(timeToString(self.time),self.x,self.y+47,self.w,self.timeFont)
     end
     x=self.x+10+(i%2)*(w+10)-xtra
     y=self.y+80+math.floor((i-1)*.5)*(h+10)
-    table.insert(b, Button(x, y, w, h, v, c, bc,0,k))
+   -- table.insert(b, Button(x, y, w, h, v, c, bc,0,k))
     i = i + 1
   end
 

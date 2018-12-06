@@ -53,7 +53,7 @@ local Menu=class(function(self)
   self.alef=1
   local a={}
   a.img=lg.newImage('ao.png')
-  a.sc,a.r=.1,8
+  a.sc,a.r=.06,8
   local w,h=a.img:getDimensions()
   a.w,a.h=w*a.sc,h*a.sc
   a.x=W-a.w-a.r
@@ -158,7 +158,7 @@ function Menu:draw()
     local sc,r=aru.sc,aru.r
 
     local ma=lm.random(9,10)*.1
-    local na=lm.random(9,10)*.1
+    local na=lm.random(7,8)*.1
     lg.setColor(1,1,ma,na)
     lg.draw(img,x,y,0,sc)
   end
