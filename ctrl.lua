@@ -3,16 +3,15 @@ local state=require 'state'
 local le=love.event
 local lm=love.math
 
-local Menu=require 'lib/Menu'
+local Chi=require 'lib/Chi'
 local Miu=require 'lib/Miu'
 local Portal=require 'lib/Portal'
 local Voyager=require 'lib/Voyager'
 local ctrl={}
 
 local lyra={
-  [0]= Menu,
+  [0]= Chi,
   [1]= Miu,
-  [2]= Portal,
   ['ao']=Voyager,
 }
 

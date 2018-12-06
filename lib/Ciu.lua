@@ -1,4 +1,0 @@
---[[
-Ciu Planet (Cateye, Cyan)
-
-]]--
