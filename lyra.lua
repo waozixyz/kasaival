@@ -10,6 +10,7 @@ local lyra=class(function(self)
   self.sight={}
   self.x=0
   self.y=0
+  self.ao={} 
   self.box={Chi,Miu,Poh}
 end)
  
@@ -22,6 +23,7 @@ function lyra:load(key)
 end
 
 function lyra:dharma(dt,mao)
+  local result={}
   for i,v in ipairs(mao) do
     if v.hp and v.hp<0 or v.sx and v.sx<0 or v.scale and v.scale<0 then
       table.remove(mao,i)
@@ -29,37 +31,35 @@ function lyra:dharma(dt,mao)
       if v.mao then
         local t=self:dharma(dt,v.mao)
         for i,v in ipairs(t) do
-          table.insert(mao,v)
+          table.insert(result,v)
         end
       end
-      table.insert(mao,v)
-
+      table.insert(result,v)
     end
   end
-  return mao
+  return result
 end
 
 function lyra:eye(dt,mao)
   local W,H=lg.getDimensions() 
+  local x,y=self.x,self.y
   local ao={}
-  x=self.x
-  y=self.y
 
-  for i,ao in ipairs(mao) do
+  for _,v in ipairs(mao) do
     local toAo=false
-    if ao.draw then
+    if v.draw then
       local offX,offY = 0,0
-      if ao.w then
-        offX = ao.w
+      if v.w then
+        offX = v.w
       end
-      if ao.h then
-        offY = ao.h
+      if v.h then
+        offY = v.h
       end
-      if ao.x and ao.y then
-        local l=ao.x>=x-offX
-        local r=ao.x<=x+W+offX
-        local d=ao.y>=y-offY
-        local u=ao.y<=y+H+offY
+      if v.x and v.y then
+        local l=v.x>=x-offX
+        local r=v.x<=x+W+offX
+        local d=v.y>=y-offY
+        local u=v.y<=y+H+offY
         if l and r and d and u then
           toAo=true
         end
@@ -78,8 +78,8 @@ function lyra:update(dt)
   local obj=self.obj
   if obj then
     if obj.update then obj:update(dt) end
-    local mao=self:dharma(dt,obj.mao)
-    if mao then
+    if obj.mao then
+     local mao=self:dharma(dt,obj.mao)
       for _,o in ipairs(mao) do
         if o.update then
           o:update(dt)
