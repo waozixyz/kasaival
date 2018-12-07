@@ -1,19 +1,18 @@
 require 'class'
 
-local lg=love.graphics
-
-local Chi=class(function(self)
+local Poh=class(function(self)
   self.id=0
   self.mao={}
+
 end)
 
-function Chi:update(dt)
+function Poh:update(dt)
 
 end
 
-function Chi:draw()
+function Poh:draw()
   lg.setColor(1,.4,.1) 
   lg.print('hi u sexy',59,50)
 end
 
-return Chi
+return Poh
