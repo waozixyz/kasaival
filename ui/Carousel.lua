@@ -4,7 +4,6 @@ local lg=love.graphics
 local lt=love.touch
 
 local state=require 'state'
-
 local Cart=require 'ui/Cart'
 
 local Ca=class(function(self,x,y,no)
@@ -26,16 +25,28 @@ local Ca=class(function(self,x,y,no)
   self.al=lg.newImage('assets/arrow-left.png')
   self.ar=lg.newImage('assets/arrow-right.png')
 end)
+function count(st,en)
+  local c={}
+  for s=st,en do 
+    table.insert(c,s)
+  end
+  return c
+end
 
-function Ca:update(dt)
-  local carts=self.carts
+function Ca:update(dt,phi)
   local touches=lt.getTouches()
+  local carts=count(1,#self.carts)
   for i,id in ipairs(touches) do
     local tx,ty=lt.getPosition(id)
-    for _,v in carts do
-     local x,y,w,h=v.x,v.y,v.w,v.h
+    for i,_ in pairs(carts) do
+     local v=self.carts[i]   
+     local x,y=v.x,v.y*phi
+     local w,h=v.w,v.h*phi
      if tx>=x and tx<=x+w and ty>=y and ty<=y+h then
-       v.active=true
+       v.touch=true
+       table.remove(carts,i)
+     else
+       v.touch=false
      end
     end
   end

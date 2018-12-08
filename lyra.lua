@@ -85,12 +85,12 @@ function lyra:update(dt)
  
   local obj=self.obj
   if obj then
-    if obj.update then obj:update(dt) end
+    if obj.update then obj:update(dt,state.phi) end
     if obj.mao then
      local mao=self:dharma(dt,obj.mao)
       for _,o in ipairs(mao) do
         if o.update then
-          o:update(dt)
+          o:update(dt,state.phi)
         end
       end
       self.ao=self:eye(dt,mao)

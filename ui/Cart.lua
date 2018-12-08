@@ -9,7 +9,9 @@ local Cart=class(function(self,x,y,w,h)
   self.y=y or 0
   self.w=w or 108
   self.h=h or 108
+  
 end)
+
 
 function Cart:update(dt)
 
@@ -18,9 +20,14 @@ end
 function Cart:draw(phi)
   local x,y=self.x,self.y*phi
   local w,h=self.w,self.h
+  if self.touch then
+    lg.setColor(.8,.8,.8,.5)
+lg.rectangle('fill',x,y,w,h)
+  else
+    lg.setColor(.6,.6,.6,.5)    
+ lg.rectangle('line',x,y,w,h)
+  end
   
-  lg.setColor(.6,.6,.6,.5)     
-  lg.rectangle('line',x,y,w,h)
 end
 
 return Cart
