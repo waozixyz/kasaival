@@ -3,18 +3,20 @@ require 'class'
 local lg=love.graphics
 
 local state=require 'state'
+
+setmetatable(_G, { __index = require('cargo').init('/') })
+
+local Camera=require 'camera'
 local Chi=require 'lib/Chi'
 local Miu=require 'lib/Miu'
-local Poh=require 'lib/Poh'
+local Poh=require 'lib/Poh' 
 
 local lyra=class(function(self)
-  self.x,self.y=0,0
-  self.h=600
-  local H=lg.getHeight()
-  state.phi=H/self.h
-  self.sight={}
+  state.w,state.h=800,600
+  local x,y=0,0
   self.ao={} 
   self.box={Chi,Miu,Poh}
+  state.eye=Camera(state.w,state.h,{x=x,y=y,resizable=true, maintainAspectRatio=true})
 end)
  
 function lyra:load(key)
@@ -43,10 +45,8 @@ function lyra:dharma(dt,mao)
   return result
 end
 
-function lyra:eye(dt,mao)
-  local W,H=lg.getDimensions() 
-   
-  local x,y=self.x,self.y
+function lyra:sight(dt,mao)
+  local x,y=state.eye:getWorldCoordinates(0,0)
   local ao={}
 
   for _,v in ipairs(mao) do
@@ -60,14 +60,10 @@ function lyra:eye(dt,mao)
       if v.h then
         h = v.h
       end
-      if v.x then
-       a=v.x>=x-w and v.x<=x+W+w
-      end
-      if v.y then
-       b=v.y>=y-h and v.y<=y+self.h
-      end
-      if a and b then
-        toAo=true
+      if v.x and v.y then
+        if v.x>=x-w and v.x<=x+w+state.eye.w*.5 and v.y>=y-h and v.y<=y+state.eye.h*.5 then
+         toAo=true
+        end
       end
     else
       toAo=true
@@ -80,41 +76,41 @@ function lyra:eye(dt,mao)
 end
 
 function lyra:update(dt)
-  local H=lg.getHeight()
-  state.phi=H/self.h
+  state.eye:update()
  
   local obj=self.obj
   if obj then
-    if obj.update then obj:update(dt,state.phi) end
+    if obj.update then obj:update(dt) end
     if obj.mao then
      local mao=self:dharma(dt,obj.mao)
       for _,o in ipairs(mao) do
         if o.update then
-          o:update(dt,state.phi)
+          o:update(dt)
         end
       end
-      self.ao=self:eye(dt,mao)
+      self.ao=mao
       self.mao=mao
     end
   end
 end
 
 function lyra:draw()
-  local W,H = lg.getDimensions()
-  local phi=state.phi
+
+  state.eye:push()
   lg.setColor(1,1,1)
-  lg.printf(#self.mao,40,80,500,'center')
+  --lg.printf(state.eye.w,-160,-220,500,'center')
   if self.ao then
     for _,o in ipairs(self.ao) do
       if o.draw then
-        o:draw(phi)
+        o:draw()
       end
     end
   end
   local obj=self.obj
   if obj and obj.draw then
-    obj:draw(phi)
+    obj:draw()
   end 
+  state.eye:pop()
 end
 
 return lyra
