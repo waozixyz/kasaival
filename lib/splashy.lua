@@ -27,20 +27,21 @@ local lg=love.graphics
 local splashy = {}
 splashy.list = {}
 splashy.inalpha = 0
-splashy.outalpha = 255
+splashy.outalpha = 1
 splashy.count = 1
 splashy.tweenlist = {}
 splashy.fadestate = "in"
 splashy.finished = false
 splashy.onCompleteFunction = nil
 
-function splashy.addSplash(img,duration,index,x,y,scale)
+function splashy.addSplash(img,duration,x,y,scale,easing,index)
+ easing=easing or 'inExpo'
 	duration=duration or 2
 	assert(type(duration)=='number' and duration>0, "duration must be a positive number.")
 	index=index or #splashy.list+1
 	assert(type(index)=="number", "index must be a number")
 	splashy.list[index]=img
-	splashy.tweenlist[index]=tween.new(duration, splashy, {inalpha = 255, outalpha = 0})
+	splashy.tweenlist[index]=tween.new(duration, splashy, {inalpha = 1, outalpha = 0}, easing)
   splashy.x,splashy.y=x,y
   splashy.scale=scale
 end
@@ -64,9 +65,9 @@ function splashy.draw()
 	if splashy.finished == false then
 		for i=1,#splashy.list do
 			if splashy.fadestate=='in' then
-				lg.setColor(1,1,1,splashy.inalpha/255)
+				lg.setColor(1,1,1,splashy.inalpha)
 			elseif splashy.fadestate=="out" then
-				lg.setColor(1,1,1,splashy.outalpha/255)
+				lg.setColor(1,1,1,splashy.outalpha)
 			end
 
 			-- If the current splash is the one in the list.
