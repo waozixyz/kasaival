@@ -7,20 +7,19 @@ local state=require 'state'
 local Cart=require 'ui/Cart'
 
 local Ca=class(function(self,x,y,no)
-  local H=lg.getHeight()
-  self.x=x or 0
-  self.y=y or 400
+  self.x=x or -state.eye.w*.5
+  self.y=y or 200
+  self.h=state.h-self.y
   self.carts={}
   local noOfCarts=no or 11
   local m=16
   for i=1,noOfCarts do
     local xoff=30
     local w=92
-    local x=w*(i-1)+xoff+m*i
-    local y=self.y+m
-    local h=H-y*state.phi-m
-
-    table.insert(self.carts,Cart(x,y,w,h))
+    local x=self.x+w*(i-1)+xoff+m*i
+    local y=self.y-m
+    local h=state.eye.h*.5-y-m
+ table.insert(self.carts,Cart(x,y,w,h))
   end
   self.al=lg.newImage('assets/arrow-left.png')
   self.ar=lg.newImage('assets/arrow-right.png')
@@ -33,43 +32,41 @@ function count(st,en)
   return c
 end
 
-function Ca:update(dt,phi)
+function Ca:update(dt)
   local touches=lt.getTouches()
   local carts=count(1,#self.carts)
-  for i,id in ipairs(touches) do
-    local tx,ty=lt.getPosition(id)
-    for i,_ in pairs(carts) do
-     local v=self.carts[i]   
-     local x,y=v.x,v.y*phi
-     local w,h=v.w,v.h*phi
-     if tx>=x and tx<=x+w and ty>=y and ty<=y+h then
-       v.touch=true
-       table.remove(carts,i)
-     else
-       v.touch=false
-     end
-    end
+
+  local tx,ty=state.eye:getMouseWorldCoordinates()
+  for i,_ in pairs(carts) do
+   local v=self.carts[i]   
+   local x,y=v.x,v.y
+   local w,h=v.w,v.h
+   if tx>=x and tx<=x+w and ty>=y and ty<=y+h then
+     v.touch=true
+     table.remove(carts,i)
+   else
+     v.touch=false
+   end
   end
 end
 
-function Ca:draw(phi)
-  local W,H=lg.getDimensions()
-  local x,y=self.x*phi,self.y*phi
-
+function Ca:draw()
+  local x,y=state.eye.x,state.eye.y
+  local w,h=state.eye.w,state.eye.h
   -- bottom HUD
   local m=12
   lg.setColor(.4,.1,.2,.5)
-  lg.rectangle('fill',0,y,W,H-y)
+  lg.rectangle('fill',x,y,w,h-y)
 
   -- boxes for sprites
   for _,v in ipairs(self.carts) do
-    v:draw(phi)
+    v:draw()
   end
 
   lg.setColor(.7,.2,.2,.8)
   m=16
-  lg.draw(self.al,m,y)
-  x=W-self.ar:getWidth()-m
+  lg.draw(self.al,x+m,y)
+  x=state.w*.5-self.ar:getWidth()-m
   lg.draw(self.ar,x,y)
 end
 
