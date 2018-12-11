@@ -8,9 +8,11 @@
 (local W (class (fn [self])))
 
 (fn W.update [W,dt]
+  
   nil)
 
 (fn W.draw [W]
+  
   nil)
 
 W
