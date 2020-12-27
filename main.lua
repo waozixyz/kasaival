@@ -1,15 +1,7 @@
- local lyra=require 'lyra'
+-- bootstrap the compiler
+fennel = require("lib.fennel")
+table.insert(package.loaders, fennel.make_searcher({correlate=true}))
+pp = function(x) print(require("lib.fennelview")(x)) end
+lume = require("lib.lume")
 
-love.load=function()
-  lyra.load()
-  return nil
-end
-love.update=function(dt)
-  lyra.update(dt)
-  return nil
-end
-love.draw=function()
-  lyra.draw()
-  return nil
-end
-
+require("wrap")
