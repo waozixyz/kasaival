@@ -76,21 +76,8 @@ local iteratee = function(x)
   end
   return function(z) return z[x] end
 end
---[[ tasks available
-check table
-only check tiles close to player
-]]--
-function lume.collision(a,b)
-  local t = {}
-  ha = a:getHitbox()
-  for i,v in ipairs(b) do
-   ht = v:getHitbox()
-   if ha[1] < ht[2] and ha[2] > ht[1] and ha[3] < ht[4] and ha[4] > ht[4] then
-     table.insert(t, v)
-   end
-  end
-  return t
-end
+
+
 
 function lume.clamp(x, min, max)
   return x < min and min or (x > max and max or x)
@@ -171,7 +158,7 @@ end
 
 
 function lume.isarray(x)
-  return (type(x) == "table" and x[1] ~= nil) and true or false
+  return type(x) == "table" and x[1] ~= nil
 end
 
 
@@ -236,18 +223,14 @@ function lume.shuffle(t)
 end
 
 
-function lume.sort(t, a, b)
+function lume.sort(t, comp)
   local rtn = lume.clone(t)
-  if a then
-  if type(a) == "string" or type(b) == "string" then
-    table.sort(rtn, function(mu,nu)
-    local mi=mu[a] or mu[b] or -9999
-    local ni=nu[a] or nu[b] or -9999
-    return mi < ni
-    end)
-  else
-    table.sort(rtn,a,b)
-  end
+  if comp then
+    if type(comp) == "string" then
+      table.sort(rtn, function(a, b) return a[comp] < b[comp] end)
+    else
+      table.sort(rtn, comp)
+    end
   else
     table.sort(rtn)
   end
