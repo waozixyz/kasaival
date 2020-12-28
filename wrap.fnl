@@ -6,7 +6,7 @@
 (var scale 1)
 
 ;; set the first mode
-(var mode (require "mode-intro"))
+(var mode (require :mode-game))
 
 (fn set-mode [mode-name ...]
   (set mode (require mode-name))
@@ -14,7 +14,7 @@
     (mode.init ...)))
 
 (fn love.load []
-  (canvas:setFilter "nearest" "nearest")
+  (canvas:setFilter :nearest :nearest)
   (repl.start)
   (set suit.theme.color {:normal {:bg [.3 .1 .14]
                                   :fg [.7 .0 .34]}

@@ -16,9 +16,12 @@
          (gr.draw bckg))
  :update (fn update [dt set-mode]
            (var (w h) (gr.getDimensions))
-           (var start (suit.Button "Start Burning" {:id 1} (- (/ w 2) 100) 100 200 30))
+           (var start (suit.Button "Start Burning" (- (/ w 2) 100) 140 200 30))
            (if (= start.hit true)
-             (set-mode :mode-game)))
+             (set-mode :mode-game))
+           (var exit (suit.Button "Extinguish" (- (/ w 2) 100) 305 200 30))
+           (if (= exit.hit true)
+             (ev.quit)))
 
  :keypressed (fn keypressed [key set-mode]
                (if (= key :escape)
