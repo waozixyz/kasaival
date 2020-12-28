@@ -1,4 +1,5 @@
-(local repl (require "lib.stdio"))
+(local repl (require :lib.stdio))
+(local suit (require :suit))
 (local canvas (let [(w h) (love.window.getMode)]
                 (love.graphics.newCanvas w h)))
 
@@ -9,12 +10,18 @@
 
 (fn set-mode [mode-name ...]
   (set mode (require mode-name))
-  (when mode.activate
-    (mode.activate ...)))
+  (when mode.init
+    (mode.init ...)))
 
 (fn love.load []
   (canvas:setFilter "nearest" "nearest")
   (repl.start)
+  (set suit.theme.color {:normal {:bg [.3 .1 .14]
+                                  :fg [.7 .0 .34]}
+                         :hovered {:bg [.4 .1 .14]
+                                   :fg [.9 .0 .1]}
+                         :active {:bg [.2 .0 .1]
+                                  :fg [.5 .1 .2]}})
   (mode.init))
 
 (fn love.draw []
@@ -24,6 +31,7 @@
   (love.graphics.clear)
   (love.graphics.setColor 1 1 1)
   (mode.draw)
+  (suit.draw)
   (love.graphics.setCanvas)
   (love.graphics.setColor 1 1 1)
   (love.graphics.draw canvas 0 0 0 scale scale))
