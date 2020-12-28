@@ -1,4 +1,4 @@
-(local Player (require :Miu.Player))
+(local Player (require :lib.Player))
 
 (local gr love.graphics)
 
