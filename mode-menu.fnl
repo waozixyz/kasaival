@@ -7,9 +7,6 @@
 
 (var show_message false)
 
-(fn test []
-  (print :hi))
-
 {:init (fn init [] 
          (set bckg (gr.newImage :assets/menu.jpg)))
  :draw (fn draw [message]

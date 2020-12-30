@@ -1,14 +1,20 @@
-(local Player (require :lib.Player))
+(local Player (require :Player))
+(local Sky (require :lib.Sky))
+(local Ground (require :lib.Ground))
 
 (local gr love.graphics)
 
-(local player (Player 1 200 200))
+(local ground (Ground))
+(local sky (Sky))
 
-{:init (fn init [])
+{:init (fn init []
+         (Player.init))
  :draw (fn draw [message]
-         (player:draw))
+         (sky:draw)
+         (ground:draw)
+         (Player.draw))
  :update (fn update [dt set-mode]
-           (player:update dt))
- :keypressed (fn keypressd [key set-mode] 
+           (Player.update dt))
+ :keypressed (fn keypressed [key set-mode] 
                (if (= key :escape)
                  (set-mode :mode-menu)))}

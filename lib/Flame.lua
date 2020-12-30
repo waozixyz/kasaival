@@ -4,12 +4,12 @@ local gr=love.graphics
 
 local SpriteSheet=require 'lib/SpriteSheet'
 
-local Flame=class(function(self,styl,x,y)
+local Flame=class(function(self,styl)
     local W,H=gr.getDimensions()
     styl=styl or 1 
     self.img='assets/flame/spr_'..styl..'.png'
-    self.x=x or 0
-    self.y=y or 0
+    self.x=x or W*.5
+    self.y=y or H*.5
     self.w,self.h=96,192
     -- add animation
     local S=SpriteSheet(self.img,self.w,self.h)
@@ -33,9 +33,6 @@ function Flame:draw()
     gr.setColor(1,1,1)
     local offX,offY=self.w*.5,self.h
     self.anime:draw(self.x,self.y,0,1,1,offX,offY)
-
-    gr.setColor(.6,.4,.1) 
-    gr.print('hi u sexy',-400,-300)
 end
 
 return Flame
