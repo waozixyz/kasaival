@@ -10,13 +10,13 @@ local Flame=class(function(self,styl)
     self.img='assets/flame/spr_'..styl..'.png'
     self.x=x or W*.5
     self.y=y or H*.5
-    self.w,self.h=96,192
+    self.w,self.h=31,184
     -- add animation
     local S=SpriteSheet(self.img,self.w,self.h)
     local a=S:createAnimation()
-    for row=1,8 do
-        local limit=22
-        if row==8 then limit=19 end
+    for row=1,4 do
+        local limit=43
+        if row==4 then limit=41 end
         for col=1,limit do
             a:addFrame(col, row)
         end

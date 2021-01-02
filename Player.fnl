@@ -16,13 +16,14 @@
  :draw (fn draw []
          (sprite:draw))
  :update (fn update [dt]
-           (if (ke.isScancodeDown :d :right)
+           (local (W H) (gr.getDimensions)) 
+           (if (and (ke.isScancodeDown :d :right) (< x W))
              (set x (+ x speed)))
-           (if (ke.isScancodeDown :a :left)
+           (if (and (ke.isScancodeDown :a :left) (> x 0))
              (set x (- x speed)))
-           (if (ke.isScancodeDown :s :down)
+           (if (and (ke.isScancodeDown :s :down) (< y H))
              (set y (+ y speed)))
-           (if (ke.isScancodeDown :w :up)
+           (if (and (ke.isScancodeDown :w :up) (> y 200))
              (set y (- y speed)))
 
            (set sprite.x x)
