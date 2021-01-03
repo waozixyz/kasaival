@@ -6,14 +6,14 @@
 (var sprite nil)
 (var speed 2)
 (var ow 31)
-(var oh 184)
+(var oh 175)
 
 {:x 0 :y 0 :scale 1
  :init (fn init [self]
          (local (W H) (gr.getDimensions)) 
          (set self.x (* W .5))
          (set self.y (* H .5))
-         (var S (SpriteSheet :assets/flame/spr_1.png ow oh))
+         (var S (SpriteSheet :assets/flame/spr_2.png ow oh))
          (var a (S:createAnimation))
          (for [row 1 4]
            (var limit 43)

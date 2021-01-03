@@ -16,6 +16,7 @@
 (fn love.load []
   (canvas:setFilter :nearest :nearest)
   (repl.start)
+  ;; set the theme color for the ui libray suit
   (set suit.theme.color {:normal {:bg [.3 .1 .14]
                                   :fg [.7 .0 .34]}
                          :hovered {:bg [.4 .1 .14]

@@ -5,7 +5,7 @@
 (var tiles {})
 (fn getTileColor []
   (var r (* (ma.random 0 3) .1))
-  (var g (* (ma.random 4 6) .1))
+  (var g (* (ma.random 3 5) .1))
   (var b (* (ma.random 1 4) .1))
   {:r r :g g :b b})
 {:height 290
