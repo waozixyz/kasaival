@@ -8,12 +8,13 @@
   (var g (* (ma.random 4 6) .1))
   (var b (* (ma.random 1 4) .1))
   {:r r :g g :b b})
-{:init (fn init []
+{:height 290
+ :init (fn init [self]
          (local (W H) (gr.getDimensions))
          (var (w h) (values 8 8)) ;start value, gets bigger at each row
          (var i 0)
-         (var y 200)
-         (while (< y (+ H 32))
+         (var y (- H self.height))
+         (while (< y H)
            (set (w h) (values (+ w 1) (+ h 1)))
            (for [x 0 W w]
              (tset tiles i {:x x :y y :w w :h h :color (getTileColor)})

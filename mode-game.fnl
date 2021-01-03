@@ -8,12 +8,14 @@
 
 {:init (fn init []
          (Player.init)
-         (Ground.init))
+         (Ground:init))
+         
  :draw (fn draw [message]
          (sky:draw)
          (Ground.draw)
          (Player.draw))
  :update (fn update [dt set-mode]
+           (var gh Ground.height)
            (Player.update dt)
            (Ground.update dt))
  :keypressed (fn keypressed [key set-mode] 
