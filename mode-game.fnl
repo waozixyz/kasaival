@@ -7,17 +7,19 @@
 (local sky (Sky))
 
 {:init (fn init []
-         (Player.init)
+         (Player:init)
          (Ground:init))
          
  :draw (fn draw [message]
          (sky:draw)
-         (Ground.draw)
-         (Player.draw))
+         (Ground:draw)
+         (Player:draw))
  :update (fn update [dt set-mode]
+           (local (W H) (gr.getDimensions))
            (var gh Ground.height)
-           (Player.update dt)
-           (Ground.update dt))
+           (set Player.scale (/ Player.y H))
+           (Player:update dt gh)
+           (Ground:update dt))
  :keypressed (fn keypressed [key set-mode] 
                (if (= key :escape)
                  (set-mode :mode-menu)))}
