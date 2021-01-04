@@ -12,7 +12,7 @@
   (var g (* (ma.random 4 6) .1))
   (var b (* (ma.random 9 10) .1))
 
-  {:r r :g g :b b})
+  [r g b])
 
 ;; each line basically represents a branch of the tree
 (fn addLine [add_x add_y]
@@ -32,7 +32,7 @@
          (addLine x y))
  :draw (fn draw [self]
          (each [key val (pairs lines)]
-           (gr.setColor val.color.r val.color.g val.color.b)
+           (gr.setColor val.color)
            (gr.setLineWidth val.w)
            (gr.line val.x1 val.y1 val.x2 val.y2)))
  :update (fn update [self dt]
