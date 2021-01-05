@@ -13,11 +13,17 @@
   (var b (* (ma.random 9 10) .1))
   [r g b])
 
+(var deg_to_rad (/ math.pi 180))
 
 ;; each line represents a branch of the tree
-(fn getLine [prev_x prev_y add_x add_y prev_w]
-  (var width (* prev_w .8))
-  {:x1 prev_x :y1 prev_y :x2 (+ prev_x add_x) :y2 (+ prev_y add_y) :w width :color (getColor)})
+;; the parameters x1 y1 angle w h are used from the previous line of branch
+(fn getLine [px py angle w h]
+  ;; decrease line size
+  ;; generate x and y coord usingn the angle
+  (var x2  (+ px (* (math.cos (* angle deg_to_rad)) h)))
+  (var y2  (+ py (* (math.sin (* angle deg_to_rad)) h)))
+  (print x2 y2)
+  {:deg angle :x1 px :y1 py :x2 x2 :y2 y2 :w w :h h :color (getColor)})
 
 (fn grow []
   ;; get the last set of branches, basically one stage of growth
@@ -29,20 +35,22 @@
   (each [i v (ipairs prev)]
     ;; decide if the branch splits into two branches
     (var split (ma.random 0 1))
+    (var (w h) (values (* v.w .9) (* v.h .9)))
     (when (= split 1)
-      (table.insert new (getLine v.x2 v.y2 (ma.random -15 -5) -20 v.w))
-      (table.insert new (getLine v.x2 v.y2 (ma.random 5 15) -20 v.w)))
+      (table.insert new (getLine v.x2 v.y2 (- v.deg (ma.random 20 30)) w h))
+      (table.insert new (getLine v.x2 v.y2 (+ v.deg (ma.random 20 30)) w h)))
     (when (= split 0)
-      (table.insert new (getLine v.x2 v.y2 (ma.random -4 4) -20 v.w))))
+      (table.insert new (getLine v.x2 v.y2 (+ v.deg (ma.random -10 10)) w h))))
   ;; add the table of new branches to the entire branches table
   (table.insert branches new))
 
 {:x 0 :y 0 :scale 1
- :init (fn init [self x y w]
+ :init (fn init [self x y w h]
          (var x (or x 500))
          (var y (or y 400))
          (var w (or w 12))
-         (var branch {:x1 x :y1 y :x2 x :y2 (- y 20) :w w :color (getColor)})
+         (var h (or h 32))
+         (var branch {:deg -90 :x1 x :y1 y :x2 x :y2 (- y 20) :w w :h h :color (getColor)})
          (table.insert branches [branch]))
  :draw (fn draw [self]
          (each [i val (ipairs branches)]
