@@ -5,6 +5,7 @@
 (var branches [])
 (var elapsed 0)
 (var stages 10)
+(var growTime .2)
 
 ;; generate random colors in a range
 (fn getColor []
@@ -22,7 +23,6 @@
   ;; generate x and y coord usingn the angle
   (var x2  (+ px (* (math.cos (* angle deg_to_rad)) h)))
   (var y2  (+ py (* (math.sin (* angle deg_to_rad)) h)))
-  (print x2 y2)
   {:deg angle :x1 px :y1 py :x2 x2 :y2 y2 :w w :h h :color (getColor)})
 
 (fn grow []
@@ -52,15 +52,22 @@
          (var h (or h 32))
          (var branch {:deg -90 :x1 x :y1 y :x2 x :y2 (- y 20) :w w :h h :color (getColor)})
          (table.insert branches [branch]))
+
  :draw (fn draw [self]
          (each [i val (ipairs branches)]
-           (each [i val (ipairs val)]
+           (each [j val (ipairs val)]
+             (var (x1 y1) (values val.x1 val.y1))
+             (var (x2 y2) (values val.x2 val.y2))
+             (when (= i (length branches))
+               (set x2 (+ x1 (/ (- x2 x1) (/ growTime elapsed))))
+               (set y2 (+ y1 (/ (- y2 y1) (/ growTime elapsed)))))
              (gr.setColor val.color)
              (gr.setLineWidth val.w)
-             (gr.line val.x1 val.y1 val.x2 val.y2))))
+             (gr.line x1 y1 x2 y2))))
+
  :update (fn update [self dt]
            (when (< (length branches) stages)
              (set elapsed (+ elapsed dt))
-             (when (> elapsed 1)
+             (when (> elapsed growTime)
                (grow)
                (set elapsed 0))))}
