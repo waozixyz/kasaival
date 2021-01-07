@@ -8,11 +8,11 @@
 (var ow 31)
 (var oh 175)
 
-{:x 0 :y 0 :scale 1
- :init (fn init [self]
-         (local (W H) (gr.getDimensions)) 
-         (set self.x (* W .5))
-         (set self.y (* H .5))
+(local (W H) (gr.getDimensions)) 
+{:x (* W .5) :y (* H .7) :scale 1
+ :init (fn init [self t]
+         (set self.x (or t.x self.x))
+         (set self.y (or t.y self.y))
          (var S (SpriteSheet :assets/flame/spr_2.png ow oh))
          (var a (S:createAnimation))
          (for [row 1 4]

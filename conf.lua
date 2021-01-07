@@ -1,7 +1,7 @@
 -- Configuration
 function love.conf(t)
 	t.gammacorrect = true
-	t.title, t.identity = "Kasaival", "Minimal"
+	t.title, t.identity = "Kasaival", "Kasaival"
 	t.version = "11.3"
 	t.window.vsync = false
  	t.window.borderless=true
