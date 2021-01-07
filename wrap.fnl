@@ -1,5 +1,5 @@
 (local repl (require :lib.stdio))
-(local suit (require :suit))
+(local suit (require :lib.suit))
 (local canvas (let [(w h) (love.window.getMode)]
                 (love.graphics.newCanvas w h)))
 

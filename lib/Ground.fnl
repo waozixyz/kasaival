@@ -3,9 +3,9 @@
 (local ma love.math)
 
 (fn getColor []
-  (var r (* (ma.random 0 3) .1))
-  (var g (* (ma.random 3 5) .1))
-  (var b (* (ma.random 1 4) .1))
+  (var r (* (ma.random 0 30) .01))
+  (var g (* (ma.random 30 50) .01))
+  (var b (* (ma.random 10 40) .01))
   [r g b])
 (var height 0)
 

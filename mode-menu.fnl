@@ -1,4 +1,4 @@
-(local suit (require :suit))
+(local suit (require :lib.suit))
 
 (local gr love.graphics)
 (local ev love.event)

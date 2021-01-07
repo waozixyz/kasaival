@@ -4,7 +4,7 @@
 (var deg_to_rad (/ math.pi 180))
 
 (fn rnc [l r]
-  ( * (ma.random l r) .1))
+  ( * (ma.random l r) .01))
 
 ;; generate random colors in a range
 (fn getColor [cs]

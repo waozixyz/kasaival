@@ -1,10 +1,10 @@
 (local copy (require :lib.copy))
 (local serpent (require :lib.serpent))
 
-(local Player (require :Player))
+(local Player (require :lib.Player))
 (local Sky (require :lib.Sky))
-(local Tree (require :Tree))
-(local Ground (require :Ground))
+(local Tree (require :lib.Tree))
+(local Ground (require :lib.Ground))
 
 (local gr love.graphics)
 (local ma love.math)
@@ -15,9 +15,9 @@
 (var trees [])
 (var gh 290)
 
-(var cr [ 5 7 2 4 3 3])
-(var cg [ 2 4 5 7 2 3 ])
-(var cb [ 5 8 2 3 8 9 ])
+(var cr [ 50 70 20 40 30 30])
+(var cg [ 20 40 50 70 20 30 ])
+(var cb [ 50 80 20 30 80 90 ])
 
 (var saveFile :save0)
 
@@ -77,11 +77,12 @@
       (table.insert trees (copy Tree))
       (var tree (. trees (length trees)))
       (tree:init v))
-    (for [i 0 10]
+    (for [i 1 10]
       (addTree true)))
   (Ground:init gh g)
   (Player:init p))
 
+(var elapsed 0)
 {:init (fn init []
          (load))
          
