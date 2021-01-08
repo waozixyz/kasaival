@@ -1,13 +1,17 @@
-(local gr love.graphics)
+(local ev love.event)
 (local fi love.filesystem)
+(local gr love.graphics)
+(local ke love.keyboard)
+(local wi love.window)
+
 (local suit (require :lib.suit))
-(local canvas (let [(w h) (love.window.getMode)]
+(var canvas (let [(w h) (wi.getMode)]
                 (gr.newCanvas w h)))
 
 (var scale 1)
 
 ;; set the first mode
-(var mode (require :src.Game))
+(var mode (require :src.Menu))
 
 (fn set-mode [mode-name ...]
   (set mode (require mode-name))
@@ -25,6 +29,9 @@
   (set suit.theme.color uiTheme)
   (mode.init))
 
+(fn love.resize [w h]
+  (set canvas (let [(w h) (wi.getMode)] (gr.newCanvas w h))))
+
 (fn love.draw []
   ;; the canvas allows you to get sharp pixel-art style scaling; if you
   ;; don't want that, just skip that and call mode.draw directly.
@@ -40,8 +47,15 @@
 (fn love.update [dt]
   (mode.update dt set-mode))
 
+(fn toggle [b]
+  (if (= b true)
+    false
+    true))
+
 (fn love.keypressed [key]
-  (if (and (love.keyboard.isDown "lctrl" "rctrl" "capslock") (= key "q"))
-      (love.event.quit)
-      ;; add what each keypress should do in each mode
-      (mode.keypressed key set-mode)))
+  (if (ke.isDown "f")
+    (wi.setFullscreen (toggle (wi.getFullscreen)))
+    (and (ke.isDown "lctrl" "rctrl" "capslock") (= key "q"))
+    (ev.quit)
+    ;; add what each keypress should do in each mode
+    (mode.keypressed key set-mode)))
