@@ -1,7 +1,8 @@
+(local gr love.graphics)
 (local fi love.filesystem)
 (local suit (require :lib.suit))
 (local canvas (let [(w h) (love.window.getMode)]
-                (love.graphics.newCanvas w h)))
+                (gr.newCanvas w h)))
 
 (var scale 1)
 
@@ -13,28 +14,28 @@
   (when mode.init
     (mode.init ...)))
 
+(var uiTheme {
+  :normal {:bg [.3 .1 .14] :fg [.7 .0 .34]} 
+  :hovered {:bg [.4 .1 .14] :fg [.9 .0 .1]}
+  :active {:bg [.2 .0 .1] :fg [.5 .1 .2]}})
+
 (fn love.load []
   (canvas:setFilter :nearest :nearest)
   ;; set the theme color for the ui libray suit
-  (set suit.theme.color {:normal {:bg [.3 .1 .14]
-                                  :fg [.7 .0 .34]}
-                         :hovered {:bg [.4 .1 .14]
-                                   :fg [.9 .0 .1]}
-                         :active {:bg [.2 .0 .1]
-                                  :fg [.5 .1 .2]}})
+  (set suit.theme.color uiTheme)
   (mode.init))
 
 (fn love.draw []
   ;; the canvas allows you to get sharp pixel-art style scaling; if you
   ;; don't want that, just skip that and call mode.draw directly.
-  (love.graphics.setCanvas canvas)
-  (love.graphics.clear)
-  (love.graphics.setColor 1 1 1)
+  (gr.setCanvas canvas)
+  (gr.clear)
+  (gr.setColor 1 1 1)
   (mode.draw)
   (suit.draw)
-  (love.graphics.setCanvas)
-  (love.graphics.setColor 1 1 1)
-  (love.graphics.draw canvas 0 0 0 scale scale))
+  (gr.setCanvas)
+  (gr.setColor 1 1 1)
+  (gr.draw canvas 0 0 0 scale scale))
 
 (fn love.update [dt]
   (mode.update dt set-mode))
