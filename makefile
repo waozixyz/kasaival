@@ -1,8 +1,8 @@
-VERSION=0.1.0
+VERSION=0.1.2
 LOVE_VERSION=11.3
 NAME=Kasaival
 ITCH_ACCOUNT=waotzi
-URL=https://code.habd.as/wolfi/Kasaival
+URL="https://code.habd.as/wolfi/Kasaival"
 AUTHOR="Wolfi"
 DESCRIPTION="Survival adventure game. Out of nowhere you have come to exist. The fire is burning inside you, but you feel it diminishing. Stay alive as long as you can! Do whatever it takes to keep your flame burning!"
 
@@ -24,10 +24,10 @@ cleansrc: ; rm -rf $(OUT)
 
 %.lua: %.fnl; lua lib/fennel --compile --correlate $< > $@
 
-LOVEFILE=release/$(NAME)-$(VERSION).love
+LOVEFILE=releases/$(NAME)-$(VERSION).love
 
 $(LOVEFILE): $(LUA) $(OUT) $(LIBS) $(ASSETS)
-	mkdir -p release/
+	mkdir -p releases/
 	find $^ -type f | LC_ALL=C sort | env TZ=UTC zip -r -q -9 -X $@ -@
 
 

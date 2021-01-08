@@ -1,3 +1,4 @@
-release/*
+releases/*
 src/*.lua
 .swp
+appimage/*
