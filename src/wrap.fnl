@@ -1,7 +1,4 @@
 (local fi love.filesystem)
-(var info (fi.getInfo :lib.stdio))
-(when info
-  (local repl (require :lib.stdio)))
 (local suit (require :lib.suit))
 (local canvas (let [(w h) (love.window.getMode)]
                 (love.graphics.newCanvas w h)))
@@ -18,8 +15,6 @@
 
 (fn love.load []
   (canvas:setFilter :nearest :nearest)
-  (when repl
-    (repl.start))
   ;; set the theme color for the ui libray suit
   (set suit.theme.color {:normal {:bg [.3 .1 .14]
                                   :fg [.7 .0 .34]}
