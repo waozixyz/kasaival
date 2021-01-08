@@ -22,7 +22,7 @@ clean: ; rm -rf releases/* $(OUT)
 cleansrc: ; rm -rf $(OUT)
 
 
-%.lua: %.fnl; lua lib/fennel --compile --correlate $< > $@
+%.lua: %.fnl; lua5.3 lib/fennel --compile --correlate $< > $@
 
 LOVEFILE=releases/$(NAME)-$(VERSION).love
 
