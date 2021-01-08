@@ -1,4 +1,7 @@
-(local repl (require :lib.stdio))
+(local fi love.filesystem)
+(var info (fi.getInfo :lib.stdio))
+(when info
+  (local repl (require :lib.stdio)))
 (local suit (require :lib.suit))
 (local canvas (let [(w h) (love.window.getMode)]
                 (love.graphics.newCanvas w h)))
@@ -6,7 +9,7 @@
 (var scale 1)
 
 ;; set the first mode
-(var mode (require :mode-game))
+(var mode (require :src.Game))
 
 (fn set-mode [mode-name ...]
   (set mode (require mode-name))
@@ -15,7 +18,8 @@
 
 (fn love.load []
   (canvas:setFilter :nearest :nearest)
-  (repl.start)
+  (when repl
+    (repl.start))
   ;; set the theme color for the ui libray suit
   (set suit.theme.color {:normal {:bg [.3 .1 .14]
                                   :fg [.7 .0 .34]}

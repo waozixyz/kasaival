@@ -1,10 +1,10 @@
 (local copy (require :lib.copy))
 (local serpent (require :lib.serpent))
 
-(local Player (require :lib.Player))
+(local Player (require :src.Player))
 (local Sky (require :lib.Sky))
-(local Tree (require :lib.Tree))
-(local Ground (require :lib.Ground))
+(local Tree (require :src.Tree))
+(local Ground (require :src.Ground))
 
 (local gr love.graphics)
 (local ma love.math)
@@ -110,4 +110,4 @@
                  (save)
                  (clear)
                  ;; return to main menu
-                 (set-mode :mode-menu)))}
+                 (set-mode :src.Menu)))}

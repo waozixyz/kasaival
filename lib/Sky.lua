@@ -1,4 +1,4 @@
- require 'class'
+ require 'lib/class'
 
 local Star = require 'lib/Star'
 

@@ -8,7 +8,7 @@ function love.conf(t)
 	t.window.resizable=false
 	t.window.width=640
 	t.window.height=480
-	t.window.icon='icon.png'
+	t.window.icon='assets/icon.png'
 	-- For Windows debugging
 	t.console = false
 end

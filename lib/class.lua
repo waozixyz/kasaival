@@ -5,7 +5,6 @@
 -- Original author unknown
 --]]
 
-
 function class(base,ctor)
   local c = {}     -- a new class instance
   if not ctor and type(base) == 'function' then

@@ -1,16 +1,17 @@
 VERSION=0.1.0
 LOVE_VERSION=11.3
-NAME=change-me
-ITCH_ACCOUNT=change-me-too
-URL=https://gitlab.com/alexjgriffith/min-love2d-fennel
-AUTHOR="Your Name"
-DESCRIPTION="Minimal setup for trying out Phil Hagelberg's fennel/love game design process."
+NAME=Kasaival
+ITCH_ACCOUNT=waotzi
+URL=https://code.habd.as/wolfi/Kasaival
+AUTHOR="Wolfi"
+DESCRIPTION="Survival adventure game. Out of nowhere you have come to exist. The fire is burning inside you, but you feel it diminishing. Stay alive as long as you can! Do whatever it takes to keep your flame burning!"
 
+
+ASSETS := $(wildcard assets/*)
 LIBS := $(wildcard lib/*)
 LUA := $(wildcard *.lua)
-SRC := $(wildcard *.fnl)
+SRC := $(wildcard src/*.fnl)
 OUT := $(patsubst %.fnl,%.lua,$(SRC))
-
 
 run: $(OUT) ; love .
 
@@ -20,13 +21,15 @@ clean: ; rm -rf releases/* $(OUT)
 
 cleansrc: ; rm -rf $(OUT)
 
+
 %.lua: %.fnl; lua lib/fennel --compile --correlate $< > $@
 
-LOVEFILE=releases/$(NAME)-$(VERSION).love
+LOVEFILE=release/$(NAME)-$(VERSION).love
 
-$(LOVEFILE): $(LUA) $(OUT) $(LIBS) #assets text
-	mkdir -p releases/
+$(LOVEFILE): $(LUA) $(OUT) $(LIBS) $(ASSETS)
+	mkdir -p release/
 	find $^ -type f | LC_ALL=C sort | env TZ=UTC zip -r -q -9 -X $@ -@
+
 
 love: $(LOVEFILE)
 

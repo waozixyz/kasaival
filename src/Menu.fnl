@@ -15,7 +15,7 @@
            (var (w h) (gr.getDimensions))
            (var start (suit.Button "Start Burning" (- (/ w 2) 100) 140 200 30))
            (if (= start.hit true)
-             (set-mode :mode-game))
+             (set-mode :src.Game))
            (var exit (suit.Button "Extinguish" (- (/ w 2) 100) 305 200 30))
            (if (= exit.hit true)
              (ev.quit)))
@@ -24,4 +24,4 @@
                (if (= key :escape)
                  (ev.quit))
                (if (= key :return)
-                 (set-mode :mode-game)))}
+                 (set-mode :src.Game)))}
