@@ -7,15 +7,20 @@
   (var g (* (ma.random 30 50) .01))
   (var b (* (ma.random 10 40) .01))
   [r g b])
-(var height 0)
 
-{:tiles {} 
- :init (fn init [self gh t]
-         (set height gh)
+(local rows 20)
+
+{:height 320
+ :tiles {} 
+ :init (fn init [self t]
          (local (W H) (gr.getDimensions))
-         (var (w h) (values 8 8)) ;start value, gets bigger at each row
+         (set self.height (- H (/ H 3)))
+         ;; start value, gets bigger at each row
+         (var w (/ self.height rows))
+         (var h w)
+
          (var i 0)
-         (var y (- H height))
+         (var y (- H self.height))
          (if (and t.tiles (> (length t.tiles) 0))
            (set self.tiles t.tiles)
            (while (< y H)

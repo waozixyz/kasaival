@@ -16,7 +16,7 @@
 (fn set-mode [mode-name ...]
   (set mode (require mode-name))
   (when mode.init
-    (mode.init ...)))
+    (mode:init ...)))
 
 (var uiTheme {
   :normal {:bg [.3 .1 .14] :fg [.7 .0 .34]} 
@@ -27,10 +27,12 @@
   (canvas:setFilter :nearest :nearest)
   ;; set the theme color for the ui libray suit
   (set suit.theme.color uiTheme)
-  (mode.init))
+  (mode:init))
 
 (fn love.resize [w h]
-  (set canvas (let [(w h) (wi.getMode)] (gr.newCanvas w h))))
+  (set canvas (let [(w h) (wi.getMode)] (gr.newCanvas w h)))
+  (when mode.resize
+    (mode:resize)))
 
 (fn love.draw []
   ;; the canvas allows you to get sharp pixel-art style scaling; if you
@@ -38,14 +40,14 @@
   (gr.setCanvas canvas)
   (gr.clear)
   (gr.setColor 1 1 1)
-  (mode.draw)
+  (mode:draw)
   (suit.draw)
   (gr.setCanvas)
   (gr.setColor 1 1 1)
   (gr.draw canvas 0 0 0 scale scale))
 
 (fn love.update [dt]
-  (mode.update dt set-mode))
+  (mode:update dt set-mode))
 
 (fn toggle [b]
   (if (= b true)
@@ -58,4 +60,4 @@
     (and (ke.isDown "lctrl" "rctrl" "capslock") (= key "q"))
     (ev.quit)
     ;; add what each keypress should do in each mode
-    (mode.keypressed key set-mode)))
+    (mode:keypressed key set-mode)))

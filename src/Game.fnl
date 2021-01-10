@@ -13,17 +13,14 @@
 (local sky (Sky))
 
 (var trees [])
-(var gh 290)
 
 (var cr [ 50 70 20 40 30 30])
 (var cg [ 20 40 50 70 20 30 ])
 (var cb [ 50 80 20 30 80 90 ])
 
-(var saveFile :save0)
-
 (fn addTree [randomStage]
   (local (W H) (gr.getDimensions))
-  (var y (ma.random (- H gh) H))
+  (var y (ma.random (- H Ground.height) H))
   (var scale (/ y H))
   (var x (ma.random 0 W))
   (var w (* (ma.random 10 12) scale))
@@ -55,17 +52,17 @@
     (table.insert t (getProp v)))
   (tset sav :t t)
 
-  (var (s m) (fi.write saveFile (serpent.dump sav))))
+  (var (s m) (fi.write :save0 (serpent.dump sav))))
 
 (fn clear []
   (set trees []))
 
-(fn load []
+(fn load [saveFile]
   (var p {})
   (var g {})
   (var t [])
 
-  (when (fi.getInfo saveFile)
+  (when (and saveFile (fi.getInfo saveFile))
     (var (contents size) (fi.read saveFile ))
     (var (ok copy) (serpent.load contents))
     (set p (. copy :p))
@@ -79,14 +76,14 @@
       (tree:init v))
     (for [i 1 10]
       (addTree true)))
-  (Ground:init gh g)
+  (Ground:init g)
   (Player:init p))
 
 (var elapsed 0)
-{:init (fn init []
-         (load))
+{:init (fn init [self saveFile]
+         (load saveFile))
          
- :draw (fn draw [message]
+ :draw (fn draw [self]
          (sky:draw)
          (Ground:draw)
          (var entities [Player])
@@ -96,16 +93,16 @@
          (each [i entity (ipairs entities)]
            (entity:draw)))
 
- :update (fn update [dt set-mode]
+ :update (fn update [self dt set-mode]
            (local (W H) (gr.getDimensions))
            ;; adjust the player size
            (set Player.scale (/ Player.y H))
            ;; update functions
-           (Player:update dt gh)
+           (Player:update dt Ground.height)
            (each [i tree (ipairs trees)]
              (tree:update dt))
            (Ground:update dt))
- :keypressed (fn keypressed [key set-mode] 
+ :keypressed (fn keypressed [self key set-mode] 
                (when (= key :escape)
                  (save)
                  (clear)
