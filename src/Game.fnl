@@ -45,8 +45,8 @@
 
 (fn save [self]
   (var sav {})
-  (tset sav :g (getProp Ground))
-  (tset sav :p (getProp Player))
+  (tset sav :g (getProp self.ground))
+  (tset sav :p (getProp self.player))
   (var t [])
   (each [i v (ipairs trees)]
     (table.insert t (getProp v)))
@@ -57,38 +57,38 @@
 (fn clear []
   (set trees []))
 
-(fn load [self]
-  (var p {})
-  (var g {})
-  (var t [])
-
-  (when (and self.saveFile (fi.getInfo self.saveFile))
-    (var (contents size) (fi.read self.saveFile))
-    (var (ok copy) (serpent.load contents))
-    (set p (. copy :p))
-    (set g (. copy :g))
-    (set t (. copy :t)))
-
-  (if (> (length t) 0)
-    (each [i v (ipairs t)]
-      (table.insert trees (copy Tree))
-      (var tree (. trees (length trees)))
-      (tree:init v))
-    (for [i 1 10]
-      (addTree true)))
-  (Ground:init g)
-  (Player:init p))
 
 (var elapsed 0)
 {:saveFile "saves/save0"
  :init (fn init [self saveFile]
          (set self.saveFile (or saveFile self.saveFile))
-         (load self))
+         (var p {})
+         (var g {})
+         (var t [])
+         
+         (when (fi.getInfo self.saveFile)
+           (var (contents size) (fi.read self.saveFile))
+           (var (ok copy) (serpent.load contents))
+           (set p (. copy :p))
+           (set g (. copy :g))
+           (set t (. copy :t)))
+         
+         (if (> (length t) 0)
+           (each [i v (ipairs t)]
+             (table.insert trees (copy Tree))
+             (var tree (. trees (length trees)))
+             (tree:init v))
+           (for [i 1 10]
+             (addTree true)))
+         (set self.ground (copy Ground))
+         (self.ground:init g)
+         (set self.player (copy Player))
+         (self.player:init p))
          
  :draw (fn draw [self]
          (sky:draw)
-         (Ground:draw)
-         (var entities [Player])
+         (self.ground:draw)
+         (var entities [self.player])
          (each [i tree (ipairs trees)]
            (table.insert entities tree))
          (set entities (lume.sort entities "y"))
@@ -98,12 +98,12 @@
  :update (fn update [self dt set-mode]
            (local (W H) (gr.getDimensions))
            ;; adjust the player size
-           (set Player.scale (/ Player.y H))
+           (set self.player.scale (/ self.player.y H))
            ;; update functions
-           (Player:update dt Ground.height)
+           (self.player:update dt self.ground.height)
            (each [i tree (ipairs trees)]
              (tree:update dt))
-           (Ground:update dt))
+           (self.ground:update dt))
  :keypressed (fn keypressed [self key set-mode] 
                (when (= key :escape)
                  (save self)
