@@ -56,7 +56,7 @@
   (var (s m) (fi.write self.saveFile (serpent.dump sav))))
 
 {:elapsed 0
- :saveFile "saves/save0"
+ :saveFile "saves/save1"
  :init (fn init [self saveFile]
          (set self.saveFile (or saveFile self.saveFile))
          (set (self.paused self.exit self.readyToExit) (values false false false))

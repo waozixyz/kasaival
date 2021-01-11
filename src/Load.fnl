@@ -24,8 +24,9 @@
              (if (string.find file :.png)
                (tset s :img (gr.newImage (.. "saves/" file)))
                (tset s :file file))))
-         (var id (+ (length self.saves) 1))
-         (tset self.saves id {:img (gr.newImage "assets/newGame.jpg") :file (.. "save" id)}))
+         (when (< (length self.saves) 4)
+           (var id (+ (length self.saves) 1))
+           (tset self.saves id {:img (gr.newImage "assets/newGame.jpg") :file (.. "save" id)})))
 
  :draw (fn draw [self]
          (Bckg.draw))
