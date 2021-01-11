@@ -6,8 +6,8 @@
 (local mo love.mouse)
 
 
-{:saves []
- :init (fn init [self]
+{:init (fn init [self]
+         (set self.saves [])
          (set self.hand (mo.getSystemCursor :hand))
          (set self.arrow (mo.getSystemCursor :arrow))
          (when (not (fi.getInfo :saves))
@@ -23,23 +23,31 @@
              (var s (. self.saves id))
              (if (string.find file :.png)
                (tset s :img (gr.newImage (.. "saves/" file)))
-               (tset s :file file)))))
+               (tset s :file file))))
+         (var id (+ (length self.saves) 1))
+         (tset self.saves id {:img (gr.newImage "assets/icon.png") :file (.. "save" id)}))
 
  :draw (fn draw [self]
          (Bckg.draw))
  :update (fn update [self dt set-mode]
+           (var cursor self.arrow)
            (local (W H) (gr.getDimensions))
-           (when (= (length self.saves) 0)
+           (when (< (length self.saves) 2)
              (set-mode :src.Game "saves/save1"))
           
            (each [id val (pairs self.saves)]
-             (var s (suit.ImageButton val.img {:id 1 :scale .2} 100 20))
-             (if (suit.isHovered 1)
-               (mo.setCursor self.hand)
-               (mo.setCursor self.arrow))
+             (print val.file)
+             (local (w h) (val.img:getDimensions))
+             (var scale (* (/ W w) .2))
+             (var y (- (* H .5) (* h scale .5)))
+             (var x (+ 20 (* (* (+ w 40) scale) (- id 1))))
+             (var s (suit.ImageButton val.img {:id id :scale scale} x y))
+             (when (suit.isHovered id)
+               (set cursor self.hand))
              (when (= s.hit true)
                (mo.setCursor self.arrow)
-               (set-mode :src.Game (.. "saves/" val.file)))))
+               (set-mode :src.Game (.. "saves/" val.file))))
+           (mo.setCursor cursor))
  :keypressed (fn keypressd [self key set-mode]
                (if (= key :escape)
                  (set-mode :src.Menu))
