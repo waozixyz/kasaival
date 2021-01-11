@@ -11,7 +11,7 @@
 (var scale 1)
 
 ;; set the first mode
-(var mode (require :src.Menu))
+(var mode (require :src.Load))
 
 (fn set-mode [mode-name ...]
   (set mode (require mode-name))
