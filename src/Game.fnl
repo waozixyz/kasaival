@@ -43,7 +43,7 @@
       (tset t k v)))
   t)
 
-(fn save []
+(fn save [self]
   (var sav {})
   (tset sav :g (getProp Ground))
   (tset sav :p (getProp Player))
@@ -52,18 +52,18 @@
     (table.insert t (getProp v)))
   (tset sav :t t)
 
-  (var (s m) (fi.write :save0 (serpent.dump sav))))
+  (var (s m) (fi.write self.saveFile (serpent.dump sav))))
 
 (fn clear []
   (set trees []))
 
-(fn load [saveFile]
+(fn load [self]
   (var p {})
   (var g {})
   (var t [])
 
-  (when (and saveFile (fi.getInfo saveFile))
-    (var (contents size) (fi.read saveFile ))
+  (when (and self.saveFile (fi.getInfo self.saveFile))
+    (var (contents size) (fi.read self.saveFile))
     (var (ok copy) (serpent.load contents))
     (set p (. copy :p))
     (set g (. copy :g))
@@ -80,8 +80,10 @@
   (Player:init p))
 
 (var elapsed 0)
-{:init (fn init [self saveFile]
-         (load saveFile))
+{:saveFile "saves/save0"
+ :init (fn init [self saveFile]
+         (set self.saveFile (or saveFile self.saveFile))
+         (load self))
          
  :draw (fn draw [self]
          (sky:draw)
@@ -104,7 +106,7 @@
            (Ground:update dt))
  :keypressed (fn keypressed [self key set-mode] 
                (when (= key :escape)
-                 (save)
+                 (save self)
                  (clear)
                  ;; return to main menu
                  (set-mode :src.Menu)))}

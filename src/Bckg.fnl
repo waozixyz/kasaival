@@ -11,7 +11,6 @@
           
          (var hs (/ (/ H h) (+ 1 (math.floor (/ H h)))))
          (set h (math.floor (* h hs)))
-         (print H h)
           
          (for [ww 0 W (* w 2) ]
            (for [hh 0 H (* h 2) ]
