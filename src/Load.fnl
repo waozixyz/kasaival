@@ -25,7 +25,7 @@
                (tset s :img (gr.newImage (.. "saves/" file)))
                (tset s :file file))))
          (var id (+ (length self.saves) 1))
-         (tset self.saves id {:img (gr.newImage "assets/icon.png") :file (.. "save" id)}))
+         (tset self.saves id {:img (gr.newImage "assets/newGame.jpg") :file (.. "save" id)}))
 
  :draw (fn draw [self]
          (Bckg.draw))
@@ -36,11 +36,10 @@
              (set-mode :src.Game "saves/save1"))
           
            (each [id val (pairs self.saves)]
-             (print val.file)
              (local (w h) (val.img:getDimensions))
              (var scale (* (/ W w) .2))
              (var y (- (* H .5) (* h scale .5)))
-             (var x (+ 20 (* (* (+ w 40) scale) (- id 1))))
+             (var x (+ (* (- id 1) (+ w (* W .1)) scale) (* W .05)))
              (var s (suit.ImageButton val.img {:id id :scale scale} x y))
              (when (suit.isHovered id)
                (set cursor self.hand))
