@@ -12,7 +12,7 @@
 (local (windowWidth windowHeight) (wi.getDesktopDimensions))
 
 ;; set the first mode
-(var mode (require :src.Load))
+(var mode (require :src.Game))
 
 (fn set-mode [mode-name ...]
   (set mode (require mode-name))

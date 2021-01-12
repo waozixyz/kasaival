@@ -1,3 +1,4 @@
+(local push (require :lib.push))
 
 (local gr love.graphics)
 (local ma love.math)
@@ -13,7 +14,7 @@
 {:height 320
  :tiles {} 
  :init (fn init [self t]
-         (local (W H) (gr.getDimensions))
+         (local (W H) (push:getDimensions))
          (set self.height (- H (/ H 3)))
          ;; start value, gets bigger at each row
          (var w (/ self.height rows))
@@ -25,7 +26,7 @@
            (set self.tiles t.tiles)
            (while (< y H)
              (set (w h) (values (+ w 1) (+ h 1)))
-             (for [x 0 W w]
+             (for [x 0 (+ W w) w]
                (tset self.tiles i {:x x :y y :w w :h h :color (getColor)})
                (tset self.tiles (+ i 1) {:x x :y y :w w :h h :color (getColor)})
                (set i (+ i 2)))
