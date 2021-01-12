@@ -7,6 +7,7 @@
 
 
 {:init (fn init [self]
+         (Bckg:init)
          (set self.saves [])
          (set self.hand (mo.getSystemCursor :hand))
          (set self.arrow (mo.getSystemCursor :arrow))
@@ -29,7 +30,7 @@
            (tset self.saves id {:img (gr.newImage "assets/newGame.jpg") :file (.. "save" id)})))
 
  :draw (fn draw [self]
-         (Bckg.draw))
+         (Bckg:draw))
  :update (fn update [self dt set-mode]
            (var cursor self.arrow)
            (local (W H) (gr.getDimensions))

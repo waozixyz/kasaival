@@ -1,17 +1,18 @@
+(local push (require :lib.push))
+(local suit (require :lib.suit))
+
 (local ev love.event)
 (local fi love.filesystem)
 (local gr love.graphics)
 (local ke love.keyboard)
+(local mo love.mouse)
 (local wi love.window)
 
-(local suit (require :lib.suit))
-(var canvas (let [(w h) (wi.getMode)]
-                (gr.newCanvas w h)))
-
-(var scale 1)
+(local (gameWidth gameHeight) (values 1920 1080))
+(local (windowWidth windowHeight) (wi.getDesktopDimensions))
 
 ;; set the first mode
-(var mode (require :src.Game))
+(var mode (require :src.Load))
 
 (fn set-mode [mode-name ...]
   (set mode (require mode-name))
@@ -24,29 +25,29 @@
   :active {:bg [.2 .0 .1] :fg [.5 .1 .2]}})
 
 (fn love.load []
-  (canvas:setFilter :nearest :nearest)
+  (push:setupScreen gameWidth gameHeight windowWidth windowHeight {:resizable true :highdpi true})
   ;; set the theme color for the ui libray suit
   (set suit.theme.color uiTheme)
   (mode:init))
 
 (fn love.resize [w h]
-  (set canvas (let [(w h) (wi.getMode)] (gr.newCanvas w h)))
+  (push:resize w h)
   (when mode.resize
     (mode:resize)))
 
 (fn love.draw []
-  ;; the canvas allows you to get sharp pixel-art style scaling; if you
-  ;; don't want that, just skip that and call mode.draw directly.
-  (gr.setCanvas canvas)
-  (gr.clear)
+  (push:start)
   (gr.setColor 1 1 1)
   (mode:draw)
-  (suit.draw)
-  (gr.setCanvas)
   (gr.setColor 1 1 1)
-  (gr.draw canvas 0 0 0 scale scale))
+  (suit.draw)
+  (push:finish))
 
 (fn love.update [dt]
+    (var (x y) (push:toGame (mo.getPosition)))
+    (set x (or x 0))
+    (set y (or y 0))
+    (suit.updateMouse x y)
   (mode:update dt set-mode))
 
 (fn toggle [b]
@@ -56,7 +57,7 @@
 
 (fn love.keypressed [key]
   (if (ke.isDown "f")
-    (wi.setFullscreen (toggle (wi.getFullscreen)))
+    (push:switchFullscreen)
     (and (ke.isDown "lctrl" "rctrl" "capslock") (= key "q"))
     (ev.quit)
     ;; add what each keypress should do in each mode

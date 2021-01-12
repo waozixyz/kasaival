@@ -1,3 +1,4 @@
+(local push (require :lib.push))
 (local suit (require :lib.suit))
 (local Bckg (require :src.Bckg))
 
@@ -6,24 +7,28 @@
 (local ma love.math)
 (local ev love.event)
 
-{
- :init (fn init [self])
+{:init (fn init [self]
+         (Bckg:init))
  :draw (fn draw [self]
-         (Bckg.draw))
+         (Bckg:draw))
          
 
  :update (fn update [self dt set-mode]
-           (var (w h) (gr.getDimensions))
-           (var start (suit.Button "Burn" (- (/ w 2) 100) (/ h 3) 200 30))
+           (local (W H) (push:getDimensions))
+           (local (w h) (values 320 64))
+           (local x (- (* W .5) (* w .5)))
+
+           (gr.setNewFont 42)
+           (var start (suit.Button "KASAI" x 330 w h))
            (when (= start.hit true)
              (set-mode :src.Load))
 
-           (var exit (suit.Button "Extinguish" (- (/ w 2) 100) (- h (/ h 3)) 200 30))
+           (var exit (suit.Button "eXtinguish" x 680 w h))
            (if (= exit.hit true)
              (ev.quit)))
 
  :keypressed (fn keypressed [self key set-mode]
-               (if (= key :escape)
+               (if (or (= key :escape) (= key :x))
                  (ev.quit))
                (if (= key :return)
                  (set-mode :src.Load)))}
