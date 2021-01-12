@@ -21,7 +21,7 @@
 
 (fn addTree [self randomStage]
   (local (W H) (push:getDimensions))
-  (var y (ma.random (- H Ground.height) H))
+  (var y (ma.random (/ H 3) H))
   (var scale (/ y H))
   (var x (ma.random 0 W))
   (var w (* (ma.random 10 12) scale))
@@ -75,6 +75,9 @@
            (set g (. sav :g))
            (set t (. sav :t)))
          
+         (set self.ground (copy Ground))
+         (self.ground:init g)
+
          (if (> (length t) 0)
            (each [i v (ipairs t)]
              (table.insert self.trees (copy Tree))
@@ -82,8 +85,7 @@
              (tree:init v))
            (for [i 1 10]
              (addTree self true)))
-         (set self.ground (copy Ground))
-         (self.ground:init g)
+         
          (set self.player (copy Player))
          (self.player:init p))
          
@@ -98,7 +100,7 @@
            (entity:draw)))
 
  :update (fn update [self dt set-mode]
-           (local (W H) (gr.getDimensions))
+           (local (W H) (push:getDimensions))
 
            (when self.readyToExit
              (set-mode :src.Menu))

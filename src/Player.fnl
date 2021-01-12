@@ -8,7 +8,7 @@
 (var ow 31)
 (var oh 175)
 
-{:speed 5 :scale 1
+{:speed 10
  :init (fn init [self t]
          (local (W H) (push:getDimensions)) 
          (set self.x (or t.x (* W .5)))

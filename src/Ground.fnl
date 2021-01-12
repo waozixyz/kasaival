@@ -9,22 +9,21 @@
   (var b (* (ma.random 10 40) .01))
   [r g b])
 
-(local rows 20)
+(local rows 50)
 
-{:height 320
- :tiles {} 
+{:tiles {} 
  :init (fn init [self t]
          (local (W H) (push:getDimensions))
-         (set self.height (- H (/ H 3)))
+         (var y (/ H 3))
+         (set self.height (- H y))
          ;; start value, gets bigger at each row
          (var w (/ self.height rows))
          (var h w)
 
          (var i 0)
-         (var y (- H self.height))
          (if (and t.tiles (> (length t.tiles) 0))
            (set self.tiles t.tiles)
-           (while (< y H)
+           (while (< y (+ H h))
              (set (w h) (values (+ w 1) (+ h 1)))
              (for [x 0 (+ W w) w]
                (tset self.tiles i {:x x :y y :w w :h h :color (getColor)})
