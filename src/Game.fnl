@@ -1,3 +1,4 @@
+(local push (require :lib.push))
 (local copy (require :lib.copy))
 (local serpent (require :lib.serpent))
 
@@ -19,7 +20,7 @@
 (fn toggle [val] (if val false true))
 
 (fn addTree [self randomStage]
-  (local (W H) (gr.getDimensions))
+  (local (W H) (push:getDimensions))
   (var y (ma.random (- H Ground.height) H))
   (var scale (/ y H))
   (var x (ma.random 0 W))

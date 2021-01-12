@@ -2,8 +2,8 @@
 
 (local gr love.graphics)
 
-{:init (fn init [self]
-         (set self.img (gr.newImage :assets/menu.jpg))
+{:init (fn init [self img]
+         (set self.img (or img (gr.newImage :assets/menu.jpg)))
          (set self.items [])
          (var (W H) (push:getDimensions))
          (var (w h) (self.img:getDimensions))
