@@ -25,7 +25,7 @@
   :active {:bg [.2 .0 .1] :fg [.5 .1 .2]}})
 
 (fn love.load []
-  (push:setupScreen gameWidth gameHeight windowWidth windowHeight {:resizable true :highdpi true})
+  (push:setupScreen gameWidth gameHeight windowWidth windowHeight {:fullscreen true :resizable true :highdpi true})
   ;; set the theme color for the ui libray suit
   (set suit.theme.color uiTheme)
   (mode:init))
@@ -50,11 +50,6 @@
     (set y (or y 0))
     (suit.updateMouse x y)
   (mode:update dt set-mode))
-
-(fn toggle [b]
-  (if (= b true)
-    false
-    true))
 
 (fn love.keypressed [key]
   (if (ke.isDown "f")

@@ -40,14 +40,14 @@
 (fn getProp [e]
   (var t {})
   (each [k v (pairs e)]
-    (when (and (~= k :init) (~= k :update) (~= k :draw))
+    (when (and (~= k :init) (~= k :update) (~= k :draw) (~= k :getHitbox) (~= k :collide))
       (tset t k v)))
   t)
 
 (fn save [self]
   (var sav {})
-  (tset sav :g (getProp self.ground))
   (tset sav :p (getProp self.player))
+  (tset sav :g (getProp self.ground))
   (var t [])
   (each [i v (ipairs self.trees)]
     (table.insert t (getProp v)))
@@ -63,9 +63,7 @@
          (set (self.paused self.exit self.readyToExit) (values false false false))
          (set self.trees [])
 
-         (var p {})
-         (var g {})
-         (var t [])
+         (var (p g t) (values {} {} []))
          
          (when (fi.getInfo self.saveFile)
            (var (contents size) (fi.read self.saveFile))
@@ -75,6 +73,7 @@
            (set g (. sav :g))
            (set t (. sav :t)))
          
+
          (set self.ground (copy Ground))
          (self.ground:init g)
 
@@ -118,7 +117,8 @@
              (self.player:update dt self.ground.height)
              (each [i tree (ipairs self.trees)]
                (tree:update dt))
-             (self.ground:update dt)))
+             (self.ground:update dt)
+             (self.ground:collide self.player)))
  :keypressed (fn keypressed [self key set-mode] 
                (when (= key :p)
                  (set self.paused (toggle self.paused)))

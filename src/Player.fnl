@@ -8,7 +8,11 @@
 (var ow 31)
 (var oh 175)
 
-{:speed 10
+{:speed 10 :scale 1
+ :getHitbox (fn getHitbox [self]
+              (var w (* ow self.scale))
+              (var h (* oh self.scale))
+              [(- self.x (* w .5)) (+ self.x (* w .5)) (- self.y (* h .2)) self.y])
  :init (fn init [self t]
          (local (W H) (push:getDimensions)) 
          (set self.x (or t.x (* W .5)))

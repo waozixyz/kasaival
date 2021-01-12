@@ -53,5 +53,5 @@
                (if (= key :escape)
                  (set-mode :src.Menu))
                (if (= key :return)
-                 (set-mode :src.Game self.saveFile)))}
+                 (set-mode :src.Game)))}
 
