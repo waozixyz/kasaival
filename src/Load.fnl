@@ -1,3 +1,4 @@
+(local push (require :lib.push))
 (local suit (require :lib.suit))
 (local Bckg (require :src.Bckg))
 
@@ -10,7 +11,6 @@
          (Bckg:init)
          (set self.saves [])
          (set self.hand (mo.getSystemCursor :hand))
-         (set self.arrow (mo.getSystemCursor :arrow))
          (when (not (fi.getInfo :saves))
            (fi.createDirectory :saves))
          (var files (fi.getDirectoryItems :saves))
@@ -33,7 +33,7 @@
          (Bckg:draw))
  :update (fn update [self dt set-mode]
            (var cursor self.arrow)
-           (local (W H) (gr.getDimensions))
+           (local (W H) (push:getDimensions))
            (when (< (length self.saves) 2)
              (set-mode :src.Game "saves/save1"))
           
@@ -46,7 +46,7 @@
              (when (suit.isHovered id)
                (set cursor self.hand))
              (when (= s.hit true)
-               (mo.setCursor self.arrow)
+               (set cursor self.arrow)
                (set-mode :src.Game (.. "saves/" val.file))))
            (mo.setCursor cursor))
  :keypressed (fn keypressd [self key set-mode]

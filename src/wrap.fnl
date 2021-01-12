@@ -35,6 +35,7 @@
   (when mode.resize
     (mode:resize)))
 
+
 (fn love.draw []
   (push:start)
   (gr.setColor 1 1 1)
