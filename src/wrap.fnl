@@ -10,7 +10,7 @@
 (local wi love.window)
 
 (local (gameWidth gameHeight) (values 1920 1080))
-(local (windowWidth windowHeight) (wi.getDesktopDimensions))
+(local (windowWidth windowHeight) (gr.getDimensions))
 
 ;; set the first mode
 (var mode (require :src.Game))
