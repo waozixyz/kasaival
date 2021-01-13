@@ -8,7 +8,7 @@
 (var ow 31)
 (var oh 175)
 
-{:speed 10 :scale 1
+{:speed 10 :scale 1 :usingJoystick false
  :getHitbox (fn getHitbox [self]
               (var w (* ow self.scale))
               (var h (* oh self.scale))
@@ -30,24 +30,33 @@
  :draw (fn draw [self]
          (gr.setColor 1 1 1)
          (sprite:draw self.x self.y 0 self.scale self.scale (* ow .5) oh))
+ :move (fn move [self dx dy gh]
+         (local (W H) (push:getDimensions)) 
+         (local s (* self.speed self.scale))
+         (var w (* ow self.scale))
+         (var (dx dy) (values (* dx s) (* dy s)))
+         (var (x y) (values (+ self.x dx) (+ self.y dy)))
+         (if (< x (* w .5))
+           (set x (* w .5))
+           (> x (- W (* w .5)))
+           (set x (- W (* w .5))))
+         (if (> y H)
+           (set y H)
+           (< y (- H gh))
+           (set y (- H gh)))
+         (set (self.x self.y) (values x y)))
  :update (fn update [self dt gh]
-           (local (W H) (push:getDimensions)) 
-           (var w (* ow self.scale))
-           (var s (* self.speed self.scale))
-           (if (and (ke.isScancodeDown :d :right) (< self.x (- W (* w .5))))
-             (set self.x (+ self.x s)))
-           (if (ke.isScancodeDown :a :left)
-             (set self.x (- self.x s)))
-           (if (and (ke.isScancodeDown :s :down) (< self.y H))
-             (set self.y (+ self.y s)))
-           (if (and (ke.isScancodeDown :w :up) (> self.y (- H gh)))
-             (set self.y (- self.y s)))
-
-           (if (< self.x (* w .5))
-             (set self.x (* w .5)))
-           (if (> self.x (- W (* w .5)))
-             (set self.x (- W (* w .5))))
-
+           (when (not self.usingJoystick)
+             (var (dx dy) (values 0 0))
+             (when (ke.isScancodeDown :d :right)
+               (set dx 1))
+             (when (ke.isScancodeDown :a :left)
+               (set dx -1))
+             (when (ke.isScancodeDown :s :down)
+               (set dy 1))
+             (when (ke.isScancodeDown :w :up)
+               (set dy -1))
+             (self:move dx dy gh))
 
 
            (sprite:update dt))}

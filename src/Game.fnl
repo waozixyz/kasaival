@@ -41,7 +41,7 @@
 (fn getProp [e]
   (var t {})
   (each [k v (pairs e)]
-    (when (and (~= k :init) (~= k :update) (~= k :draw) (~= k :getHitbox) (~= k :collide))
+    (when (and (~= k :move) (~= k :init) (~= k :update) (~= k :draw) (~= k :getHitbox) (~= k :collide))
       (tset t k v)))
   t)
 
@@ -102,7 +102,10 @@
            (entity:draw))
          (self.moveStick:draw))
  :touch (fn touch [self ...]
-          (self.moveStick:touch ...))
+          (var (mx my) (self.moveStick:touch ...))
+          (when (or (~= mx 0) (~= my 0))
+            (self.player:move mx my self.ground.height)
+            (set self.player.usingJoystick true)))
 
  :update (fn update [self dt set-mode]
            (local (W H) (push:getDimensions))
@@ -124,7 +127,8 @@
              (each [i tree (ipairs self.trees)]
                (tree:update dt))
              (self.ground:update dt)
-             (self.ground:collide self.player)))
+             (self.ground:collide self.player)
+             (set self.player.usingJoystick false)))
 
  :keypressed (fn keypressed [self key set-mode] 
                (when (= key :p)
