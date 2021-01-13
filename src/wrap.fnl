@@ -6,6 +6,7 @@
 (local gr love.graphics)
 (local ke love.keyboard)
 (local mo love.mouse)
+(local to love.touch)
 (local wi love.window)
 
 (local (gameWidth gameHeight) (values 1920 1080))
@@ -31,9 +32,9 @@
   (mode:init))
 
 (fn love.resize [w h]
-  (push:resize w h)
   (when mode.resize
-    (mode:resize)))
+    (mode:resize))
+  (push:resize w h))
 
 
 (fn love.draw []
@@ -45,10 +46,26 @@
   (push:finish))
 
 (fn love.update [dt]
-    (var (x y) (push:toGame (mo.getPosition)))
-    (set x (or x 0))
-    (set y (or y 0))
-    (suit.updateMouse x y)
+  ;; update mouse coordinates for suit ui library
+  (var (x y) (push:toGame (mo.getPosition)))
+  (set x (or x 0))
+  (set y (or y 0))
+  (suit.updateMouse x y)
+  
+  ;; capture mouse and touch and pass in unified mode:touch function with x and y param
+  (when mode.touch
+    (local touches (to.getTouches))
+    (when (> (length touches) 0)
+      (each [i v (ipairs touches)]
+        (local (x y) (push:toGame (mo.getPosition v)))
+        (when (and x y)
+          (mode:touch x y))))
+    (when (mo.isDown 1)
+      (local (x y) (push:toGame (mo.getPosition)))
+      (when (and x y)
+        (mode:touch x y))))
+
+  ;; update mode
   (mode:update dt set-mode))
 
 (fn love.keypressed [key]

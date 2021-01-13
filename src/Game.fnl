@@ -2,6 +2,7 @@
 (local copy (require :lib.copy))
 (local serpent (require :lib.serpent))
 
+(local Joystick (require :src.Joystick))
 (local Player (require :src.Player))
 (local Sky (require :lib.Sky))
 (local Tree (require :src.Tree))
@@ -86,7 +87,9 @@
              (addTree self true)))
          
          (set self.player (copy Player))
-         (self.player:init p))
+         (self.player:init p)
+         (set self.moveStick (copy Joystick))
+         (self.moveStick:init))
          
  :draw (fn draw [self]
          (sky:draw)
@@ -96,7 +99,10 @@
            (table.insert entities tree))
          (set entities (lume.sort entities "y"))
          (each [i entity (ipairs entities)]
-           (entity:draw)))
+           (entity:draw))
+         (self.moveStick:draw))
+ :touch (fn touch [self ...]
+          (self.moveStick:touch ...))
 
  :update (fn update [self dt set-mode]
            (local (W H) (push:getDimensions))
@@ -119,6 +125,7 @@
                (tree:update dt))
              (self.ground:update dt)
              (self.ground:collide self.player)))
+
  :keypressed (fn keypressed [self key set-mode] 
                (when (= key :p)
                  (set self.paused (toggle self.paused)))
