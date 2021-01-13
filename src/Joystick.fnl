@@ -17,6 +17,9 @@
          (set self.y (- H self.d)))
  :draw (fn draw [self]
          (gr.setColor self.color)
+         (gr.setLineWidth 10)
+         (gr.line self.x self.y self.dx self.dy)
+         (gr.circle :fill self.x self.y (* self.r .4))
          (gr.circle :fill self.dx self.dy self.r)
          (set self.dx self.x)
          (set self.dy self.y))
