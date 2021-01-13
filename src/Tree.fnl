@@ -36,9 +36,28 @@
       (when (= split 0)
         (table.insert new (getLine v.x2 v.y2 (+ v.deg (ma.random -10 10)) w h self.colorScheme)))))
   ;; add the table of new self.branches to the entire self.branches table
-  (table.insert self.branches new))
+  (table.insert self.branches new)
+  (when (= (length self.branches) self.stages)
+    (set self.colorScheme nil)))
 
-{:x 0 :y 0 :scale 1 :stages 10 :branches [] :elapsed 0 :growTime 1 :colorScheme [ .1 .3 .1 .3 .1 .3 ] 
+{:x 0 :y 0 :scale 1 :element "plant" :stages 10 :branches [] :elapsed 0 :growTime 1
+ :colorScheme [ .1 .3 .1 .3 .1 .3 ] 
+ :getHitbox (fn getHitbox [self] 
+              (var first (. (. self.branches 1) 1))
+              (var w (* first.w self.scale 2))
+              (var h (* first.h self.scale 2))
+              [(- self.x w) (+ self.x w) (- self.y h) (+ self.y h)])
+ :collided (fn collided [self element]
+             (when (= element :fire)
+               (each [i val (ipairs self.branches)]
+                 (each [j val (ipairs val)]
+                   (var c val.color)
+                   (var (r g b) (values (. c 1) (. c 2) (. c 3)))
+                   (set r (+ r .01))
+                   (set g (- g .01))
+                   (set b (- b .01))
+                   (set val.color [r g b])))))
+
  :init (fn init [self t]
          (set self.colorScheme (or t.colorScheme self.colorScheme))
          (set self.stages (or t.stages self.stages))

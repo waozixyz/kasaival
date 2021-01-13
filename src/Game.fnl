@@ -41,7 +41,7 @@
 (fn getProp [e]
   (var t {})
   (each [k v (pairs e)]
-    (when (and (~= k :move) (~= k :init) (~= k :update) (~= k :draw) (~= k :getHitbox) (~= k :collide))
+    (when (and (~= k :move) (~= k :init) (~= k :collided) (~= k :update) (~= k :draw) (~= k :getHitbox) (~= k :collide))
       (tset t k v)))
   t)
 
@@ -57,6 +57,11 @@
   (tset sav :elapsed self.elapsed)
   (var (s m) (fi.write self.saveFile (serpent.dump sav))))
 
+(fn checkCollision [o1 o2]
+  (local (h1 h2) (values (o1:getHitbox) (o2:getHitbox)))
+  (if (and (<= (. h1 1) (. h2 2)) (>= (. h1 2) (. h2 1)) (<= (. h1 3) (. h2 4)) (>= (. h1 4) (. h2 3)))
+             true
+             false))
 {:elapsed 0
  :saveFile "saves/save1"
  :virtualJoystick true
@@ -130,7 +135,10 @@
              ;; update functions
              (self.player:update dt self.ground.height)
              (each [i tree (ipairs self.trees)]
-               (tree:update dt))
+               (tree:update dt)
+               (when (checkCollision tree self.player)
+                 (self.player:collided tree.element)
+                 (tree:collided self.player.element)))
              (self.ground:update dt)
              (self.ground:collide self.player)
              (set self.player.usingJoystick false)))

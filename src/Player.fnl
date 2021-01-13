@@ -8,11 +8,14 @@
 (var ow 31)
 (var oh 175)
 
-{:speed 10 :scale 1 :usingJoystick false
+{:speed 10 :scale 1 :usingJoystick false :element "fire" :hp 100
  :getHitbox (fn getHitbox [self]
               (var w (* ow self.scale))
               (var h (* oh self.scale))
               [(- self.x (* w .5)) (+ self.x (* w .5)) (- self.y (* h .2)) self.y])
+ :collided (fn collided [self element]
+             (when (= element :plant)
+               (set self.hp (+ self.hp .001))))
  :init (fn init [self t]
          (local (W H) (push:getDimensions)) 
          (set self.x (or t.x (* W .5)))
@@ -48,14 +51,15 @@
  :update (fn update [self dt gh]
            (when (not self.usingJoystick)
              (var (dx dy) (values 0 0))
-             (when (ke.isScancodeDown :d :right)
+             (when (ke.isScancodeDown :d :right :kp6)
                (set dx 1))
-             (when (ke.isScancodeDown :a :left)
+             (when (ke.isScancodeDown :a :left :kp4)
                (set dx -1))
-             (when (ke.isScancodeDown :s :down)
+             (when (ke.isScancodeDown :s :down :kp2)
                (set dy 1))
-             (when (ke.isScancodeDown :w :up)
+             (when (ke.isScancodeDown :w :up :kp8)
                (set dy -1))
+
              (self:move dx dy gh))
 
 
