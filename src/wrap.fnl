@@ -10,7 +10,6 @@
 (local wi love.window)
 
 (local (gameWidth gameHeight) (values 1920 1080))
-(local (windowWidth windowHeight) (gr.getDimensions))
 
 ;; set the first mode
 (var mode (require :src.Game))
@@ -26,6 +25,10 @@
   :active {:bg [.2 .0 .1] :fg [.5 .1 .2]}})
 
 (fn love.load []
+  (var (windowWidth windowHeight) (gr.getDimensions))
+  (when (= (love.system.getOS) (or "Linux" "Windows" "OS X"))
+    (set (windowWidth windowHeight) (wi.getDesktopDimensions)))
+
   (push:setupScreen gameWidth gameHeight windowWidth windowHeight {:fullscreen true :resizable true :highdpi true})
   ;; set the theme color for the ui libray suit
   (set suit.theme.color uiTheme)
