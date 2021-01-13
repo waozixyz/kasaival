@@ -14,9 +14,9 @@
 
 (local sky (Sky))
 
-(var cr [ 50 70 20 40 30 30])
-(var cg [ 20 40 50 70 20 30 ])
-(var cb [ 50 80 20 30 80 90 ])
+(var cr [ 50 70 20 40 20 30])
+(var cg [ 20 30 50 70 20 30 ])
+(var cb [ 20 30 20 40 50 70 ])
 
 (fn toggle [val] (if val false true))
 
@@ -34,7 +34,7 @@
   (var maxStage (ma.random 8 10))
   (var currentStage (if randomStage (ma.random 0 maxStage) 0))
   (var growTime (ma.random .5 1))
-  (var c (. [cb cb cb] (ma.random 1 3)))
+  (var c (. [cr cg cb] (ma.random 1 3)))
   ;; initialize the tree
   (tree:init {:x x :y y :scale scale :w w :h h :maxStage maxStage :currentStage currentStage :growTime growTime :colorScheme c}))
 
@@ -91,7 +91,7 @@
              (table.insert self.trees (copy Tree))
              (var tree (. self.trees (length self.trees)))
              (tree:init v))
-           (for [i 1 10]
+           (for [i 1 100]
              (addTree self true)))
          
          (set self.player (copy Player))
@@ -135,10 +135,12 @@
              ;; update functions
              (self.player:update dt self.ground.height)
              (each [i tree (ipairs self.trees)]
-               (tree:update dt)
                (when (checkCollision tree self.player)
                  (self.player:collided tree.element)
-                 (tree:collided self.player.element)))
+                 (tree:collided self.player.element))
+               (tree:update dt)
+               (when (< (length tree.branches) 1)
+                 (table.remove self.trees i)))
              (self.ground:update dt)
              (self.ground:collide self.player)
              (set self.player.usingJoystick false)))

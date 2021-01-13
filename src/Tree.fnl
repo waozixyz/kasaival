@@ -36,27 +36,30 @@
       (when (= split 0)
         (table.insert new (getLine v.x2 v.y2 (+ v.deg (ma.random -10 10)) w h self.colorScheme)))))
   ;; add the table of new self.branches to the entire self.branches table
-  (table.insert self.branches new)
-  (when (= (length self.branches) self.stages)
-    (set self.colorScheme nil)))
+  (table.insert self.branches new))
+
+(fn shrink [self]
+  (table.remove self.branches (length self.branches)))
 
 {:x 0 :y 0 :scale 1 :element "plant" :stages 10 :branches [] :elapsed 0 :growTime 1
- :colorScheme [ .1 .3 .1 .3 .1 .3 ] 
+ :colorScheme [ 10 30 10 30 10 30 ] :hp 100
  :getHitbox (fn getHitbox [self] 
               (var first (. (. self.branches 1) 1))
               (var w (* first.w self.scale 2))
               (var h (* first.h self.scale 2))
               [(- self.x w) (+ self.x w) (- self.y h) (+ self.y h)])
+
  :collided (fn collided [self element]
              (when (= element :fire)
                (each [i val (ipairs self.branches)]
                  (each [j val (ipairs val)]
                    (var c val.color)
                    (var (r g b) (values (. c 1) (. c 2) (. c 3)))
-                   (set r (+ r .01))
-                   (set g (- g .01))
-                   (set b (- b .01))
-                   (set val.color [r g b])))))
+                   (when (< r .9) (set r (+ r .06)))
+                   (when (> g .3) (set g (- g .02)))
+                   (when (> b .1) (set b (- b .01)))
+                   (set val.color [r g b])
+                   (set self.hp (- self.hp .1))))))
 
  :init (fn init [self t]
          (set self.colorScheme (or t.colorScheme self.colorScheme))
@@ -76,20 +79,24 @@
            (grow self)))
 
  :draw (fn draw [self]
-         (each [i val (ipairs self.branches)]
-           (each [j val (ipairs val)]
-             (var (x1 y1) (values val.x1 val.y1))
-             (var (x2 y2) (values val.x2 val.y2))
-             (when (= i (length self.branches))
-               (set x2 (+ x1 (/ (- x2 x1) (/ self.growTime self.elapsed))))
-               (set y2 (+ y1 (/ (- y2 y1) (/ self.growTime self.elapsed)))))
-             (gr.setColor val.color)
-             (gr.setLineWidth (* val.w self.scale))
-             (gr.line x1 y1 x2 y2))))
+         (when (> (length self.branches) 0)
+           (each [i val (ipairs self.branches)]
+             (each [j val (ipairs val)]
+               (var (x1 y1) (values val.x1 val.y1))
+               (var (x2 y2) (values val.x2 val.y2))
+               (when (= i (length self.branches))
+                 (set x2 (+ x1 (/ (- x2 x1) (/ self.growTime self.elapsed))))
+                 (set y2 (+ y1 (/ (- y2 y1) (/ self.growTime self.elapsed)))))
+               (gr.setColor val.color)
+               (gr.setLineWidth (* val.w self.scale))
+               (gr.line x1 y1 x2 y2)))))
 
  :update (fn update [self dt]
-           (when (< (length self.branches) self.stages)
+           (local l (length self.branches))
+           (when (and (< l self.stages) (> self.hp 80))
              (set self.elapsed (+ self.elapsed dt))
              (when (> self.elapsed self.growTime)
                (grow self)
-               (set self.elapsed 0))))}
+               (set self.elapsed 0)))
+           (when (and (> l (/ self.hp l)) (> l 0))
+                    (shrink self)))}
