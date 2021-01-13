@@ -59,7 +59,10 @@
 
 {:elapsed 0
  :saveFile "saves/save1"
+ :virtualJoystick true
  :init (fn init [self saveFile]
+         (when (= (love.system.getOS) (or "Linux" "Windows" "OS X"))
+           (set self.virtualJoystick false))
          (set self.saveFile (or saveFile self.saveFile))
          (set (self.paused self.exit self.readyToExit) (values false false false))
          (set self.trees [])
@@ -100,12 +103,14 @@
          (set entities (lume.sort entities "y"))
          (each [i entity (ipairs entities)]
            (entity:draw))
-         (self.moveStick:draw))
+         (when self.virtualJoystick
+           (self.moveStick:draw)))
  :touch (fn touch [self ...]
-          (var (mx my) (self.moveStick:touch ...))
-          (when (or (~= mx 0) (~= my 0))
-            (self.player:move mx my self.ground.height)
-            (set self.player.usingJoystick true)))
+          (when self.virtualJoystick
+            (var (mx my) (self.moveStick:touch ...))
+            (when (or (~= mx 0) (~= my 0))
+              (self.player:move mx my self.ground.height)
+              (set self.player.usingJoystick true))))
 
  :update (fn update [self dt set-mode]
            (local (W H) (push:getDimensions))
