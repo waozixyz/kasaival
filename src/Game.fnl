@@ -16,11 +16,13 @@
 
 (var cr [ 500 700 200 400 200 300 ])
 (var cg [ 200 300 500 700 200 300 ])
-(var cb [ 200 300 200 400 500 700 ])
+(var cb [ 200 300 300 500 500 600 ])
+
+(var testing true)
 
 (fn toggle [val] (if val false true))
 
-(fn addTree [self randomStage]
+(fn addTree [self completeTree]
   (local (W H) (push:getDimensions))
   (var y (ma.random (/ H 3) H))
   (var scale (/ y H))
@@ -32,7 +34,7 @@
   ;; get the newest tree
   (var tree (. self.trees (length self.trees)))
   (var maxStage (ma.random 8 10))
-  (var currentStage (if randomStage (ma.random 0 maxStage) 0))
+  (var currentStage (if completeTree maxStage 0))
   (var growTime (ma.random .5 1))
   (var c (. [cr cg cb] (ma.random 1 3)))
   ;; initialize the tree
@@ -57,6 +59,14 @@
   (tset sav :elapsed self.elapsed)
   (var (s m) (fi.write self.saveFile (serpent.dump sav))))
 
+(fn drawText [text font size xpad ypad]
+  (local (W H) (push:getDimensions))
+  (local xpad (or xpad 0))
+  (local ypad (or ypad 0))
+  (local w (font:getWidth text))
+  (gr.setFont font)
+  (gr.print text (+ (- (* W .5) (* w .5)) xpad) (+ (* H .5) ypad)))
+
 (fn checkCollision [o1 o2]
   (local (h1 h2) (values (o1:getHitbox) (o2:getHitbox)))
   (if (and (<= (. h1 1) (. h2 2)) (>= (. h1 2) (. h2 1)) (<= (. h1 3) (. h2 4)) (>= (. h1 4) (. h2 3)))
@@ -67,6 +77,8 @@
  :virtualJoystick true
  :treeTime 0
  :init (fn init [self saveFile]
+         (set self.fontSize 48)
+         (set self.font (gr.newFont self.fontSize))
          (when (= (love.system.getOS) (or "Linux" "Windows" "OS X"))
            (set self.virtualJoystick false))
          (set self.saveFile (or saveFile self.saveFile))
@@ -101,6 +113,7 @@
          (self.moveStick:init))
          
  :draw (fn draw [self]
+         (local (W H) (push:getDimensions))
          (sky:draw)
          (self.ground:draw)
          (var entities [self.player])
@@ -110,7 +123,14 @@
          (each [i entity (ipairs entities)]
            (entity:draw))
          (when self.virtualJoystick
-           (self.moveStick:draw)))
+           (self.moveStick:draw))
+         (when (<= self.player.hp 0)
+           (gr.setFont self.font)
+           (gr.setColor 0 0 0 .5)
+           (gr.rectangle "fill" 0 0 W H)
+           (gr.setColor .6 0 .3)
+           (drawText "GameOver" self.font self.fontSize 0 0)
+           (drawText "press any key to try again" self.font self.fontSize 0 self.fontSize)))
  :touch (fn touch [self ...]
           (when self.virtualJoystick
             (var (mx my) (self.moveStick:touch ...))
@@ -129,11 +149,12 @@
              (set-mode :src.Menu))
            (when (and self.paused (not self.readyToExit))
              (gr.captureScreenshot (.. self.saveFile ".png"))
-             (save self)
+             (when (not testing)
+               (save self))
              (when self.exit
                (set self.readyToExit true)))
              
-           (when (not self.paused)
+           (when (and (not self.paused) (> self.player.hp 0))
              (set self.elapsed (+ self.elapsed dt))
              ;; adjust the player size
              (set self.player.scale (* (/ self.player.y H) (* self.player.hp .01)))
@@ -149,8 +170,10 @@
              (self.ground:update dt)
              (self.ground:collide self.player)
              (set self.player.usingJoystick false)))
-
  :keypressed (fn keypressed [self key set-mode] 
+               (when (<= self.player.hp 0)
+                 (set-mode :src.Game))
+
                (when (= key :p)
                  (set self.paused (toggle self.paused)))
                (when (= key :escape)

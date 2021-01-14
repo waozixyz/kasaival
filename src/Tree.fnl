@@ -66,7 +66,7 @@
                    (when (> g 300) (set g (- g 20)))
                    (when (> b 100) (set b (- b 10)))
                    (set val.color [r g b])
-                   (set self.hp (- self.hp .1))))))
+                   (set self.hp (- self.hp .5))))))
 
  :init (fn init [self t]
          (set self.colorScheme (or t.colorScheme self.colorScheme))

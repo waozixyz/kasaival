@@ -15,7 +15,7 @@
               [(- self.x (* w .5)) (+ self.x (* w .5)) (- self.y (* h .2)) self.y])
  :collided (fn collided [self element]
              (when (= element :plant)
-               (set self.hp (+ self.hp .1))))
+               (set self.hp (+ self.hp .5))))
  :init (fn init [self t]
          (local (W H) (push:getDimensions)) 
          (set self.x (or t.x (* W .5)))
@@ -49,7 +49,7 @@
            (set y (- H gh)))
          (set (self.x self.y) (values x y)))
  :update (fn update [self dt gh]
-           (set self.hp (- self.hp .02))
+           (set self.hp (- self.hp .3))
            (when (not self.usingJoystick)
              (var (dx dy) (values 0 0))
              (when (ke.isScancodeDown :d :right :kp6)
