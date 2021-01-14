@@ -77,6 +77,7 @@
  :virtualJoystick true
  :treeTime 0
  :init (fn init [self saveFile]
+         (set self.restart false)
          (set self.fontSize 48)
          (set self.font (gr.newFont self.fontSize))
          (when (= (love.system.getOS) (or "Linux" "Windows" "OS X"))
@@ -130,8 +131,10 @@
            (gr.rectangle "fill" 0 0 W H)
            (gr.setColor .6 0 .3)
            (drawText "GameOver" self.font self.fontSize 0 0)
-           (drawText "press any key to try again" self.font self.fontSize 0 self.fontSize)))
+           (drawText "touch anywhere or press any key to try again" self.font self.fontSize 0 self.fontSize)))
  :touch (fn touch [self ...]
+          (when (<= self.player.hp 0)
+            (set self.restart true))
           (when self.virtualJoystick
             (var (mx my) (self.moveStick:touch ...))
             (when (or (~= mx 0) (~= my 0))
@@ -139,6 +142,8 @@
               (set self.player.usingJoystick true))))
 
  :update (fn update [self dt set-mode]
+           (when self.restart
+             (set-mode :src.Game))
            (local (W H) (push:getDimensions))
            (set self.treeTime (+ self.treeTime dt))
            (when (> self.treeTime 5)
@@ -172,7 +177,7 @@
              (set self.player.usingJoystick false)))
  :keypressed (fn keypressed [self key set-mode] 
                (when (<= self.player.hp 0)
-                 (set-mode :src.Game))
+                 (set self.restart true))
 
                (when (= key :p)
                  (set self.paused (toggle self.paused)))
