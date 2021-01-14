@@ -18,7 +18,7 @@
 (var cg [ 200 300 500 700 200 300 ])
 (var cb [ 200 300 300 500 500 600 ])
 
-(var testing true)
+(var testing false)
 
 (fn toggle [val] (if val false true))
 
