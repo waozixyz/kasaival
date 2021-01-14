@@ -15,11 +15,11 @@
   (var (r g b) (values (. c 1) (. c 2) (. c 3)))
   (var (ro go bo) (values (. co 1) (. co 2) (. co 3)))
   (when (~= r ro)
-    (set r (+ r (* (- ro r) .007)))) 
+    (set r (+ r (math.floor (* (- ro r) .004))))) 
   (when (~= g go)
-    (set g (+ g (* (- go g) .005)))) 
+    (set g (+ g (math.ceil (* (- go g) .002))))) 
   (when (~= b bo)
-    (set b (+ b (* (- bo b) .001)))) 
+    (set b (+ b (math.ceil (* (- bo b) .001))))) 
   [r g b])
 
 (fn burnTile [tile]
@@ -32,9 +32,9 @@
     (< r 700) 
     (set r (+ r 30))
     (< r 800) 
-    (set r (+ r 12)))
-  (when (> g 100)
-    (set g (- g 8))) 
+    (set r (+ r 20)))
+  (when (> g 50)
+    (set g (- g 14))) 
   (when (> b 200)
     (set b (- b 4))) 
   [r g b])
@@ -46,6 +46,7 @@
             (local o (obj:getHitbox))
             (each [i v (ipairs self.tiles)]
               (when (and (<= v.x (. o 2)) (>= (+ v.x v.w) (. o 1)) (<= (- v.y v.h) (. o 4)) (>= v.y (. o 3)))
+                (obj:collided (lume.getColor v.color .001))
                 (set v.color (burnTile v)))))
 
 

@@ -146,7 +146,7 @@
              (set-mode :src.Game))
            (local (W H) (push:getDimensions))
            (set self.treeTime (+ self.treeTime dt))
-           (when (> self.treeTime 5)
+           (when (> self.treeTime 1)
              (addTree self)
              (set self.treeTime 0))
 
@@ -162,7 +162,7 @@
            (when (and (not self.paused) (> self.player.hp 0))
              (set self.elapsed (+ self.elapsed dt))
              ;; adjust the player size
-             (set self.player.scale (* (/ self.player.y H) (* self.player.hp .01)))
+             (set self.player.scale (* (/ self.player.y H) (* self.player.hp .001)))
              ;; update functions
              (self.player:update dt self.ground.height)
              (each [i tree (ipairs self.trees)]
