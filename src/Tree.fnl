@@ -74,6 +74,7 @@
          (set self.growTime (or t.growTime self.growTime))
          (set self.x (or t.x self.x))
          (set self.y (or t.y self.y))
+         (set self.hp (or t.hp self.hp))
          (set self.scale (or t.scale self.scale))
          (var currentStage (or t.currentStage 0))
          (var w (or t.w 12))

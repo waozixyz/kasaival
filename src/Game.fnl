@@ -25,8 +25,8 @@
   (var y (ma.random (/ H 3) H))
   (var scale (/ y H))
   (var x (ma.random 0 W))
-  (var w (* (ma.random 10 12) scale))
-  (var h (* (ma.random 22 32) scale))
+  (var w (* (ma.random 14 16) scale))
+  (var h (* (ma.random 32 52) scale))
   ;; copy the table template of Tree
   (table.insert self.trees (copy Tree))
   ;; get the newest tree
@@ -136,7 +136,7 @@
            (when (not self.paused)
              (set self.elapsed (+ self.elapsed dt))
              ;; adjust the player size
-             (set self.player.scale (/ self.player.y H))
+             (set self.player.scale (* (/ self.player.y H) (* self.player.hp .01)))
              ;; update functions
              (self.player:update dt self.ground.height)
              (each [i tree (ipairs self.trees)]
