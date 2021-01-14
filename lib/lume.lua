@@ -89,6 +89,11 @@ function lume.round(x, increment)
   return x >= 0 and math_floor(x + .5) or math_ceil(x - .5)
 end
 
+function lume.decimal(number, decimals)
+    local power = 10^decimals
+    return math.floor(number * power) / power
+end
+
 
 function lume.sign(x)
   return x < 0 and -1 or 1
@@ -403,7 +408,7 @@ function lume.count(t, fn)
   else
     if lume.isarray(t) then
       return #t
-    end
+  end
     for _ in iter(t) do count = count + 1 end
   end
   return count
@@ -554,60 +559,6 @@ function lume.lambda(str)
 end
 
 
-local serialize
-
-local serialize_map = {
-  [ "boolean" ] = tostring,
-  [ "nil"     ] = tostring,
-  [ "string"  ] = function(v) return string.format("%q", v) end,
-  [ "number"  ] = function(v)
-    if      v ~=  v     then return  "0/0"      --  nan
-    elseif  v ==  1 / 0 then return  "1/0"      --  inf
-    elseif  v == -1 / 0 then return "-1/0" end  -- -inf
-    return tostring(v)
-  end,
-  [ "table"   ] = function(t, stk)
-    stk = stk or {}
-    if stk[t] then error("circular reference") end
-    local rtn = {}
-    stk[t] = true
-    for k, v in pairs(t) do
-      rtn[#rtn + 1] = "[" .. serialize(k, stk) .. "]=" .. serialize(v, stk)
-    end
-    stk[t] = nil
-    return "{" .. table.concat(rtn, ",") .. "}"
-  end
-}
-
-setmetatable(serialize_map, {
-  __index = function(_, k) error("unsupported serialize type: " .. k) end
-})
-
-serialize = function(x, stk)
-  return serialize_map[type(x)](x, stk)
-end
-
-function lume.serialize(x)
-  return serialize(x)
-end
-
-
-function lume.deserialize(str)
-  return lume.dostring("return " .. str)
-end
-
-
-function lume.split(str, sep)
-  if not sep then
-    return lume.array(str:gmatch("([%S]+)"))
-  else
-    assert(sep ~= "", "empty separator")
-    local psep = patternescape(sep)
-    return lume.array((str..sep):gmatch("(.-)("..psep..")"))
-  end
-end
-
-
 function lume.trim(str, chars)
   if not chars then return str:match("^[%s]*(.-)[%s]*$") end
   chars = patternescape(chars)
@@ -721,50 +672,11 @@ function lume.hotswap(modname)
 end
 
 
-local ripairs_iter = function(t, i)
-  i = i - 1
-  local v = t[i]
-  if v ~= nil then 
-    return i, v
-  end
-end
-
-function lume.ripairs(t)
-  return ripairs_iter, t, (#t + 1)
+function lume.getColor(color, decimal)
+    return {color[1] * decimal, color[2] * decimal, color[3] * decimal}
 end
 
 
-function lume.color(str, mul)
-  mul = mul or 1
-  local r, g, b, a
-  r, g, b = str:match("#(%x%x)(%x%x)(%x%x)")
-  if r then
-    r = tonumber(r, 16) / 0xff
-    g = tonumber(g, 16) / 0xff
-    b = tonumber(b, 16) / 0xff
-    a = 1
-  elseif str:match("rgba?%s*%([%d%s%.,]+%)") then
-    local f = str:gmatch("[%d.]+")
-    r = (f() or 0) / 0xff
-    g = (f() or 0) / 0xff
-    b = (f() or 0) / 0xff
-    a = f() or 1
-  else
-    error(("bad color string '%s'"):format(str))
-  end
-  return r * mul, g * mul, b * mul, a * mul
-end
-
-
-local chain_mt = {}
-chain_mt.__index = lume.map(lume.filter(lume, iscallable, true),
-  function(fn)
-    return function(self, ...)
-      self._value = fn(self._value, ...)
-      return self
-    end
-  end)
-chain_mt.__index.result = function(x) return x._value end
 
 function lume.chain(value)
   return setmetatable({ _value = value }, chain_mt)

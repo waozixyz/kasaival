@@ -4,20 +4,23 @@
 (var deg_to_rad (/ math.pi 180))
 
 (fn rnc [l r]
-  ( * (ma.random l r) .01))
+  (math.floor (ma.random l r)))
 
 ;; generate random colors in a range
-(fn getColor [cs]
+(fn rndColor [cs]
   [(rnc (. cs 1) (. cs 2)) (rnc (. cs 3) (. cs 4)) (rnc (. cs 5) (. cs 6))])
+
+(fn getColor [c]
+  [(* (. c 1) .01) (* (. c 2) .01) (* (. c 3) .01)])
 
 ;; each line represents a branch of the tree
 ;; the parameters x1 y1 angle w h are used from the previous line of branch
 (fn getLine [px py angle w h cs]
   ;; decrease line size
   ;; generate x and y coord usingn the angle
-  (var x2  (+ px (* (math.cos (* angle deg_to_rad)) h)))
-  (var y2  (+ py (* (math.sin (* angle deg_to_rad)) h)))
-  {:deg angle :x1 px :y1 py :x2 x2 :y2 y2 :w w :h h :color (getColor cs)})
+  (var x2 (math.floor (+ px (* (math.cos (* angle deg_to_rad)) h))))
+  (var y2 (math.floor (+ py (* (math.sin (* angle deg_to_rad)) h))))
+  {:deg angle :x1 px :y1 py :x2 x2 :y2 y2 :w w :h h :color (rndColor cs)})
 
 (fn grow [self]
   ;; get the last set of self.branches, basically one stage of growth
@@ -28,7 +31,7 @@
   ;; for each previous branch add new self.branches
   (each [i v (ipairs prev)]
     ;; decide if the branch splits into two self.branches
-    (var (w h) (values (* v.w .9) (* v.h .9)))
+    (var (w h) (values (* v.w .9) (* v.h .9) 2))
     (let [split (ma.random 0 1)]
       (when (= split 1)
         (table.insert new (getLine v.x2 v.y2 (- v.deg (ma.random 20 30)) w h self.colorScheme))
@@ -39,10 +42,14 @@
   (table.insert self.branches new))
 
 (fn shrink [self]
+  (set self.elapsed 0)
   (table.remove self.branches (length self.branches)))
+
+
 
 {:x 0 :y 0 :scale 1 :element "plant" :stages 10 :branches [] :elapsed 0 :growTime 1
  :colorScheme [ 10 30 10 30 10 30 ] :hp 100
+
  :getHitbox (fn getHitbox [self] 
               (var first (. (. self.branches 1) 1))
               (var w (* first.w self.scale 2))
@@ -55,9 +62,9 @@
                  (each [j val (ipairs val)]
                    (var c val.color)
                    (var (r g b) (values (. c 1) (. c 2) (. c 3)))
-                   (when (< r .9) (set r (+ r .06)))
-                   (when (> g .3) (set g (- g .02)))
-                   (when (> b .1) (set b (- b .01)))
+                   (when (< r 90) (set r (+ r 6)))
+                   (when (> g 30) (set g (- g 2)))
+                   (when (> b 10) (set b (- b 1)))
                    (set val.color [r g b])
                    (set self.hp (- self.hp .1))))))
 
@@ -71,7 +78,7 @@
          (var currentStage (or t.currentStage 0))
          (var w (or t.w 12))
          (var h (or t.h 32))
-         (var branch {:deg -90 :x1 self.x :y1 self.y :x2 self.x :y2 (- self.y 20) :w w :h h :color (getColor self.colorScheme)})
+         (var branch {:deg -90 :x1 self.x :y1 self.y :x2 self.x :y2 (- self.y 20) :w w :h h :color (rndColor self.colorScheme)})
          (if (and t.branches (> (length t.branches) 0))
            (set self.branches t.branches)
            (table.insert self.branches [branch]))
@@ -79,24 +86,26 @@
            (grow self)))
 
  :draw (fn draw [self]
-         (when (> (length self.branches) 0)
+         (local l (length self.branches))
+         (when (> l 0)
            (each [i val (ipairs self.branches)]
              (each [j val (ipairs val)]
                (var (x1 y1) (values val.x1 val.y1))
                (var (x2 y2) (values val.x2 val.y2))
-               (when (= i (length self.branches))
+               (when (= i l)
                  (set x2 (+ x1 (/ (- x2 x1) (/ self.growTime self.elapsed))))
                  (set y2 (+ y1 (/ (- y2 y1) (/ self.growTime self.elapsed)))))
-               (gr.setColor val.color)
+               (gr.setColor (getColor val.color))
                (gr.setLineWidth (* val.w self.scale))
                (gr.line x1 y1 x2 y2)))))
 
  :update (fn update [self dt]
            (local l (length self.branches))
-           (when (and (< l self.stages) (> self.hp 80))
-             (set self.elapsed (+ self.elapsed dt))
-             (when (> self.elapsed self.growTime)
-               (grow self)
-               (set self.elapsed 0)))
-           (when (and (> l (/ self.hp l)) (> l 0))
-                    (shrink self)))}
+           (if (and (< l self.stages) (> self.hp 80))
+             (do
+               (set self.elapsed (+ self.elapsed dt))
+               (when (> self.elapsed self.growTime)
+                 (grow self)
+                 (set self.elapsed 0)))
+           (and (> l (/ self.hp l)) (> l 0))
+             (shrink self)))}

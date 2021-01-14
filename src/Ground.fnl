@@ -3,10 +3,10 @@
 (local gr love.graphics)
 (local ma love.math)
 
-(fn getColor []
-  (var r (* (ma.random 0 30) .01))
-  (var g (* (ma.random 30 50) .01))
-  (var b (* (ma.random 10 40) .01))
+(fn rndColor []
+  (var r (ma.random 0 300))
+  (var g (ma.random 300 500))
+  (var b (ma.random 100 400))
   [r g b])
 
 (fn healTile [tile]
@@ -25,19 +25,19 @@
 (fn burnTile [tile]
   (var c tile.color)
   (var (r g b) (values (. c 1) (. c 2) (. c 3)))
-  (if (< r .3)
-    (set r (+ r .04))
-    (< r .5) 
-    (set r (+ r .015))
-    (< r .7) 
-    (set r (+ r .004)))
-  (when (> g .1)
-    (set g (- g .03))) 
-  (when (> b .2)
-    (set b (- b .02))) 
+  (if (< r 300)
+    (set r (+ r 40))
+    (< r 500) 
+    (set r (+ r 20))
+    (< r 700) 
+    (set r (+ r 6)))
+  (when (> g 100)
+    (set g (- g 4))) 
+  (when (> b 200)
+    (set b (- b 2))) 
   [r g b])
 
-(local rows 50)
+(local rows 40)
 
 {:tiles [] 
  :collide (fn collide [self obj]
@@ -61,16 +61,16 @@
            (while (< y (+ H h))
              (set (w h) (values (+ w 1) (+ h 1)))
              (for [x 0 (+ W w) w]
-               (var c (getColor))
+               (var c (rndColor))
                (table.insert self.tiles {:x x :y y :w w :h h :color c :orgColor c})
-               (var c (getColor))
+               (var c (rndColor))
                (table.insert self.tiles {:x x :y y :w w :h h :color c :orgColor c})
                (set i (+ i 2)))
              (set y (+ y h)))))
  :draw (fn draw [self]
          (each [i val (ipairs self.tiles)]
            (set val.color (healTile val))
-           (gr.setColor val.color)
+           (gr.setColor (lume.getColor val.color .001))
            (if (= (% i 2) 0)
              (gr.polygon "fill" (- val.x (* val.w .5)) val.y val.x (- val.y val.h) (+ val.x (* val.w .5)) val.y)
            (= (% i 2) 1)
