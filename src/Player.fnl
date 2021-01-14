@@ -8,7 +8,7 @@
 (var ow 31)
 (var oh 175)
 
-{:speed 10 :scale 1 :usingJoystick false :element "fire" :hp 100
+{:speed 20 :scale 1 :usingJoystick false :element "fire" :hp 100
  :getHitbox (fn getHitbox [self]
               (var w (* ow self.scale))
               (var h (* oh self.scale))

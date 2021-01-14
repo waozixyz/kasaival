@@ -11,7 +11,7 @@
   [(rnc (. cs 1) (. cs 2)) (rnc (. cs 3) (. cs 4)) (rnc (. cs 5) (. cs 6))])
 
 (fn getColor [c]
-  [(* (. c 1) .01) (* (. c 2) .01) (* (. c 3) .01)])
+  [(* (. c 1) .001) (* (. c 2) .001) (* (. c 3) .001)])
 
 ;; each line represents a branch of the tree
 ;; the parameters x1 y1 angle w h are used from the previous line of branch
@@ -48,7 +48,7 @@
 
 
 {:x 0 :y 0 :scale 1 :element "plant" :stages 10 :branches [] :elapsed 0 :growTime 1
- :colorScheme [ 10 30 10 30 10 30 ] :hp 100
+ :colorScheme [ 100 300 100 300 100 300 ] :hp 100 :collapseTime 0
 
  :getHitbox (fn getHitbox [self] 
               (var first (. (. self.branches 1) 1))
@@ -62,9 +62,9 @@
                  (each [j val (ipairs val)]
                    (var c val.color)
                    (var (r g b) (values (. c 1) (. c 2) (. c 3)))
-                   (when (< r 90) (set r (+ r 6)))
-                   (when (> g 30) (set g (- g 2)))
-                   (when (> b 10) (set b (- b 1)))
+                   (when (< r 900) (set r (+ r 60)))
+                   (when (> g 300) (set g (- g 20)))
+                   (when (> b 100) (set b (- b 10)))
                    (set val.color [r g b])
                    (set self.hp (- self.hp .1))))))
 
@@ -101,11 +101,26 @@
 
  :update (fn update [self dt]
            (local l (length self.branches))
-           (if (and (< l self.stages) (> self.hp 80))
-             (do
+           (if (> self.hp 80)
+             (when (< l self.stages)
                (set self.elapsed (+ self.elapsed dt))
                (when (> self.elapsed self.growTime)
                  (grow self)
                  (set self.elapsed 0)))
-           (and (> l (/ self.hp l)) (> l 0))
-             (shrink self)))}
+             (> l 0)
+             (do
+               (if (> l (/ self.hp l))
+                 (shrink self)
+                 (when (< l 5)
+                   (set self.collapseTime (+ self.collapseTime dt))
+                   (when (> self.collapseTime (* self.growTime 10))
+                     (shrink self)
+                     (set self.collapseTime 0))))
+               (each [i val (ipairs self.branches)]
+                 (each [j val (ipairs val)]
+                   (var c val.color)
+                   (var (r g b) (values (. c 1) (. c 2) (. c 3)))
+                   (when (> r 300) (set r (- r 8)))
+                   (when (< g 200) (set g (+ g 4)))
+                   (when (< b 120) (set b (+ b 4)))
+                   (set val.color [r g b]))))))}

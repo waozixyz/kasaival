@@ -14,9 +14,9 @@
 
 (local sky (Sky))
 
-(var cr [ 50 70 20 40 20 30])
-(var cg [ 20 30 50 70 20 30 ])
-(var cb [ 20 30 20 40 50 70 ])
+(var cr [ 500 700 200 400 200 300 ])
+(var cg [ 200 300 500 700 200 300 ])
+(var cb [ 200 300 200 400 500 700 ])
 
 (fn toggle [val] (if val false true))
 
@@ -65,6 +65,7 @@
 {:elapsed 0
  :saveFile "saves/save1"
  :virtualJoystick true
+ :treeTime 0
  :init (fn init [self saveFile]
          (when (= (love.system.getOS) (or "Linux" "Windows" "OS X"))
            (set self.virtualJoystick false))
@@ -119,6 +120,10 @@
 
  :update (fn update [self dt set-mode]
            (local (W H) (push:getDimensions))
+           (set self.treeTime (+ self.treeTime dt))
+           (when (> self.treeTime 5)
+             (addTree self)
+             (set self.treeTime 0))
 
            (when self.readyToExit
              (set-mode :src.Menu))
