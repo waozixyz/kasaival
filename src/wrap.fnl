@@ -9,6 +9,7 @@
 (local to love.touch)
 (local wi love.window)
 
+
 (local (gameWidth gameHeight) (values 1920 1080))
 
 ;; set the first mode
@@ -72,7 +73,7 @@
   (mode:update dt set-mode))
 
 (fn love.keypressed [key]
-  (if (ke.isDown "f")
+  (if (or (= key "f") (= key "f11"))
     (push:switchFullscreen)
     (and (ke.isDown "lctrl" "rctrl" "capslock") (= key "q"))
     (ev.quit)

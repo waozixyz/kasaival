@@ -2,11 +2,12 @@
 (local copy (require :lib.copy))
 (local serpent (require :lib.serpent))
 
-(local Joystick (require :src.Joystick))
+(local Ground (require :src.Ground))
 (local Player (require :src.Player))
+(local Saves (require :src.Saves))
 (local Sky (require :lib.Sky))
 (local Tree (require :src.Tree))
-(local Ground (require :src.Ground))
+(local Joystick (require :src.Joystick))
 
 (local gr love.graphics)
 (local ma love.math)
@@ -25,6 +26,7 @@
 (fn addTree [self completeTree]
   (local (W H) (push:getDimensions))
   (var y (ma.random (/ H 3) H))
+  (set y (+ y (ma.random 0 1)))
   (var scale (/ y H))
   (var x (ma.random 0 W))
   (var w (* (ma.random 14 16) scale))
@@ -72,8 +74,8 @@
   (if (and (<= (. h1 1) (. h2 2)) (>= (. h1 2) (. h2 1)) (<= (. h1 3) (. h2 4)) (>= (. h1 4) (. h2 3)))
              true
              false))
+
 {:elapsed 0
- :saveFile "saves/save1"
  :virtualJoystick true
  :treeTime 0
  :init (fn init [self saveFile]
@@ -82,7 +84,8 @@
          (set self.font (gr.newFont self.fontSize))
          (when (= (love.system.getOS) (or "Linux" "Windows" "OS X"))
            (set self.virtualJoystick false))
-         (set self.saveFile (or saveFile self.saveFile))
+
+         (set self.saveFile (or saveFile (Saves:nextSave)))
          (set (self.paused self.exit self.readyToExit) (values false false false))
          (set self.trees [])
 
@@ -120,7 +123,7 @@
          (var entities [self.player])
          (each [i tree (ipairs self.trees)]
            (table.insert entities tree))
-         (set entities (lume.sort entities "y"))
+         (set entities (lume.sort entities :y))
          (each [i entity (ipairs entities)]
            (entity:draw))
          (when self.virtualJoystick
@@ -171,6 +174,8 @@
                  (tree:collided self.player.element))
                (tree:update dt)
                (when (< (length tree.branches) 1)
+                 (set self.player.xp (+ self.player.xp 10)) 
+                 (set self.player.hp (+ self.player.hp ))
                  (table.remove self.trees i)))
              (self.ground:update dt)
              (self.ground:collide self.player)
@@ -178,7 +183,6 @@
  :keypressed (fn keypressed [self key set-mode] 
                (when (<= self.player.hp 0)
                  (set self.restart true))
-
                (when (= key :p)
                  (set self.paused (toggle self.paused)))
                (when (= key :escape)

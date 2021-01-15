@@ -8,7 +8,7 @@
 (var ow 31)
 (var oh 175)
 
-{:speed 10 :scale 1 :usingJoystick false :element "fire" :hp 1000
+{:scale 1 :usingJoystick false :element "fire"
  :getHitbox (fn getHitbox [self]
               (var w (* ow self.scale))
               (var h (* oh self.scale))
@@ -22,6 +22,10 @@
          (local (W H) (push:getDimensions)) 
          (set self.x (or t.x (* W .5)))
          (set self.y (or t.y (* H .7)))
+         (set self.xp (or t.xp 0))
+         (set self.hp (or t.hp 1000))
+         (set self.lvl (or t.lvl 0))
+         (set self.speed (or t.speed 10))
          (var S (SpriteSheet :assets/flame/spr_2.png ow oh))
          (var a (S:createAnimation))
          (for [row 1 4]
