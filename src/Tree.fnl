@@ -15,12 +15,12 @@
 
 ;; each line represents a branch of the tree
 ;; the parameters x1 y1 angle w h are used from the previous line of branch
-(fn getLine [px py angle w h cs]
+(fn getLine [p angle w h cs]
   ;; decrease line size
   ;; generate x and y coord usingn the angle
-  (var x2 (math.floor (+ px (* (math.cos (* angle deg_to_rad)) h))))
-  (var y2 (math.floor (+ py (* (math.sin (* angle deg_to_rad)) h))))
-  {:deg angle :x1 px :y1 py :x2 x2 :y2 y2 :w w :h h :color (rndColor cs)})
+  (var nx (math.floor (+ (. p 1) (* (math.cos (* angle deg_to_rad)) h))))
+  (var ny (math.floor (+ (. p 2) (* (math.sin (* angle deg_to_rad)) h))))
+  {:deg angle :p p :n [nx ny]  :w w :h h :color (rndColor cs)})
 
 (fn grow [self]
   ;; get the last set of self.branches, basically one stage of growth
@@ -34,10 +34,10 @@
     (var (w h) (values (* v.w .9) (* v.h .9) 2))
     (let [split (ma.random 0 1)]
       (when (= split 1)
-        (table.insert new (getLine v.x2 v.y2 (- v.deg (ma.random 20 30)) w h self.colorScheme))
-        (table.insert new (getLine v.x2 v.y2 (+ v.deg (ma.random 20 30)) w h self.colorScheme)))
+        (table.insert new (getLine v.n (- v.deg (ma.random 20 30)) w h self.colorScheme))
+        (table.insert new (getLine v.n (+ v.deg (ma.random 20 30)) w h self.colorScheme)))
       (when (= split 0)
-        (table.insert new (getLine v.x2 v.y2 (+ v.deg (ma.random -10 10)) w h self.colorScheme)))))
+        (table.insert new (getLine v.n (+ v.deg (ma.random -10 10)) w h self.colorScheme)))))
   ;; add the table of new self.branches to the entire self.branches table
   (table.insert self.branches new))
 
@@ -47,8 +47,7 @@
 
 
 
-{:x 0 :y 0 :scale 1 :element "plant" :stages 10 :branches [] :elapsed 0 :growTime 1
- :colorScheme [ 100 300 100 300 100 300 ] :hp 100 :collapseTime 0
+{:x 0 :y 0 :element "plant" :colorScheme [ 100 300 100 300 100 300 ] :collapseTime 0
 
  :getHitbox (fn getHitbox [self] 
               (var first (. (. self.branches 1) 1))
@@ -70,16 +69,20 @@
 
  :init (fn init [self t]
          (set self.colorScheme (or t.colorScheme self.colorScheme))
-         (set self.stages (or t.stages self.stages))
-         (set self.growTime (or t.growTime self.growTime))
+         (set self.elapsed (or t.elapsed 0))
+         (set self.stages (or t.stages 10))
+         (set self.growTime (or t.growTime 1))
          (set self.x (or t.x self.x))
          (set self.y (or t.y self.y))
-         (set self.hp (or t.hp self.hp))
-         (set self.scale (or t.scale self.scale))
+         (set self.hp (or t.hp 100))
+         (set self.scale (or t.scale 1))
+         (set self.branches (or t.branches []))
          (var currentStage (or t.currentStage 0))
          (var w (or t.w 12))
          (var h (or t.h 32))
-         (var branch {:deg -90 :x1 self.x :y1 self.y :x2 self.x :y2 (- self.y 20) :w w :h h :color (rndColor self.colorScheme)})
+         (var p [self.x  self.y]) ;; prev coord
+         (var n [self.x (- self.y h)]) ;; next coori
+         (var branch {:deg -90 :p p :n n :w w :h h :color (rndColor self.colorScheme)})
          (if (and t.branches (> (length t.branches) 0))
            (set self.branches t.branches)
            (table.insert self.branches [branch]))
@@ -91,14 +94,14 @@
          (when (> l 0)
            (each [i val (ipairs self.branches)]
              (each [j val (ipairs val)]
-               (var (x1 y1) (values val.x1 val.y1))
-               (var (x2 y2) (values val.x2 val.y2))
+               (var (px py) (values (. val.p 1) (. val.p 2)))
+               (var (nx ny) (values (. val.n 1) (. val.n 2)))
                (when (= i l)
-                 (set x2 (+ x1 (/ (- x2 x1) (/ self.growTime self.elapsed))))
-                 (set y2 (+ y1 (/ (- y2 y1) (/ self.growTime self.elapsed)))))
+                 (set nx (+ px (/ (- nx px) (/ self.growTime self.elapsed))))
+                 (set ny (+ py (/ (- ny py) (/ self.growTime self.elapsed)))))
                (gr.setColor (getColor val.color))
                (gr.setLineWidth (* val.w self.scale))
-               (gr.line x1 y1 x2 y2)))))
+               (gr.line px py nx ny)))))
 
  :update (fn update [self dt]
            (local l (length self.branches))

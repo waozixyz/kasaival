@@ -19,8 +19,6 @@
 (var cg [ 200 300 500 700 200 300 ])
 (var cb [ 200 300 300 500 500 600 ])
 
-(var testing false)
-
 (fn toggle [val] (if val false true))
 
 (fn addTree [self completeTree]
@@ -157,7 +155,7 @@
              (set-mode :src.Menu))
            (when (and self.paused (not self.readyToExit))
              (gr.captureScreenshot (.. self.saveFile ".png"))
-             (when (not testing)
+             (when (not _G.testing)
                (save self))
              (when self.exit
                (set self.readyToExit true)))
