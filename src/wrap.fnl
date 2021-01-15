@@ -13,7 +13,7 @@
 (local (gameWidth gameHeight) (values 1920 1080))
 
 ;; set the first mode
-(global testing false)
+(global testing true)
 
 (var mode (require :src.Menu))
 (when _G.testing

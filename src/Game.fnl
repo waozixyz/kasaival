@@ -9,6 +9,7 @@
 (local Tree (require :src.Tree))
 (local Joystick (require :src.Joystick))
 
+(local au love.audio)
 (local gr love.graphics)
 (local ma love.math)
 (local fi love.filesystem)
@@ -73,13 +74,27 @@
              true
              false))
 
-{:elapsed 0
+(fn playSong [self]
+  (set self.songAuthor :TeknoAXE)
+  (local dir :assets/music/)
+  (local list [:Running_On_Air :Robot_Disco_Dance :Supersonic :Dystopian_Paradise :Caught_in_the_Drift])
+  (local ext :.mp3)
+  (var title self.songTitle)
+  (while (= title self.songTitle)
+    (set self.songTitle (. list (ma.random (length list)))))
+  (set self.bgm (au.newSource (.. dir self.songTitle ext) :stream))
+  (au.play self.bgm))
+
+{:elapsed 0 :bgm nil
  :virtualJoystick true
  :treeTime 0
+ :muted false
  :init (fn init [self saveFile]
          (set self.restart false)
          (set self.fontSize 48)
-         (set self.font (gr.newFont self.fontSize))
+         (set self.bigFont (gr.newFont :assets/fonts/hintedSymbola.ttf self.fontSize))
+         (set self.font (gr.newFont :assets/fonts/hintedSymbola.ttf 20))
+
          (when (= (love.system.getOS) (or "Linux" "Windows" "OS X"))
            (set self.virtualJoystick false))
 
@@ -97,6 +112,12 @@
            (set g (. sav :g))
            (set t (. sav :t)))
          
+         (if (not self.bgm)
+           (playSong self)
+           (not (self.bgm:isPlaying))
+           (self.bgm:play))
+         (when self.muted
+           (self.bgm:pause))
 
          (set self.ground (copy Ground))
          (self.ground:init g)
@@ -127,12 +148,19 @@
          (when self.virtualJoystick
            (self.moveStick:draw))
          (when (<= self.player.hp 0)
-           (gr.setFont self.font)
+           (gr.setFont self.bigFont)
            (gr.setColor 0 0 0 .5)
            (gr.rectangle "fill" 0 0 W H)
            (gr.setColor .6 0 .3)
-           (drawText "GameOver" self.font self.fontSize 0 0)
-           (drawText "touch anywhere or press any key to try again" self.font self.fontSize 0 self.fontSize)))
+           (drawText "GameOver" self.bigFont self.fontSize 0 0)
+           (drawText "touch anywhere or press any key to try again" self.bigFont self.fontSize 0 self.fontSize))
+         (do
+           (gr.setFont self.font)
+           (gr.setColor [1 1 1])
+           (local title (.. "🎶 " self.songAuthor " - " self.songTitle " 🎶"))
+           (local w (self.font:getWidth title))
+           (gr.print title (- W w 20) (- H 40))))
+
  :touch (fn touch [self ...]
           (when (<= self.player.hp 0)
             (set self.restart true))
@@ -143,23 +171,29 @@
               (set self.player.usingJoystick true))))
 
  :update (fn update [self dt set-mode]
-           (when self.restart
-             (set-mode :src.Game))
            (local (W H) (push:getDimensions))
            (set self.treeTime (+ self.treeTime dt))
            (when (> self.treeTime 1)
              (addTree self)
              (set self.treeTime 0))
 
+           (when (and (not (self.bgm:isPlaying)) (not self.muted))
+             (playSong self))
+           
            (when self.readyToExit
+             (self.bgm:pause)
              (set-mode :src.Menu))
+           (when self.restart
+             (set-mode :src.Game))
+
+           
            (when (and self.paused (not self.readyToExit))
              (gr.captureScreenshot (.. self.saveFile ".png"))
-             (when (not _G.testing)
-               (save self))
+             (save self)
              (when self.exit
                (set self.readyToExit true)))
              
+
            (when (and (not self.paused) (> self.player.hp 0))
              (set self.elapsed (+ self.elapsed dt))
              ;; adjust the player size
@@ -181,6 +215,16 @@
  :keypressed (fn keypressed [self key set-mode] 
                (when (<= self.player.hp 0)
                  (set self.restart true))
+               (when (= key :n)
+                 (self.bgm:stop))
+               (when (= key :m)
+                 (if self.muted
+                   (do
+                     (set self.muted false)
+                     (self.bgm:play))
+                   (do
+                     (set self.muted true)
+                     (self.bgm:pause))))
                (when (= key :p)
                  (set self.paused (toggle self.paused)))
                (when (= key :escape)
