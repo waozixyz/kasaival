@@ -8,5 +8,5 @@ Strange water creatures spawn and the climate is going more and more crazy over 
 How long can you survive?
 
 <center>
-[![](../assets/icon.png)](play.html)
+[![](../assets/icon.png)](../releases/Kasaival-0.1.3.love)
 </center>
