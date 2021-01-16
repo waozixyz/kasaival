@@ -1,9 +1,12 @@
 # Welcome
 
-Kasaival is an arcade style adventure game. You have come to exist, with no prior knowledge and you have the urge to survive. You soon realize that the plants give you strength and any water based element makes you weaker. 
-
-Try to survive as long as you can, fighting the climate and any water monsters you might encounter.
+Kasaival is an arcade style adventure game.
+Kasai is an out of control flame and this flame is you.
+You want to survive, but you can only do so by burning and nurishing yourself through plant matter.
+In this adventurous world you have a lot of obstacles to try and live out your out of control existence.
+Strange water creatures spawn and the climate is going more and more crazy over time.
+How long can you survive?
 
 <center>
-![](../assets/icon.png)
+[![](../assets/icon.png))](play.html)
 </center>
