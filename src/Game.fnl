@@ -63,13 +63,6 @@
   (tset sav :elapsed self.elapsed)
   (var (s m) (fi.write self.saveFile (serpent.dump sav))))
 
-(fn drawText [text font size xpad ypad]
-  (local (W H) (push:getDimensions))
-  (local xpad (or xpad 0))
-  (local ypad (or ypad 0))
-  (local w (font:getWidth text))
-  (gr.setFont font)
-  (gr.print text (+ (- (* W .5) (* w .5)) xpad) (+ (* H .5) ypad)))
 
 (fn checkCollision [o1 o2]
   (local (h1 h2) (values (o1:getHitbox) (o2:getHitbox)))
@@ -85,10 +78,7 @@
  :init (fn init [self saveFile]
          (HUD:init)
          (set self.restart false)
-         (set self.fontSize 48)
-         (set self.bigFont (gr.newFont :assets/fonts/hintedSymbola.ttf self.fontSize))
-         (set self.font (gr.newFont :assets/fonts/hintedSymbola.ttf 20))
-
+         
          (when (or (= (sy.getOS) "Android") (= (sy.getOS) "iOS"))
            (set self.virtualJoystick true))
 
@@ -104,14 +94,7 @@
            (set self.elapsed (. sav :elapsed))
            (set p (. sav :p))
            (set g (. sav :g))
-           (set t (. sav :t)))
-         
-         (if (not Music.bgm)
-           (Music:play)
-           (not (Music.bgm:isPlaying))
-           (Music.bgm:play))
-         (when self.muted
-           (Music.bgm:pause))
+           (set t (. sav :t))) 
 
          (set self.ground (copy Ground))
          (self.ground:init g)
@@ -141,20 +124,7 @@
            (entity:draw))
          (when self.virtualJoystick
            (self.moveStick:draw))
-         (when (<= self.player.hp 0)
-           (gr.setFont self.bigFont)
-           (gr.setColor 0 0 0 .5)
-           (gr.rectangle "fill" 0 0 W H)
-           (gr.setColor .6 0 .3)
-           (drawText "GameOver" self.bigFont self.fontSize 0 0)
-           (drawText "touch anywhere or press any key to try again" self.bigFont self.fontSize 0 self.fontSize))
-         (do
-           (gr.setFont self.font)
-           (gr.setColor [1 1 1])
-           (local title (.. "🎶 " Music.songAuthor " - " Music.songTitle " 🎶"))
-           (local w (self.font:getWidth title))
-           (gr.print title (- W w 20) (- H 40))))
-
+         (HUD:draw self))
  :touch (fn touch [self ...]
           (if (<= self.player.hp 0)
             (set self.restart true)
@@ -167,8 +137,11 @@
  :update (fn update [self dt set-mode]
            (HUD:update self)
            (local (W H) (push:getDimensions))
-           (when (and (not (Music.bgm:isPlaying)) (not self.muted))
+
+           (if self.muted
+             (Music:mute)
              (Music:play))
+
            
            (when self.readyToExit
              (Music.bgm:pause)

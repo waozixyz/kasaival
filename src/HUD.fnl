@@ -9,8 +9,21 @@
 
 (fn toggle [val] (if val false true))
 
+(fn drawText [text font size xpad ypad]
+  (local (W H) (push:getDimensions))
+  (local xpad (or xpad 0))
+  (local ypad (or ypad 0))
+  (local w (font:getWidth text))
+  (gr.setFont font)
+  (gr.print text (+ (- (* W .5) (* w .5)) xpad) (+ (* H .5) ypad)))
+
 {:init (fn init [self]
          (Cursor:init)
+
+         (set self.fontSize 48)
+         (set self.bigFont (gr.newFont :assets/fonts/hintedSymbola.ttf self.fontSize))
+         (set self.font (gr.newFont :assets/fonts/hintedSymbola.ttf 20))
+
          (set self.exit (gr.newImage :assets/icons/exit.png))
          (set self.resume (gr.newImage :assets/icons/resume.png))
          (set self.pause (gr.newImage :assets/icons/pause.png))
@@ -18,7 +31,21 @@
          (set self.nomusic (gr.newImage :assets/icons/nomusic.png))
          (set self.sound (gr.newImage :assets/icons/sound.png))
          (set self.nosound (gr.newImage :assets/icons/nosound.png)))
- :draw (fn draw [self])
+ :draw (fn draw [self game]
+         (local (W H) (push:getDimensions))
+         (when (<= game.player.hp 0)
+           (gr.setFont self.bigFont)
+           (gr.setColor 0 0 0 .5)
+           (gr.rectangle "fill" 0 0 W H)
+           (gr.setColor .6 0 .3)
+           (drawText "GameOver" self.bigFont self.fontSize 0 0)
+           (drawText "touch anywhere or press any key to try again" self.bigFont self.fontSize 0 self.fontSize))
+         (when Music.songTitle
+           (gr.setFont self.font)
+           (gr.setColor [1 1 1])
+           (local title (.. "🎶 " Music.songAuthor " - " Music.songTitle " 🎶"))
+           (local w (self.font:getWidth title))
+           (gr.print title (- W w 20) (- H 40))))
 
  :update (fn update [self game]
            (local (W H) (push:getDimensions))
@@ -57,9 +84,6 @@
                (when (= key :n)
                  (Music.bgm:stop))
                (when (= key :m)
-                 (if game.muted
-                   (Music.bgm:play)
-                   (Music.bgm:pause))
                  (set game.muted (toggle game.muted)))
                (when (or (= key :p) (= key :pause))
                  (set game.paused (toggle game.paused)))
