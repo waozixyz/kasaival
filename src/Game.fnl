@@ -3,6 +3,7 @@
 (local serpent (require :lib.serpent))
 
 (local Ground (require :src.Ground))
+(local HUD (require :src.HUD))
 (local Player (require :src.Player))
 (local Saves (require :src.Saves))
 (local Sky (require :lib.Sky))
@@ -89,8 +90,9 @@
 {:elapsed 0 :bgm nil
  :virtualJoystick false
  :treeTime 0
- :muted false
+ :muted true
  :init (fn init [self saveFile]
+         (HUD:init)
          (set self.restart false)
          (set self.fontSize 48)
          (set self.bigFont (gr.newFont :assets/fonts/hintedSymbola.ttf self.fontSize))
@@ -172,12 +174,8 @@
               (set self.player.usingJoystick true))))
 
  :update (fn update [self dt set-mode]
+           (HUD:update self)
            (local (W H) (push:getDimensions))
-           (set self.treeTime (+ self.treeTime dt))
-           (when (> self.treeTime 1)
-             (addTree self)
-             (set self.treeTime 0))
-
            (when (and (not (self.bgm:isPlaying)) (not self.muted))
              (playSong self))
            
@@ -188,14 +186,23 @@
              (set-mode :src.Game))
 
            
-           (when (and self.paused (not self.readyToExit))
-             (gr.captureScreenshot (.. self.saveFile ".png"))
-             (save self)
-             (when self.exit
-               (set self.readyToExit true)))
+           (when (and self.exit (not self.readyToExit))
+             (if _G.testing
+               (love.event.quit)
+               (do
+                 (gr.captureScreenshot (.. self.saveFile ".png"))
+                 (save self)
+                 (set self.readyToExit true))))
              
 
            (when (and (not self.paused) (> self.player.hp 0))
+
+             ;; add new trees after treeTime goes over 1 second
+             (set self.treeTime (+ self.treeTime dt))
+             (when (> self.treeTime 1)
+               (addTree self)
+               (set self.treeTime 0))
+
              (set self.elapsed (+ self.elapsed dt))
              ;; adjust the player size
              (set self.player.scale (* (/ self.player.y H) (* self.player.hp .001)))
@@ -214,6 +221,7 @@
              (self.ground:collide self.player)
              (set self.player.usingJoystick false)))
  :keypressed (fn keypressed [self key set-mode] 
+               (HUD:keypressed self key)
                (when (<= self.player.hp 0)
                  (set self.restart true))
                (when (= key :n)
@@ -226,8 +234,6 @@
                    (do
                      (set self.muted true)
                      (self.bgm:pause))))
-               (when (= key :p)
-                 (set self.paused (toggle self.paused)))
                (when (= key :escape)
                  (set self.paused true)
                  (set self.exit true)))}

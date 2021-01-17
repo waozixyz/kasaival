@@ -1,0 +1,51 @@
+(local suit (require :lib.suit))
+(local push (require :lib.push))
+
+(local Cursor (require :src.Cursor))
+
+(local gr love.graphics)
+(local mo love.mouse)
+
+(fn toggle [val] (if val false true))
+
+{:init (fn init [self]
+         (Cursor:init)
+         (set self.exit (gr.newImage :assets/icons/exit.png))
+         (set self.resume (gr.newImage :assets/icons/resume.png))
+         (set self.pause (gr.newImage :assets/icons/pause.png))
+         (set self.music (gr.newImage :assets/icons/music.png))
+         (set self.nomusic (gr.newImage :assets/icons/nomusic.png))
+         (set self.sound (gr.newImage :assets/icons/sound.png))
+         (set self.nosound (gr.newImage :assets/icons/nosound.png)))
+ :draw (fn draw [self])
+
+ :update (fn update [self game]
+           (local (W H) (push:getDimensions))
+           
+
+           (var exit_button (suit.ImageButton self.exit 20 20))
+           (when (= exit_button.hit true)
+             (set game.exit true))
+
+
+           (var pause_img self.pause) 
+           (when game.paused (set pause_img self.resume))
+           (var pause_button (suit.ImageButton pause_img 100 20))
+           (when (= pause_button.hit true)
+             (set game.paused (toggle game.paused)))
+  
+
+           (var music_button (suit.ImageButton self.music (- W 84) 20))
+           (when (= music_button.hit true)
+             nil)
+
+           (var sound_button (suit.ImageButton self.sound (- W 164) 20))
+           (when (= sound_button.hit true)
+             nil)
+
+           (Cursor:update))
+
+
+ :keypressed (fn keypressd [self game key set-mode]
+               (when (or (= key :p) (= key :pause))
+                 (set game.paused (toggle game.paused))))}
