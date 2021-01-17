@@ -233,7 +233,4 @@
                      (self.bgm:play))
                    (do
                      (set self.muted true)
-                     (self.bgm:pause))))
-               (when (= key :escape)
-                 (set self.paused true)
-                 (set self.exit true)))}
+                     (self.bgm:pause)))))}

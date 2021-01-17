@@ -28,24 +28,29 @@
              (set game.exit true))
 
 
-           (var pause_img self.pause) 
-           (when game.paused (set pause_img self.resume))
-           (var pause_button (suit.ImageButton pause_img 100 20))
+           (var pause_image self.pause) 
+           (when game.paused (set pause_image self.resume))
+           (var pause_button (suit.ImageButton pause_image 100 20))
            (when (= pause_button.hit true)
              (set game.paused (toggle game.paused)))
   
 
-           (var music_button (suit.ImageButton self.music (- W 84) 20))
+           (var music_image self.music)
+           (when game.muted (set music_image self.nomusic))
+           (var music_button (suit.ImageButton music_image (- W 84) 20))
            (when (= music_button.hit true)
-             nil)
+             (set game.muted (toggle game.muted)))
 
-           (var sound_button (suit.ImageButton self.sound (- W 164) 20))
-           (when (= sound_button.hit true)
-             nil)
+           ;;(var sound_button (suit.ImageButton self.sound (- W 164) 20))
+           ;;(when (= sound_button.hit true)
+           ;;  nil)
 
            (Cursor:update))
 
 
  :keypressed (fn keypressd [self game key set-mode]
                (when (or (= key :p) (= key :pause))
-                 (set game.paused (toggle game.paused))))}
+                 (set game.paused (toggle game.paused)))
+               (when (= key :escape)
+                 (set game.paused true)
+                 (set game.exit true)))}
