@@ -4,13 +4,14 @@
 
 (local Ground (require :src.Ground))
 (local HUD (require :src.HUD))
+(local Joystick (require :src.Joystick))
+(local Music (require :src.Music))
 (local Player (require :src.Player))
 (local Saves (require :src.Saves))
 (local Sky (require :lib.Sky))
 (local Tree (require :src.Tree))
-(local Joystick (require :src.Joystick))
 
-(local au love.audio)
+
 (local fi love.filesystem)
 (local gr love.graphics)
 (local ma love.math)
@@ -76,16 +77,6 @@
              true
              false))
 
-(fn playSong [self]
-  (set self.songAuthor :TeknoAXE)
-  (local dir :assets/music/)
-  (local list [:Running_On_Air :Robot_Disco_Dance :Supersonic :Dystopian_Paradise :Caught_in_the_Drift])
-  (local ext :.mp3)
-  (var title self.songTitle)
-  (while (= title self.songTitle)
-    (set self.songTitle (. list (ma.random (length list)))))
-  (set self.bgm (au.newSource (.. dir self.songTitle ext) :stream))
-  (au.play self.bgm))
 
 {:elapsed 0 :bgm nil
  :virtualJoystick false
@@ -115,12 +106,12 @@
            (set g (. sav :g))
            (set t (. sav :t)))
          
-         (if (not self.bgm)
-           (playSong self)
-           (not (self.bgm:isPlaying))
-           (self.bgm:play))
+         (if (not Music.bgm)
+           (Music:play)
+           (not (Music.bgm:isPlaying))
+           (Music.bgm:play))
          (when self.muted
-           (self.bgm:pause))
+           (Music.bgm:pause))
 
          (set self.ground (copy Ground))
          (self.ground:init g)
@@ -160,7 +151,7 @@
          (do
            (gr.setFont self.font)
            (gr.setColor [1 1 1])
-           (local title (.. "🎶 " self.songAuthor " - " self.songTitle " 🎶"))
+           (local title (.. "🎶 " Music.songAuthor " - " Music.songTitle " 🎶"))
            (local w (self.font:getWidth title))
            (gr.print title (- W w 20) (- H 40))))
 
@@ -176,11 +167,11 @@
  :update (fn update [self dt set-mode]
            (HUD:update self)
            (local (W H) (push:getDimensions))
-           (when (and (not (self.bgm:isPlaying)) (not self.muted))
-             (playSong self))
+           (when (and (not (Music.bgm:isPlaying)) (not self.muted))
+             (Music:play))
            
            (when self.readyToExit
-             (self.bgm:pause)
+             (Music.bgm:pause)
              (set-mode :src.Menu))
            (when self.restart
              (set-mode :src.Game))
@@ -223,14 +214,4 @@
  :keypressed (fn keypressed [self key set-mode] 
                (HUD:keypressed self key)
                (when (<= self.player.hp 0)
-                 (set self.restart true))
-               (when (= key :n)
-                 (self.bgm:stop))
-               (when (= key :m)
-                 (if self.muted
-                   (do
-                     (set self.muted false)
-                     (self.bgm:play))
-                   (do
-                     (set self.muted true)
-                     (self.bgm:pause)))))}
+                 (set self.restart true)))}

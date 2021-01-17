@@ -2,6 +2,7 @@
 (local push (require :lib.push))
 
 (local Cursor (require :src.Cursor))
+(local Music (require :src.Music))
 
 (local gr love.graphics)
 (local mo love.mouse)
@@ -49,6 +50,17 @@
 
 
  :keypressed (fn keypressd [self game key set-mode]
+               (when (= key :kp+)
+                 (Music.bgm:setVolume (+ (Music.bgm:getVolume) .1)))
+               (when (= key :kp-)
+                 (Music.bgm:setVolume (- (Music.bgm:getVolume) .1)))
+               (when (= key :n)
+                 (Music.bgm:stop))
+               (when (= key :m)
+                 (if game.muted
+                   (Music.bgm:play)
+                   (Music.bgm:pause))
+                 (set game.muted (toggle game.muted)))
                (when (or (= key :p) (= key :pause))
                  (set game.paused (toggle game.paused)))
                (when (= key :escape)
