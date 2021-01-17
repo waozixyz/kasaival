@@ -13,7 +13,7 @@
 (local fi love.filesystem)
 (local gr love.graphics)
 (local ma love.math)
-(local sy love.sytsem)
+(local sy love.system)
 
 (local sky (Sky))
 
@@ -87,7 +87,7 @@
   (au.play self.bgm))
 
 {:elapsed 0 :bgm nil
- :virtualJoystick true
+ :virtualJoystick false
  :treeTime 0
  :muted false
  :init (fn init [self saveFile]
@@ -96,8 +96,8 @@
          (set self.bigFont (gr.newFont :assets/fonts/hintedSymbola.ttf self.fontSize))
          (set self.font (gr.newFont :assets/fonts/hintedSymbola.ttf 20))
 
-         (when (or (= (sy.getOS) "Android") (= (sy.getOs) "iOS"))
-           (set self.virtualJoystick false))
+         (when (or (= (sy.getOS) "Android") (= (sy.getOS) "iOS"))
+           (set self.virtualJoystick true))
 
          (set self.saveFile (or saveFile (Saves:nextSave)))
          (set (self.paused self.exit self.readyToExit) (values false false false))

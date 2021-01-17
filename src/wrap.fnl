@@ -31,11 +31,13 @@
   :active {:bg [.2 .0 .1] :fg [.5 .1 .2]}})
 
 (fn love.load []
+  (var fullscreen false)
   (var (windowWidth windowHeight) (wi.getDesktopDimensions))
-  (when (or (= (sy.getOS) "Android") (= (sy.getOs) "iOS"))
+  (when (or (= (sy.getOS) "Android") (= (sy.getOS) "iOS"))
+    (set fullscreen true)
     (var (windowWidth windowHeight) (gr.getDimensions)))
 
-  (push:setupScreen gameWidth gameHeight windowWidth windowHeight {:fullscreen true :resizable true :highdpi true})
+  (push:setupScreen gameWidth gameHeight windowWidth windowHeight {:fullscreen fullscreen :resizable true :highdpi true})
   ;; set the theme color for the ui libray suit
   (set suit.theme.color uiTheme)
   (mode:init))
