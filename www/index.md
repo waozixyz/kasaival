@@ -15,3 +15,5 @@ How long can you survive?
 </center>
 
 Make sure to install [love2d](https://love2d.org/) before opening the .love file!
+
+Currently the main developer is [Wolfi ☬ Space](https://wolfi.space). If you have feedback, feel free to use the forum or contact me directly.
