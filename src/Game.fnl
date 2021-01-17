@@ -167,7 +167,7 @@
  :touch (fn touch [self ...]
           (if (<= self.player.hp 0)
             (set self.restart true)
-            (when (and self.virtualJoystick (not self.pause))
+            (when (and self.virtualJoystick (not self.paused))
               (var (mx my) (self.moveStick:touch ...))
               (when (or (~= mx 0) (~= my 0))
                 (self.player:move mx my self.ground.height)
