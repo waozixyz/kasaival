@@ -10,9 +10,10 @@
 (local Joystick (require :src.Joystick))
 
 (local au love.audio)
+(local fi love.filesystem)
 (local gr love.graphics)
 (local ma love.math)
-(local fi love.filesystem)
+(local sy love.sytsem)
 
 (local sky (Sky))
 
@@ -95,7 +96,7 @@
          (set self.bigFont (gr.newFont :assets/fonts/hintedSymbola.ttf self.fontSize))
          (set self.font (gr.newFont :assets/fonts/hintedSymbola.ttf 20))
 
-         (when (= (love.system.getOS) (or "Linux" "Windows" "OS X"))
+         (when (or (= (sy.getOS) "Android") (= (sy.getOs) "iOS"))
            (set self.virtualJoystick false))
 
          (set self.saveFile (or saveFile (Saves:nextSave)))

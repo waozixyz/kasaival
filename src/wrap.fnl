@@ -6,6 +6,7 @@
 (local gr love.graphics)
 (local ke love.keyboard)
 (local mo love.mouse)
+(local sy love.system)
 (local to love.touch)
 (local wi love.window)
 
@@ -30,9 +31,9 @@
   :active {:bg [.2 .0 .1] :fg [.5 .1 .2]}})
 
 (fn love.load []
-  (var (windowWidth windowHeight) (gr.getDimensions))
-  (when (= (love.system.getOS) (or "Linux" "Windows" "OS X"))
-    (set (windowWidth windowHeight) (wi.getDesktopDimensions)))
+  (var (windowWidth windowHeight) (wi.getDesktopDimensions))
+  (when (or (= (sy.getOS) "Android") (= (sy.getOs) "iOS"))
+    (var (windowWidth windowHeight) (gr.getDimensions)))
 
   (push:setupScreen gameWidth gameHeight windowWidth windowHeight {:fullscreen true :resizable true :highdpi true})
   ;; set the theme color for the ui libray suit
