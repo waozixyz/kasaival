@@ -165,13 +165,13 @@
            (gr.print title (- W w 20) (- H 40))))
 
  :touch (fn touch [self ...]
-          (when (<= self.player.hp 0)
-            (set self.restart true))
-          (when self.virtualJoystick
-            (var (mx my) (self.moveStick:touch ...))
-            (when (or (~= mx 0) (~= my 0))
-              (self.player:move mx my self.ground.height)
-              (set self.player.usingJoystick true))))
+          (if (<= self.player.hp 0)
+            (set self.restart true)
+            (when (and self.virtualJoystick (not self.pause))
+              (var (mx my) (self.moveStick:touch ...))
+              (when (or (~= mx 0) (~= my 0))
+                (self.player:move mx my self.ground.height)
+                (set self.player.usingJoystick true)))))
 
  :update (fn update [self dt set-mode]
            (HUD:update self)
