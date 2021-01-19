@@ -27,12 +27,20 @@
 
 (fn addTree [self completeTree]
   (local (W H) (push:getDimensions))
-  (var y (ma.random (/ H 3) H))
-  (set y (+ y (ma.random 0 1)))
-  (var scale (/ y H))
+  (var y (ma.random 0 (- H (/ H 3))))
+  (var scale (/ (+ y (/ H 3)) H))
+
   (var x (ma.random 0 W))
+  ;; create a projected x value in the fantasy 2.5 d world
+  (var vir_x (/ x scale))
+
+  (var rat_x (/ x vir_x))
+  (set y (+ (/ H 3) (* y rat_x)))
+
+
   (var w (* (ma.random 14 16) scale))
   (var h (* (ma.random 32 52) scale))
+  
   ;; copy the table template of Tree
   (table.insert self.trees (copy Tree))
   ;; get the newest tree
