@@ -31,9 +31,10 @@
   :active {:bg [.2 .0 .1] :fg [.5 .1 .2]}})
 
 (fn love.load []
-  (var fullscreen true)
-  (var resizable true)
-  (var (windowWidth windowHeight) (wi.getDesktopDimensions))
+  (var fullscreen false)
+  (var resizable false)
+  ;;(var (windowWidth windowHeight) (wi.getDesktopDimensions))
+  (var (windowWidth windowHeight) (values 800 450))
   (when (or (= (sy.getOS) "Android") (= (sy.getOS) "iOS"))
     (var (windowWidth windowHeight) (gr.getDimensions)))
 
