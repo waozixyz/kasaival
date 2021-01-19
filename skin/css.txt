@@ -23,7 +23,7 @@ button:hover, input[type="submit"]:hover {
   color: #ffd0d7;
 }
 
-textarea, input[type="text"] {
+textarea, input[type="text"], input[type="input"] {
   color: #ffd0d7;
   background-color: #886384;
 
@@ -180,10 +180,9 @@ div.forumSel, td.tktDspValue {
   color: #fbb4a6; 
   background-color: #380324;
 }
- (artifact-916) in reply to 1.0 [source]
 pre.verbatim {
   color: #fbf4c6; 
-  background-color: #946072;
+  background-color: inherit;
 }
 
 .debug {
