@@ -19,9 +19,8 @@
 
 (local sky (Sky))
 
-(var cr [ 500 700 200 400 200 300 ])
-(var cg [ 200 300 500 700 200 300 ])
-(var cb [ 200 300 300 500 500 600 ])
+;;(var cg [ 200 300 500 700 200 300 ])
+;;(var cb [ 200 300 300 500 500 600 ])
 
 (fn toggle [val] (if val false true))
 
@@ -49,7 +48,10 @@
   (var maxStage (ma.random 8 10))
   (var currentStage (if completeTree maxStage 0))
   (var growTime (ma.random .5 1))
-  (var c (. [cr cg cb] (ma.random 1 3)))
+  (var cs1 [ 500 700 200 400 200 300 ])
+  (var cs2 [ 300 400 400 600 200 300 ])
+  (var cs3 [ 300 500 200 400 300 500 ])
+  (var c (. [cs1 cs2 cs3] (ma.random 1 3)))
   ;; initialize the tree
   (tree:init {:x x :y y :scale scale :w w :h h :maxStage maxStage :currentStage currentStage :growTime growTime :colorScheme c}))
 

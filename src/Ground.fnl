@@ -70,7 +70,7 @@
            (while (< y (+ H h))
              (var row [])
              (set (w h) (values (+ w 1) (+ h 1)))
-             (for [x (- (* g.width -.5) w) (- g.width (* g.width .5)) w]
+             (for [x (* g.width -.5) (- g.width (* g.width .5)) w]
                (var c (rndColor))
                (table.insert row {:x x :y y :w w :h h :color c :orgColor c})
                (var c (rndColor))
