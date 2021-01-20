@@ -194,6 +194,7 @@ pre.verbatim {
 table.report {
   border: none;
   margin: 1em 0;
+  color: #b10156;
 }
 td {
   padding: .5em;

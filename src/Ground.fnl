@@ -39,18 +39,18 @@
     (set b (- b 4))) 
   [r g b])
 
-(local rows 40)
+(local rows 30)
 
 {:tiles [] 
  :collide (fn collide [self obj]
-            (local o (obj:getHitbox))
+            (local (l r u d) (obj:getHitbox))
             (each [i v (ipairs self.tiles)]
-              (when (and (<= v.x (. o 2)) (>= (+ v.x v.w) (. o 1)) (<= (- v.y v.h) (. o 4)) (>= v.y (. o 3)))
+              (when (and (<= v.x r) (>= (+ v.x v.w) l) (<= (- v.y v.h) d) (>= v.y u))
                 (obj:collided (lume.getColor v.color .001))
                 (set v.color (burnTile v)))))
 
 
- :init (fn init [self t]
+ :init (fn init [self g t]
          (local (W H) (push:getDimensions))
          (var y (/ H 3))
          (set self.height (- H y))
@@ -59,11 +59,11 @@
          (var h w)
 
          (var i 0)
-         (if (and t t.tiles (> (length t.tiles) 0))
-           (set self.tiles t.tiles)
+         (set self.tiles (or t.tiles []))
+         (when (= (length self.tiles) 0)
            (while (< y (+ H h))
              (set (w h) (values (+ w 1) (+ h 1)))
-             (for [x 0 (+ W w) w]
+             (for [x (- (* g.width .5)) (- g.width (* g.width .5)) w]
                (var c (rndColor))
                (table.insert self.tiles {:x x :y y :w w :h h :color c :orgColor c})
                (var c (rndColor))

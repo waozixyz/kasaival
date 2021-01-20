@@ -34,7 +34,7 @@
   (var fullscreen false)
   (var resizable false)
   ;;(var (windowWidth windowHeight) (wi.getDesktopDimensions))
-  (var (windowWidth windowHeight) (values 800 450))
+  (var (windowWidth windowHeight) (values 1200 675))
   (when (or (= (sy.getOS) "Android") (= (sy.getOS) "iOS"))
     (var (windowWidth windowHeight) (gr.getDimensions)))
 
@@ -71,11 +71,11 @@
       (each [i v (ipairs touches)]
         (local (x y) (push:toGame (mo.getPosition v)))
         (when (and x y)
-          (mode:touch x y))))
+          (mode:touch x y dt))))
     (when (mo.isDown 1)
       (local (x y) (push:toGame (mo.getPosition)))
       (when (and x y)
-        (mode:touch x y))))
+        (mode:touch x y dt))))
 
   ;; update mode
   (mode:update dt set-mode))

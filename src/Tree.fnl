@@ -53,7 +53,7 @@
               (var first (. (. self.branches 1) 1))
               (var w (* first.w self.scale 2))
               (var h (* first.h self.scale 2))
-              [(- self.x w) (+ self.x w) (- self.y h) (+ self.y h)])
+              (values (- self.x w) (+ self.x w) (- self.y h) (+ self.y h)))
 
  :collided (fn collided [self element]
              (when (= element :fire)

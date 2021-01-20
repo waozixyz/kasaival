@@ -4,7 +4,6 @@
 
 (local Ground (require :src.Ground))
 (local HUD (require :src.HUD))
-(local Joystick (require :src.Joystick))
 (local Music (require :src.Music))
 (local Player (require :src.Player))
 (local Saves (require :src.Saves))
@@ -14,6 +13,7 @@
 
 (local fi love.filesystem)
 (local gr love.graphics)
+(local ke love.keyboard)
 (local ma love.math)
 (local sy love.system)
 
@@ -68,61 +68,95 @@
     (table.insert t (getProp v)))
   (tset sav :t t)
 
+  (tset sav :cx self.cx)
   (tset sav :elapsed self.elapsed)
+  (tset sav :muted self.muted)
+  (tset sav :treeTime self.treeTime)
+
   (var (s m) (fi.write self.saveFile (serpent.dump sav))))
 
 
 (fn checkCollision [o1 o2]
-  (local (h1 h2) (values (o1:getHitbox) (o2:getHitbox)))
-  (if (and (<= (. h1 1) (. h2 2)) (>= (. h1 2) (. h2 1)) (<= (. h1 3) (. h2 4)) (>= (. h1 4) (. h2 3)))
+  (local (l1 r1 u1 d1) (o1:getHitbox))
+  (local (l2 r2 u2 d2) (o2:getHitbox))
+  (if (and (<= l1 r2) (>= r1 l2) (<= u1 d2) (>= d1 u2))
              true
              false))
 
 
+(local radToDeg (/ 180 math.pi))
+(local degToRad (/ math.pi 180))
+
+
+
 {:elapsed 0 :bgm nil
- :virtualJoystick false
+ :usingTouchMove false
+ :muted true :cx 0
  :treeTime 0
- :muted true
  :init (fn init [self saveFile]
+         ;; seth the game width
+         (local (W H) (push:getDimensions))
+         (set self.width (* W 2))
+
+         ;; initialize the head over display
          (HUD:init)
+
+
+         ;; the game is not over and shouldnt restart, triggering true will restart the game
          (set self.restart false)
          
-         (when (or (= (sy.getOS) "Android") (= (sy.getOS) "iOS"))
-           (set self.virtualJoystick true))
-
+         ;; get the last saveFile
          (set self.saveFile (or saveFile (Saves:nextSave)))
+
+         ;; these variables are made for pausing exiting and saving the game
          (set (self.paused self.exit self.readyToExit) (values false false false))
+
+         ;; this table is used to store all trees
          (set self.trees [])
 
-         (var (p g t) (values {} {} []))
-         
+         ;; load player ground trees from savefile into here
+         (var (p g t) (values {} {} nil))
          (when (fi.getInfo self.saveFile)
+           (set t [])
            (var (contents size) (fi.read self.saveFile))
            (var (ok sav) (serpent.load contents))
+           ;; set up game
+           ;; set elapsed time
            (set self.elapsed (. sav :elapsed))
+           ;; get tree time
+           (set self.treeTime (. sav :treeTime))
+           ;; set the initiale camera x value
+           (set self.cx (. save :cx))
+           ;; load player
            (set p (. sav :p))
+           ;; load ground
            (set g (. sav :g))
+           ;; load trees
            (set t (. sav :t))) 
 
+         ;; load ground
          (set self.ground (copy Ground))
-         (self.ground:init g)
+         (self.ground:init self g)
 
-         (if (> (length t) 0)
+         ;; for each tree in table load its content
+         ;; if the tree table is empty make a hundred new trees
+         (if (and t (> (length t) 0))
            (each [i v (ipairs t)]
              (table.insert self.trees (copy Tree))
              (var tree (. self.trees (length self.trees)))
              (tree:init v))
            (for [i 1 100]
              (addTree self true)))
-         
+         ;; load player
          (set self.player (copy Player))
-         (self.player:init p)
-         (set self.moveStick (copy Joystick))
-         (self.moveStick:init))
+         (self.player:init p))
          
  :draw (fn draw [self]
          (local (W H) (push:getDimensions))
+         (var sky_cx (* self.cx .2))
+         (gr.translate sky_cx 0)
          (sky:draw)
+         (gr.translate (- self.cx sky_cx) 0)
          (self.ground:draw)
          (var entities [self.player])
          (each [i tree (ipairs self.trees)]
@@ -130,17 +164,25 @@
          (set entities (lume.sort entities :y))
          (each [i entity (ipairs entities)]
            (entity:draw))
-         (when self.virtualJoystick
-           (self.moveStick:draw))
+         (gr.translate (- self.cx)  0)
          (HUD:draw self))
- :touch (fn touch [self ...]
-          (if (<= self.player.hp 0)
-            (set self.restart true)
-            (when (and self.virtualJoystick (not self.paused))
-              (var (mx my) (self.moveStick:touch ...))
-              (when (or (~= mx 0) (~= my 0))
-                (self.player:move mx my self.ground.height)
-                (set self.player.usingJoystick true)))))
+ :touch (fn touch [self x y dt]
+          (when (<= self.player.hp 0)
+            (set self.restart true))
+          (when (not self.paused)
+            (var (px py) (values self.player.x self.player.y))
+            (var x (- x self.cx))
+            (var (nx ny) (values (- x px) (- y py)))
+            (var w (* self.player.scale self.player.ow .2))
+            (var h (* self.player.scale self.player.oh .2))
+            (when (and (< nx w) (> nx (- w)) (< ny h) (> ny (- h))) (set nx nil) (set ny nil))
+            (when (and (> y 100) nx ny)
+              (var angle (* (math.atan2 nx ny) radToDeg))
+              (when (< angle 0) (set angle (+ 360 angle)))
+              (set angle (* angle degToRad))
+              (var (ax ay) (values (math.sin angle) (math.cos angle)))
+              (self.player:move ax ay self dt)
+              (set self.usingTouchMove true))))
 
  :update (fn update [self dt set-mode]
            (HUD:update self)
@@ -168,6 +210,18 @@
              
 
            (when (and (not self.paused) (> self.player.hp 0))
+             (when (not self.usingTouchMove)
+               (var (dx dy) (values 0 0))
+               (when (ke.isScancodeDown :d :right :kp6)
+                 (set dx 1))
+               (when (ke.isScancodeDown :a :left :kp4)
+                 (set dx -1))
+               (when (ke.isScancodeDown :s :down :kp2)
+                 (set dy 1))
+               (when (ke.isScancodeDown :w :up :kp8)
+                 (set dy -1))
+               (self.player:move dx dy self dt))
+
 
              ;; add new trees after treeTime goes over 1 second
              (set self.treeTime (+ self.treeTime dt))
@@ -179,7 +233,7 @@
              ;; adjust the player size
              (set self.player.scale (* (/ self.player.y H) (* self.player.hp .001)))
              ;; update functions
-             (self.player:update dt self.ground.height)
+             (self.player:update dt self)
              (each [i tree (ipairs self.trees)]
                (when (checkCollision tree self.player)
                  (self.player:collided tree.element)
@@ -191,7 +245,7 @@
                  (table.remove self.trees i)))
              (self.ground:update dt)
              (self.ground:collide self.player)
-             (set self.player.usingJoystick false)))
+             (set self.usingTouchMove false)))
  :keypressed (fn keypressed [self key set-mode] 
                (HUD:keypressed self key)
                (when (<= self.player.hp 0)
