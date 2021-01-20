@@ -26,11 +26,12 @@
 (fn toggle [val] (if val false true))
 
 (fn addTree [self completeTree]
-  (local (W H) (push:getDimensions))
+  (local H (push:getHeight))
   (var y (ma.random 0 (- H (/ H 3))))
   (var scale (/ (+ y (/ H 3)) H))
 
-  (var x (ma.random 0 W))
+  (local W self.width)
+  (var x (ma.random (* (- W) .5) (+ W (* (- W) .5))))
   ;; create a projected x value in the fantasy 2.5 d world
   (var vir_x (/ x scale))
 
@@ -88,18 +89,18 @@
 
 
 
-{:elapsed 0 :bgm nil
- :usingTouchMove false
- :muted true :cx 0
- :treeTime 0
- :init (fn init [self saveFile]
+{:init (fn init [self saveFile]
          ;; seth the game width
          (local (W H) (push:getDimensions))
          (set self.width (* W 2))
+         (set self.elapsed 0)
+         (set self.muted true)
+         (set self.treeTime 0)
+         (set self.cx 0)
+         (set self.usingTouchMove false)
 
          ;; initialize the head over display
          (HUD:init)
-
 
          ;; the game is not over and shouldnt restart, triggering true will restart the game
          (set self.restart false)
@@ -144,7 +145,7 @@
              (table.insert self.trees (copy Tree))
              (var tree (. self.trees (length self.trees)))
              (tree:init v))
-           (for [i 1 100]
+           (for [i 1 200]
              (addTree self true)))
          ;; load player
          (set self.player (copy Player))
@@ -244,13 +245,16 @@
              ;; update functions
              (self.player:update dt self)
              (each [i tree (ipairs self.trees)]
+               ;; check tree collisions with player
                (when (checkCollision tree self.player)
                  (self.player:collided tree.element)
                  (tree:collided self.player.element))
+               ;; update tree
                (tree:update dt)
+               ;; when tree dead
                (when (< (length tree.branches) 1)
                  (set self.player.xp (+ self.player.xp 10)) 
-                 (set self.player.hp (+ self.player.hp ))
+                 (set self.player.hp (+ self.player.hp 20))
                  (table.remove self.trees i)))
              (self.ground:update dt)
              (self.ground:collide self.player)
