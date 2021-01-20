@@ -83,7 +83,6 @@
              true
              false))
 
-
 (local radToDeg (/ 180 math.pi))
 (local degToRad (/ math.pi 180))
 
@@ -150,20 +149,30 @@
          ;; load player
          (set self.player (copy Player))
          (self.player:init p))
+
+ :checkVisible (fn checkVisible [self x w]
+                 (local (W H) (push:getDimensions))
+                 (if (and (< (+ x self.cx) (+ W w)) (> (+ x self.cx) (- w))) true false))
          
  :draw (fn draw [self]
          (local (W H) (push:getDimensions))
+         ;; set the sky translation lower then the normal translation
          (var sky_cx (* self.cx .2))
          (gr.translate sky_cx 0)
          (sky:draw)
+
+         ;; translate world using camera x 
          (gr.translate (- self.cx sky_cx) 0)
-         (self.ground:draw)
+         (self.ground:draw self)
          (var entities [self.player])
          (each [i tree (ipairs self.trees)]
-           (table.insert entities tree))
+           (when (self:checkVisible tree.x 200)
+             (table.insert entities tree)))
          (set entities (lume.sort entities :y))
          (each [i entity (ipairs entities)]
            (entity:draw))
+
+         ;; reset camera translation to draw HUD
          (gr.translate (- self.cx)  0)
          (HUD:draw self))
  :touch (fn touch [self x y dt]

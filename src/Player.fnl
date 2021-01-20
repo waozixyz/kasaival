@@ -6,8 +6,7 @@
 
 (var sprite nil)
 
-{:scale 1 :element "fire"
- :ow 31 :oh 175
+{:scale 1 :element "fire" :ow 31 :oh 175
  :getHitbox (fn getHitbox [self]
               (var w (* self.ow self.scale))
               (var h (* self.oh self.scale))

@@ -39,17 +39,23 @@
     (set b (- b 4))) 
   [r g b])
 
+(fn getTile [i v]
+  (if (= (% i 2) 0)
+    (values (- v.x (* v.w .5)) v.y v.x (- v.y v.h) (+ v.x (* v.w .5)) v.y)
+    (= (% i 2) 1)
+    (values v.x (- v.y v.h) (+ v.x (* v.w .5)) v.y (+ v.x v.w) (- v.y v.h))))
+
+
 (local rows 30)
 
-{:tiles [] 
+{:grid [] 
  :collide (fn collide [self obj]
             (local (l r u d) (obj:getHitbox))
-            (each [i v (ipairs self.tiles)]
-              (when (and (<= v.x r) (>= (+ v.x v.w) l) (<= (- v.y v.h) d) (>= v.y u))
-                (obj:collided (lume.getColor v.color .001))
-                (set v.color (burnTile v)))))
-
-
+            (each [i row (ipairs self.grid)]
+              (each [i v (ipairs row)]
+                (when (and (<= v.x r) (>= (+ v.x v.w) l) (<= (- v.y v.h) d) (>= v.y u))
+                  (obj:collided (lume.getColor v.color .001))
+                  (set v.color (burnTile v))))))
  :init (fn init [self g t]
          (local (W H) (push:getDimensions))
          (var y (/ H 3))
@@ -59,23 +65,24 @@
          (var h w)
 
          (var i 0)
-         (set self.tiles (or t.tiles []))
-         (when (= (length self.tiles) 0)
+         (set self.grid (or t.grid []))
+         (when (= (length self.grid) 0)
            (while (< y (+ H h))
+             (var row [])
              (set (w h) (values (+ w 1) (+ h 1)))
              (for [x (- (* g.width .5)) (- g.width (* g.width .5)) w]
                (var c (rndColor))
-               (table.insert self.tiles {:x x :y y :w w :h h :color c :orgColor c})
+               (table.insert row {:x x :y y :w w :h h :color c :orgColor c})
                (var c (rndColor))
-               (table.insert self.tiles {:x x :y y :w w :h h :color c :orgColor c})
+               (table.insert row {:x x :y y :w w :h h :color c :orgColor c})
                (set i (+ i 2)))
+             (table.insert self.grid row)
              (set y (+ y h)))))
- :draw (fn draw [self]
-         (each [i val (ipairs self.tiles)]
-           (set val.color (healTile val))
-           (gr.setColor (lume.getColor val.color .001))
-           (if (= (% i 2) 0)
-             (gr.polygon "fill" (- val.x (* val.w .5)) val.y val.x (- val.y val.h) (+ val.x (* val.w .5)) val.y)
-           (= (% i 2) 1)
-             (gr.polygon "fill" val.x (- val.y val.h) (+ val.x (* val.w .5)) val.y (+ val.x val.w) (- val.y val.h)))))
+ :draw (fn draw [self g]
+         (each [i row (ipairs self.grid)]
+           (each [i tile (ipairs row)]
+             (set tile.color (healTile tile))
+             (when (g:checkVisible tile.x tile.w) 
+               (gr.setColor (lume.getColor tile.color .001))
+               (gr.polygon "fill" (getTile i tile))))))
  :update (fn update [self dt])}
