@@ -12,7 +12,7 @@ Strange water creatures spawn and the climate is going more and more crazy over 
 How long can you survive?
 
 <center>
-[![](../assets/icon.png)](/uv/releases/Kasaival-0.1.3.love)
+[![](/assets/icon.png)](/uv/releases/Kasaival-0.1.3.love)
 </center>
 
 Make sure to install <a href="https://love2d.org" target="_blank">love2d</a> before opening the .love file!
