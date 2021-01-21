@@ -19,8 +19,6 @@
   (var co tile.orgColor)
   (var (r g b) (values (. c 1) (. c 2) (. c 3)))
   (var (ro go bo) (values (. co 1) (. co 2) (. co 3)))
-  (when (< g 100)
-      (set g (+ g 8)))
   (if (> r 800)
     (do
       (set r (- r 15))

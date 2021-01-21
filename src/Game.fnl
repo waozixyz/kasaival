@@ -7,7 +7,7 @@
 (local Music (require :src.Music))
 (local Player (require :src.Player))
 (local Saves (require :src.Saves))
-(local Sky (require :lib.Sky))
+(local Sky (require :src.Sky))
 (local Tree (require :src.Tree))
 
 
@@ -16,8 +16,6 @@
 (local ke love.keyboard)
 (local ma love.math)
 (local sy love.system)
-
-(local sky (Sky))
 
 ;;(var cg [ 200 300 500 700 200 300 ])
 ;;(var cb [ 200 300 300 500 500 600 ])
@@ -64,6 +62,7 @@
 
 (fn save [self]
   (var sav {})
+  (tset sav :sky (getProp self.sky))
   (tset sav :p (getProp self.player))
   (tset sav :g (getProp self.ground))
   (var t [])
@@ -116,8 +115,8 @@
          ;; this table is used to store all trees
          (set self.trees [])
 
-         ;; load player ground trees from savefile into here
-         (var (p g t) (values {} {} nil))
+         ;; load sky player ground trees from savefile into here
+         (var (sky p g t) (values {} {} {} nil))
          (when (fi.getInfo self.saveFile)
            (set t [])
            (var (contents size) (fi.read self.saveFile))
@@ -129,12 +128,18 @@
            (set self.treeTime (. sav :treeTime))
            ;; set the initiale camera x value
            (set self.cx (. save :cx))
+           ;; load sky
+           (set sky (. sav :sky))
            ;; load player
            (set p (. sav :p))
            ;; load ground
            (set g (. sav :g))
            ;; load trees
            (set t (. sav :t))) 
+
+         ;; load sky
+         (set self.sky (copy Sky))
+         (self.sky:init sky)
 
          ;; load ground
          (set self.ground (copy Ground))
@@ -160,12 +165,10 @@
  :draw (fn draw [self]
          (local (W H) (push:getDimensions))
          ;; set the sky translation lower then the normal translation
-         (var sky_cx (* self.cx .2))
-         (gr.translate sky_cx 0)
-         (sky:draw)
+         (self.sky:draw self.cx)
 
          ;; translate world using camera x 
-         (gr.translate (- self.cx sky_cx) 0)
+         (gr.translate self.cx 0)
          (self.ground:draw self)
          (var entities [self.player])
          (each [i tree (ipairs self.trees)]
@@ -263,8 +266,8 @@
                  (set self.player.xp (+ self.player.xp 10)) 
                  (set self.player.hp (+ self.player.hp 20))
                  (table.remove self.trees i)))
-             (self.ground:update dt)
              (self.ground:collide self.player)
+             (self.ground:update dt)
              (set self.usingTouchMove false)))
  :keypressed (fn keypressed [self key set-mode] 
                (HUD:keypressed self key)

@@ -54,7 +54,7 @@
         (set (self.x self.y) (values x y)))
  :update (fn update [self dt g]
            (if (> self.hp 2900)
-             (set self.hp (- self.hp 40))
+             (set self.hp (- self.hp 120))
              (> self.hp 2400)
              (set self.hp (- self.hp 20))
              (> self.hp 2000)
@@ -64,7 +64,7 @@
              (> self.hp 1600)
              (set self.hp (- self.hp 3))
              (> self.hp 1200)
-             (set self.hp (- self.hp 1))
+             (set self.hp (- self.hp 2))
              (> self.hp 900)
              (set self.hp (- self.hp 6))
              (> self.hp 800)
