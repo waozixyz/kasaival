@@ -267,7 +267,7 @@
                  (set self.player.hp (+ self.player.hp 20))
                  (table.remove self.trees i)))
              (self.ground:collide self.player)
-             (self.ground:update dt)
+             (self.ground:update dt self)
              (set self.usingTouchMove false)))
  :keypressed (fn keypressed [self key set-mode] 
                (HUD:keypressed self key)

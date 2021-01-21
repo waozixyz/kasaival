@@ -104,12 +104,14 @@
  :draw (fn draw [self g]
          (each [i row (ipairs self.grid)]
            (each [i tile (ipairs row)]
-             (set tile.color (healTile tile))
-             (if (< (- (+ tile.x g.cx) tile.w) (* g.width -.5))
-               (set tile.x (+ tile.x g.width))
-               (> (+ tile.x g.cx) (* g.width .5))
-               (set tile.x (- tile.x g.width)))
              (when (g:checkVisible tile.x tile.w) 
                (gr.setColor (lume.getColor tile.color .001))
                (gr.polygon "fill" (getTile i tile))))))
- :update (fn update [self dt])}
+ :update (fn update [self dt g]
+           (each [i row (ipairs self.grid)]
+             (each [i tile (ipairs row)]
+               (set tile.color (healTile tile))
+               (if (< (- (+ tile.x g.cx) tile.w) (* g.width -.5))
+                 (set tile.x (+ tile.x g.width))
+                 (> (+ tile.x g.cx) (* g.width .5))
+                 (set tile.x (- tile.x g.width))))))}
