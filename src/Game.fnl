@@ -38,8 +38,8 @@
   (set y (+ (/ H 3) (* y rat_x)))
 
 
-  (var w (* (ma.random 14 16) scale))
-  (var h (* (ma.random 32 52) scale))
+  (var w (* (ma.random 22 33) scale))
+  (var h (* (ma.random 42 52) scale))
   
   ;; copy the table template of Tree
   (table.insert self.trees (copy Tree))
@@ -247,6 +247,11 @@
              ;; update functions
              (self.player:update dt self)
              (each [i tree (ipairs self.trees)]
+               (if (< (+ tree.x self.cx) (* self.width -.5))
+                 (set tree.x (+ tree.x self.width))
+                 (> (+ tree.x self.cx) (* self.width .5))
+                 (set tree.x (- tree.x self.width)))
+
                ;; check tree collisions with player
                (when (checkCollision tree self.player)
                  (self.player:collided tree.element)

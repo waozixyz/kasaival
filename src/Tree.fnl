@@ -80,8 +80,8 @@
          (var currentStage (or t.currentStage 0))
          (var w (or t.w 12))
          (var h (or t.h 32))
-         (var p [self.x  self.y]) ;; prev coord
-         (var n [self.x (- self.y h)]) ;; next coori
+         (var p [0  self.y]) ;; prev coord
+         (var n [0 (- self.y h)]) ;; next coori
          (var branch {:deg -90 :p p :n n :w w :h h :color (rndColor self.colorScheme)})
          (if (and t.branches (> (length t.branches) 0))
            (set self.branches t.branches)
@@ -90,6 +90,7 @@
            (grow self)))
 
  :draw (fn draw [self]
+         (local x self.x)
          (local l (length self.branches))
          (when (> l 0)
            (each [i val (ipairs self.branches)]
@@ -99,6 +100,7 @@
                (when (= i l)
                  (set nx (+ px (/ (- nx px) (/ self.growTime self.elapsed))))
                  (set ny (+ py (/ (- ny py) (/ self.growTime self.elapsed)))))
+               (set (px nx) (values (+ x px) (+ x nx)))
                (gr.setColor (getColor val.color))
                (gr.setLineWidth (* val.w self.scale))
                (gr.line px py nx ny)))))
