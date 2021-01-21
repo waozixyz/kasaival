@@ -23,7 +23,7 @@ button:hover, input[type="submit"]:hover {
   color: #ffd0d7;
 }
 
-textarea, input[type="text"], input[type="input"] {
+textarea, input[type="text"], input[type="input"], input[type="password"] {
   color: #ffd0d7;
   background-color: #886384;
 

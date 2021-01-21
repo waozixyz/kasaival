@@ -19,25 +19,32 @@
   (var co tile.orgColor)
   (var (r g b) (values (. c 1) (. c 2) (. c 3)))
   (var (ro go bo) (values (. co 1) (. co 2) (. co 3)))
+  (when (< g 100)
+      (set g (+ g 8)))
   (if (> r 800)
     (do
-      (set r (- r 12))
-      (set g (- g 7))
+      (set r (- r 15))
+      (set g (- g 8))
       (set b (- b 6)))
     (> r 700)
     (do
-      (set r (- r 7))
-      (set g (- g 5))
-      (set b (- b 3))) 
+      (set r (- r 10))
+      (set g (- g 8))
+      (set b (- b 6))) 
+    (> r 600)
+    (do
+      (set r (- r 5))
+      (set g (- g 7))
+      (set b (- b 4))) 
     (> r 500)
     (do
       (set r (- r 2))
       (set g (- g 4))
-      (set b (- b 1)))
+      (set b (- b 1))))
     (do 
       (set r (+ r (balanceColor r ro)))
       (set g (+ g (balanceColor g go)))
-      (set b (+ b (balanceColor b bo)))))
+      (set b (+ b (balanceColor b bo))))
   [r g b])
 
 (fn burnTile [tile]
@@ -48,11 +55,11 @@
     (< r 500) 
     (set r (+ r 120))
     (< r 600) 
-    (set r (+ r 50))
+    (set r (+ r 80))
     (< r 700) 
-    (set r (+ r 30))
+    (set r (+ r 50))
     (< r 800) 
-    (set r (+ r 10)))
+    (set r (+ r 30)))
   [r g b])
 
 (fn getTile [i v]
