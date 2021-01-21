@@ -94,7 +94,7 @@
 {:init (fn init [self saveFile]
          ;; seth the game width
          (local (W H) (push:getDimensions))
-         (set self.width (* W 2))
+         (set self.width (* W 3))
          (set self.elapsed 0)
          (set self.muted true)
          (set self.treeTime 0)

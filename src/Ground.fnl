@@ -9,34 +9,50 @@
   (var b (ma.random 100 400))
   [r g b])
 
+
+(fn balanceColor [c co]
+  (local d (- co c))
+  (if (> d 0) 1 (< d 0) -1 0))
+
 (fn healTile [tile]
   (var c tile.color)
   (var co tile.orgColor)
   (var (r g b) (values (. c 1) (. c 2) (. c 3)))
   (var (ro go bo) (values (. co 1) (. co 2) (. co 3)))
-  (when (~= r ro)
-    (set r (+ r (math.floor (* (- ro r) .004))))) 
-  (when (~= g go)
-    (set g (+ g (math.ceil (* (- go g) .002))))) 
-  (when (~= b bo)
-    (set b (+ b (math.ceil (* (- bo b) .001))))) 
+  (if (> r 800)
+    (do
+      (set r (- r 12))
+      (set g (- g 7))
+      (set b (- b 6)))
+    (> r 700)
+    (do
+      (set r (- r 7))
+      (set g (- g 5))
+      (set b (- b 3))) 
+    (> r 500)
+    (do
+      (set r (- r 2))
+      (set g (- g 4))
+      (set b (- b 1)))
+    (do 
+      (set r (+ r (balanceColor r ro)))
+      (set g (+ g (balanceColor g go)))
+      (set b (+ b (balanceColor b bo)))))
   [r g b])
 
 (fn burnTile [tile]
   (var c tile.color)
   (var (r g b) (values (. c 1) (. c 2) (. c 3)))
   (if (< r 300)
-    (set r (+ r 100))
+    (set r (+ r 170))
+    (< r 500) 
+    (set r (+ r 120))
     (< r 600) 
-    (set r (+ r 80))
+    (set r (+ r 50))
     (< r 700) 
     (set r (+ r 30))
     (< r 800) 
-    (set r (+ r 20)))
-  (when (> g 50)
-    (set g (- g 14))) 
-  (when (> b 200)
-    (set b (- b 4))) 
+    (set r (+ r 10)))
   [r g b])
 
 (fn getTile [i v]
@@ -54,7 +70,9 @@
             (each [i row (ipairs self.grid)]
               (each [i v (ipairs row)]
                 (when (and (<= v.x r) (>= (+ v.x v.w) l) (<= (- v.y v.h) d) (>= v.y u))
+                  ;; give object actual color
                   (obj:collided (lume.getColor v.color .001))
+                  ;; burn the tile
                   (set v.color (burnTile v))))))
  :init (fn init [self g t]
          (local (W H) (push:getDimensions))
@@ -82,6 +100,10 @@
          (each [i row (ipairs self.grid)]
            (each [i tile (ipairs row)]
              (set tile.color (healTile tile))
+             (if (< (- (+ tile.x g.cx) tile.w) (* g.width -.5))
+               (set tile.x (+ tile.x g.width))
+               (> (+ tile.x g.cx) (* g.width .5))
+               (set tile.x (- tile.x g.width)))
              (when (g:checkVisible tile.x tile.w) 
                (gr.setColor (lume.getColor tile.color .001))
                (gr.polygon "fill" (getTile i tile))))))
