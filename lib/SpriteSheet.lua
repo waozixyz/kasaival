@@ -6,7 +6,7 @@ local Animation={}
 Animation.__index=Animation
 
 function Animation.new(spritesheet)
-  local obj={parent=spritesheet, name=name, frames={}, currentFrame=0, delay=0.1, playing=true, elapsed=0}
+  local obj={parent=spritesheet, frames={}, currentFrame=0, delay=0.1, playing=true, elapsed=0}
   return setmetatable(obj, Animation)
 end
 

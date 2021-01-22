@@ -676,12 +676,6 @@ function lume.getColor(color, decimal)
     return {color[1] * decimal, color[2] * decimal, color[3] * decimal}
 end
 
-
-
-function lume.chain(value)
-  return setmetatable({ _value = value }, chain_mt)
-end
-
 setmetatable(lume,  {
   __call = function(_, ...)
     return lume.chain(...)

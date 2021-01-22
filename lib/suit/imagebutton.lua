@@ -28,14 +28,6 @@ return function(core, normal, ...)
 			return false
 		end
 
-		if opt.mask then
-			-- alpha test
-			assert(isType(opt.mask, "ImageData"), "Option `mask` is not a love.image.ImageData")
-			assert(u < mask:getWidth() and v < mask:getHeight(), "Mask may not be smaller than image.")
-			local _,_,_,a = mask:getPixel(u,v)
-			return a > 0
-		end
-
 		return true
 	end)
 

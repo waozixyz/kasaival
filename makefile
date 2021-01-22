@@ -2,7 +2,7 @@ VERSION=0.1.4
 LOVE_VERSION=11.3
 NAME=Kasaival
 ITCH_ACCOUNT=waotzi
-URL="https://code.habd.as/wolfi/Kasaival"
+URL="https://kasaival.rocks"
 AUTHOR="Wolfi"
 DESCRIPTION="Survival adventure game. Out of nowhere you have come to exist. The fire is burning inside you, but you feel it diminishing. Stay alive as long as you can! Do whatever it takes to keep your flame burning!"
 
