@@ -1,4 +1,3 @@
 releases/*
 .swp
-appimage/*
 appimage/squashfs-root/*

@@ -10,23 +10,15 @@ DESCRIPTION="Survival adventure game. Out of nowhere you have come to exist. The
 ASSETS := $(wildcard assets/*)
 LIBS := $(wildcard lib/*)
 LUA := $(wildcard *.lua)
-SRC := $(wildcard src/*.fnl)
-OUT := $(patsubst %.fnl,%.lua,$(SRC))
+SRC := $(wildcard src/*)
 
-run: $(OUT) ; love .
+run: love .
 
-count: ; cloc *.fnl --force-lang=clojure
-
-clean: ; rm -rf releases/* $(OUT)
-
-cleansrc: ; rm -rf $(OUT)
-
-
-%.lua: %.fnl; lua5.3 lib/fennel --compile --correlate $< > $@
+clean: ; rm -rf releases/* 
 
 LOVEFILE=releases/$(NAME)-$(VERSION).love
 
-$(LOVEFILE): $(LUA) $(OUT) $(LIBS) $(ASSETS)
+$(LOVEFILE): $(LUA) $(SRC) $(LIBS) $(ASSETS)
 	mkdir -p releases/
 	find $^ -type f | LC_ALL=C sort | env TZ=UTC zip -r -q -9 -X $@ -@
 
