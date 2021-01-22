@@ -22,7 +22,7 @@ local function play(self)
 end
 return {
     dir = "assets/music/",
-    ext = ".mp3",
+    ext = ".ogg",
     mute = mute,
     play = play,
     songAuthor = "TeknoAXE",
