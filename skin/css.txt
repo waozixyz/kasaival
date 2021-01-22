@@ -194,7 +194,7 @@ pre.verbatim {
 table.report {
   border: none;
   margin: 1em 0;
-  color: #b10156;
+  color: #a151a6;
 }
 td {
   padding: .5em;
@@ -204,4 +204,8 @@ select {
   border: none;
   color: #ffd0d7;
   background-color: #886384;
+}
+.timelineModernCell, .timelineTable, .timelineVerboseCell, .timelineTime, .timelineGraph, .timelineClassicCell, .timelineColumnarCell, .timelineDetailCell {
+  color: #ffd0d7 !important;
+  background-color: #171526 !important;
 }
