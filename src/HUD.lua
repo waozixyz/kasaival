@@ -23,12 +23,12 @@ local function draw(self, game)
     local W, H = push:getDimensions()
     local hp = game.player.hp
     local alpha = (1 / (hp / 170) - 1)
+
     if alpha > .4 then alpha = .4 end
-
     gr.setColor(.2, 0, 0, alpha)
-    gr.rectangle("fill", 0, 0, W, H)
-    gr.rectangle("fill", 0, 0, W, H)
-
+    if (math.floor(hp / 10) % 2 == 1) then
+        gr.rectangle("fill", 0, 0, W, H)
+    end
     if (hp <= 0) then
         gr.setFont(self.bigFont)
         gr.setColor(0, 0, 0, 0.5)
@@ -36,6 +36,13 @@ local function draw(self, game)
         gr.setColor(.6, 0, .3)
         drawText("GameOver", self.bigFont, self.fontSize, 0, 0)
         drawText("touch anywhere or press any key to try again", self.bigFont, self.fontSize, 0, self.fontSize)
+    elseif (game.paused == true) then
+        gr.setFont(self.bigFont)
+        gr.setColor(1, 1, 1, 0.5)
+        gr.rectangle("fill", 0, 0, W, H)
+        gr.setColor(.6, 0, .3)
+        drawText("Game Paused", self.bigFont, self.fontSize, 0, 0)
+        drawText("touch anywhere or press any key to unpause", self.bigFont, self.fontSize, 0, self.fontSize)
     end
 
     if Music.songTitle then
@@ -65,7 +72,7 @@ local function keypressd(self, game, key, set_mode)
     if (key == "kp-") then Music.bgm:setVolume(Music.bgm:getVolume() - .1) end
     if (key == "n") then Music.bgm:stop() end
     if (key == "m") then game.muted = toggle(game.muted) end
-    if (key == "p" or key == "pause") then game.paused = toggle(game.paused) end
+    if (key == "p" or key == "pause" or key == "space") then game.paused = toggle(game.paused) end
     if (key == "escape") then game.paused = true game.exit = true end
 end
 local function update(self, game)
