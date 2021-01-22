@@ -52,7 +52,7 @@ function Layout:push(x,y)
 		self._heights,
 	}
 
-	return self:reset(x,y, padx or self._padx, pady or self._pady)
+	return self:reset(x,y, self._padx, self._pady)
 end
 
 function Layout:pop()

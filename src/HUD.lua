@@ -5,15 +5,8 @@ local Cursor = require("src.Cursor")
 local Music = require("src.Music")
 
 local gr = love.graphics
-local mo = love.mouse
 
-local function toggle(val)
-    if val then
-        return false
-    else
-        return true
-    end
-end
+local function toggle(val) if val then return false else return true end end
 
 local function drawText(text, font, size, xpad, ypad)
     local W, H = push:getDimensions()
@@ -23,7 +16,7 @@ local function drawText(text, font, size, xpad, ypad)
     local w = font:getWidth(text)
 
     gr.setFont(font)
-    return gr.print(text, (((W * 0.5) - (w * 0.5)) + xpad0), ((H * 0.5) + ypad0))
+    gr.print(text, (((W * 0.5) - (w * 0.5)) + xpad0), ((H * 0.5) + ypad0))
 end
 
 local function draw(self, game)
@@ -57,7 +50,7 @@ local function init(self)
     Cursor:init()
     self.fontSize = 48
     self.bigFont = gr.newFont("assets/fonts/hintedSymbola.ttf", self.fontSize)
-    self.font = gr.newFont("assets/fonts/hintedSymbola.ttf", 20)
+    self.font = gr.newFont("assets/fonts/hintedSymbola.ttf", 32)
     self.exit = gr.newImage("assets/icons/exit.png")
     self.resume = gr.newImage("assets/icons/resume.png")
     self.pause = gr.newImage("assets/icons/pause.png")

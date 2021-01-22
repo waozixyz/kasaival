@@ -13,15 +13,11 @@ Testing = true
 
 local mode = require("src.Menu")
 
-if Testing then
-    mode = require("src.Game")
-end
+if Testing then mode = require("src.Game") end
 
 local function set_mode(mode_name, ...)
     mode = require(mode_name)
-    if mode.init then
-        return mode:init(...)
-    end
+    if mode.init then mode:init(...) end
 end
 
 local uiTheme = {
@@ -38,10 +34,12 @@ local uiTheme = {
 
 function love.load()
     local fullscreen = false
-    local resizable = false
+    local resizable = true
     local windowWidth, windowHeight = 1200, 675
     if ((sy.getOS() == "Android") or (sy.getOS() == "iOS")) then
-        local windowWidth0, windowHeight0 = gr.getDimensions()
+        fullscreen = true
+        resizable = false
+        windowWidth, windowHeight = gr.getDimensions()
     end
     push:setupScreen(
         gameWidth,
@@ -51,14 +49,14 @@ function love.load()
         {fullscreen = fullscreen, highdpi = true, resizable = resizable}
     )
     suit.theme.color = uiTheme
-    return mode:init()
+    mode:init()
 end
 
 function love.resize(w, h)
     if mode.resize then
         mode:resize()
     end
-    return push:resize(w, h)
+    push:resize(w, h)
 end
 
 function love.draw()
@@ -67,7 +65,7 @@ function love.draw()
     mode:draw()
     gr.setColor(1, 1, 1)
     suit.draw()
-    return push:finish()
+    push:finish()
 end
 
 function love.update(dt)
@@ -92,15 +90,15 @@ function love.update(dt)
             end
         end
     end
-    return mode:update(dt, set_mode)
+    mode:update(dt, set_mode)
 end
 
 function love.keypressed(key)
     if ((key == "f") or (key == "f11")) then
-        return push:switchFullscreen()
+        push:switchFullscreen()
     elseif (ke.isDown("lctrl", "rctrl", "capslock") and (key == "q")) then
-        return ev.quit()
+        ev.quit()
     else
-        return mode:keypressed(key, set_mode)
+        mode:keypressed(key, set_mode)
     end
 end
