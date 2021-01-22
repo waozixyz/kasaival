@@ -1,5 +1,4 @@
 releases/*
-src/*.lua
 .swp
 appimage/*
 appimage/squashfs-root/*
