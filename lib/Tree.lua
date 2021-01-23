@@ -32,7 +32,7 @@ local function grow(self)
             table.insert(new, getLine(v.n, (v.deg + ma.random(-10, 10)), w, h, self.colorScheme))
         end
     end
-    return table.insert(self.branches, new)
+    table.insert(self.branches, new)
 end
 
 local function shrink(self)
@@ -53,7 +53,7 @@ local function collided(self, element)
                     b = b - .02
                 end
                 v.color = {r, g, b}
-                self.hp = self.hp - (1 / (self.hp * .3))
+                self.hp = self.hp - .1
             end
         end
     end
@@ -124,16 +124,12 @@ local function update(self, dt)
             end
         end
     elseif (l > 0) then
-        if (l > (self.hp / l)) then
+
+        if (l > (self.hp / self.stages)) then self.collapseTime = self.collapseTime + 1 end
+        if l < 5 then self.collapseTime = self.collapseTime + dt end
+        if self.collapseTime > self.growTime then
             shrink(self)
-        else
-            if (l < 5) then
-                self.collapseTime = (self.collapseTime + dt)
-                if self.collapseTime > self.growTime then
-                    shrink(self)
-                    self.collapseTime = 0
-                end
-            end
+            self.collapseTime = 0
         end
 
         for _, row in ipairs(self.branches) do
