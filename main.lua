@@ -68,28 +68,16 @@ function love.draw()
     push:finish()
 end
 
+
 function love.update(dt)
     local x, y = push:toGame(mo.getPosition())
     x = (x or 0)
     y = (y or 0)
     suit.updateMouse(x, y)
-    if mode.touch then
-        local touches = to.getTouches()
-        if (#touches > 0) then
-            for i, v in ipairs(touches) do
-                local x0, y0 = push:toGame(mo.getPosition(v))
-                if (x0 and y0) then
-                    mode:touch(x0, y0, dt)
-                end
-            end
-        end
-        if mo.isDown(1) then
-            local x0, y0 = push:toGame(mo.getPosition())
-            if (x0 and y0) then
-                mode:touch(x0, y0, dt)
-            end
-        end
+    if mo.isDown(1) then
+        mode:touch(x, y, dt)
     end
+    
     mode:update(dt, set_mode)
 end
 

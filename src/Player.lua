@@ -28,7 +28,7 @@ local function init(self, sav)
     self.xp = (sav.xp or 0)
     self.hp = (sav.hp or 200)
     self.lvl = (sav.lvl or 0)
-    self.speed = (sav.speed or 300)
+    self.speed = (sav.speed or 10)
     local S = SpriteSheet("assets/flame/spr_2.png", self.ow, self.oh)
     local a = S:createAnimation()
     for row = 1, 4 do
@@ -46,7 +46,7 @@ end
 
 local function move(self, dx, dy, g, dt)
     local W, H = push:getDimensions()
-    local s = (self.speed * self.scale * dt)
+    local s = self.speed * self.scale * dt * 20
     local dx0, dy0 = (dx * s), (dy * s)
     local x, y = (self.x + dx0), (self.y + dy0)
     if ((x + g.cx) < (W / 4)) then
