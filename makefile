@@ -6,7 +6,6 @@ URL="https://kasaival.rocks"
 AUTHOR="Wolfi"
 DESCRIPTION="Survival adventure game. Out of nowhere you have come to exist. The fire is burning inside you, but you feel it diminishing. Stay alive as long as you can! Do whatever it takes to keep your flame burning!"
 
-
 ASSETS := $(wildcard assets/*)
 LIBS := $(wildcard lib/*)
 LUA := $(wildcard *.lua)
@@ -29,7 +28,7 @@ love: $(LOVEFILE)
 
 REL=$(PWD)/love-release.sh # https://p.hagelb.org/love-release.sh
 FLAGS=-a "$(AUTHOR)" --description $(DESCRIPTION) \
-	--love $(LOVE_VERSION) --url $(URL) --version $(VERSION) --lovefile $(LOVEFILE)
+	--love $(LOVE_VERSION) --url $(URL) -v $(VERSION) --lovefile $(LOVEFILE) 
 
 releases/$(NAME)-$(VERSION)-x86_64.AppImage: $(LOVEFILE)
 	cd appimage && ./build.sh $(LOVE_VERSION) $(PWD)/$(LOVEFILE)
@@ -43,9 +42,14 @@ releases/$(NAME)-$(VERSION)-win.zip: $(LOVEFILE)
 	$(REL) $(FLAGS) -W32
 	mv releases/$(NAME)-win32.zip $@
 
+releases/$(NAME)-$(VERSION).apk: $(LOVEFILE)
+	$(REL) $(FLAGS) -A
+	mv releases/$(NAME)-aligned-debugSigned.apk $@
+
 linux: releases/$(NAME)-$(VERSION)-x86_64.AppImage
 mac: releases/$(NAME)-$(VERSION)-macos.zip
 windows: releases/$(NAME)-$(VERSION)-win.zip
+android: releases/$(NAME)-$(VERSION).apk
 
 # If you release on itch.io, you should install butler:
 # https://itch.io/docs/butler/installing.html

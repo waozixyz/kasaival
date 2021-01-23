@@ -342,7 +342,7 @@ init_module () {
     MODULE="$1"
     CACHE_DIR="$CACHE_DIR/$2"
     read_options "$3"
-    LOVE_FILE="${TITLE}.love"
+    LOVE_FILE="${TITLE}-${GAME_VERSION}.love"
     mkdir -p "$RELEASE_DIR" "$CACHE_DIR"
     echo "Generating $TITLE with LÖVE $LOVE_VERSION for ${MODULE}..."
     return 0
@@ -448,110 +448,55 @@ if [[ $EMBEDDED == true ]]; then
 # Android debug package
 init_module "Android" "android" "A"
 OPTIONS="A"
-LONG_OPTIONS="activity:,update"
-
-
-IDENTITY=$(echo $TITLE | sed -e 's/[^-a-zA-Z0-9_]/-/g' | tr '[:upper:]' '[:lower:]')
-ACTIVITY=$(echo $TITLE | sed -e 's/[^a-zA-Z0-9_]/_/g')
-
-
-# Options
-while true; do
-    case "$1" in
-        --Aactivity ) ACTIVITY="$2"; shift 2 ;;
-        --Aupdate )   UPDATE_ANDROID=true; shift ;;
-        -- ) break ;;
-        * ) shift ;;
-    esac
-done
-
-
-# Android
-missing_info=false
-missing_deps=false
-error_msg="Could not build Android package."
-if ! command -v git > /dev/null 2>&1; then
-    missing_deps=true
-    error_msg="$error_msg\ngit was not found."
-fi
-if ! command -v ndk-build > /dev/null 2>&1; then
-    missing_deps=true
-    error_msg="$error_msg\nndk-build was not found."
-fi
-if ! command -v ant > /dev/null 2>&1; then
-    missing_deps=true
-    error_msg="$error_msg\nant was not found."
-fi
-if [[ $missing_deps == true  ]]; then
-    exit_module "deps" "$error_msg"
-fi
-
-if [[ -z $GAME_VERSION ]]; then
-    missing_info=true
-    error_msg="$error_msg\nMissing project's version. Use -v or --Aversion."
-fi
-if [[ -z $AUTHOR ]]; then
-    missing_info=true
-    error_msg="$error_msg\nMissing maintainer's name. Use -a or --Aauthor."
-fi
-if [[ $missing_info == true  ]]; then
-    exit_module "options" "$error_msg"
-fi
-
 
 create_love_file 0
 
 
-LOVE_ANDROID_DIR="$CACHE_DIR/love-android-sdl2"
-if [[ -d $LOVE_ANDROID_DIR ]]; then
-    cd "$LOVE_ANDROID_DIR"
-    git checkout -- .
-    rm -rf src/com bin gen
-    if [[ $UPDATE_ANDROID = true ]]; then
-        LOCAL=$(git rev-parse @)
-        REMOTE=$(git rev-parse @{u})
-        BASE=$(git merge-base @ @{u})
-        if [[ $LOCAL == $REMOTE ]]; then
-            echo "love-android-sdl2 is already up-to-date."
-        elif [[ $LOCAL == $BASE ]]; then
-            git pull
-            ndk-build --jobs $(( $(nproc) + 1))
-        fi
-    fi
-else
-    cd "$CACHE_DIR"
-    git clone https://bitbucket.org/MartinFelis/love-android-sdl2.git
-    cd "$LOVE_ANDROID_DIR"
-    ndk-build --jobs $(( $(nproc) + 1))
+LOVE_ANDROID_DIR="$CACHE_DIR/love_decoded"
+
+cd "$CACHE_DIR"
+if [[ ! -f "love-11.3-android-embed.apk" ]];then
+    wget "https://github.com/love2d/love/releases/download/11.3/love-11.3-android-embed.apk"
 fi
 
-ANDROID_VERSION=$(grep -Eo -m 1 "[0-9]+.[0-9]+.[0-9]+[a-z]*" "$LOVE_ANDROID_DIR"/AndroidManifest.xml)
+if [[ ! -f "uber-apk-signer.jar" ]];then
+    wget "https://github.com/patrickfav/uber-apk-signer/releases/download/v1.2.1/uber-apk-signer-1.2.1.jar"
+    mv "uber-apk-signer-1.2.1.jar" "uber-apk-signer.jar"
+fi
+
+if [[ ! -d $LOVE_ANDROID_DIR ]]; then
+    cd "$LOVE_ANDROID_DIR"
+    apktool d -s -o love_decoded love-11.3-android-embed.apk
+fi
+
+ANDROID_VERSION=$(grep -Eo -m 1 "[0-9]+.[0-9]+.[0-9]+[a-z]*" "$PROJECT_DIR"/AndroidManifest.xml)
 ANDROID_LOVE_VERSION=$(echo "$ANDROID_VERSION" | grep -Eo "[0-9]+.[0-9]+.[0-9]+")
 
-if [[ "$LOVE_VERSION" != "$ANDROID_LOVE_VERSION" ]]; then
-    exit_module 1 "Love version ($LOVE_VERSION) differs from love-android-sdl2 version ($ANDROID_LOVE_VERSION). Could not create package."
+if [[ "$GAME_VERSION" != "$ANDROID_LOVE_VERSION" ]]; then
+    exit_module 1 "Love version ($GAME_VERSION) differs from android version ($ANDROID_LOVE_VERSION). Could not create package."
 fi
 
-mkdir -p assets
+mkdir -p "$LOVE_ANDROID_DIR"/assets
 cd "$PROJECT_DIR"
 cd "$RELEASE_DIR"
 cp "$LOVE_FILE" "$LOVE_ANDROID_DIR/assets/game.love"
-cd "$LOVE_ANDROID_DIR"
+cd "$PROJECT_DIR"
+cp "AndroidManifest.xml" "$LOVE_ANDROID_DIR"
 
-sed -i.bak -e "s/org.love2d.android/com.${AUTHOR}.${IDENTITY}/" \
-    -e "s/$ANDROID_VERSION/${ANDROID_VERSION}-${IDENTITY}-v${GAME_VERSION}/" \
-    -e "0,/LÖVE for Android/s//$TITLE $GAME_VERSION/" \
-    -e "s/LÖVE for Android/$TITLE/" \
-    -e "s/GameActivity/$ACTIVITY/" \
-    AndroidManifest.xml
+# sed -i.bak -e "s/org.love2d.android/rocks.${IDENTITY}/" \
+#    -e "s/$ANDROID_VERSION/${ANDROID_VERSION}-${IDENTITY}-v${GAME_VERSION}/" \
+#    -e "0,/LÖVE for Android/s//$TITLE $GAME_VERSION/" \
+#    -e "s/LÖVE for Android/$TITLE/" \
+#    -e "s/GameActivity/$ACTIVITY/" \
+#    AndroidManifest.xml
 
-mkdir -p "src/com/$AUTHOR/$IDENTITY"
-cat > "src/com/$AUTHOR/$IDENTITY/${ACTIVITY}.java" <<EOF
-package com.${AUTHOR}.${IDENTITY};
-import org.love2d.android.GameActivity;
+cd "$PROJECT_DIR/assets"
+cp "icon.png" "$LOVE_ANDROID_DIR/res/drawable-xxxhdpi/love.png"
+cp "icon.png" "$LOVE_ANDROID_DIR/res/drawable-xxhdpi/love.png"
+cp "icon.png" "$LOVE_ANDROID_DIR/res/drawable-xhdpi/love.png"
+cp "icon.png" "$LOVE_ANDROID_DIR/res/drawable-mdpi/love.png"
+cp "icon.png" "$LOVE_ANDROID_DIR/res/drawable-hdpi/love.png"
 
-public class $ACTIVITY extends GameActivity {}
-EOF
 
 if [[ -d "$ICON" ]]; then
     cd "$PROJECT_DIR"
@@ -591,13 +536,11 @@ if [[ -d "$ICON" ]]; then
     cd "$LOVE_ANDROID_DIR"
 fi
 
-
-ant debug
-cd "$PROJECT_DIR"
-cp "$LOVE_ANDROID_DIR/bin/love_android_sdl2-debug.apk" "$RELEASE_DIR"
-git checkout -- .
-rm -rf src/com bin gen
-
+cd "$LOVE_ANDROID_DIR"
+apktool b -o "$TITLE-unsigned.apk" 
+mv "$TITLE-unsigned.apk" "$CACHE_DIR"
+cd "$CACHE_DIR"
+java -jar uber-apk-signer.jar --apks $TITLE-unsigned.apk --out "$PROJECT_DIR/$RELEASE_DIR"
 
 exit_module
 EndOfModule

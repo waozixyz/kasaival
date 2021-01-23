@@ -2,3 +2,4 @@ releases/*
 .swp
 appimage/squashfs-root/*
 appimage/*
+love_decoded/*
