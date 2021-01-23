@@ -6,8 +6,8 @@ local gr = love.graphics
 local sprite = nil
 
 local function collided(self, oc, f)
-    if (type(oc) == "table") then self.hp = (self.hp + (oc[2] - oc[3])) end
-    if (oc == "plant") then self.hp = (self.hp + .5) end
+    if (type(oc) == "table") then self.hp = (self.hp + (oc[2] - oc[3]) * .5) end
+    if (oc == "plant") then self.hp = (self.hp + .2) end
 end
 
 local function getHitbox(self)
@@ -62,19 +62,21 @@ local function move(self, dx, dy, g, dt)
     self.x, self.y = x, y
 end
 
-local function update(self, dt, g)
+local function update(self, dt)
     if (self.hp > 260) then
         self.hp = self.hp - 15
     elseif (self.hp > 240) then
-        self.hp = self.hp - 3
+        self.hp = self.hp - 2
     elseif (self.hp > 220) then
-        self.hp = self.hp - .8
-    elseif (self.hp > 170) then
-        self.hp = self.hp - .5
-    elseif (self.hp > 120) then
         self.hp = self.hp - .4
+    elseif (self.hp > 170) then
+        self.hp = self.hp - .3
+    elseif (self.hp > 120) then
+        self.hp = self.hp - .2
     elseif (self.hp > 70) then
-        self.hp = self.hp - .8
+        self.hp = self.hp - .5
+    elseif (self.hp > 50) then
+        self.hp = self.hp - 1
     elseif (self.hp > 30) then
         self.hp = self.hp - 3
     else

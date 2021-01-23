@@ -3,20 +3,20 @@ local lume = require("lib.lume")
 local push = require("lib.push")
 local serpent = require("lib.serpent")
 
-local Ground = require("src.Ground")
-local HUD = require("src.HUD")
-local Music = require("src.Music")
-local Player = require("src.Player")
-local Saves = require("src.Saves")
-local Sky = require("src.Sky")
-local Tree = require("src.Tree")
+local Ground = require("lib.Ground")
+local HUD = require("lib.HUD")
+local Music = require("lib.Music")
+local Player = require("lib.Player")
+local Saves = require("lib.Saves")
+local Sky = require("lib.Sky")
+local Tree = require("lib.Tree")
 
 local fi = love.filesystem
 local gr = love.graphics
 local ke = love.keyboard
 local ma = love.math
 
-local function addTree(self, completeTree)
+local function addTree(self, randStage)
     local H = push:getHeight()
 
     local y = ma.random(0, H - self.height)
@@ -38,8 +38,8 @@ local function addTree(self, completeTree)
     local tree = self.trees[#self.trees]
     local maxStage = ma.random(8, 10)
     local currentStage = nil
-    if completeTree then currentStage = maxStage else currentStage = 0 end
-    local growTime = ma.random(0.5, 1)
+    if randStage then currentStage = ma.random(0, maxStage) else currentStage = 0 end
+    local growTime = ma.random(1, 3)
     local cs1 = {.5, .7, .2, .4, .2, .3}
     local cs2 = {.3, .4, .4, .6, .2, .3}
     local cs3 = {.3, .5, .2, .4, .3, .5}
@@ -232,10 +232,10 @@ local function update(self, dt, set_mode)
         do
         end
         Music.bgm:pause()
-        set_mode("src.Menu")
+        set_mode("lib.Menu")
     end
     if self.restart then
-        set_mode("src.Game")
+        set_mode("lib.Game")
     end
     if (self.exit and not self.readyToExit) then
         if Testing then
@@ -280,7 +280,7 @@ local function update(self, dt, set_mode)
             tree:update(dt)
             if (#tree.branches < 1) then
                 self.player.xp = (self.player.xp + 10)
-                self.player.hp = (self.player.hp + 2)
+                self.player.hp = (self.player.hp + 1)
                 table.remove(self.trees, i)
             end
         end

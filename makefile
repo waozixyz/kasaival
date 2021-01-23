@@ -9,7 +9,6 @@ DESCRIPTION="Survival adventure game. Out of nowhere you have come to exist. The
 ASSETS := $(wildcard assets/*)
 LIBS := $(wildcard lib/*)
 LUA := $(wildcard *.lua)
-SRC := $(wildcard src/*)
 
 run: love .
 
@@ -17,7 +16,7 @@ clean: ; rm -rf releases/*
 
 LOVEFILE=releases/$(NAME)-$(VERSION).love
 
-$(LOVEFILE): $(LUA) $(SRC) $(LIBS) $(ASSETS)
+$(LOVEFILE): $(LUA) $(LIBS) $(ASSETS)
 	mkdir -p releases/
 	find $^ -type f | LC_ALL=C sort | env TZ=UTC zip -r -q -9 -X $@ -@
 

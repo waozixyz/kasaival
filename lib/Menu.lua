@@ -1,7 +1,7 @@
 local push = require("lib.push")
 local suit = require("lib.suit")
-local Bckg = require("src.Bckg")
-local Cursor = require("src.Cursor")
+local Bckg = require("lib.Bckg")
+local Cursor = require("lib.Cursor")
 
 local gr = love.graphics
 local ev = love.event
@@ -20,7 +20,7 @@ local function keypressed(self, key, set_mode)
         ev.quit()
     end
     if (key == "return") then
-        return set_mode("src.Load")
+        return set_mode("lib.Load")
     end
 end
 local function update(self, dt, set_mode)
@@ -31,7 +31,7 @@ local function update(self, dt, set_mode)
     local start = suit.Button("KASAI", x, 330, w, h)
 
     if start.hit then
-        set_mode("src.Load")
+        set_mode("lib.Load")
     end
     local exit = suit.Button("eXtinguish", x, 680, w, h)
     if exit.hit then

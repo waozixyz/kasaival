@@ -11,9 +11,9 @@ local to = love.touch
 local gameWidth, gameHeight = 1920, 1080
 Testing = true
 
-local mode = require("src.Menu")
+local mode = require("lib.Menu")
 
-if Testing then mode = require("src.Game") end
+if Testing then mode = require("lib.Game") end
 
 local function set_mode(mode_name, ...)
     mode = require(mode_name)

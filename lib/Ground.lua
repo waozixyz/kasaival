@@ -11,9 +11,11 @@ local function rndColor()
 end
 
 local function balanceColor(c, co, m)
-    local d = (co - c)
-    if (d > m) then return m
-    elseif (d < -m) then return -m
+    local d = co - c
+    if (d > m) then
+        return m
+    elseif (d < -m) then
+        return -m
     else return 0 end
 end
 
@@ -27,16 +29,16 @@ local function healTile(tile)
         g = (g - .007)
         b = (b - .002)
     elseif (r > .5) then
-        r = (r - .004)
-        g = (g - .004)
-        b = (b - .001)
+        r = (r - .005)
+        g = (g - .005)
+        b = (b - .002)
     else
         r = (r + balanceColor(r, ro, .001))
-        g = (g + balanceColor(g, go, .001))
-        b = (b + balanceColor(b, bo, .0006))
+        g = (g + balanceColor(g, go, .0003))
+        b = (b + balanceColor(b, bo, .00005))
     end
-    if (g < .1) then g = .1 end
-    if (b < .1) then b = .1 end
+    if (g < .07) then g = .07 end
+    if (b < .07) then b = .07 end
     return {r, g, b}
 end
 
@@ -58,7 +60,7 @@ local function burnTile(tile)
 end
 
 local function getTile(i, v)
-    if ((i % 2) == 0) then
+    if (i % 2 == 0) then
         return (v.x - (v.w * 0.5)), v.y, v.x, (v.y - v.h), (v.x + (v.w * 0.5)), v.y
     elseif ((i % 2) == 1) then
         return v.x, (v.y - v.h), (v.x + (v.w * 0.5)), v.y, (v.x + v.w), (v.y - v.h)
@@ -69,8 +71,8 @@ local rows = 20
 local function collide(self, obj)
     local l, r, u, d = obj:getHitbox()
 
-    for i, row in ipairs(self.grid) do
-        for i0, v in ipairs(row) do
+    for _, row in ipairs(self.grid) do
+        for _, v in ipairs(row) do
             if ((v.x <= r) and ((v.x + v.w) >= l) and ((v.y - v.h) <= d) and (v.y >= u)) then
                 obj:collided(v.color)
                 v.color = burnTile(v)
@@ -104,8 +106,8 @@ local function init(self, sav, gw, gh)
             for x = (gw * -0.5), (gw - (gw * 0.5)), w do
                 local c = rndColor()
                 table.insert(row, {color = c, h = h, orgColor = c, w = w, x = x, y = y})
-                local c0 = rndColor()
-                table.insert(row, {color = c0, h = h, orgColor = c0, w = w, x = x, y = y})
+                c = rndColor()
+                table.insert(row, {color = c, h = h, orgColor = c, w = w, x = x, y = y})
                 i = (i + 2)
             end
             table.insert(self.grid, row)

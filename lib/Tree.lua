@@ -37,7 +37,7 @@ end
 
 local function shrink(self)
     self.elapsed = 0
-    return table.remove(self.branches, #self.branches)
+    table.remove(self.branches, #self.branches)
 end
 
 local function collided(self, element)
@@ -47,16 +47,13 @@ local function collided(self, element)
                 local c = v.color
                 local r, g, b = c[1], c[2], c[3]
                 if (r < .9) then
-                    r = r + .06
-                end
-                if (g > .3) then
-                    g = g - .02
+                    r = r + .04
                 end
                 if (b > .1) then
-                    b = b - .01
+                    b = b - .02
                 end
                 v.color = {r, g, b}
-                self.hp = self.hp - 0.5
+                self.hp = self.hp - (1 / (self.hp * .3))
             end
         end
     end
@@ -124,7 +121,6 @@ local function update(self, dt)
             if (self.elapsed > self.growTime) then
                 grow(self)
                 self.elapsed = 0
-                return nil
             end
         end
     elseif (l > 0) then
@@ -133,7 +129,7 @@ local function update(self, dt)
         else
             if (l < 5) then
                 self.collapseTime = (self.collapseTime + dt)
-                if (self.collapseTime > (self.growTime * 5)) then
+                if self.collapseTime > self.growTime then
                     shrink(self)
                     self.collapseTime = 0
                 end

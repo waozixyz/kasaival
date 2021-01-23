@@ -1,8 +1,8 @@
 local suit = require("lib.suit")
 local push = require("lib.push")
 
-local Cursor = require("src.Cursor")
-local Music = require("src.Music")
+local Cursor = require("lib.Cursor")
+local Music = require("lib.Music")
 
 local gr = love.graphics
 

@@ -1,8 +1,8 @@
 local push = require("lib.push")
 local suit = require("lib.suit")
-local Bckg = require("src.Bckg")
-local Cursor = require("src.Cursor")
-local Saves = require("src.Saves")
+local Bckg = require("lib.Bckg")
+local Cursor = require("lib.Cursor")
+local Saves = require("lib.Saves")
 
 local gr = love.graphics
 
@@ -20,29 +20,29 @@ local function init(self)
 end
 local function keypressd(self, key, set_mode)
     if (key == "escape") then
-        set_mode("src.Menu")
+        set_mode("lib.Menu")
     end
     if (key == "1") then
-        set_mode("src.Game", (Saves.saveName .. "1"))
+        set_mode("lib.Game", (Saves.saveName .. "1"))
     end
     if (key == "2") then
-        set_mode("src.Game", (Saves.saveName .. "2"))
+        set_mode("lib.Game", (Saves.saveName .. "2"))
     end
     if (key == "3") then
-        set_mode("src.Game", (Saves.saveName .. "3"))
+        set_mode("lib.Game", (Saves.saveName .. "3"))
     end
     if (key == "4") then
-        set_mode("src.Game", (Saves.saveName .. "4"))
+        set_mode("lib.Game", (Saves.saveName .. "4"))
     end
     if (key == "return") then
-        return set_mode("src.Game", (Saves.saveName .. "1"))
+        return set_mode("lib.Game", (Saves.saveName .. "1"))
     end
 end
 local function update(self, dt, set_mode)
     local W, H = push:getDimensions()
     if self.saves then
         if (#self.saves < 2) then
-            set_mode("src.Game", "saves/save1")
+            set_mode("lib.Game", "saves/save1")
         end
         for id, sav in pairs(self.saves) do
             local w, h = 400, 200
@@ -62,9 +62,9 @@ local function update(self, dt, set_mode)
             -- if button hit, set_mode
             if (s.hit == true) then
                 if sav.file then
-                    set_mode("src.Game", ("saves/" .. sav.file))
+                    set_mode("lib.Game", ("saves/" .. sav.file))
                 else
-                    set_mode("src.Game")
+                    set_mode("lib.Game")
                 end
             end
         end
