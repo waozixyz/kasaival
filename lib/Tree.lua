@@ -41,15 +41,15 @@ local function shrink(self)
 end
 
 local function collided(self, element)
-    if (element == "fire") then
+    if element == "fire" then
         for _, row in ipairs(self.branches) do
             for _, v in ipairs(row) do
                 local c = v.color
                 local r, g, b = c[1], c[2], c[3]
-                if (r < .9) then
+                if r < .9 then
                     r = r + .04
                 end
-                if (b > .1) then
+                if b > .1 then
                     b = b - .02
                 end
                 v.color = {r, g, b}
@@ -87,16 +87,27 @@ local function getHitbox(self)
     return self.x - w, self.x + w, self.y - h, self.y + h
 end
 
+
+
 local function init(self, sav)
-    self.colorScheme = sav.colorScheme or self.colorScheme
-    self.elapsed = sav.elapsed or 0
-    self.stages = sav.maxStage or 7
-    self.growTime = sav.growTime or 1
-    self.x = sav.x or self.x
-    self.y = sav.y or self.y
-    self.hp = sav.hp or 100
-    self.scale = sav.scale or 1
-    self.branches = sav.branches or {}
+					local tmpl = {
+						   elapsed = 0,
+					    collapseTime = 0,
+					    colorScheme = {.5, .7, .2, .4, .2, .3},
+					    element = "plant",
+					    growTime = 1,
+					    maxStage = 7,
+					    x = 0, y = 0,
+					    hp = 100,
+					    scale = 1,
+					    branches = {},
+					    leaves = {}
+					}
+
+    for k,v in pairs(tmpl) do
+         self[k] = sav[k] or v
+    end
+ 
     local currentStage = sav.currentStage or 0
     local w = sav.w or 12
     local h = sav.h or 32
@@ -116,7 +127,7 @@ end
 local function update(self, dt)
     local l = #self.branches
     if self.hp > 80 then
-        if l < self.stages then
+        if l < self.maxStage then
             self.elapsed = self.elapsed + dt
             if self.elapsed > self.growTime then
                 grow(self)
@@ -127,7 +138,7 @@ local function update(self, dt)
 
         if l > self.hp / l then self.collapseTime = self.collapseTime + 1 end
         if l < 5 then self.collapseTime = self.collapseTime + dt end
-        if self.collapseTime > self.growTime then
+        if self.collapseTime > self.growTime*.5 then
             shrink(self)
             self.collapseTime = 0
         end
@@ -151,14 +162,9 @@ local function update(self, dt)
     end
 end
 return {
-    collapseTime = 0,
     collided = collided,
-    colorScheme = {.1, .3, .1, .3, .1, .3},
     draw = draw,
-    element = "plant",
     getHitbox = getHitbox,
     init = init,
-    update = update,
-    x = 0,
-    y = 0
+    update = update
 }
