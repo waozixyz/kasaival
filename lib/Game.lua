@@ -31,7 +31,7 @@ local function addTree(self, randStage)
     y =  self.height + (y * rat_x)
 
     local w = (ma.random(22, 33) * scale)
-    local h = (ma.random(52, 69) * scale)
+    local h = (ma.random(62, 96) * scale)
 
     table.insert(self.trees, copy(Tree))
 
@@ -41,11 +41,11 @@ local function addTree(self, randStage)
     if randStage then currentStage = ma.random(0, maxStage) else currentStage = 0 end
     local growTime = ma.random(1, 3)
     local cs1 = {.5, .7, .2, .4, .2, .3}
-    local cs2 = {.3, .4, .4, .6, .2, .3}
+    local cs2 = {.5, .6, .4, .6, .2, .3}
     local cs3 = {.3, .5, .2, .4, .3, .5}
 
     local c = ({cs1, cs2, cs3})[ma.random(1, 3)]
-    return tree:init(
+    tree:init(
         {
             colorScheme = c,
             currentStage = currentStage,
@@ -97,8 +97,8 @@ local function checkCollision(o1, o2)
     end
 end
 
-local radToDeg = (180 / math.pi)
-local degToRad = (math.pi / 180)
+local radToDeg = 180 / math.pi
+local degToRad = math.pi / 180
 
 local function checkVisible(self, x, w)
     local W = push:getWidth()
