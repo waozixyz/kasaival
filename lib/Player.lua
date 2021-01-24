@@ -85,8 +85,8 @@ return {
     getHitbox = getHitbox,
     init = init,
     move = move,
-    oh = 70,
-    ow = 23,
+    oh = 72,
+    ow = 32,
     scale = 1,
     update = update
 }
