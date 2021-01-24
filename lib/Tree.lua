@@ -22,13 +22,13 @@ local function grow(self)
 
     for i, v in ipairs(prev) do
         local w, h = v.w * 0.9, v.h * 0.9
-        local split = ma.random(0, 5)
+        local split = ma.random(0, 3)
 
-        if split > 1 then
+        if split > 0 then
             table.insert(new, getLine(v.n, v.deg - ma.random(20, 30), w, h, self.colorScheme))
             table.insert(new, getLine(v.n, v.deg + ma.random(20, 30), w, h, self.colorScheme))
         end
-        if split == 1 then
+        if split == 0 then
             table.insert(new, getLine(v.n, v.deg + ma.random(-10, 10), w, h, self.colorScheme))
         end
     end
@@ -90,37 +90,42 @@ end
 
 
 local function init(self, sav)
-					local tmpl = {
-						   elapsed = 0,
-					    collapseTime = 0,
-					    colorScheme = {.5, .7, .2, .4, .2, .3},
-					    element = "plant",
-					    growTime = 1,
-					    maxStage = 7,
-					    x = 0, y = 0,
-					    hp = 100,
-					    scale = 1,
-					    branches = {},
-					    leaves = {}
-					}
+    -- default values
+	local tmpl = {
+        elapsed = 0,
+	    collapseTime = 0,
+	    colorScheme = {.5, .7, .2, .4, .2, .3},
+	    element = "plant",
+	    growTime = 1,
+		maxStage = 7,
+		x = 0, y = 0,
+		hp = 100,
+		scale = 1,
+		branches = {},
+        leaves = {}
+    }
 
+    -- replace with sav data
     for k,v in pairs(tmpl) do
          self[k] = sav[k] or v
     end
- 
-    local currentStage = sav.currentStage or 0
-    local w = sav.w or 12
-    local h = sav.h or 32
-    local p = {0, self.y}
-    local n = {0, self.y - h}
-    local branch = {color = rndColor(self.colorScheme), deg = -90, h = h, n = n, p = p, w = w}
-    if sav.branches and #sav.branches > 0 then
-        self.branches = sav.branches
-    else
-        table.insert(self.branches, {branch})
-    end
-    for _ = #self.branches, currentStage do
-        grow(self)
+
+    do -- fill branches table with data
+        local currentStage = sav.currentStage or 0
+        local w = sav.w or 12
+        local h = sav.h or 32
+        local p = {0, self.y}
+        local n = {0, self.y - h}
+        local branch = {color = rndColor(self.colorScheme), deg = -90, h = h, n = n, p = p, w = w}
+        if sav.branches and #sav.branches > 0 then
+            self.branches = sav.branches
+        else
+            table.insert(self.branches, {branch})
+        end
+        -- grow to currentStage
+        for _ = #self.branches, currentStage do
+            grow(self)
+        end
     end
 end
 
