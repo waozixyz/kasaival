@@ -64,7 +64,7 @@ local function getProp(e)
     local t = {}
 
     for k, v in pairs(e) do
-        if ((k ~= "move") and (k ~= "init") and (k ~= "collided") and (k ~= "update") and (k ~= "draw") and (k ~= "getHitbox") and (k ~= "collide")) then
+        if k ~= "move" and k ~= "init" and k ~= "collided" and k ~= "update" and k ~= "draw" and k ~= "getHitbox" and k ~= "collide" then
             t[k] = v
         end
     end
@@ -90,7 +90,7 @@ local function checkCollision(o1, o2)
     local l1, r1, u1, d1 = o1:getHitbox()
     local l2, r2, u2, d2 = o2:getHitbox()
 
-    if ((l1 <= r2) and (r1 >= l2) and (u1 <= d2) and (d1 >= u2)) then
+    if l1 <= r2 and r1 >= l2 and u1 <= d2 and d1 >= u2 then
         return true
     else
         return false
@@ -102,7 +102,7 @@ local degToRad = (math.pi / 180)
 
 local function checkVisible(self, x, w)
     local W = push:getWidth()
-    if (((x + self.cx) < (W + w)) and ((x + self.cx) > (-w))) then return true else return false end
+    if x + self.cx < W + w and x + self.cx > -w then return true else return false end
 end
 
 local function init(self, saveFile)
@@ -123,14 +123,14 @@ local function init(self, saveFile)
         _, sav = serpent.load(contents)
     end
 
-    self.elapsed = (sav.elapsed or 0)
-    self.muted = (sav.muted or false)
-    self.treeTime = (sav.treeTime or 0)
-    self.cx = (sav.cx or 0)
+    self.elapsed = sav.elapsed or 0
+    self.muted = sav.muted or false
+    self.treeTime = sav.treeTime or 0
+    self.cx = sav.cx or 0
 
     
     self.trees = {}
-    local sky, p, g, t = (sav.sky or {}), (sav.p or {}), (sav.g or {}), (sav.t or nil)
+    local sky, p, g, t = sav.sky or {}, sav.p or {}, sav.g or {}, sav.t or nil
 
     -- init sky
     self.sky = copy(Sky)
@@ -145,7 +145,7 @@ local function init(self, saveFile)
     self.player:init(p)
     
     -- init trees
-    if (t and (#t > 0)) then
+    if t and #t > 0 then
         for i, v in ipairs(t) do
             table.insert(self.trees, copy(Tree))
             local tree = self.trees[#self.trees]
@@ -161,24 +161,23 @@ end
 
 local function keypressed(self, key, set_mode)
     HUD:keypressed(self, key)
-    if (self.player.hp <= 0) then self.restart = true end
 end
 
 local function touch(self, x, y, dt)
-    if (self.player.hp <= 0) then self.restart = true end
-    if not self.paused and self.elapsed > 1 then
+    HUD:touch(self, x, y)
+    if not self.paused then
         local px, py = self.player.x, self.player.y
-        local x0 = (x - self.cx)
-        local nx, ny = (x0 - px), (y - py)
-        local w = (self.player.scale * self.player.ow * 0.2)
-        local h = (self.player.scale * self.player.oh * 0.2)
-        if ((nx < w) and (nx > (-w)) and (ny < h) and (ny > (-h))) then
+        x = x - self.cx
+        local nx, ny = x - px, y - py
+        local w = self.player.scale * self.player.ow * 0.2
+        local h = self.player.scale * self.player.oh * 0.2
+        if nx < w and nx > -w and ny < h and ny > -h then
             nx = nil
             ny = nil
         end
-        if ((y > 100) and nx and ny) then
-            local angle = (math.atan2(nx, ny) * radToDeg)
-            if (angle < 0) then
+        if y > 100 and nx and ny then
+            local angle = math.atan2(nx, ny) * radToDeg
+            if angle < 0 then
                 angle = 360 + angle
             end
             angle = angle * degToRad
@@ -220,6 +219,18 @@ local function draw(self)
     HUD:draw(self)
 end
 
+local function focus(self, f)
+    if not f then
+        self.paused = true
+        if not self.muted then
+            self.muted = true
+            self.unmute = true
+        end
+    elseif self.unmute then
+        self.muted = false
+    end
+end
+
 local function update(self, dt, set_mode)
     HUD:update(self)
     local _, H = push:getDimensions()
@@ -229,25 +240,23 @@ local function update(self, dt, set_mode)
         Music:play()
     end
     if self.readyToExit then
-        do
-        end
         Music.bgm:pause()
         set_mode("lib.Menu")
     end
     if self.restart then
         set_mode("lib.Game")
     end
-    if (self.exit and not self.readyToExit) then
+    if self.exit and not self.readyToExit then
         if Testing then
             love.event.quit()
         else
-            gr.captureScreenshot((self.saveFile .. ".png"))
+            gr.captureScreenshot(self.saveFile .. ".png")
             save(self)
             self.readyToExit = true
         end
     end
-    if not self.paused and (self.player.hp > 0) then
-        if not self.usingTouchMove and self.elapsed > 1 then
+    if not self.paused and self.player.hp > 0 then
+        if not self.usingTouchMove then
             local dx, dy = 0, 0
             if ke.isScancodeDown("d", "right", "kp6") then dx = 1 end
             if ke.isScancodeDown("a", "left", "kp4") then dx = -1 end
@@ -255,31 +264,31 @@ local function update(self, dt, set_mode)
             if ke.isScancodeDown("w", "up", "kp8") then dy = -1 end
             self.player:move(dx, dy, self, dt)
         end
-        self.treeTime = (self.treeTime + dt)
-        if (self.treeTime > 1) then
+        self.treeTime = self.treeTime + dt
+        if self.treeTime > 1 then
             addTree(self)
             self.treeTime = 0
         end
-        self.elapsed = (self.elapsed + dt)
-        self.player.scale = ((self.player.y / H) * (self.player.hp * 0.01))
+        self.elapsed = self.elapsed + dt
+        self.player.scale = (self.player.y / H) * self.player.hp * 0.01
 
         self.player:update(dt, self)
         for i, tree in ipairs(self.trees) do
-            if ((tree.x + self.cx) < (self.width * -0.5)) then
-                tree.x = (tree.x + self.width)
-            elseif ((tree.x + self.cx) > (self.width * 0.5)) then
-                tree.x = (tree.x - self.width)
+            if tree.x + self.cx < self.width * -0.5 then
+                tree.x = tree.x + self.width
+            elseif tree.x + self.cx > self.width * 0.5 then
+                tree.x = tree.x - self.width
             end
             if checkCollision(tree, self.player) then
                 do
                 end
-                (self.player):collided(tree.element)
+                self.player:collided(tree.element)
                 tree:collided(self.player.element)
             end
             tree:update(dt)
-            if (#tree.branches < 1) then
-                self.player.xp = (self.player.xp + 10)
-                self.player.hp = (self.player.hp + 1)
+            if #tree.branches < 1 then
+                self.player.xp = self.player.xp + 10
+                self.player.hp = self.player.hp + 1
                 table.remove(self.trees, i)
             end
         end
@@ -289,4 +298,4 @@ local function update(self, dt, set_mode)
         self.usingTouchMove = false
     end
 end
-return {checkVisible = checkVisible, draw = draw, init = init, keypressed = keypressed, touch = touch, update = update}
+return {checkVisible = checkVisible, draw = draw, init = init, keypressed = keypressed, touch = touch, focus = focus, update = update}

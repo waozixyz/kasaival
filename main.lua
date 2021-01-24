@@ -91,3 +91,9 @@ function love.keypressed(key)
         mode:keypressed(key, set_mode)
     end
 end
+
+function love.focus(f)
+  if mode.focus then
+    mode:focus(f)
+  end
+end

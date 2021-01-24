@@ -11,12 +11,12 @@ local function toggle(val) if val then return false else return true end end
 local function drawText(text, font, size, xpad, ypad)
     local W, H = push:getDimensions()
 
-    local xpad0 = (xpad or 0)
-    local ypad0 = (ypad or 0)
+    xpad = xpad or 0
+    ypad = ypad or 0
     local w = font:getWidth(text)
 
     gr.setFont(font)
-    gr.print(text, (((W * 0.5) - (w * 0.5)) + xpad0), ((H * 0.5) + ypad0))
+    gr.print(text, W * 0.5 - w * 0.5 + xpad, H * 0.5 + ypad)
 end
 
 local function draw(self, game)
@@ -25,14 +25,14 @@ local function draw(self, game)
 
     gr.setColor(.2, 0, 0, 1 - (hp / 100) - .4)
     gr.rectangle("fill", 0, 0, W, H)
-    if (hp <= 0) then
+    if hp <= 0 then
         gr.setFont(self.bigFont)
         gr.setColor(0, 0, 0, 0.5)
         gr.rectangle("fill", 0, 0, W, H)
         gr.setColor(.6, 0, .3)
         drawText("GameOver", self.bigFont, self.fontSize, 0, 0)
         drawText("touch anywhere or press any key to try again", self.bigFont, self.fontSize, 0, self.fontSize)
-    elseif (game.paused == true) then
+    elseif game.paused == true then
         gr.setFont(self.bigFont)
         gr.setColor(1, 1, 1, 0.5)
         gr.rectangle("fill", 0, 0, W, H)
@@ -44,9 +44,9 @@ local function draw(self, game)
     if Music.songTitle then
         gr.setFont(self.font)
         gr.setColor({1, 1, 1})
-        local title = ("\240\159\142\182 " .. Music.songAuthor .. " - " .. Music.songTitle .. " \240\159\142\182")
+        local title = "\240\159\142\182 " .. Music.songAuthor .. " - " .. Music.songTitle .. " \240\159\142\182"
         local w = (self.font):getWidth(title)
-        return gr.print(title, (W - w - 20), (H - 40))
+        gr.print(title, W - w - 20, H - 40)
     end
 end
 local function init(self)
@@ -62,19 +62,26 @@ local function init(self)
     self.sound = gr.newImage("assets/icons/sound.png")
     self.nosound = gr.newImage("assets/icons/nosound.png")
 end
-
+local function tk(self, game)
+    if game.paused then game.paused = toggle(game.paused) end
+    if game.player.hp <= 0 then game.restart = true end
+end
+local function touch(self, game, x, y)
+    tk(self, game)
+end
 local function keypressd(self, game, key, set_mode)
-    if (key == "kp+") then Music.bgm:setVolume(Music.bgm:getVolume() + .1) end
-    if (key == "kp-") then Music.bgm:setVolume(Music.bgm:getVolume() - .1) end
-    if (key == "n") then Music.bgm:stop() end
-    if (key == "m") then game.muted = toggle(game.muted) end
-    if (key == "p" or key == "pause" or key == "space") then game.paused = toggle(game.paused) end
-    if (key == "escape") then game.paused = true game.exit = true end
+    tk(self, game)
+    if key == "kp+" then Music.bgm:setVolume(Music.bgm:getVolume() + .1) end
+    if key == "kp-" then Music.bgm:setVolume(Music.bgm:getVolume() - .1) end
+    if key == "n" then Music.bgm:stop() end
+    if key == "m" then game.muted = toggle(game.muted) end
+    if key == "p" or key == "pause" or key == "space" then game.paused = toggle(game.paused) end
+    if key == "escape" then game.paused = true game.exit = true end
 end
 local function update(self, game)
     local W, H = push:getDimensions()
     local exit_button = suit.ImageButton(self.exit, 20, 20)
-    if (exit_button.hit == true) then
+    if exit_button.hit == true then
         game.exit = true
     end
     local pause_image = self.pause
@@ -82,7 +89,7 @@ local function update(self, game)
         pause_image = self.resume
     end
     local pause_button = suit.ImageButton(pause_image, 100, 20)
-    if (pause_button.hit == true) then
+    if pause_button.hit == true then
         game.paused = toggle(game.paused)
     end
     local music_image = self.music
@@ -93,6 +100,6 @@ local function update(self, game)
     if (music_button.hit == true) then
         game.muted = toggle(game.muted)
     end
-    return Cursor:update()
+    Cursor:update()
 end
-return {draw = draw, init = init, keypressed = keypressd, update = update}
+return {draw = draw, init = init, keypressed = keypressd, touch = touch, update = update}
