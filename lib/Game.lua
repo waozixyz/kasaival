@@ -105,7 +105,7 @@ local function checkVisible(self, x, w)
     if x + self.cx < W + w and x + self.cx > -w then return true else return false end
 end
 
-local function init(self, saveFile)
+local function init(self, _, saveFile)
     -- default init for every game
     self.restart, self.paused, self.exit = false, false, 0
     local W, H= push:getDimensions()
@@ -116,7 +116,7 @@ local function init(self, saveFile)
 
 
     -- load save content if possible
-    self.saveFile = (saveFile or Saves:nextSave())
+    self.saveFile = saveFile or Saves:nextSave()
     local sav = {}
     if fi.getInfo(self.saveFile) then
         local contents = fi.read(self.saveFile)

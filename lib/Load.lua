@@ -9,64 +9,73 @@ local gr = love.graphics
 local function draw(self)
     return Bckg:draw()
 end
-local function init(self)
+
+local function init(self, set_mode)
     Bckg:init()
     Cursor:init()
     self.saves = Saves:getFiles()
-    if (#self.saves < 4) then
-        local id = (#self.saves + 1)
-        self.saves[id] = {file = ("save" .. id), img = gr.newImage("assets/newGame.jpg")}
+    if self.saves and #self.saves < 1 then
+        set_mode("lib.Game", "saves/save1")
     end
 end
 local function keypressd(self, key, set_mode)
-    if (key == "escape") then
+    if key == "escape" then
         set_mode("lib.Menu")
-    end
-    if (key == "1") then
+    elseif key == "1" then
+        set_mode("lib.Game", (Saves.saveName .. "1"))
+    elseif key == "2" then
+        set_mode("lib.Game", (Saves.saveName .. "2"))
+    elseif key == "3" then
+        set_mode("lib.Game", (Saves.saveName .. "3"))
+    elseif key == "4" then
+        set_mode("lib.Game", (Saves.saveName .. "4"))
+    elseif key == "return" then
         set_mode("lib.Game", (Saves.saveName .. "1"))
     end
-    if (key == "2") then
-        set_mode("lib.Game", (Saves.saveName .. "2"))
-    end
-    if (key == "3") then
-        set_mode("lib.Game", (Saves.saveName .. "3"))
-    end
-    if (key == "4") then
-        set_mode("lib.Game", (Saves.saveName .. "4"))
-    end
-    if (key == "return") then
-        return set_mode("lib.Game", (Saves.saveName .. "1"))
-    end
+end
+local function getShape(id, sav)
+    local W, H = push:getDimensions()
+    local w, h = 400, 200
+    if sav and sav.img then w, h = sav.img:getDimensions() end
+    local scale = (W / w) * 0.2
+    local y = H * 0.5 - h * scale * 0.5
+    local x = (id - 1) * (w + W * 0.1) * scale + W * 0.05
+    return x, y, w * scale, h * scale, scale
 end
 local function update(self, dt, set_mode)
-    local W, H = push:getDimensions()
     if self.saves then
-        if (#self.saves < 2) then
-            set_mode("lib.Game", "saves/save1")
-        end
         for id, sav in pairs(self.saves) do
-            local w, h = 400, 200
-            if sav.img then w, h = sav.img:getDimensions() end
-            local scale = ((W / w) * 0.2)
-            local y = ((H * 0.5) - (h * scale * 0.5))
-            local x = (((id - 1) * (w + (W * 0.1)) * scale) + (W * 0.05))
+            local x, y, w, h, scale = getShape(id, sav)
             
             -- if there is an image file make ImageButton otherwise make Button
-            local s
             if sav.img then
-                s = suit.ImageButton(sav.img, {scale = scale}, x, y)
+                suit.ImageButton(sav.img, {id = id, scale = scale}, x, y)
             else
-                s = suit.Button(sav.file, x, y, w, h)
+                suit.Button(sav.file, {id = id}, x, y, w, h)
             end
-
             -- if button hit, set_mode
-            if (s.hit == true) then
+            if suit.isHit(id) then
                 if sav.file then
                     set_mode("lib.Game", ("saves/" .. sav.file))
                 else
                     set_mode("lib.Game")
                 end
             end
+            suit.Button("delete", {id = id .. "del"}, x + w * .25, y + h + 50, w * .5, 50)
+            if suit.isHit(id .. "del") then
+                Saves:remove(id)
+                table.remove(self.saves, id)
+            end
+        end
+        local id = 1
+        while self.saves[id] do
+            id = id + 1
+        end
+        local x, y, w, h = getShape(id, self.saves[#self.saves])
+
+        suit.Button("New Game", {id = id}, x, y, w, h)
+        if suit.isHit(id) then
+            set_mode("lib.Game")
         end
         Cursor:update()
     end

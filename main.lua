@@ -17,7 +17,7 @@ if Testing then mode = require("lib.Game") end
 
 local function set_mode(mode_name, ...)
     mode = require(mode_name)
-    if mode.init then mode:init(...) end
+    if mode.init then mode:init(set_mode, ...) end
 end
 
 local uiTheme = {
@@ -49,7 +49,7 @@ function love.load()
         {fullscreen = fullscreen, highdpi = true, resizable = resizable}
     )
     suit.theme.color = uiTheme
-    mode:init()
+    mode:init(set_mode)
 end
 
 function love.resize(w, h)

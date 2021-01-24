@@ -4,7 +4,7 @@ local gr = love.graphics
 local function checkFiles(self, saves)
     local rtn = {}
 
-    for i, sav in ipairs(saves) do
+    for i, sav in pairs(saves) do
         if (#sav < 2) then
             if sav.file then
                 rtn[i] = sav
@@ -15,11 +15,15 @@ local function checkFiles(self, saves)
     end
     return rtn
 end
+local function remove(self, id)
+    fi.remove(self.saveName .. id)
+    fi.remove(self.saveName .. id .. ".png")
+end
 local function getFiles(self)
     local rtn = {}
     if not fi.getInfo("saves") then fi.createDirectory("saves") end
     local files = fi.getDirectoryItems("saves")
-    for _, file in ipairs(files) do
+    for _, file in pairs(files) do
         local id = file:gsub("save", "")
         id = id:gsub(".png", "")
         id = tonumber(id)
@@ -37,4 +41,4 @@ end
 local function nextSave(self)
     return (self.saveName .. (#self:getFiles() + 1))
 end
-return {checkFiles = checkFiles, getFiles = getFiles, nextSave = nextSave, saveName = "saves/save"}
+return {remove = remove, checkFiles = checkFiles, getFiles = getFiles, nextSave = nextSave, saveName = "saves/save"}
