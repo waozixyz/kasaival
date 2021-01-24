@@ -6,7 +6,6 @@ local gr = love.graphics
 local ke = love.keyboard
 local mo = love.mouse
 local sy = love.system
-local to = love.touch
 
 local gameWidth, gameHeight = 1920, 1080
 Testing = true

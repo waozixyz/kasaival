@@ -4,23 +4,20 @@ local Flame = require("lib.Flame")
 local gr = love.graphics
 
 local function collided(self, oc, f)
-    if type(oc) == "table" then self.hp = self.hp + (oc[2] - oc[3]) * .5 end
-    if oc == "plant" then self.hp = self.hp + .2 end
+    if type(oc) == "table" then self.hp = self.hp + oc[2] - oc[3] end
+    if oc == "plant" then self.hp = self.hp + .5 end
 end
 
 local function getHitbox(self)
     local w = (self.ow * self.scale)
     local h = (self.oh * self.scale)
-    return self.x - (w * 0.5), self.x + (w * 0.5), self.y - (h * 0.2), self.y
+    return self.x - w * 0.5, self.x + w * 0.5, self.y - h * 0.5, self.y + h * .5
 end
 
 local function draw(self)
     gr.setColor(1,1,1,1)
-    gr.setBlendMode("alpha")
-    local W, H = push:getDimensions()
-    local sc = self.scale * 2
-    local x, y = math.floor(self.x), math.floor(self.y)
-    gr.draw(self.flame, x, y, 0, sc, sc, (self.ow * 0.5))
+    gr.setBlendMode("add")
+    gr.draw(self.flame)
     gr.setBlendMode("alpha")
 end
 
@@ -30,10 +27,27 @@ local function init(self, sav)
     self.x = sav.x or W * .5
     self.y = sav.y or H * .7
     self.xp = sav.xp or 0
-    self.hp = sav.hp or 150
+    self.hp = sav.hp or 200
     self.lvl = sav.lvl or 0
     self.speed = sav.speed or 20
     self.flame = Flame()
+    self.sizes = {1, 1, 1, 1, 1, 1, 1, 1}
+    self.elapsed = 0
+end
+
+local function returnTable(t)
+    return t[1], t[2], t[3], t[4], t[5], t[6], t[7]
+end
+local function getSizes(sizes, scale)
+    local rtn = sizes
+    rtn[7] = rtn[6] * .7
+    rtn[6] = rtn[5] * .7
+    rtn[5] = rtn[4] * .7
+    rtn[4] = rtn[3] * .7
+    rtn[3] = rtn[2] * .7
+    rtn[2] = rtn[1]
+    rtn[1] = scale
+    return rtn
 end
 
 local function move(self, dx, dy, g, dt)
@@ -51,28 +65,34 @@ local function move(self, dx, dy, g, dt)
     elseif (y < (H - g.ground.height)) then
         y = H - g.ground.height
     end
+    self.flame:setPosition(x, y)
+
+    self.flame:setSizes(returnTable(self.sizes))
     self.x, self.y = x, y
 end
 
+
 local function update(self, dt)
-    if self.hp > 260 then
-        self.hp = self.hp - .9
-    elseif self.hp > 220 then
-        self.hp = self.hp - .6
-    elseif self.hp > 160 then
-        self.hp = self.hp - .4
-    elseif self.hp > 140 then
-        self.hp = self.hp - .5
-    elseif self.hp > 120 then
-        self.hp = self.hp - .3
-    elseif self.hp > 100 then
-        self.hp = self.hp - .2
-    elseif self.hp > 80 then
-        self.hp = self.hp - .3
-    elseif self.hp > 60 then
-        self.hp = self.hp - .4
-    else
-        self.hp = self.hp - 1
+
+    self.elapsed = self.elapsed + dt
+    
+    if self.elapsed > .2 then
+        self.sizes = getSizes(self.sizes, self.scale)
+        self.elapsed = 0
+    end
+    
+    self.hp = self.hp - (self.hp / 100) * self.burnRate
+    if self.hp > 300 then
+        self.hp = self.hp - 10
+    end
+    if self.hp > 230 then
+        self.hp = self.hp - self.burnRate
+    end
+    if self.hp > 150 or self.hp < 50 then
+        self.hp = self.hp - 0.5 * self.burnRate
+    end
+    if self.hp < 80 or self.hp > 120 then
+        self.hp = self.hp - 0.1 * self.burnRate
     end
     self.flame:update(dt)
 
@@ -85,8 +105,9 @@ return {
     getHitbox = getHitbox,
     init = init,
     move = move,
-    oh = 72,
+    oh = 32,
     ow = 32,
     scale = 1,
-    update = update
+    update = update,
+    burnRate = .2,
 }
