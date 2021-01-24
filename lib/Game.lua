@@ -222,13 +222,23 @@ end
 local function focus(self, f)
     -- when the game is not focused, pause and mute music
     if not f then
-        self.paused = true
+        if not self.paused then
+            self.unpause = true
+            self.paused = true
+        end
         if not self.muted then
             self.muted = true
             self.unmute = true
         end
-    elseif self.unmute then
-        self.muted = false
+    else
+        if self.unmute then
+            self.muted = false
+            self.unmute = false
+        end
+        if self.unpause then
+            self.paused = false
+            self.unpause = false
+        end
     end
 end
 

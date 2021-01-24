@@ -9,7 +9,7 @@ local sy = love.system
 local to = love.touch
 
 local gameWidth, gameHeight = 1920, 1080
-Testing = false
+Testing = true
 
 local mode = require("lib.Menu")
 
