@@ -36,7 +36,7 @@ local function addTree(self, randStage)
     table.insert(self.trees, copy(Tree))
 
     local tree = self.trees[#self.trees]
-    local maxStage = ma.random(8, 10)
+    local maxStage = ma.random(6, 8)
     local currentStage = nil
     if randStage then currentStage = ma.random(0, maxStage) else currentStage = 0 end
     local growTime = ma.random(1, 3)

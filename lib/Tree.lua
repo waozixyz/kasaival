@@ -53,7 +53,7 @@ local function collided(self, element)
                     b = b - .02
                 end
                 v.color = {r, g, b}
-                self.hp = self.hp - .1
+                self.hp = self.hp - .3
             end
         end
     end
@@ -90,7 +90,7 @@ end
 local function init(self, sav)
     self.colorScheme = sav.colorScheme or self.colorScheme
     self.elapsed = sav.elapsed or 0
-    self.stages = sav.stages or 10
+    self.stages = sav.maxStage or 10
     self.growTime = sav.growTime or 1
     self.x = sav.x or self.x
     self.y = sav.y or self.y
@@ -108,14 +108,14 @@ local function init(self, sav)
     else
         table.insert(self.branches, {branch})
     end
-    for i = #self.branches, currentStage do
+    for _ = #self.branches, currentStage do
         grow(self)
     end
 end
 
 local function update(self, dt)
     local l = #self.branches
-    if (self.hp > 80) then
+    if self.hp > 80 then
         if (l < self.stages) then
             self.elapsed = (self.elapsed + dt)
             if (self.elapsed > self.growTime) then
@@ -123,9 +123,9 @@ local function update(self, dt)
                 self.elapsed = 0
             end
         end
-    elseif (l > 0) then
+    elseif l > 0 then
 
-        if (l > (self.hp / self.stages)) then self.collapseTime = self.collapseTime + 1 end
+        if (l > self.hp / l) then self.collapseTime = self.collapseTime + 1 end
         if l < 5 then self.collapseTime = self.collapseTime + dt end
         if self.collapseTime > self.growTime then
             shrink(self)
@@ -137,13 +137,13 @@ local function update(self, dt)
                 local c = v.color
                 local r, g, b = c[1], c[2], c[3]
                 if (r > .3) then
-                    r = (r - .008)
+                    r = r - .0013
                 end
                 if (g < .2) then
-                    g = (g + .004)
+                    g = g + .0007
                 end
                 if (b < .12) then
-                    b = (b + .004)
+                    b = b + .0007
                 end
                 v.color = {r, g, b}
             end

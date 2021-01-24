@@ -36,7 +36,7 @@ function love.load()
     local fullscreen = false
     local resizable = true
     local windowWidth, windowHeight = 1200, 675
-    if ((sy.getOS() == "Android") or (sy.getOS() == "iOS")) then
+    if sy.getOS() == "Android" or sy.getOS() == "iOS" then
         fullscreen = true
         resizable = false
         windowWidth, windowHeight = gr.getDimensions()
@@ -78,14 +78,14 @@ function love.update(dt)
             mode:touch(x, y, dt)
         end
     end
-    
+        
     mode:update(dt, set_mode)
 end
 
 function love.keypressed(key)
-    if ((key == "f") or (key == "f11")) then
+    if key == "f" or key == "f11" then
         push:switchFullscreen()
-    elseif (ke.isDown("lctrl", "rctrl", "capslock") and (key == "q")) then
+    elseif ke.isDown("lctrl", "rctrl", "capslock") and key == "q" then
         ev.quit()
     else
         mode:keypressed(key, set_mode)

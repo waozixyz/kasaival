@@ -22,13 +22,9 @@ end
 local function draw(self, game)
     local W, H = push:getDimensions()
     local hp = game.player.hp
-    local alpha = (1 / (hp / 170) - 1)
 
-    if alpha > .4 then alpha = .4 end
-    gr.setColor(.2, 0, 0, alpha)
-    if (math.floor(hp / 10) % 2 == 1) then
-        gr.rectangle("fill", 0, 0, W, H)
-    end
+    gr.setColor(.2, 0, 0, 1 - (hp / 100) - .4)
+    gr.rectangle("fill", 0, 0, W, H)
     if (hp <= 0) then
         gr.setFont(self.bigFont)
         gr.setColor(0, 0, 0, 0.5)

@@ -26,5 +26,5 @@ return {
     mute = mute,
     play = play,
     songAuthor = "TeknoAXE",
-    songs = {"Running_On_Air", "Robot_Disco_Dance", "Supersonic", "Dystopian_Paradise", "Caught_in_the_Drift"}
+    songs = {"Running_On_Air", "Robot_Disco_Dance", "Supersonic", "Caught_in_the_Drift"}
 }
