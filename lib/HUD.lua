@@ -19,6 +19,18 @@ local function drawText(text, font, size, xpad, ypad)
     gr.print(text, W * 0.5 - w * 0.5 + xpad, H * 0.5 + ypad)
 end
 
+local function drawOverlay(self, title, subtitle, color, font, fontSize)
+    local W, H = push:getDimensions()
+    fontSize = fontSize or self.fontSize
+    font = font or self.bigFont
+    gr.setFont(font)
+    gr.setColor(color or {0, 0, 0, 0.5})
+    gr.rectangle("fill", 0, 0, W, H)
+    gr.setColor(.6, 0, .3)
+    drawText(title or "", self.bigFont, self.fontSize, 0, 0)
+    drawText(subtitle or "", font, fontSize, 0, fontSize)
+end
+
 local function draw(self, game)
     local W, H = push:getDimensions()
     local hp = game.player.hp
@@ -26,19 +38,11 @@ local function draw(self, game)
     gr.setColor(.2, 0, 0, 1 - (hp / 100) - .4)
     gr.rectangle("fill", 0, 0, W, H)
     if hp <= 0 then
-        gr.setFont(self.bigFont)
-        gr.setColor(0, 0, 0, 0.5)
-        gr.rectangle("fill", 0, 0, W, H)
-        gr.setColor(.6, 0, .3)
-        drawText("GameOver", self.bigFont, self.fontSize, 0, 0)
-        drawText("touch anywhere or press any key to try again", self.bigFont, self.fontSize, 0, self.fontSize)
-    elseif game.paused == true then
-        gr.setFont(self.bigFont)
-        gr.setColor(1, 1, 1, 0.5)
-        gr.rectangle("fill", 0, 0, W, H)
-        gr.setColor(.6, 0, .3)
-        drawText("Game Paused", self.bigFont, self.fontSize, 0, 0)
-        drawText("touch anywhere or press any key to unpause", self.bigFont, self.fontSize, 0, self.fontSize)
+        drawOverlay(self, "GameOver", "touch anywhere or press any key to try again", {0, 0, 0, 0.5})
+    elseif game.paused == true and game.exit == 0 then
+        drawOverlay(self, "Game Paused", "touch anywhere or press any key to unpause", {1, 1, 1, 0.5})
+    elseif game.exit == 1 or game.exit == 2 then
+        drawOverlay(self, "Game Saving", "please wait patiently...", {0, 0.2, 0, 0.5})
     end
 
     if Music.songTitle then
@@ -62,27 +66,36 @@ local function init(self)
     self.sound = gr.newImage("assets/icons/sound.png")
     self.nosound = gr.newImage("assets/icons/nosound.png")
 end
-local function tk(self, game)
-    if game.paused then game.paused = toggle(game.paused) end
-    if game.player.hp <= 0 then game.restart = true end
+local function tk( game)
+    if game.paused then 
+        game.paused = toggle(game.paused)
+        return true
+    end
+    if game.player.hp <= 0 then
+        game.restart = true
+        return true
+    end
 end
 local function touch(self, game, x, y)
-    tk(self, game)
+    tk(game)
 end
-local function keypressd(self, game, key, set_mode)
-    tk(self, game)
-    if key == "kp+" then Music.bgm:setVolume(Music.bgm:getVolume() + .1) end
-    if key == "kp-" then Music.bgm:setVolume(Music.bgm:getVolume() - .1) end
-    if key == "n" then Music.bgm:stop() end
-    if key == "m" then game.muted = toggle(game.muted) end
-    if key == "p" or key == "pause" or key == "space" then game.paused = toggle(game.paused) end
-    if key == "escape" then game.paused = true game.exit = true end
+
+local function keypressed(self, game, key)
+    if not tk(game) then
+        if key == "kp+" then Music.bgm:setVolume(Music.bgm:getVolume() + .1) end
+        if key == "kp-" then Music.bgm:setVolume(Music.bgm:getVolume() - .1) end
+        if key == "n" then Music.bgm:stop() end
+        if key == "m" then game.muted = toggle(game.muted) end
+        if key == "p" or key == "pause" or key == "space" then game.paused = toggle(game.paused) end
+        if key == "escape" and game.exit < 1 then game.exit = 1 end
+    end
 end
+
 local function update(self, game)
-    local W, H = push:getDimensions()
+    local W = push:getWidth()
     local exit_button = suit.ImageButton(self.exit, 20, 20)
-    if exit_button.hit == true then
-        game.exit = true
+    if exit_button.hit == true and game.exit < 1 then
+        game.exit = 1
     end
     local pause_image = self.pause
     if game.paused then
@@ -102,4 +115,4 @@ local function update(self, game)
     end
     Cursor:update()
 end
-return {draw = draw, init = init, keypressed = keypressd, touch = touch, update = update}
+return {draw = draw, init = init, keypressed = keypressed, touch = touch, update = update}

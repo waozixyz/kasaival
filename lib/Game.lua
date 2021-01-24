@@ -23,15 +23,15 @@ local function addTree(self, randStage)
     local scale = (y + self.height) / H
 
     local W = self.width
-    local x = ma.random(W * -.5, W + (W * -.5))
+    local x = ma.random(W * -0.5, W + W * -0.5)
 
     local vir_x = x / scale
 
     local rat_x = x / vir_x
     y =  self.height + (y * rat_x)
 
-    local w = (ma.random(22, 33) * scale)
-    local h = (ma.random(62, 96) * scale)
+    local w = ma.random(22, 33) * scale
+    local h = ma.random(62, 96) * scale
 
     table.insert(self.trees, copy(Tree))
 
@@ -76,7 +76,7 @@ local function save(self)
     sav["p"] = getProp(self.player)
     sav["g"] = getProp(self.ground)
     local t = {}
-    for i, v in ipairs(self.trees) do table.insert(t, getProp(v)) end
+    for _, v in ipairs(self.trees) do table.insert(t, getProp(v)) end
     sav["t"] = t
     sav["cx"] = self.cx
     sav["elapsed"] = self.elapsed
@@ -107,7 +107,7 @@ end
 
 local function init(self, saveFile)
     -- default init for every game
-    self.restart, self.paused, self.exit, self.readyToExit = false, false, false, false
+    self.restart, self.paused, self.exit = false, false, 0
     local W, H= push:getDimensions()
     self.usingTouchMove = false
     self.width = W * 3
@@ -146,13 +146,13 @@ local function init(self, saveFile)
     
     -- init trees
     if t and #t > 0 then
-        for i, v in ipairs(t) do
+        for _, v in ipairs(t) do
             table.insert(self.trees, copy(Tree))
             local tree = self.trees[#self.trees]
             tree:init(v)
         end
     else
-        for i = 1, 60 do
+        for _ = 1, 60 do
             addTree(self, true)
         end
     end
@@ -160,7 +160,7 @@ local function init(self, saveFile)
 end
 
 local function keypressed(self, key, set_mode)
-    HUD:keypressed(self, key)
+    HUD:keypressed(self, key, set_mode)
 end
 
 local function touch(self, x, y, dt)
@@ -220,6 +220,7 @@ local function draw(self)
 end
 
 local function focus(self, f)
+    -- when the game is not focused, pause and mute music
     if not f then
         self.paused = true
         if not self.muted then
@@ -239,23 +240,23 @@ local function update(self, dt, set_mode)
     else
         Music:play()
     end
-    if self.readyToExit then
-        Music.bgm:pause()
-        set_mode("lib.Menu")
-    end
+    
     if self.restart then
         set_mode("lib.Game")
     end
-    if self.exit and not self.readyToExit then
+    if self.exit == 1 then
         if Testing then
             love.event.quit()
-        else
-            gr.captureScreenshot(self.saveFile .. ".png")
-            save(self)
-            self.readyToExit = true
         end
-    end
-    if not self.paused and self.player.hp > 0 then
+        self.exit = 2
+    elseif self.exit == 2 then
+        gr.captureScreenshot(self.saveFile .. ".png")
+        save(self)
+        self.exit = 3
+    elseif self.exit == 3 then
+        Music.bgm:pause()
+        set_mode("lib.Menu")
+    elseif not self.paused and self.player.hp > 0 then
         if not self.usingTouchMove then
             local dx, dy = 0, 0
             if ke.isScancodeDown("d", "right", "kp6") then dx = 1 end
@@ -283,7 +284,7 @@ local function update(self, dt, set_mode)
                 do
                 end
                 self.player:collided(tree.element)
-                tree:collided(self.player.element)
+                tree:collided(self.player)
             end
             tree:update(dt)
             if #tree.branches < 1 then

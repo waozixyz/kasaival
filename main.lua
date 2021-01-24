@@ -9,7 +9,7 @@ local sy = love.system
 local to = love.touch
 
 local gameWidth, gameHeight = 1920, 1080
-Testing = true
+Testing = false
 
 local mode = require("lib.Menu")
 
@@ -74,7 +74,7 @@ function love.update(dt)
     
     if x and y then
         suit.updateMouse(x, y)
-        if mo.isDown(1) then
+        if mo.isDown(1) and mode.touch then
             mode:touch(x, y, dt)
         end
     end

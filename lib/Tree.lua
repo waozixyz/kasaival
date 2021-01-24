@@ -18,17 +18,19 @@ end
 
 local function grow(self)
     local prev = self.branches[#self.branches]
-    local new = {}
+    local new = {} 
 
-    for i, v in ipairs(prev) do
+    for _, v in ipairs(prev) do
+        -- make branches thinner
         local w, h = v.w * 0.9, v.h * 0.9
-        local split = ma.random(0, 3)
 
-        if split > 0 then
+        -- decide if branch should split into two
+        local split = ma.random(1, 3)
+        if split > 1 or #prev < 3 then
             table.insert(new, getLine(v.n, v.deg - ma.random(20, 30), w, h, self.colorScheme))
             table.insert(new, getLine(v.n, v.deg + ma.random(20, 30), w, h, self.colorScheme))
         end
-        if split == 0 then
+        if split == 1 then
             table.insert(new, getLine(v.n, v.deg + ma.random(-10, 10), w, h, self.colorScheme))
         end
     end
@@ -40,8 +42,8 @@ local function shrink(self)
     table.remove(self.branches, #self.branches)
 end
 
-local function collided(self, element)
-    if element == "fire" then
+local function collided(self, obj)
+    if obj.element == "fire" then
         for _, row in ipairs(self.branches) do
             for _, v in ipairs(row) do
                 local c = v.color
@@ -53,7 +55,11 @@ local function collided(self, element)
                     b = b - .02
                 end
                 v.color = {r, g, b}
-                self.hp = self.hp - .8
+                local m = .5
+                if obj.hp > 200 then
+                    m = m * 1
+                end
+                self.hp = self.hp - m
             end
         end
     end
@@ -115,7 +121,7 @@ local function init(self, sav)
         local w = sav.w or 12
         local h = sav.h or 32
         local p = {0, self.y}
-        local n = {0, self.y - h}
+        local n = {ma.random(-10, 10), self.y - h}
         local branch = {color = rndColor(self.colorScheme), deg = -90, h = h, n = n, p = p, w = w}
         if sav.branches and #sav.branches > 0 then
             self.branches = sav.branches
@@ -131,7 +137,7 @@ end
 
 local function update(self, dt)
     local l = #self.branches
-    if self.hp > 80 then
+    if self.hp > 50 then
         if l < self.maxStage then
             self.elapsed = self.elapsed + dt
             if self.elapsed > self.growTime then
@@ -141,7 +147,8 @@ local function update(self, dt)
         end
     elseif l > 0 then
 
-        if l > self.hp / l then self.collapseTime = self.collapseTime + 1 end
+        if math.floor(self.hp / l) % 4 == 0 then self.collapseTime = self.collapseTime + 20 * dt end
+        if l > math.floor(self.hp / l) then self.collapseTime = self.collapseTime + 20 * dt end
         if l < 5 then self.collapseTime = self.collapseTime + dt end
         if self.collapseTime > self.growTime*.5 then
             shrink(self)
@@ -150,7 +157,7 @@ local function update(self, dt)
 
         for _, row in ipairs(self.branches) do
             for _, v in ipairs(row) do
-                local c = v.color
+                local c = v.color 
                 local r, g, b = c[1], c[2], c[3]
                 if r > .3 then
                     r = r - .0013

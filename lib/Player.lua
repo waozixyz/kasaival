@@ -72,7 +72,7 @@ local function update(self, dt)
     elseif self.hp > 60 then
         self.hp = self.hp - .4
     else
-        self.hp = self.hp - .4
+        self.hp = self.hp - 1
     end
     self.flame:update(dt)
 
