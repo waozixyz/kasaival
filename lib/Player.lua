@@ -30,7 +30,7 @@ local function init(self, sav)
     self.x = sav.x or W * .5
     self.y = sav.y or H * .7
     self.xp = sav.xp or 0
-    self.hp = sav.hp or 100
+    self.hp = sav.hp or 150
     self.lvl = sav.lvl or 0
     self.speed = sav.speed or 20
     self.flame = Flame()
@@ -62,15 +62,17 @@ local function update(self, dt)
     elseif self.hp > 160 then
         self.hp = self.hp - .4
     elseif self.hp > 140 then
-        self.hp = self.hp - .3
+        self.hp = self.hp - .5
     elseif self.hp > 120 then
-        self.hp = self.hp - .2
-    elseif self.hp > 100 then
         self.hp = self.hp - .3
+    elseif self.hp > 100 then
+        self.hp = self.hp - .2
     elseif self.hp > 80 then
-        self.hp = self.hp - .4
+        self.hp = self.hp - .3
     elseif self.hp > 60 then
-        self.hp = self.hp - .6
+        self.hp = self.hp - .4
+    else
+        self.hp = self.hp - .4
     end
     self.flame:update(dt)
 

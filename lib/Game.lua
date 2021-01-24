@@ -166,7 +166,7 @@ end
 
 local function touch(self, x, y, dt)
     if (self.player.hp <= 0) then self.restart = true end
-    if not self.paused then
+    if not self.paused and self.elapsed > 1 then
         local px, py = self.player.x, self.player.y
         local x0 = (x - self.cx)
         local nx, ny = (x0 - px), (y - py)
@@ -246,8 +246,8 @@ local function update(self, dt, set_mode)
             self.readyToExit = true
         end
     end
-    if (not self.paused and (self.player.hp > 0)) then
-        if not self.usingTouchMove then
+    if not self.paused and (self.player.hp > 0) then
+        if not self.usingTouchMove and self.elapsed > 1 then
             local dx, dy = 0, 0
             if ke.isScancodeDown("d", "right", "kp6") then dx = 1 end
             if ke.isScancodeDown("a", "left", "kp4") then dx = -1 end
@@ -262,9 +262,8 @@ local function update(self, dt, set_mode)
         end
         self.elapsed = (self.elapsed + dt)
         self.player.scale = ((self.player.y / H) * (self.player.hp * 0.01))
-        do
-        end
-        (self.player):update(dt, self)
+
+        self.player:update(dt, self)
         for i, tree in ipairs(self.trees) do
             if ((tree.x + self.cx) < (self.width * -0.5)) then
                 tree.x = (tree.x + self.width)
