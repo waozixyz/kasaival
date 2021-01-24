@@ -71,11 +71,12 @@ end
 
 function love.update(dt)
     local x, y = push:toGame(mo.getPosition())
-    x = (x or 0)
-    y = (y or 0)
-    suit.updateMouse(x, y)
-    if mo.isDown(1) then
-        mode:touch(x, y, dt)
+    
+    if x and y then
+        suit.updateMouse(x, y)
+        if mo.isDown(1) then
+            mode:touch(x, y, dt)
+        end
     end
     
     mode:update(dt, set_mode)
