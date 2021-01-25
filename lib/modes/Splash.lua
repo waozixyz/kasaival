@@ -9,7 +9,7 @@ local function keypressed(self, key, set_mode)
 end
 
 local function update(self, dt, set_mode)
-    set_mode("lib.Menu")
+    set_mode("Menu")
 end
 
 return {draw = draw, init = init, keypressed = keypressed, update = update}

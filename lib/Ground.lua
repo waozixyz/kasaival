@@ -66,7 +66,7 @@ local function getTile(i, v)
         return v.x, v.y - v.h, v.x + v.w * 0.5, v.y, v.x + v.w, v.y - v.h
     end
 end
-local rows = 20
+local rows = 18
 
 local function collide(self, obj)
     local l, r, u, d = obj:getHitbox()
@@ -102,7 +102,7 @@ local function init(self, sav, gw, gh)
     if #self.grid == 0 then
         while y < H + h do
             local row = {}
-            w, h = w + 1, h + 1
+            w, h = w + 3, h + 3
             for x = gw * -0.5, gw - gw * 0.5, w do
                 local c = rndColor()
                 table.insert(row, {color = c, h = h, orgColor = c, w = w, x = x, y = y})

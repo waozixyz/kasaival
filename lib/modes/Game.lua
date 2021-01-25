@@ -1,63 +1,42 @@
+-- library functions
 local copy = require("lib.copy")
 local lume = require("lib.lume")
 local push = require("lib.push")
 local serpent = require("lib.serpent")
 
+-- Main components
 local Ground = require("lib.Ground")
-local HUD = require("lib.HUD")
+local HUD = require("lib.ui.HUD")
 local Music = require("lib.Music")
-local Player = require("lib.Player")
-local Saves = require("lib.Saves")
-local Sky = require("lib.Sky")
-local Tree = require("lib.Tree")
+local Player = require "lib.Player"
+local Saves = require "lib.Saves"
+local Sky = require "lib.Sky"
+local Spawner = require "lib.Spawner"
 
+-- Trees
+local MainTree = require "lib.trees.Main"
+local CherryTree = require "lib.trees.Cherry"
+local OakTree = require "lib.trees.Oak"
+
+-- aliases
 local fi = love.filesystem
 local gr = love.graphics
 local ke = love.keyboard
 local ma = love.math
 
 local function addTree(self, randStage)
-    local H = push:getHeight()
-
-    local y = ma.random(0, H - self.height)
-    local scale = (y + self.height) / H
-
-    local W = self.width
-    local x = ma.random(W * -0.5, W + W * -0.5)
-
-    local vir_x = x / scale
-
-    local rat_x = x / vir_x
-    y =  self.height + (y * rat_x)
-
-    local w = ma.random(22, 33) * scale
-    local h = ma.random(62, 96) * scale
-
-    table.insert(self.trees, copy(Tree))
-
-    local tree = self.trees[#self.trees]
-    local maxStage = ma.random(6, 8)
-    local currentStage = nil
-    if randStage then currentStage = ma.random(0, maxStage) else currentStage = 0 end
-    local growTime = ma.random(1, 3)
-    local cs1 = {.5, .7, .2, .4, .2, .3}
-    local cs2 = {.5, .6, .4, .6, .2, .3}
-    local cs3 = {.3, .5, .2, .4, .3, .5}
-
-    local c = ({cs1, cs2, cs3})[ma.random(1, 3)]
-    tree:init(
-        {
-            colorScheme = c,
-            currentStage = currentStage,
-            growTime = growTime,
-            h = h,
-            maxStage = maxStage,
-            scale = scale,
-            w = w,
-            x = x,
-            y = y
-        }
-    )
+    -- get random x y coord in game
+    local x, y, scale = Spawner(self.width, self.height)
+    -- decide which tree to grow
+    local chance = ma.random(0, 10)
+    local tree
+    if chance > 2 then
+        tree = OakTree(x, y, scale, randStage)
+    else
+        --tree = CherryTree(x, y, scale, randStage)
+    end
+    -- add to trees table
+    table.insert(self.trees, tree)
 end
 
 local function getProp(e)
@@ -83,7 +62,7 @@ local function save(self)
     sav["muted"] = self.muted
     sav["treeTime"] = self.treeTime
 
-    local s, m = fi.write(self.saveFile, serpent.dump(sav))
+    fi.write(self.saveFile, serpent.dump(sav))
 end
 
 local function checkCollision(o1, o2)
@@ -124,30 +103,30 @@ local function init(self, _, saveFile)
     end
 
     self.elapsed = sav.elapsed or 0
-    self.muted = sav.muted or false
+    self.muted = sav.muted or true
     self.treeTime = sav.treeTime or 0
     self.cx = sav.cx or 0
 
-    
+
     self.trees = {}
     local sky, p, g, t = sav.sky or {}, sav.p or {}, sav.g or {}, sav.t or nil
 
     -- init sky
     self.sky = copy(Sky)
     self.sky:init(sky)
-    
+
     -- ini ground
     self.ground = copy(Ground)
     self.ground:init(g, self.width, self.height)
-    
+
     -- ini player
     self.player = copy(Player)
     self.player:init(p)
-    
+
     -- init trees
     if t and #t > 0 then
         for _, v in ipairs(t) do
-            table.insert(self.trees, copy(Tree))
+            table.insert(self.trees, copy(MainTree))
             local tree = self.trees[#self.trees]
             tree:init(v)
         end
@@ -197,7 +176,7 @@ local function draw(self)
 
     -- draw ground
     self.ground:draw(self)
-    
+
     -- make entities table
     local entities = {self.player}
     for _, tree in ipairs(self.trees) do
@@ -250,9 +229,9 @@ local function update(self, dt, set_mode)
     else
         Music:play()
     end
-    
+
     if self.restart then
-        set_mode("lib.Game")
+        set_mode("Game")
     end
     if self.exit == 1 then
         if Testing then
@@ -265,7 +244,7 @@ local function update(self, dt, set_mode)
         self.exit = 3
     elseif self.exit == 3 then
         Music.bgm:pause()
-        set_mode("lib.Menu")
+        set_mode("Menu")
     elseif not self.paused and self.player.hp > 0 then
         if not self.usingTouchMove then
             local dx, dy = 0, 0

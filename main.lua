@@ -10,12 +10,12 @@ local sy = love.system
 local gameWidth, gameHeight = 1920, 1080
 Testing = true
 
-local mode = require("lib.Menu")
+local mode = require("lib.modes.Menu")
 
-if Testing then mode = require("lib.Game") end
+if Testing then mode = require("lib.modes.Game") end
 
 local function set_mode(mode_name, ...)
-    mode = require(mode_name)
+    mode = require("lib.modes." .. mode_name)
     if mode.init then mode:init(set_mode, ...) end
 end
 

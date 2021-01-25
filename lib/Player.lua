@@ -1,5 +1,5 @@
 local push = require("lib.push")
-local Flame = require("lib.Flame")
+local Flame = require("lib.ps.Flame")
 
 local gr = love.graphics
 
@@ -29,7 +29,7 @@ local function init(self, sav)
     self.xp = sav.xp or 0
     self.hp = sav.hp or 200
     self.lvl = sav.lvl or 0
-    self.speed = sav.speed or 20
+    self.speed = sav.speed or 10
     self.flame = Flame()
     self.sizes = {1, 1, 1, 1, 1, 1, 1, 1}
     self.elapsed = 0
@@ -77,7 +77,7 @@ local function update(self, dt)
     self.elapsed = self.elapsed + dt
     
     if self.elapsed > .2 then
-        self.sizes = getSizes(self.sizes, self.scale)
+        self.sizes = getSizes(self.sizes, self.scale * 2)
         self.elapsed = 0
     end
     
@@ -92,7 +92,7 @@ local function update(self, dt)
         self.hp = self.hp - 0.5 * self.burnRate
     end
     if self.hp < 80 or self.hp > 120 then
-        self.hp = self.hp - 0.1 * self.burnRate
+        self.hp = self.hp - 0.2 * self.burnRate
     end
     self.flame:update(dt)
 
@@ -109,5 +109,5 @@ return {
     ow = 32,
     scale = 1,
     update = update,
-    burnRate = .2,
+    burnRate = .1,
 }

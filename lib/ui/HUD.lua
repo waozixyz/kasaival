@@ -1,7 +1,7 @@
 local suit = require("lib.suit")
 local push = require("lib.push")
 
-local Cursor = require("lib.Cursor")
+local Cursor = require("lib.ui.Cursor")
 local Music = require("lib.Music")
 
 local gr = love.graphics
@@ -35,7 +35,7 @@ local function draw(self, game)
     local W, H = push:getDimensions()
     local hp = game.player.hp
 
-    gr.setColor(.2, 0, 0, 1 - (hp / 100) - .4)
+    gr.setColor(.2, 0, 0, 1 - (hp / 100))
     gr.rectangle("fill", 0, 0, W, H)
     if hp <= 0 then
         drawOverlay(self, "GameOver", "touch anywhere or press any key to try again", {0, 0, 0, 0.5})
@@ -109,7 +109,7 @@ local function update(self, game)
     if game.muted then
         music_image = self.nomusic
     end
-    local music_button = suit.ImageButton(music_image, (W - 84), 20)
+    local music_button = suit.ImageButton(music_image, W - 84, 20)
     if (music_button.hit == true) then
         game.muted = toggle(game.muted)
     end

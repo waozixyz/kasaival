@@ -1,7 +1,7 @@
 local push = require("lib.push")
 local suit = require("lib.suit")
-local Bckg = require("lib.Bckg")
-local Cursor = require("lib.Cursor")
+local Bckg = require("lib.ui.Bckg")
+local Cursor = require("lib.ui.Cursor")
 local Saves = require("lib.Saves")
 
 local gr = love.graphics
@@ -15,22 +15,22 @@ local function init(self, set_mode)
     Cursor:init()
     self.saves = Saves:getFiles()
     if self.saves and #self.saves < 1 then
-        set_mode("lib.Game", "saves/save1")
+        set_mode("Game", "saves/save1")
     end
 end
 local function keypressd(self, key, set_mode)
     if key == "escape" then
-        set_mode("lib.Menu")
+        set_mode("Menu")
     elseif key == "1" then
-        set_mode("lib.Game", (Saves.saveName .. "1"))
+        set_mode("Game", (Saves.saveName .. "1"))
     elseif key == "2" then
-        set_mode("lib.Game", (Saves.saveName .. "2"))
+        set_mode("Game", (Saves.saveName .. "2"))
     elseif key == "3" then
-        set_mode("lib.Game", (Saves.saveName .. "3"))
+        set_mode("Game", (Saves.saveName .. "3"))
     elseif key == "4" then
-        set_mode("lib.Game", (Saves.saveName .. "4"))
+        set_mode("Game", (Saves.saveName .. "4"))
     elseif key == "return" then
-        set_mode("lib.Game", (Saves.saveName .. "1"))
+        set_mode("Game", (Saves.saveName .. "1"))
     end
 end
 local function getShape(id, sav)
@@ -56,9 +56,9 @@ local function update(self, dt, set_mode)
             -- if button hit, set_mode
             if suit.isHit(id) then
                 if sav.file then
-                    set_mode("lib.Game", ("saves/" .. sav.file))
+                    set_mode("Game", ("saves/" .. sav.file))
                 else
-                    set_mode("lib.Game")
+                    set_mode("Game")
                 end
             end
             suit.Button("delete", {id = id .. "del"}, x + w * .25, y + h + 50, w * .5, 50)
@@ -75,7 +75,7 @@ local function update(self, dt, set_mode)
 
         suit.Button("New Game", {id = id}, x, y, w, h)
         if suit.isHit(id) then
-            set_mode("lib.Game")
+            set_mode("Game")
         end
         Cursor:update()
     end
