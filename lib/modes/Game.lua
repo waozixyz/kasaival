@@ -138,8 +138,8 @@ local function init(self, _, saveFile)
 
 end
 
-local function keypressed(self, key, set_mode)
-    HUD:keypressed(self, key, set_mode)
+local function keypressed(...)
+    HUD:keypressed(...)
 end
 
 local function touch(self, x, y, dt)

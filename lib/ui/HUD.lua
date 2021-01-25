@@ -77,7 +77,10 @@ local function tk( game)
     end
 end
 local function touch(self, game, x, y)
-    tk(game)
+    local w, h =self.pause:getDimensions()
+    if x > w + 100 or y > h + 20 then
+        tk(game)
+    end
 end
 
 local function keypressed(self, game, key)

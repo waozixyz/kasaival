@@ -16,7 +16,11 @@ end
 
 local function draw(self)
     gr.setColor(1,1,1,1)
-    gr.setBlendMode("add")
+    if self.boost then
+        gr.setBlendMode("add")
+    else
+        gr.setBlendMode("alpha")
+    end
     gr.draw(self.flame)
     gr.setBlendMode("alpha")
 end
@@ -33,6 +37,7 @@ local function init(self, sav)
     self.flame = Flame()
     self.sizes = {1, 1, 1, 1, 1, 1, 1, 1}
     self.elapsed = 0
+    self.boost = false
 end
 
 local function returnTable(t)
