@@ -14,8 +14,8 @@ local Sky = require "lib.Sky"
 local Spawner = require "lib.Spawner"
 
 -- Trees
-local MainTree = require "lib.trees.Main"
-local CherryTree = require "lib.trees.Cherry"
+local MainTree = require "lib.trees.Tree"
+local SakuraTree = require "lib.trees.Sakura"
 local OakTree = require "lib.trees.Oak"
 
 -- aliases
@@ -28,12 +28,12 @@ local function addTree(self, randStage)
     -- get random x y coord in game
     local x, y, scale = Spawner(self.width, self.height)
     -- decide which tree to grow
-    local chance = ma.random(0, 10)
+    local chance = ma.random(0, 100)
     local tree
     if chance > 2 then
         tree = OakTree(x, y, scale, randStage)
     else
-        --tree = CherryTree(x, y, scale, randStage)
+        tree = SakuraTree(x, y, scale, randStage)
     end
     -- add to trees table
     table.insert(self.trees, tree)
@@ -93,7 +93,6 @@ local function init(self, _, saveFile)
     self.height = H / 2.5
     HUD:init()
 
-
     -- load save content if possible
     self.saveFile = saveFile or Saves:nextSave()
     local sav = {}
@@ -144,7 +143,7 @@ end
 
 local function touch(self, x, y, dt)
     HUD:touch(self, x, y)
-    if not self.paused then
+    if not self.paused and y > 100 then
         local px, py = self.player.x, self.player.y
         x = x - self.cx
         local nx, ny = x - px, y - py
@@ -154,7 +153,7 @@ local function touch(self, x, y, dt)
             nx = nil
             ny = nil
         end
-        if y > 100 and nx and ny then
+        if nx and ny then
             local angle = math.atan2(nx, ny) * radToDeg
             if angle < 0 then
                 angle = 360 + angle
@@ -270,9 +269,7 @@ local function update(self, dt, set_mode)
                 tree.x = tree.x - self.width
             end
             if checkCollision(tree, self.player) then
-                do
-                end
-                self.player:collided(tree.element)
+                self.player:collided(tree.element, tree.special, #tree.branches == tree.maxStage)
                 tree:collided(self.player)
             end
             tree:update(dt)

@@ -1,4 +1,4 @@
-local Main = require "lib.trees.Main"
+local Main = require "lib.trees.Tree"
 local copy = require "lib.copy"
 
 local ma = love.math
@@ -12,7 +12,7 @@ return function(x, y, scale, randStage)
     local maxStage = ma.random(7, 8)
     local currentStage = nil
     if randStage then currentStage = ma.random(0, maxStage) else currentStage = 0 end
-    local growTime = ma.random(2, 3)
+    local growTime = ma.random(3, 4)
     local bcs1 = {.4, .5, .3, .4, .2, .2}
     local bcs2 = {.5, .6, .2, .3, .2, .3}
     local bcs3 = {.4, .5, .2, .3, .2, .3}

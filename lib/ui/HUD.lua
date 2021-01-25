@@ -60,7 +60,11 @@ local function init(self)
     self.font = gr.newFont("assets/fonts/hintedSymbola.ttf", 32)
     self.exit = gr.newImage("assets/icons/exit.png")
     self.resume = gr.newImage("assets/icons/resume.png")
-    self.pause = gr.newImage("assets/icons/pause.png")
+    self.pause = {
+        img = gr.newImage("assets/icons/pause.png"),
+        x = 140,
+        y = 20
+    }
     self.music = gr.newImage("assets/icons/music.png")
     self.nomusic = gr.newImage("assets/icons/nomusic.png")
     self.sound = gr.newImage("assets/icons/sound.png")
@@ -77,8 +81,8 @@ local function tk( game)
     end
 end
 local function touch(self, game, x, y)
-    local w, h =self.pause:getDimensions()
-    if x > w + 100 or y > h + 20 then
+    local w, h =self.pause.img:getDimensions()
+    if x > w + self.pause.x or y > h + self.pause.y then
         tk(game)
     end
 end
@@ -100,11 +104,11 @@ local function update(self, game)
     if exit_button.hit == true and game.exit < 1 then
         game.exit = 1
     end
-    local pause_image = self.pause
+    local pause_image = self.pause.img
     if game.paused then
         pause_image = self.resume
     end
-    local pause_button = suit.ImageButton(pause_image, 100, 20)
+    local pause_button = suit.ImageButton(pause_image, self.pause.x, self.pause.y)
     if pause_button.hit == true then
         game.paused = toggle(game.paused)
     end
@@ -112,7 +116,7 @@ local function update(self, game)
     if game.muted then
         music_image = self.nomusic
     end
-    local music_button = suit.ImageButton(music_image, W - 84, 20)
+    local music_button = suit.ImageButton(music_image, W - 128, 20)
     if (music_button.hit == true) then
         game.muted = toggle(game.muted)
     end

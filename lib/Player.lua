@@ -3,9 +3,31 @@ local Flame = require("lib.ps.Flame")
 
 local gr = love.graphics
 
-local function collided(self, oc, f)
+local function startBoost(self)
+    self.dp = self.dp * 1.5
+    self.boost = true
+    self.speed = self.speed * 1.5
+end
+
+local function stopBoost(self)
+    self.dp = self.dp / 1.5
+    self.boost = false
+    self.speed = self.speed / 1.5
+end
+
+local function collided(self, oc, s, full)
     if type(oc) == "table" then self.hp = self.hp + oc[2] - oc[3] end
-    if oc == "plant" then self.hp = self.hp + .5 end
+    if oc == "plant" then
+        self.hp = self.hp + .5
+        if full and s == "sakura" then
+            self.boostTime = 10
+            if not self.boost then
+                startBoost(self)
+            end
+        elseif full then
+            self.hp = self.hp + 1
+        end
+    end
 end
 
 local function getHitbox(self)
@@ -78,6 +100,9 @@ end
 
 
 local function update(self, dt)
+    if self.boostTime > 0 then
+        self.boostTime = self.boostTime - dt
+    elseif self.boost then stopBoost(self) end
 
     self.elapsed = self.elapsed + dt
     
@@ -104,14 +129,16 @@ local function update(self, dt)
 end
 
 return {
+    boostTime = 0,
     collided = collided,
     draw = draw,
     element = "fire",
     getHitbox = getHitbox,
     init = init,
     move = move,
-    oh = 32,
-    ow = 32,
+    oh = 32, -- height
+    ow = 32, -- width
+    dp = .5, -- destroy power
     scale = 1,
     update = update,
     burnRate = .1,

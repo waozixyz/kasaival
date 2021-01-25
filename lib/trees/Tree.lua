@@ -1,8 +1,11 @@
+local Flame = require "lib.ps.Flame"
+
 local gr = love.graphics
 local ma = love.math
 local deg_to_rad = math.pi / 180
 
 local function burn(c)
+
     local r, g, b = c[1], c[2], c[3]
     if r < .9 then
         r = r + .04
@@ -22,10 +25,7 @@ local function collided(self, obj)
                     v.leaf.color = burn(v.leaf.color)
                 end
 
-                local m = .5
-                if obj.hp > 200 then
-                    m = m * 1
-                end
+                local m = obj.dp
                 self.hp = self.hp - m
             end
         end
@@ -69,8 +69,9 @@ local function grow(self)
         -- decide if branch should split into two
         local split = ma.random(1, 3)
         if split > 1 or #prev < 3 then
-            table.insert(row, getLine(self, v.n, v.deg - ma.random(20, 30), w, h))
-            table.insert(row, getLine(self, v.n, v.deg + ma.random(20, 30), w, h))
+            local sa = self.splitAngle
+            table.insert(row, getLine(self, v.n, v.deg - ma.random(sa[1], sa[2]), w, h))
+            table.insert(row, getLine(self, v.n, v.deg + ma.random(sa[1], sa[2]), w, h))
         end
         if split == 1 then
             table.insert(row, getLine(self, v.n, v.deg + ma.random(-10, 10), w, h))
@@ -117,6 +118,9 @@ local function draw(self)
         gr.setColor(v.color)
         gr.ellipse("fill", v.x, v.y, v.w, v.h)
     end
+    if self.flame then
+        gr.draw(self.flame)
+    end
 end
 
 local function getHitbox(self)
@@ -135,14 +139,16 @@ local function init(self, sav)
 	    collapseTime = 0,
         branchScheme = {.5, .7, .2, .4, .2, .3},
         leafScheme = {.2, .2, .5, .6, .2, .4},
-	    element = "plant",
+        element = "plant",
+        special = "",
 	    growTime = 1,
 		maxStage = 7,
 		x = 0, y = 0,
 		hp = 100,
 		scale = 1,
 		branches = {},
-        leaves = {}
+        leaves = {},
+        splitAngle = {20, 30}
     }
 
     -- replace with sav data
@@ -180,9 +186,15 @@ local function update(self, dt)
             end
         end
     elseif l > 0 then
-
-        if math.floor(self.hp / l) % 4 == 0 then self.collapseTime = self.collapseTime + 20 * dt end
-        if l > math.floor(self.hp / l) then self.collapseTime = self.collapseTime + 20 * dt end
+        if not self.flame then
+            self.flame = Flame()
+            
+            self.flame:setPosition(self.x, self.y)
+            self.flame:emit(20)
+            self.flame:setSpeed(200)
+        end
+        if math.floor(self.hp / l) % 4 == 0 then self.collapseTime = self.collapseTime + 10 * dt end
+        if l > math.floor(self.hp / l) then self.collapseTime = self.collapseTime + 10 * dt end
         if l < 5 then self.collapseTime = self.collapseTime + dt end
         if self.collapseTime > self.growTime*.5 then
             shrink(self)
@@ -205,7 +217,14 @@ local function update(self, dt)
                 v.color = {r, g, b}
             end
         end
+
+  
+        if self.flame then
+            self.flame:update(dt)
+        end
     end
+
+
 end
 return {
     collided = collided,
