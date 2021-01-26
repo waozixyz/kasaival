@@ -4,6 +4,7 @@ local copy = require "lib.copy"
 local ma = love.math
 
 return function(x, y, scale, randStage)
+    x, y, scale = x or 400, y or 400, scale or 1
     local w = ma.random(22, 27) * scale
     local h = ma.random(72, 86) * scale
 

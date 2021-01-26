@@ -160,7 +160,7 @@ local function touch(self, x, y, dt)
             end
             angle = angle * degToRad
             local ax, ay = math.sin(angle), math.cos(angle)
-            self.player:move(ax, ay, self, dt)
+            self.player:move(ax, ay, self.cx, self.height, dt)
             self.usingTouchMove = true
         end
     end
@@ -251,7 +251,7 @@ local function update(self, dt, set_mode)
             if ke.isScancodeDown("a", "left", "kp4") then dx = -1 end
             if ke.isScancodeDown("s", "down", "kp2") then dy = 1 end
             if ke.isScancodeDown("w", "up", "kp8") then dy = -1 end
-            self.player:move(dx, dy, self, dt)
+            self.player:move(dx, dy, self.cx, self.height, dt)
         end
         self.treeTime = self.treeTime + dt
         if self.treeTime > 1 then

@@ -77,20 +77,20 @@ local function getSizes(sizes, scale)
     return rtn
 end
 
-local function move(self, dx, dy, g, dt)
+local function move(self, dx, dy, cx, gh, dt)
     local W, H = push:getDimensions()
     local s = self.speed * self.scale * dt * 20
     dx, dy = dx * s, dy * s
     local x, y = self.x + dx, self.y + dy
-    if x + g.cx < W / 4 then
-        g.cx = g.cx - dx
-    elseif x + g.cx > W - (W / 4) then
-        g.cx = g.cx - dx
+    if x + cx < W / 4 then
+        cx = cx - dx
+    elseif x + cx > W - (W / 4) then
+        cx = cx - dx
     end
     if y > H then
         y = H
-    elseif (y < (H - g.ground.height)) then
-        y = H - g.ground.height
+    elseif y < (H - gh) then
+        y = H - gh
     end
     self.flame:setPosition(x, y)
 
@@ -107,7 +107,7 @@ local function update(self, dt)
     self.elapsed = self.elapsed + dt
     
     if self.elapsed > .2 then
-        self.sizes = getSizes(self.sizes, self.scale * 2)
+        self.sizes = getSizes(self.sizes, self.scale * .5)
         self.elapsed = 0
     end
     

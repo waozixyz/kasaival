@@ -10,14 +10,12 @@ local sy = love.system
 local gameWidth, gameHeight = 1920, 1080
 Testing = true
 
-local mode = require("lib.modes.Menu")
-
-if Testing then mode = require("lib.modes.Game") end
-
+local mode
 local function set_mode(mode_name, ...)
-    mode = require("lib.modes." .. mode_name)
+    mode = require("lib.scenes." .. mode_name)
     if mode.init then mode:init(set_mode, ...) end
 end
+
 
 local uiTheme = {
     active = {bg = {.2, 0, .1}, fg = {.5, .1, .2}},
@@ -47,6 +45,8 @@ function love.load()
         windowHeight,
         {fullscreen = fullscreen, highdpi = true, resizable = resizable}
     )
+    set_mode("Splash")
+
     suit.theme.color = uiTheme
     mode:init(set_mode)
 end

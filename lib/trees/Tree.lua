@@ -177,7 +177,7 @@ end
 
 local function update(self, dt)
     local l = #self.branches
-    if self.hp > 50 then
+    if self.hp > 70 then
         if l < self.maxStage then
             self.elapsed = self.elapsed + dt
             if self.elapsed > self.growTime then
@@ -190,14 +190,12 @@ local function update(self, dt)
             self.flame = Flame()
             
             self.flame:setPosition(self.x, self.y)
-            self.flame:emit(20)
-            self.flame:setSpeed(200)
         end
         if math.floor(self.hp / l) % 4 == 0 then self.collapseTime = self.collapseTime + 10 * dt end
         if l > math.floor(self.hp / l) then self.collapseTime = self.collapseTime + 10 * dt end
         if l < 5 then self.collapseTime = self.collapseTime + dt end
         if self.collapseTime > self.growTime*.5 then
-            shrink(self)
+         --   shrink(self)
             self.collapseTime = 0
         end
 
