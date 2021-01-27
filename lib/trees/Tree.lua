@@ -9,8 +9,8 @@ local function collided(self, obj)
         -- reduce hp based on the object destroy power
         self.burnIntensity = obj.dp
         self.burnTimer = 4
-        if self.flame then
-            self.flame:setEmissionRate(20)
+        if self.fire then
+            self.fire:setEmissionRate(20)
         end
     end
 end
@@ -52,9 +52,9 @@ local function draw(self)
         end
     end
 
-    if self.flame then
+    if self.fire then
         gr.setColor(1, 1, 1)
-        gr.draw(self.flame)
+        gr.draw(self.fire)
     end
 end
 
@@ -142,17 +142,17 @@ local function update(self, dt)
 
     -- have this seperate in case the tree is dead but particles need to die
     if self.burning then
-        if not self.flame and l > 0 then
-            self.flame = Fire()
-            self.flame:setPosition(self.x, self.y)
-            self.flame:setSpeed(getHeight(self) * .5)
+        if not self.fire and l > 0 then
+            self.fire = Fire()
+            self.fire:setPosition(self.x, self.y)
+            self.fire:setSpeed(getHeight(self) * .5)
         end
-        self.flame:update(dt)
-    elseif self.flame then
-        self.flame:setEmissionRate(0)
-        self.flame:update(dt)
-        if self.flame:getCount() <= 0 then
-            self.flame = nil
+        self.fire:update(dt)
+    elseif self.fire then
+        self.fire:setEmissionRate(0)
+        self.fire:update(dt)
+        if self.fire:getCount() <= 0 then
+            self.fire = nil
             if self.dying then
                 self.dead = true
             end
