@@ -198,7 +198,9 @@ local function update(self, dt, set_mode)
         save(self)
         self.exit = 3
     elseif self.exit == 3 then
-        Music.bgm:pause()
+        if Music.bgm then
+            Music.bgm:pause()
+        end
         set_mode("Menu")
     elseif not self.paused and self.player.hp > 0 then
         self.treeTime = self.treeTime + dt

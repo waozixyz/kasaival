@@ -153,5 +153,5 @@ return {
     dp = .5, -- destroy power
     scale = 1,
     update = update,
-    burnRate = .1,
+    burnRate = .6,
 }
