@@ -30,7 +30,27 @@ local function drawOverlay(self, title, subtitle, color, font, fontSize)
     drawText(title or "", self.bigFont, self.fontSize, 0, 0)
     drawText(subtitle or "", font, fontSize, 0, fontSize)
 end
-
+local function focus(self, game, f)
+    if not f then
+        if not game.paused then
+            game.unpause = true
+            game.paused = true
+        end
+        if not game.muted then
+            game.muted = true
+            game.unmute = true
+        end
+    else
+        if game.unmute then
+            game.muted = false
+            game.unmute = false
+        end
+        if game.unpause then
+            game.paused = false
+            game.unpause = false
+        end
+    end
+end
 local function draw(self, game)
     local W, H = push:getDimensions()
     local hp = game.player.hp
@@ -122,4 +142,4 @@ local function update(self, game)
     end
     Cursor:update()
 end
-return {draw = draw, init = init, keypressed = keypressed, touch = touch, update = update}
+return {focus = focus, draw = draw, init = init, keypressed = keypressed, touch = touch, update = update}

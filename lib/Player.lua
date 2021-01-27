@@ -1,4 +1,6 @@
 local push = require("lib.push")
+
+local Controller = require("lib.Controller")
 local Flame = require("lib.ps.Flame")
 
 local gr = love.graphics
@@ -60,6 +62,7 @@ local function init(self, sav)
     self.sizes = {1, 1, 1, 1, 1, 1, 1, 1}
     self.elapsed = 0
     self.boost = false
+    return self
 end
 
 local function returnTable(t)
@@ -77,29 +80,38 @@ local function getSizes(sizes, scale)
     return rtn
 end
 
-local function move(self, dx, dy, cx, gh, dt)
+local function move(self, dx, dy, g, dt)
     local W, H = push:getDimensions()
     local s = self.speed * self.scale * dt * 20
     dx, dy = dx * s, dy * s
     local x, y = self.x + dx, self.y + dy
-    if x + cx < W / 4 then
-        cx = cx - dx
-    elseif x + cx > W - (W / 4) then
-        cx = cx - dx
+    if x + g.cx < W / 5 then
+        g.cx = g.cx - dx
+    elseif x + g.cx > W - (W / 5) then
+        g.cx = g.cx - dx
     end
     if y > H then
         y = H
-    elseif y < (H - gh) then
-        y = H - gh
+    elseif y < g.height then
+        y = g.height
     end
     self.flame:setPosition(x, y)
-
     self.flame:setSizes(returnTable(self.sizes))
     self.x, self.y = x, y
 end
 
+local function touch(self, game, x, y, dt)
+    local dx, dy = Controller:touch(self, game, x, y)
+    if dx and dy then
+        move(self, dx, dy, game, dt)
+    end
+end
 
-local function update(self, dt)
+local function update(self, game, dt)
+    local dx, dy = Controller:update(self, dt)
+    if dx and dy then
+        move(self, dx, dy, game, dt)
+    end
     if self.boostTime > 0 then
         self.boostTime = self.boostTime - dt
     elseif self.boost then stopBoost(self) end
@@ -131,11 +143,11 @@ end
 return {
     boostTime = 0,
     collided = collided,
+    touch = touch,
     draw = draw,
     element = "fire",
     getHitbox = getHitbox,
     init = init,
-    move = move,
     oh = 32, -- height
     ow = 32, -- width
     dp = .5, -- destroy power

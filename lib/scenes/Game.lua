@@ -41,7 +41,6 @@ end
 
 local function getProp(e)
     local t = {}
-
     for k, v in pairs(e) do
         if k ~= "move" and k ~= "init" and k ~= "collided" and k ~= "update" and k ~= "draw" and k ~= "getHitbox" and k ~= "collide" then
             t[k] = v
@@ -76,9 +75,6 @@ local function checkCollision(o1, o2)
     end
 end
 
-local radToDeg = 180 / math.pi
-local degToRad = math.pi / 180
-
 local function checkVisible(self, x, w)
     local W = push:getWidth()
     if x + self.cx < W + w and x + self.cx > -w then return true else return false end
@@ -111,16 +107,13 @@ local function init(self, _, saveFile)
     local sky, p, g, t = sav.sky or {}, sav.p or {}, sav.g or {}, sav.t or nil
 
     -- init sky
-    self.sky = copy(Sky)
-    self.sky:init(sky)
+    self.sky = copy(Sky):init(sky)
 
     -- ini ground
-    self.ground = copy(Ground)
-    self.ground:init(g, self.width, self.height)
+    self.ground = copy(Ground):init(g, self.width, self.height)
 
     -- ini player
-    self.player = copy(Player)
-    self.player:init(p)
+    self.player = copy(Player):init(p)
 
     -- init trees
     if t and #t > 0 then
@@ -144,25 +137,7 @@ end
 local function touch(self, x, y, dt)
     HUD:touch(self, x, y)
     if not self.paused and y > 100 then
-        local px, py = self.player.x, self.player.y
-        x = x - self.cx
-        local nx, ny = x - px, y - py
-        local w = self.player.scale * self.player.ow * 0.2
-        local h = self.player.scale * self.player.oh * 0.2
-        if nx < w and nx > -w and ny < h and ny > -h then
-            nx = nil
-            ny = nil
-        end
-        if nx and ny then
-            local angle = math.atan2(nx, ny) * radToDeg
-            if angle < 0 then
-                angle = 360 + angle
-            end
-            angle = angle * degToRad
-            local ax, ay = math.sin(angle), math.cos(angle)
-            self.player:move(ax, ay, self.cx, self.height, dt)
-            self.usingTouchMove = true
-        end
+        self.player:touch(self, x, y, dt)
     end
 end
 
@@ -186,7 +161,7 @@ local function draw(self)
     -- sort entities by y axis
     entities = lume.sort(entities, "y")
     -- draw entities
-    for i, entity in ipairs(entities) do
+    for _, entity in ipairs(entities) do
         entity:draw()
     end
 
@@ -197,27 +172,8 @@ local function draw(self)
     HUD:draw(self)
 end
 
-local function focus(self, f)
-    -- when the game is not focused, pause and mute music
-    if not f then
-        if not self.paused then
-            self.unpause = true
-            self.paused = true
-        end
-        if not self.muted then
-            self.muted = true
-            self.unmute = true
-        end
-    else
-        if self.unmute then
-            self.muted = false
-            self.unmute = false
-        end
-        if self.unpause then
-            self.paused = false
-            self.unpause = false
-        end
-    end
+local function focus(...)
+    HUD:focus(...)
 end
 
 local function update(self, dt, set_mode)
@@ -245,14 +201,6 @@ local function update(self, dt, set_mode)
         Music.bgm:pause()
         set_mode("Menu")
     elseif not self.paused and self.player.hp > 0 then
-        if not self.usingTouchMove then
-            local dx, dy = 0, 0
-            if ke.isScancodeDown("d", "right", "kp6") then dx = 1 end
-            if ke.isScancodeDown("a", "left", "kp4") then dx = -1 end
-            if ke.isScancodeDown("s", "down", "kp2") then dy = 1 end
-            if ke.isScancodeDown("w", "up", "kp8") then dy = -1 end
-            self.player:move(dx, dy, self.cx, self.height, dt)
-        end
         self.treeTime = self.treeTime + dt
         if self.treeTime > 1 then
             addTree(self)
@@ -261,19 +209,19 @@ local function update(self, dt, set_mode)
         self.elapsed = self.elapsed + dt
         self.player.scale = (self.player.y / H) * self.player.hp * 0.01
 
-        self.player:update(dt, self)
+        self.player:update(self, dt)
         for i, tree in ipairs(self.trees) do
             if tree.x + self.cx < self.width * -0.5 then
                 tree.x = tree.x + self.width
             elseif tree.x + self.cx > self.width * 0.5 then
                 tree.x = tree.x - self.width
             end
-            if checkCollision(tree, self.player) then
+            if #tree.branches > 0 and checkCollision(tree, self.player) then
                 self.player:collided(tree.element, tree.special, #tree.branches == tree.maxStage)
                 tree:collided(self.player)
             end
             tree:update(dt)
-            if #tree.branches < 1 then
+            if tree.dead then
                 self.player.xp = self.player.xp + 10
                 self.player.hp = self.player.hp + 1
                 table.remove(self.trees, i)
@@ -281,8 +229,7 @@ local function update(self, dt, set_mode)
         end
         self.sky:update(dt)
         self.ground:collide(self.player)
-        self.ground:update(dt, self)
-        self.usingTouchMove = false
+        self.ground:update(self, dt)
     end
 end
 return {checkVisible = checkVisible, draw = draw, init = init, keypressed = keypressed, touch = touch, focus = focus, update = update}

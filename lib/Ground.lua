@@ -94,8 +94,8 @@ end
 local function init(self, sav, gw, gh)
     local H = push:getHeight()
     local y = gh
-    self.height = (H - y)
-    local w = (self.height / rows)
+    self.height = H - y
+    local w = self.height / rows
     local h = w
     local i = 0
     if sav and sav.grid then self.grid = sav.grid else self.grid = {} end
@@ -114,8 +114,9 @@ local function init(self, sav, gw, gh)
             y = y + h
         end
     end
+    return self
 end
-local function update(self, dt, g)
+local function update(self, g, dt)
     for _, row in ipairs(self.grid) do
         for _, tile in ipairs(row) do
             tile.color = healTile(tile)

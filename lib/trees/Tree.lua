@@ -1,33 +1,16 @@
-local Flame = require "lib.ps.Flame"
+local Fire = require "lib.ps.Fire"
 
 local gr = love.graphics
 local ma = love.math
 local deg_to_rad = math.pi / 180
 
-local function burn(c)
-
-    local r, g, b = c[1], c[2], c[3]
-    if r < .9 then
-        r = r + .04
-    end
-    if b > .1 then
-        b = b - .02
-    end
-    return {r, g, b}
-end
-
 local function collided(self, obj)
     if obj.element == "fire" then
-        for _, row in ipairs(self.branches) do
-            for _, v in ipairs(row) do
-                v.color = burn(v.color)
-                if v.leaf then
-                    v.leaf.color = burn(v.leaf.color)
-                end
-
-                local m = obj.dp
-                self.hp = self.hp - m
-            end
+        -- reduce hp based on the object destroy power
+        self.burnIntensity = obj.dp
+        self.burnTimer = 3
+        if self.flame then
+            self.flame:setEmissionRate(20)
         end
     end
 end
@@ -44,14 +27,15 @@ local function addLeaf(self, x, y, w)
     return { x = x, y = y, color = rndColor(self.leafScheme), w = w * ma.random(8, 10) * .1, h = w * ma.random(8, 10) * .1 }
 end
 
-local function getLine(self, p, angle, w, h)
+local function getLine(self, v, angle)
+    local w, h = v.w * 0.9, v.h * 0.95
     local rtn = {}
     rtn.color = rndColor(self.branchScheme)
     rtn.deg, rtn.w, rtn.h = angle, w, h
-    local nx = math.floor(p[1] + math.cos(angle * deg_to_rad) * h)
-    local ny = math.floor(p[2] + math.sin(angle * deg_to_rad) * h)
+    local nx = math.floor(v.n[1] + math.cos(angle * deg_to_rad) * h)
+    local ny = math.floor(v.n[2] + math.sin(angle * deg_to_rad) * h)
     rtn.n = {nx, ny}
-    rtn.p = p
+    rtn.p = v.n
     if #self.branches > 2 then
         rtn.leaf = addLeaf(self, ma.random(-w, w), ma.random(-2, 2), w)
     end
@@ -59,30 +43,36 @@ local function getLine(self, p, angle, w, h)
 end
 
 local function grow(self)
-    local prev = self.branches[#self.branches]
-    local row = {}
-
-    for i, v in ipairs(prev) do
-        -- make branches thinner
-        local w, h = v.w * 0.9, v.h * 0.9
-
-        -- decide if branch should split into two
-        local split = ma.random(1, 3)
-        if split > 1 or #prev < 3 then
-            local sa = self.splitAngle
-            table.insert(row, getLine(self, v.n, v.deg - ma.random(sa[1], sa[2]), w, h))
-            table.insert(row, getLine(self, v.n, v.deg + ma.random(sa[1], sa[2]), w, h))
+    local prev
+    local i = #self.branches
+    while not prev do
+        prev = self.branches[i]
+        i = i - 1
+        if i <= 0 and not prev then
+            return
         end
-        if split == 1 then
-            table.insert(row, getLine(self, v.n, v.deg + ma.random(-10, 10), w, h))
-        end
-     
     end
-    table.insert(self.branches, row)
+    if prev then 
+        local row = {}
+
+        for _, v in ipairs(prev) do
+            -- decide if branch should split into two
+            local split = ma.random(1, 3)
+            if split > 1 or #prev < 3 then
+                local sa = self.splitAngle
+                table.insert(row, getLine(self, v, v.deg - ma.random(sa[1], sa[2])))
+                table.insert(row, getLine(self, v, v.deg + ma.random(sa[1], sa[2])))
+            end
+            if split == 1 then
+                table.insert(row, getLine(self, v, v.deg + ma.random(-10, 10)))
+            end
+        
+        end
+        table.insert(self.branches, row)
+    end
 end
 
 local function shrink(self)
-    self.elapsed = 0
     table.remove(self.branches, #self.branches)
 end
 
@@ -113,12 +103,14 @@ local function draw(self)
                 end
             end
         end
+        for _, v in ipairs(leaves) do
+            gr.setColor(v.color)
+            gr.ellipse("fill", v.x, v.y, v.w, v.h)
+        end
     end
-    for _, v in ipairs(leaves) do
-        gr.setColor(v.color)
-        gr.ellipse("fill", v.x, v.y, v.w, v.h)
-    end
+
     if self.flame then
+        gr.setColor(1, 1, 1)
         gr.draw(self.flame)
     end
 end
@@ -144,10 +136,11 @@ local function init(self, sav)
 	    growTime = 1,
 		maxStage = 7,
 		x = 0, y = 0,
-		hp = 100,
 		scale = 1,
 		branches = {},
         leaves = {},
+        burnTimer = 0,
+        burnIntensity = 1,
         splitAngle = {20, 30}
     }
 
@@ -175,9 +168,55 @@ local function init(self, sav)
     end
 end
 
+local function healColor(self)
+    for _, row in ipairs(self.branches) do
+        for _, v in ipairs(row) do
+            local c = v.color 
+            local r, g, b = c[1], c[2], c[3]
+            if r > .3 then
+                r = r - .0013
+            end
+            if g < .2 then
+                g = g + .0007
+            end
+            if b < .12 then
+                b = b + .0007
+            end
+            v.color = {r, g, b}
+        end
+    end
+end
+
+local function getHeight(self)
+    local h = self.branches[1][1].h * self.scale
+    return #self.branches * h * .7
+end
+local function burnColor(c)
+    local r, g, b = c[1], c[2], c[3]
+    if r < .9 then
+        r = r + .04
+    end
+    if b > .1 then
+        b = b - .02
+    end
+    return {r, g, b}
+end
+
+local function burn(self)
+    for _, row in ipairs(self.branches) do
+        for _, v in ipairs(row) do
+            v.color = burnColor(v.color)
+            if v.leaf then
+                v.leaf.color = burnColor(v.leaf.color)
+            end
+        end
+    end
+end
+
+
 local function update(self, dt)
     local l = #self.branches
-    if self.hp > 70 then
+    if self.burnTimer <= 0 then
         if l < self.maxStage then
             self.elapsed = self.elapsed + dt
             if self.elapsed > self.growTime then
@@ -185,43 +224,37 @@ local function update(self, dt)
                 self.elapsed = 0
             end
         end
+        healColor(self)
+        self.burning = false
     elseif l > 0 then
-        if not self.flame then
-            self.flame = Flame()
-            
-            self.flame:setPosition(self.x, self.y)
-        end
-        if math.floor(self.hp / l) % 4 == 0 then self.collapseTime = self.collapseTime + 10 * dt end
-        if l > math.floor(self.hp / l) then self.collapseTime = self.collapseTime + 10 * dt end
-        if l < 5 then self.collapseTime = self.collapseTime + dt end
+        self.burnTimer = self.burnTimer - dt
+        burn(self)
+        self.collapseTime = self.collapseTime + dt * self.burnIntensity * 10
         if self.collapseTime > self.growTime*.5 then
-         --   shrink(self)
+            shrink(self)
             self.collapseTime = 0
         end
+        self.burning = true
+    else self.burning = false self.dying = true end
 
-        for _, row in ipairs(self.branches) do
-            for _, v in ipairs(row) do
-                local c = v.color 
-                local r, g, b = c[1], c[2], c[3]
-                if r > .3 then
-                    r = r - .0013
-                end
-                if g < .2 then
-                    g = g + .0007
-                end
-                if b < .12 then
-                    b = b + .0007
-                end
-                v.color = {r, g, b}
+    -- have this seperate in case the tree is dead but particles need to die
+    if self.burning then
+        if not self.flame then
+            self.flame = Fire()
+            self.flame:setPosition(self.x, self.y)
+            self.flame:setSpeed(getHeight(self) * .5)
+        end
+        self.flame:update(dt)
+    elseif self.flame then
+        self.flame:setEmissionRate(0)
+        self.flame:update(dt)
+        if self.flame:getCount() <= 0 then
+            self.flame = nil
+            if self.dying then
+                self.dead = true
             end
         end
-
-  
-        if self.flame then
-            self.flame:update(dt)
-        end
     end
-
 
 end
 return {

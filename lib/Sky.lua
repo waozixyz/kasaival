@@ -4,8 +4,9 @@ local ma = love.math
 local function init(self, sav)
     self.bckg = gr.newImage("/assets/sky/bckg-2.jpg")
     local h = self.bckg:getHeight()
-    self.y = (sav.y or ma.random((h * -0.5), 0))
+    self.y = sav.y or ma.random(h * -0.5, 0)
     self.nebula = gr.newImage("/assets/sky/nebula.png")
+    return self
 end
 
 local function draw(self)

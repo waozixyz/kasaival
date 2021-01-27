@@ -3,11 +3,11 @@ local gr = love.graphics
 local function rtn()
 
 
-    local image1 = gr.newImage("assets/lightDot.png")
+    local image1 = gr.newImage("assets/lightBlur.png")
     image1:setFilter("linear", "linear")
 
     local ps = gr.newParticleSystem(image1, 69)
-    ps:setColors(1, 0.2, 0.8, 0, 1, 0, 0, 1, 0.9, 0.3, 0, 1, 1, 0.4, 0, 1)
+    ps:setColors(.7, 0, 0, 1, .8, 0, 0, 1, .7, 0.3, 0, 1, .8, 0.2, 0, 1)
     ps:setDirection(-1.6)
     ps:setEmissionArea("none", 0, 0, 0, false)
     ps:setEmissionRate(20)
@@ -19,7 +19,7 @@ local function rtn()
     ps:setRadialAcceleration(0, 0)
     ps:setRelativeRotation(true)
     ps:setRotation(0, 0)
-    ps:setSizes(0.4)
+    ps:setSizes(0.2)
     ps:setSizeVariation(0.2)
     ps:setSpeed(67, 100)
     ps:setSpin(-50, 50)
