@@ -65,8 +65,6 @@ local function getHitbox(self)
     return self.x - w, self.x + w, self.y - h, self.y + h
 end
 
-
-
 local function init(self, sav)
     -- default values
 	local tmpl = {
@@ -98,7 +96,7 @@ local function init(self, sav)
         local h = sav.h or 32
         local p = {0, self.y}
         local n = {0, self.y - h}
-        local branch = {color = rndColor(self.branchScheme), deg = -90, h = h, n = n, p = p, w = w}
+        local branch = {color = grow.rndColor(self.branchScheme), deg = -90, h = h, n = n, p = p, w = w}
         if sav.branches and #sav.branches > 0 then
             self.branches = sav.branches
         else
@@ -106,7 +104,7 @@ local function init(self, sav)
         end
         -- grow to currentStage
         for _ = #self.branches, currentStage do
-            grow(self)
+            grow.now(self)
         end
     end
 end
@@ -169,7 +167,7 @@ local function update(self, dt)
         if l < self.maxStage then
             self.elapsed = self.elapsed + dt
             if self.elapsed > self.growTime then
-                grow(self)
+                grow.now(self)
                 self.elapsed = 0
             end
         end
