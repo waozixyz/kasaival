@@ -8,7 +8,7 @@ local function collided(self, obj)
     if obj.element == "fire" then
         -- reduce hp based on the object destroy power
         self.burnIntensity = obj.dp
-        self.burnTimer = 3
+        self.burnTimer = 4
         if self.flame then
             self.flame:setEmissionRate(20)
         end
@@ -73,6 +73,7 @@ local function draw(self)
     local leaves = {}
     local x = self.x
     local l = #self.branches
+
     if l > 0 then
         for i, row in ipairs(self.branches) do
             for _, v in ipairs(row) do
@@ -160,21 +161,27 @@ local function init(self, sav)
     end
 end
 
-local function healColor(self)
+local function healColor(c)
+    local r, g, b = c[1], c[2], c[3]
+    if r > .3 then
+        r = r - .0013
+    end
+    if g < .2 then
+        g = g + .0007
+    end
+    if b < .12 then
+        b = b + .0007
+    end
+    return {r, g, b}
+end
+
+local function heal(self)
     for _, row in ipairs(self.branches) do
         for _, v in ipairs(row) do
-            local c = v.color 
-            local r, g, b = c[1], c[2], c[3]
-            if r > .3 then
-                r = r - .0013
+            v.color = healColor(v.color)
+            if v.leaf then
+                v.leaf.color = healColor(v.leaf.color)
             end
-            if g < .2 then
-                g = g + .0007
-            end
-            if b < .12 then
-                b = b + .0007
-            end
-            v.color = {r, g, b}
         end
     end
 end
@@ -186,10 +193,10 @@ end
 local function burnColor(c)
     local r, g, b = c[1], c[2], c[3]
     if r < .9 then
-        r = r + .04
+        r = r + .03
     end
     if b > .1 then
-        b = b - .02
+        b = b - .01
     end
     return {r, g, b}
 end
@@ -216,22 +223,24 @@ local function update(self, dt)
                 self.elapsed = 0
             end
         end
-        healColor(self)
+        heal(self)
         self.burning = false
     elseif l > 0 then
-        self.burnTimer = self.burnTimer - dt
-        burn(self)
-        self.collapseTime = self.collapseTime + dt * self.burnIntensity * 10
-        if self.collapseTime > self.growTime*.5 then
+        if self.elapsed >= 0 then
+            self.elapsed = self.elapsed - dt * self.burnIntensity * 15
+
+        else
             shrink(self)
-            self.collapseTime = 0
+            self.elapsed = self.growTime
         end
+        burn(self)
         self.burning = true
+        self.burnTimer = self.burnTimer - dt
     else self.burning = false self.dying = true end
 
     -- have this seperate in case the tree is dead but particles need to die
     if self.burning then
-        if not self.flame then
+        if not self.flame and l > 0 then
             self.flame = Fire()
             self.flame:setPosition(self.x, self.y)
             self.flame:setSpeed(getHeight(self) * .5)
@@ -247,7 +256,6 @@ local function update(self, dt)
             end
         end
     end
-
 end
 return {
     collided = collided,
