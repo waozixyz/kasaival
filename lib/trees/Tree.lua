@@ -43,16 +43,8 @@ local function getLine(self, v, angle)
 end
 
 local function grow(self)
-    local prev
-    local i = #self.branches
-    while not prev do
-        prev = self.branches[i]
-        i = i - 1
-        if i <= 0 and not prev then
-            return
-        end
-    end
-    if prev then 
+    if #self.branches > 0 then 
+        local prev = self.branches[#self.branches]
         local row = {}
 
         for _, v in ipairs(prev) do
