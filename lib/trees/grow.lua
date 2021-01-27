@@ -51,4 +51,52 @@ local function now(self)
     end
 end
 
-return {now = now, rndColor = rndColor}
+local function burnColor(c)
+    local r, g, b = c[1], c[2], c[3]
+    if r < .9 then
+        r = r + .03
+    end
+    if b > .1 then
+        b = b - .01
+    end
+    return {r, g, b}
+end
+
+local function burn(self)
+    for _, row in ipairs(self.branches) do
+        for _, v in ipairs(row) do
+            v.color = burnColor(v.color)
+            if v.leaf then
+                v.leaf.color = burnColor(v.leaf.color)
+            end
+        end
+    end
+end
+
+local function healColor(c)
+    local r, g, b = c[1], c[2], c[3]
+    if r > .3 then
+        r = r - .0013
+    end
+    if g < .2 then
+        g = g + .0007
+    end
+    if b < .12 then
+        b = b + .0007
+    end
+    return {r, g, b}
+end
+
+local function heal(self)
+    for _, row in ipairs(self.branches) do
+        for _, v in ipairs(row) do
+            v.color = healColor(v.color)
+            if v.leaf then
+                v.leaf.color = healColor(v.leaf.color)
+            end
+        end
+    end
+end
+
+
+return {now = now, rndColor = rndColor, burn = burn, heal = heal}

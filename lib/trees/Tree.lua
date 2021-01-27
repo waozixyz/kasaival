@@ -109,57 +109,11 @@ local function init(self, sav)
     end
 end
 
-local function healColor(c)
-    local r, g, b = c[1], c[2], c[3]
-    if r > .3 then
-        r = r - .0013
-    end
-    if g < .2 then
-        g = g + .0007
-    end
-    if b < .12 then
-        b = b + .0007
-    end
-    return {r, g, b}
-end
-
-local function heal(self)
-    for _, row in ipairs(self.branches) do
-        for _, v in ipairs(row) do
-            v.color = healColor(v.color)
-            if v.leaf then
-                v.leaf.color = healColor(v.leaf.color)
-            end
-        end
-    end
-end
 
 local function getHeight(self)
     local h = self.branches[1][1].h * self.scale
     return #self.branches * h * .7
 end
-local function burnColor(c)
-    local r, g, b = c[1], c[2], c[3]
-    if r < .9 then
-        r = r + .03
-    end
-    if b > .1 then
-        b = b - .01
-    end
-    return {r, g, b}
-end
-
-local function burn(self)
-    for _, row in ipairs(self.branches) do
-        for _, v in ipairs(row) do
-            v.color = burnColor(v.color)
-            if v.leaf then
-                v.leaf.color = burnColor(v.leaf.color)
-            end
-        end
-    end
-end
-
 
 local function update(self, dt)
     local l = #self.branches
@@ -171,7 +125,7 @@ local function update(self, dt)
                 self.elapsed = 0
             end
         end
-        heal(self)
+        grow.heal(self)
         self.burning = false
     elseif l > 0 then
         if self.elapsed >= 0 then
@@ -181,7 +135,7 @@ local function update(self, dt)
             shrink(self)
             self.elapsed = self.growTime
         end
-        burn(self)
+        grow.burn(self)
         self.burning = true
         self.burnTimer = self.burnTimer - dt
     else self.burning = false self.dying = true end
