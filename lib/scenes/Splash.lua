@@ -1,5 +1,6 @@
 local copy = require "lib.copy"
 local push = require "lib.push"
+local suit = require "lib.suit"
 
 local Bckg = require "lib.ui.Bckg"
 local Player = require "lib.Player"
@@ -13,10 +14,7 @@ local ev = love.event
 local function init(self)
     -- step 1: set up the text intro
     self.font = gr.newFont("assets/fonts/hintedSymbola.ttf", 142)
-    self[1] = copy(Typewriter):init("Nothing", 200, 40, 132)
-    self[2] = copy(Typewriter):init("...nothing at all", 1000, 300, 100)
-    self[3] = copy(Typewriter):init("...and yet", 300, 400, 120)
-    self[4] = copy(Typewriter):init("you feel something", 900, 700, 100)
+    self[1] = copy(Typewriter):init("Is this your first time?", 200, 40, 132)
     self.alpha = 1
     Bckg:init()
 end
