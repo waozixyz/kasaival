@@ -1,3 +1,5 @@
 local sky = { y = 0 }
 
-return {sky = sky}
+local ground = {}
+
+return {sky = sky, ground = ground}

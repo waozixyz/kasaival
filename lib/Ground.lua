@@ -1,4 +1,5 @@
-local push = require("lib.push")
+local lyra = require "lib.lyra"
+local push = require "lib.push"
 
 local gr = love.graphics
 local ma = love.math
@@ -66,7 +67,7 @@ local function getTile(i, v)
         return v.x, v.y - v.h, v.x + v.w * 0.5, v.y, v.x + v.w, v.y - v.h
     end
 end
-local rows = 40
+local rows = 13
 
 local function collide(self, obj)
     local l, r, u, d = obj:getHitbox()
@@ -81,20 +82,21 @@ local function collide(self, obj)
     end
 end
 
-local function draw(self, g)
+local function draw(self)
     for _, row in ipairs(self.grid) do
         for i, tile in ipairs(row) do
-            if g:checkVisible(tile.x, tile.w) then
+            if lyra:checkVisible(tile.x, tile.w) then
                 gr.setColor(tile.color)
                 gr.polygon("fill", getTile(i, tile))
             end
         end
     end
 end
-local function init(self, sav, gw, gh)
+local function init(self, sav)
+
     local H = push:getHeight()
-    local y = gh
-    self.height = H - y
+    local y = H - lyra.gh
+    self.height = lyra.gh
     local w = self.height / rows
     local h = w
     local i = 0
@@ -102,8 +104,7 @@ local function init(self, sav, gw, gh)
     if #self.grid == 0 then
         while y < H + h do
             local row = {}
-            w, h = w + 1, h + 1
-            for x = gw * -0.5, gw - gw * 0.5, w do
+            for x = lyra.startx - w, lyra.gw + lyra.startx + w, w do
                 local c = rndColor()
                 table.insert(row, {color = c, h = h, orgColor = c, w = w, x = x, y = y})
                 c = rndColor()
@@ -116,15 +117,10 @@ local function init(self, sav, gw, gh)
     end
     return self
 end
-local function update(self, g, dt)
+local function update(self, dt)
     for _, row in ipairs(self.grid) do
         for _, tile in ipairs(row) do
             tile.color = healTile(tile)
-            if tile.x + g.cx - tile.w < g.width * -0.5 then
-                tile.x = tile.x + g.width
-            elseif tile.x + g.cx > g.width * 0.5 then
-                tile.x = tile.x - g.width
-            end
         end
     end
 end

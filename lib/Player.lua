@@ -88,12 +88,19 @@ local function move(self, dx, dy, dt)
     local s = self.speed * self.scale * dt * 20
     dx, dy = dx * s, dy * s
     local x, y = self.x + dx, self.y + dy
-    if x + ly.cx < W / 5 then
+    if x + ly.cx < W / 5 and -ly.cx > ly.startx then
         ly.cx = ly.cx - dx
-    elseif x + ly.cx > W - (W / 5) then
+    elseif x + ly.cx > W - (W / 5) and -ly.cx + W < ly.gw + ly.startx then
         ly.cx = ly.cx - dx
     end
-    if y < H - ly.gh then
+    if x + ly.cx > W then
+        x = W - ly.cx
+    elseif x + ly.cx < 0 then
+        x = 0
+    end
+    if y > H then
+        y = H
+    elseif y < H - ly.gh then
         y = H - ly.gh
     end
     self.flame:setPosition(x, y)
@@ -127,14 +134,11 @@ local function update(self, dt)
     self.hp = self.hp - (self.hp / 100) * self.burnRate
     if self.hp > 300 then
         self.hp = self.hp - 10
-    end
-    if self.hp > 230 then
+    elseif self.hp > 230 then
         self.hp = self.hp - self.burnRate
-    end
-    if self.hp > 150 or self.hp < 50 then
+    elseif self.hp > 150 or self.hp < 50 then
         self.hp = self.hp - 0.5 * self.burnRate
-    end
-    if self.hp < 80 or self.hp > 120 then
+    elseif self.hp < 80 or self.hp > 120 then
         self.hp = self.hp - 0.2 * self.burnRate
     end
     self.flame:update(dt)

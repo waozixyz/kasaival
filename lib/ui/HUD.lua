@@ -65,10 +65,10 @@ end
 
 local function drawOverlay(item)
     local W, H = push:getDimensions()
-    item.title:draw()
-    item.subtitle:draw()
     gr.setColor(item.color)
     gr.rectangle("fill", 0, 0, W, H)
+    item.title:draw()
+    item.subtitle:draw()
 end
 
 local function draw(self, game)

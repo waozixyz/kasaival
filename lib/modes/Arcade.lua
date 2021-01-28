@@ -75,11 +75,6 @@ local function checkCollision(o1, o2)
     end
 end
 
-local function checkVisible(self, x, w)
-    local W = push:getWidth()
-    if x + self.cx < W + w and x + self.cx > -w then return true else return false end
-end
-
 local function init(self, _, saveFile)
     -- default init for every game
     self.restart, self.paused, self.exit = false, false, 0

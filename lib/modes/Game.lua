@@ -37,12 +37,18 @@ local function init(self)
     lyra.cx = 0
     -- set the ground height 
     lyra.gh = H * .5
+    -- set the stagewidth
+    lyra.gw = 3000
     -- create a player
     self.player = copy(Player:init())
     -- init head up display
     HUD:init()
     -- init Sky
     Sky:init(stage.sky)
+    -- init Ground
+    Ground:init(stage.ground)
+
+    lyra:init(Ground, self.player)
 end
 
 local function keypressed(...)
@@ -56,7 +62,17 @@ end
 
 local function draw(self)
     Sky:draw()
-    self.player:draw()
+
+    -- translate with camera x
+    gr.translate(lyra.cx, 0)
+
+    -- draw entities
+    lyra:draw()
+
+    -- undo translation
+    gr.translate(-lyra.cx, 0)
+
+    -- draw head up display
     HUD:draw(self)
 end
 
@@ -70,7 +86,10 @@ local function update(self, dt, set_mode)
     end
     -- HUD:update(self)
     if not self.paused then
-        self.player:update(dt)
+    --    self.player:update(dt)
+        lyra:update(dt)
+        Ground:collide(self.player)
+
     end
     if self.exit == 1 then
         ev.quit()
