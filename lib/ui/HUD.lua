@@ -1,83 +1,30 @@
-local suit = require("lib.suit")
-local push = require("lib.push")
+local copy = require "lib.copy"
+local suit = require "lib.suit"
+local push = require "lib.push"
 
-local Cursor = require("lib.ui.Cursor")
-local Music = require("lib.Music")
-
+local Cursor = require "lib.ui.Cursor"
+local Music = require "lib.Music"
+local Text = require "lib.ui.Text"
 local gr = love.graphics
 
-local function toggle(val) if val then return false else return true end end
-
-local function drawText(text, font, size, xpad, ypad)
-    local W, H = push:getDimensions()
-
-    xpad = xpad or 0
-    ypad = ypad or 0
-    local w = font:getWidth(text)
-
-    gr.setFont(font)
-    gr.print(text, W * 0.5 - w * 0.5 + xpad, H * 0.5 + ypad)
+-- get text for overlay
+local function getText(title, subtitle, color)
+    local H = push:getHeight()
+    local rtn = {}
+    rtn.title = copy(Text:init(title, 64, H * .4))
+    rtn.subtitle = copy(Text:init(subtitle, 42, H * .5))
+    rtn.color = color
+    return rtn
 end
 
-local function drawOverlay(self, title, subtitle, color, font, fontSize)
-    local W, H = push:getDimensions()
-    fontSize = fontSize or self.fontSize
-    font = font or self.bigFont
-    gr.setFont(font)
-    gr.setColor(color or {0, 0, 0, 0.5})
-    gr.rectangle("fill", 0, 0, W, H)
-    gr.setColor(.6, 0, .3)
-    drawText(title or "", self.bigFont, self.fontSize, 0, 0)
-    drawText(subtitle or "", font, fontSize, 0, fontSize)
-end
-local function focus(self, game, f)
-    if not f then
-        if not game.paused then
-            game.unpause = true
-            game.paused = true
-        end
-        if not game.muted then
-            game.muted = true
-            game.unmute = true
-        end
-    else
-        if game.unmute then
-            game.muted = false
-            game.unmute = false
-        end
-        if game.unpause then
-            game.paused = false
-            game.unpause = false
-        end
-    end
-end
-local function draw(self, game)
-    local W, H = push:getDimensions()
-    local hp = game.player.hp
-
-    gr.setColor(.2, 0, 0, 1 - (hp / 100))
-    gr.rectangle("fill", 0, 0, W, H)
-    if hp <= 0 then
-        drawOverlay(self, "GameOver", "touch anywhere or press any key to try again", {0, 0, 0, 0.5})
-    elseif game.paused == true and game.exit == 0 then
-        drawOverlay(self, "Game Paused", "touch anywhere or press any key to unpause", {1, 1, 1, 0.5})
-    elseif game.exit == 1 or game.exit == 2 then
-        drawOverlay(self, "Game Saving", "please wait patiently...", {0, 0.2, 0, 0.5})
-    end
-
-    if Music.songTitle then
-        gr.setFont(self.font)
-        gr.setColor({1, 1, 1})
-        local title = "\240\159\142\182 " .. Music.songAuthor .. " - " .. Music.songTitle .. " \240\159\142\182"
-        local w = (self.font):getWidth(title)
-        gr.print(title, W - w - 20, H - 40)
-    end
-end
 local function init(self)
     Cursor:init()
-    self.fontSize = 48
-    self.bigFont = gr.newFont("assets/fonts/hintedSymbola.ttf", self.fontSize)
-    self.font = gr.newFont("assets/fonts/hintedSymbola.ttf", 32)
+    -- load text
+    self.gameover = getText("GameOver", "touch anywhere or press any key to try again", {0, 0, 0, 0.5})
+    self.gamepaused = getText("Game Paused", "touch anywhere or press any key to unpause", {1, 1, 1, 0.5})
+    self.gamesaving = getText("Game Saving", "please wait patiently...", {0, 0.2, 0, 0.5})
+
+    -- load icons
     self.exit = gr.newImage("assets/icons/exit.png")
     self.resume = gr.newImage("assets/icons/resume.png")
     self.pause = {
@@ -89,6 +36,63 @@ local function init(self)
     self.nomusic = gr.newImage("assets/icons/nomusic.png")
     self.sound = gr.newImage("assets/icons/sound.png")
     self.nosound = gr.newImage("assets/icons/nosound.png")
+end
+
+
+local function toggle(val) if val then return false else return true end end
+
+local function focus(self, game, f)
+    if not f then
+        if not game.paused then
+            self.unpause = true
+            game.paused = true
+        end
+        if not game.muted then
+            game.muted = true
+            self.unmute = true
+        end
+    else
+        if self.unmute then
+            game.muted = false
+            self.unmute = false
+        end
+        if self.unpause then
+            game.paused = false
+            self.unpause = false
+        end
+    end
+end
+
+local function drawOverlay(item)
+    local W, H = push:getDimensions()
+    item.title:draw()
+    item.subtitle:draw()
+    gr.setColor(item.color)
+    gr.rectangle("fill", 0, 0, W, H)
+end
+
+local function draw(self, game)
+    local W, H = push:getDimensions()
+    local hp = game.player.hp
+
+    gr.setColor(.2, 0, 0, 1 - (hp / 100))
+    gr.rectangle("fill", 0, 0, W, H)
+
+    if hp <= 0 then
+        drawOverlay(self.gameover)
+    elseif game.paused == true and (not game.exit or game.exit == 0) then
+        drawOverlay(self.gamepaused)
+    elseif game.exit == 1 or game.exit == 2 then
+        drawOverlay(self.gamesaving)
+    end
+
+    if Music.songTitle then
+        gr.setFont(self.font)
+        gr.setColor({1, 1, 1})
+        local title = "\240\159\142\182 " .. Music.songAuthor .. " - " .. Music.songTitle .. " \240\159\142\182"
+        local w = (self.font):getWidth(title)
+        gr.print(title, W - w - 20, H - 40)
+    end
 end
 local function tk( game)
     if game.paused then 
@@ -114,7 +118,7 @@ local function keypressed(self, game, key)
         if key == "n" then Music.bgm:stop() end
         if key == "m" then game.muted = toggle(game.muted) end
         if key == "p" or key == "pause" or key == "space" then game.paused = toggle(game.paused) end
-        if key == "escape" and game.exit < 1 then game.exit = 1 end
+        if key == "escape" and (not game.exit or game.exit < 1) then game.exit = 1 end
     end
 end
 

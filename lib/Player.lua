@@ -80,20 +80,26 @@ local function getSizes(sizes, scale)
     return rtn
 end
 
-local function move(self, dx, dy, g, dt)
+local function move(self, dx, dy, dt, g)
     local W, H = push:getDimensions()
     local s = self.speed * self.scale * dt * 20
     dx, dy = dx * s, dy * s
     local x, y = self.x + dx, self.y + dy
-    if x + g.cx < W / 5 then
-        g.cx = g.cx - dx
-    elseif x + g.cx > W - (W / 5) then
-        g.cx = g.cx - dx
+    if g then
+        if x + g.cx < W / 5 then
+            g.cx = g.cx - dx
+        elseif x + g.cx > W - (W / 5) then
+            g.cx = g.cx - dx
+        end
+    end
+    local h = 0
+    if g then
+        h = g.height
     end
     if y > H then
         y = H
-    elseif y < g.height then
-        y = g.height
+    elseif y < h then
+        y = h
     end
     self.flame:setPosition(x, y)
     self.flame:setSizes(returnTable(self.sizes))
@@ -103,14 +109,14 @@ end
 local function touch(self, game, x, y, dt)
     local dx, dy = Controller:touch(self, game, x, y)
     if dx and dy then
-        move(self, dx, dy, game, dt)
+        move(self, dx, dy, dt, game)
     end
 end
 
-local function update(self, game, dt)
+local function update(self, dt, game)
     local dx, dy = Controller:update(self, dt)
     if dx and dy then
-        move(self, dx, dy, game, dt)
+        move(self, dx, dy, dt, game)
     end
     if self.boostTime > 0 then
         self.boostTime = self.boostTime - dt
@@ -153,5 +159,5 @@ return {
     dp = .5, -- destroy power
     scale = 1,
     update = update,
-    burnRate = .6,
+    burnRate = .1,
 }

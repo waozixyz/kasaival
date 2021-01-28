@@ -201,7 +201,7 @@ local function update(self, dt, set_mode)
         if Music.bgm then
             Music.bgm:pause()
         end
-        set_mode("Menu")
+        love.event.quit()
     elseif not self.paused and self.player.hp > 0 then
         self.treeTime = self.treeTime + dt
         if self.treeTime > 1 then
@@ -211,7 +211,7 @@ local function update(self, dt, set_mode)
         self.elapsed = self.elapsed + dt
         self.player.scale = (self.player.y / H) * self.player.hp * 0.01
 
-        self.player:update(self, dt)
+        self.player:update(dt, self)
         for i, tree in ipairs(self.trees) do
             if tree.x + self.cx < self.width * -0.5 then
                 tree.x = tree.x + self.width
