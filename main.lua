@@ -1,3 +1,4 @@
+local copy = require("lib.copy")
 local push = require("lib.push")
 local suit = require("lib.suit")
 
@@ -12,7 +13,7 @@ Testing = false
 
 local mode
 local function set_mode(mode_name, ...)
-    mode = require("lib.modes." .. mode_name)
+    mode = copy(require("lib.modes." .. mode_name))
     if mode.init then mode:init(set_mode, ...) end
 end
 

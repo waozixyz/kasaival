@@ -1,6 +1,7 @@
 -- library functions
 local copy = require("lib.copy")
 local lume = require("lib.lume")
+local lyra = require("lib.lyra")
 local push = require("lib.push")
 local serpent = require("lib.serpent")
 
@@ -25,20 +26,36 @@ local gr = love.graphics
 local ke = love.keyboard
 local ma = love.math
 
+local function load_stage(stage_name)
+    return copy(require("lib.stages." .. stage_name))
+end
+
 local function init(self)
-    self.player = copy(Player):init()
+    local stage = load_stage("Tutorial")
+    local H = push:getHeight()
+    -- set camera x
+    lyra.cx = 0
+    -- set the ground height 
+    lyra.gh = H * .5
+    -- create a player
+    self.player = copy(Player:init())
+    -- init head up display
     HUD:init()
+    -- init Sky
+    Sky:init(stage.sky)
 end
 
 local function keypressed(...)
     HUD:keypressed(...)
 end
 
-local function touch(self, x, y, dt)
-    HUD:touch(self, x, y)
+local function touch(self, ...)
+    HUD:touch(self, ...)
+    self.player:touch(...)
 end
 
 local function draw(self)
+    Sky:draw()
     self.player:draw()
     HUD:draw(self)
 end
@@ -48,6 +65,9 @@ local function focus(...)
 end
 
 local function update(self, dt, set_mode)
+    if self.restart then
+        set_mode("Game")
+    end
     -- HUD:update(self)
     if not self.paused then
         self.player:update(dt)

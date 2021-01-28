@@ -2,10 +2,21 @@ local gr = love.graphics
 local ma = love.math
 
 local function init(self, sav)
+    -- const values
     self.bckg = gr.newImage("/assets/sky/bckg-2.jpg")
-    local h = self.bckg:getHeight()
-    self.y = sav.y or ma.random(h * -0.5, 0)
     self.nebula = gr.newImage("/assets/sky/nebula.png")
+    local h = self.bckg:getHeight()
+    
+    -- default values
+	local tmpl = {
+        y = ma.random(h * -0.5, 0)
+    }
+    
+    -- replace with sav data
+    for k,v in pairs(tmpl) do
+        self[k] = sav[k] or v
+    end
+
     return self
 end
 

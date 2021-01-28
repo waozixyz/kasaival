@@ -1,9 +1,3 @@
-local push = require "lib.push"
-
-local Font = require "lib.ui.Font"
-
-local gr = love.graphics
-
 local function init(self, ...)
     self.items = {}
     for _, v in ipairs({...}) do
@@ -28,4 +22,4 @@ local function draw(self, ...)
     end
 end
 
-return {init = init, update = update, draw = draw}
+return {init = init, update = update, draw = draw, cx = 0, gh = 600}

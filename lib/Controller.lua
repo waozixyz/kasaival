@@ -1,11 +1,13 @@
+local lyra = require "lib.lyra"
+
 local ke = love.keyboard
 
 local radToDeg = 180 / math.pi
 local degToRad = math.pi / 180
 
-local function touch(self, obj, game, x, y)
+local function touch(self, obj, x, y)
     local px, py = obj.x, obj.y
-    x = x - game.cx
+    x = x - lyra.cx
     local nx, ny = x - px, y - py
     local w = obj.scale * obj.ow * 0.2
     local h = obj.scale * obj.oh * 0.2
