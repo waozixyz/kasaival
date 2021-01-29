@@ -3,29 +3,21 @@ local suit = require "lib.suit"
 local push = require "lib.push"
 
 local Cursor = require "lib.ui.Cursor"
-local Music = require "lib.sys.Music"
 local Font = require "lib.ui.Font"
+local Overlay = require "lib.ui.Overlay"
+local Music = require "lib.sys.Music"
 local Text = require "lib.ui.Text"
 
 
 local gr = love.graphics
 
--- get text for overlay
-local function getText(title, subtitle, color)
-    local H = push:getHeight()
-    local rtn = {}
-    rtn.title = copy(Text:init(title, 64, H * .4))
-    rtn.subtitle = copy(Text:init(subtitle, 42, H * .5))
-    rtn.color = color
-    return rtn
-end
 
 local function init(self)
     Cursor:init()
     -- load text
-    self.gameover = getText("GameOver", "touch anywhere or press any key to try again", {0, 0, 0, 0.5})
-    self.gamepaused = getText("Game Paused", "touch anywhere or press any key to unpause", {1, 1, 1, 0.5})
-    self.gamesaving = getText("Game Saving", "please wait patiently...", {0, 0.2, 0, 0.5})
+    self.gameover = Overlay.getText("GameOver", "touch anywhere or press any key to try again", {0, 0, 0, 0.5})
+    self.gamepaused = Overlay.getText("Game Paused", "touch anywhere or press any key to unpause", {1, 1, 1, 0.5})
+    self.gamesaving = Overlay.getText("Game Saving", "please wait patiently...", {0, 0.2, 0, 0.5})
 
     -- load icons
     self.exit = gr.newImage("assets/icons/exit.png")
@@ -44,13 +36,6 @@ end
 
 local function toggle(val) if val then return false else return true end end
 
-local function drawOverlay(item)
-    local W, H = push:getDimensions()
-    gr.setColor(item.color)
-    gr.rectangle("fill", 0, 0, W, H)
-    item.title:draw()
-    item.subtitle:draw()
-end
 
 local function draw(self, game)
     local W, H = push:getDimensions()
@@ -60,11 +45,11 @@ local function draw(self, game)
     gr.rectangle("fill", 0, 0, W, H)
 
     if hp <= 0 then
-        drawOverlay(self.gameover)
+        Overlay.draw(self.gameover)
     elseif game.paused == true and (not game.exit or game.exit == 0) then
-        drawOverlay(self.gamepaused)
+        Overlay.draw(self.gamepaused)
     elseif game.exit == 1 or game.exit == 2 then
-        drawOverlay(self.gamesaving)
+        Overlay.draw(self.gamesaving)
     end
 
     if Music.songTitle then
@@ -125,4 +110,4 @@ local function update(self, game)
     end
     Cursor:update()
 end
-return {focus = focus, draw = draw, init = init, keypressed = keypressed, touch = touch, update = update}
+return {draw = draw, init = init, keypressed = keypressed, touch = touch, update = update}
