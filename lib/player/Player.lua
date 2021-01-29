@@ -1,7 +1,7 @@
 local lyra = require("lib.lyra")
 local push = require("lib.push")
 
-local Controller = require("lib.Controller")
+local Controller = require("lib.player.Controller")
 local Flame = require("lib.ps.Flame")
 
 -- aliases

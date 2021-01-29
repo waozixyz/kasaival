@@ -1,7 +1,7 @@
 local copy = require "lib.copy"
 local push = require "lib.push"
 
-local Player = require "lib.Player"
+local Player = require "lib.player.Player"
 local Sakura = require "lib.plants.Sakura"
 local Typewriter = require "lib.ui.Typewriter"
 

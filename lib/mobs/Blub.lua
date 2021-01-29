@@ -1,4 +1,4 @@
-local Player = require("lib.Player")
+local Player = require("lib.player.Player")
 
 local gr = love.graphics
 

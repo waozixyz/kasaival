@@ -5,13 +5,13 @@ local push = require("lib.push")
 local serpent = require("lib.serpent")
 
 -- Main components
-local Ground = require("lib.Ground")
+local Ground = require("lib.scene.Ground")
 local HUD = require("lib.ui.HUD")
-local Music = require("lib.Music")
-local Player = require "lib.Player"
-local Saves = require "lib.Saves"
-local Sky = require "lib.Sky"
-local Spawner = require "lib.Spawner"
+local Music = require("lib.sys.Music")
+local Player = require "lib.player.Player"
+local Saves = require "lib.sys.Saves"
+local Sky = require "lib.scene.Sky"
+local Spawner = require "lib.plants.Spawner"
 
 -- plants
 local MainTree = require "lib.plants.Tree"

@@ -2,7 +2,7 @@ local push = require("lib.push")
 local suit = require("lib.suit")
 local Bckg = require("lib.ui.Bckg")
 local Cursor = require("lib.ui.Cursor")
-local Saves = require("lib.Saves")
+local Saves = require("lib.sys.Saves")
 
 local gr = love.graphics
 

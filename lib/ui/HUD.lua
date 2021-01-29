@@ -3,7 +3,7 @@ local suit = require "lib.suit"
 local push = require "lib.push"
 
 local Cursor = require "lib.ui.Cursor"
-local Music = require "lib.Music"
+local Music = require "lib.sys.Music"
 local Font = require "lib.ui.Font"
 local Text = require "lib.ui.Text"
 local gr = love.graphics
