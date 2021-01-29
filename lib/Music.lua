@@ -1,22 +1,46 @@
 local au = love.audio
 local ma = love.math
 
-local function mute(self)
-    if self.bgm then
-        return (self.bgm):pause()
+local function toggle(self)
+    if self.bgm and self.bgm:isPlaying() then
+        self:mute()
+    else
+        self:play()
     end
 end
+
+local function muted(self)
+    if self.bgm and self.bgm:isPlaying() then
+        return false
+    else
+        return true
+    end
+end
+
+local function mute(self)
+    if self.bgm then
+        self.bgm:pause()
+    end
+end
+
+local function next(self)
+    self.bgm:stop()
+    self.bgm = nil
+    self:play()
+end
+
 local function play(self, songs)
+    if songs then self.songs = songs end
     if self.bgm then
         if not self.bgm:isPlaying() then
             self.bgm:play()
         end
     else
-        local newSong
-        while newSong == self.title do
-            newSong = ma.random(1, #songs)
+        -- always replace newSong until a different title comes up
+        local newSong = { title = self.title } -- to replace
+        while newSong.title == self.title do
+            newSong = self.songs[ma.random(1, #self.songs)] -- new song
         end
-        newSong = songs[newSong]
         -- add audio source
         self.bgm = au.newSource(self.dir .. newSong.author .. "/" .. newSong.title .. "." .. newSong.ext, "stream")
 
@@ -28,4 +52,10 @@ local function play(self, songs)
         au.play(self.bgm)
     end
 end
-return { song = {}, dir = "assets/music/", mute = mute, play = play }
+local function up(self)
+    self.bgm:setVolume(self.bgm:getVolume() + .1)
+end
+local function down(self)
+    self.bgm:setVolume(self.bgm:getVolume() - .1)
+end
+return { next = next, up = up, muted = muted, down = down, toggle = toggle, song = {}, dir = "assets/music/", mute = mute, play = play }

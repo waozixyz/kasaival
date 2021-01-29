@@ -93,9 +93,7 @@ local function update(self, dt, set_mode)
     if self.restart then
         set_mode("Game")
     end
-    HUD:update(self)
     if not self.paused then
-    --    self.player:update(dt)
         lyra:update(dt)
         Ground:collide(self.player)
 
@@ -103,5 +101,6 @@ local function update(self, dt, set_mode)
     if self.exit == 1 then
         ev.quit()
     end
+    HUD:update(self)
 end
 return {draw = draw, init = init, keypressed = keypressed, touch = touch, focus = focus, update = update}

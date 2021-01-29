@@ -94,7 +94,7 @@ local function draw(self, game)
     end
 end
 local function tk( game)
-    if game.paused then 
+    if game.paused then
         game.paused = toggle(game.paused)
         return true
     end
@@ -104,7 +104,7 @@ local function tk( game)
     end
 end
 local function touch(self, game, x, y)
-    local w, h =self.pause.img:getDimensions()
+    local w, h = self.pause.img:getDimensions()
     if x > w + self.pause.x or y > h + self.pause.y then
         tk(game)
     end
@@ -112,10 +112,10 @@ end
 
 local function keypressed(self, game, key)
     if not tk(game) then
-        if key == "kp+" then Music.bgm:setVolume(Music.bgm:getVolume() + .1) end
-        if key == "kp-" then Music.bgm:setVolume(Music.bgm:getVolume() - .1) end
-        if key == "n" then Music.bgm:stop() end
-        if key == "m" then game.muted = toggle(game.muted) end
+        if key == "kp+" then Music:up() end
+        if key == "kp-" then Music:down() end
+        if key == "n" then Music:next() end
+        if key == "m" then Music:toggle() end
         if key == "p" or key == "pause" or key == "space" then game.paused = toggle(game.paused) end
         if key == "escape" and (not game.exit or game.exit < 1) then game.exit = 1 end
     end
@@ -124,7 +124,7 @@ end
 local function update(self, game)
     local W = push:getWidth()
     local exit_button = suit.ImageButton(self.exit, 20, 20)
-    if exit_button.hit == true and game.exit < 1 then
+    if exit_button.hit == true and game.exit and game.exit < 1 then
         game.exit = 1
     end
     local pause_image = self.pause.img
@@ -136,12 +136,12 @@ local function update(self, game)
         game.paused = toggle(game.paused)
     end
     local music_image = self.music
-    if game.muted then
+    if Music:muted() then
         music_image = self.nomusic
     end
     local music_button = suit.ImageButton(music_image, W - 128, 20)
-    if (music_button.hit == true) then
-        game.muted = toggle(game.muted)
+    if music_button.hit == true then
+        Music:toggle()
     end
     Cursor:update()
 end
