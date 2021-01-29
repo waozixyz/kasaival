@@ -4,27 +4,29 @@ local ma = love.math
 
 local deg_to_rad = math.pi / 180
 
-local function addLeaf(self, x, y, w)
-    return { x = x, y = y, color = lyra.getColor(self.leafScheme), w = w * ma.random(8, 10) * .1, h = w * ma.random(8, 10) * .1 }
+local function addLeaf(x, y, w, cs)
+    return { x = x, y = y, color = lyra.getColor(cs), w = w * ma.random(8, 10) * .1, h = w * ma.random(8, 10) * .1 }
 end
 
-local function getLine(self, v, angle)
+local function getLine(l, v, angle, cs_b, cs_l)
     local w, h = v.w * 0.9, v.h * 0.95
     local rtn = {}
-    rtn.color = lyra.getColor(self.branchScheme)
+    rtn.color = lyra.getColor(cs_b)
     rtn.deg, rtn.w, rtn.h = angle, w, h
     local nx = math.floor(v.n[1] + math.cos(angle * deg_to_rad) * h)
     local ny = math.floor(v.n[2] + math.sin(angle * deg_to_rad) * h)
     rtn.n = {nx, ny}
     rtn.p = v.n
-    if #self.branches > 2 then
-        rtn.leaf = addLeaf(self, ma.random(-w, w), ma.random(-2, 2), w)
+    if l > 2 then
+        rtn.leaf = addLeaf(ma.random(-w, w), ma.random(-2, 2), w, cs_l)
     end
     return rtn
 end
 
 local function now(self)
-    if #self.branches > 0 then
+    local l = #self.branches
+    local cs_b, cs_l = self.cs_branch, self.cs_leaf
+    if l > 0 then
         local prev = self.branches[#self.branches]
         local row = {}
 
@@ -33,11 +35,13 @@ local function now(self)
             local split = ma.random(1, 3)
             if split > 1 or #prev < 3 then
                 local sa = self.splitAngle
-                table.insert(row, getLine(self, v, v.deg - ma.random(sa[1], sa[2])))
-                table.insert(row, getLine(self, v, v.deg + ma.random(sa[1], sa[2])))
+                local rd = v.deg - ma.random(sa[1], sa[2])
+                table.insert(row, getLine(l, v, rd, cs_b, cs_l))
+                rd = v.deg + ma.random(sa[1], sa[2])
+                table.insert(row, getLine(l, v, rd, cs_b, cs_l))
             end
             if split == 1 then
-                table.insert(row, getLine(self, v, v.deg + ma.random(-10, 10)))
+                table.insert(row, getLine(l, v, v.deg + ma.random(-10, 10), cs_b, cs_l))
             end
         
         end

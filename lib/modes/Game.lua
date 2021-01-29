@@ -1,26 +1,23 @@
 -- library functions
-local copy = require("lib.copy")
-local lume = require("lib.lume")
-local lyra = require("lib.lyra")
-local push = require("lib.push")
-local serpent = require("lib.serpent")
+local copy = require "lib.copy"
+local lume = require "lib.lume"
+local lyra = require "lib.lyra"
+local push = require "lib.push"
+local serpent = require "lib.serpent"
 
 -- Main components
 local Background = require "lib.scene.Background"
 local Focus = require "lib.sys.Focus"
-local Ground = require("lib.scene.Ground")
-local HUD = require("lib.ui.HUD")
-local Music = require("lib.sys.Music")
+local Ground = require "lib.scene.Ground"
+local HUD = require "lib.ui.HUD" 
+local Music = require "lib.sys.Music"
 local Player = require "lib.player.Player"
 local Saves = require "lib.sys.Saves"
 local Sky = require "lib.scene.Sky"
 local Spawner = require "lib.plants.Spawner"
 
 -- plants
-local Tree = require "lib.plants.Tree"
-local Sakura = require "lib.plants.Sakura"
-local Oak = require "lib.plants.Oak"
-local Kali = require "lib.plants.Kali"
+local Plant = require "lib.plants.Plant"
 
 -- aliases
 local ev = love.event
@@ -38,7 +35,7 @@ local function init(self)
     local H = push:getHeight()
     -- set camera x
     lyra.cx = 0
-    -- set the ground height 
+    -- set the ground height
     lyra.gh = H * .5
     -- set the stagewidth
     lyra.gw = stage.width
@@ -48,8 +45,6 @@ local function init(self)
     Ground:init(stage.ground)
     -- init head up display
     HUD:init()
-    -- init Kali
-    Kali:init()
     -- init Music
     Music:play(stage.music)
     -- create a player
@@ -57,7 +52,7 @@ local function init(self)
     -- init Sky
     Sky:init(stage.sky)
     -- add here for auto draw update
-    lyra:init(Ground, Kali, self.player, Sakura())
+    lyra:init(self.player, Plant:new("Sakura"))
 end
 
 local function keypressed(...)
@@ -72,7 +67,7 @@ end
 local function draw(self)
     Sky:draw()
     Background:draw()
-    
+
     -- translate with camera x
     gr.translate(lyra.cx, 0)
 
@@ -97,7 +92,6 @@ local function update(self, dt, set_mode)
     if not self.paused then
         lyra:update(dt)
         Ground:collide(self.player)
-
     end
     if self.exit == 1 then
         ev.quit()

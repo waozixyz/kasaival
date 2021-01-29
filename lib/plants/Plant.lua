@@ -1,9 +1,74 @@
 local Fire = require "lib.ps.Fire"
 
-local grow = require "lib.plants.grow"
 local lyra = require "lib.lyra"
+local grow = require "lib.plants.grow"
 
 local gr = love.graphics
+
+local function new(self, sav)
+    -- default template
+    local plant = {
+        -- element is obvious, but used for collisions
+        element = "plant",
+        -- special powerups, nothing is default
+        special = "",
+        -- how long it takes to grow
+        growTime = 1,
+        -- timer to know when to grow
+        growTimer = 1,
+        -- how long it takes to remove a tree stage
+        burnTimer = .5,
+        -- branch colorscheme
+        cs_branch = {.5, .7, .2, .4, .2, .3},
+        -- leaf colorscheme
+        cs_leaf = {.2, .2, .5, .6, .2, .4},
+        -- how many layers the tree will have
+        maxStage = 7,
+        -- coords
+        x = 600, y = 800,
+        -- scale
+        scale = 1,
+        -- table of all branches, each layer in their of table
+        branches = {},
+        -- table of all layer
+        leaves = {},
+        -- the random angle divergence
+        splitAngle = {20, 30},
+        -- how fast this material burns
+        burnIntensity = 15,
+    }
+    -- if sav is a string, then its not from the savefile
+    -- loads a new tree usinge the name stored in sav
+    local prop = {}
+    if type(sav) == "string" then
+        prop = require ("lib.plants." .. sav)
+    elseif type(sav) == "table" then
+        prop = sav
+    end
+    -- fill self with properties of plant or prop
+    for k,v in pairs(plant) do
+        self[k] = prop[k] or v
+    end
+    do -- fill branches table with data
+        local currentStage = sav.currentStage or 0
+        local w = sav.w or prop.w or 12
+        local h = sav.h or prop.h or 32
+        local p = {0, self.y}
+        local n = {0, self.y - h}
+        local branch = {color = lyra.getColor(self.cs_branch), deg = -90, h = h, n = n, p = p, w = w}
+        if sav.branches and #sav.branches > 0 then
+            self.branches = sav.branches
+        else
+            table.insert(self.branches, {branch})
+        end
+        -- grow to currentStage
+        for _ = #self.branches, currentStage do
+            grow.now(prop)
+        end
+    end
+    -- return the new plant
+    return copy(self)
+end
 
 local function collided(self, obj)
     if obj.element == "fire" then
@@ -32,10 +97,10 @@ local function draw(self)
                 local px, py = v.p[1], v.p[2]
                 local nx, ny = v.n[1], v.n[2]
                 if i == l then
-                    nx = px + (nx - px) / (self.growTime / self.elapsed)
-                    ny = py + (ny - py) / (self.growTime / self.elapsed)
+                    nx = px + (nx - px) * (self.growTime / self.growTimer)
+                    ny = py + (ny - py) * (self.growTime / self.growTimer)
                     if leaf then
-                        leaf.color[4] = (self.elapsed / self.growTime)
+                        leaf.color[4] = (self.growTimer / self.growTime)
                     end
                 end
                 px, nx = x + px, x + nx
@@ -66,52 +131,6 @@ local function getHitbox(self)
     return self.x - w, self.x + w, self.y - h, self.y + h
 end
 
-local function init(self, sav)
-    sav = sav or {}
-    -- default values
-	local tmpl = {
-        elapsed = 0,
-	    collapseTime = 0,
-        branchScheme = {.5, .7, .2, .4, .2, .3},
-        leafScheme = {.2, .2, .5, .6, .2, .4},
-        element = "plant",
-        special = "",
-	    growTime = 1,
-		maxStage = 7,
-		x = 0, y = 0,
-		scale = 1,
-		branches = {},
-        leaves = {},
-        burnTimer = 0,
-        burnIntensity = 1,
-        splitAngle = {20, 30}
-    }
-
-    -- replace with sav data
-    for k,v in pairs(tmpl) do
-        self[k] = sav[k] or v
-    end
-
-    do -- fill branches table with data
-        local currentStage = sav.currentStage or 0
-        local w = sav.w or 12
-        local h = sav.h or 32
-        local p = {0, self.y}
-        local n = {0, self.y - h}
-        local branch = {color = lyra.getColor(self.branchScheme), deg = -90, h = h, n = n, p = p, w = w}
-        if sav.branches and #sav.branches > 0 then
-            self.branches = sav.branches
-        else
-            table.insert(self.branches, {branch})
-        end
-        -- grow to currentStage
-        for _ = #self.branches, currentStage do
-            grow.now(self)
-        end
-    end
-end
-
-
 local function getHeight(self)
     local h = self.branches[1][1].h * self.scale
     return #self.branches * h * .7
@@ -121,21 +140,20 @@ local function update(self, dt)
     local l = #self.branches
     if self.burnTimer <= 0 then
         if l < self.maxStage then
-            self.elapsed = self.elapsed + dt
-            if self.elapsed > self.growTime then
+            self.growTimer = self.growTimer - dt
+            if self.growTimer <= 0 then
                 grow.now(self)
-                self.elapsed = 0
+                self.growTimer = self.growTime
             end
         end
         grow.heal(self)
         self.burning = false
     elseif l > 0 then
-        if self.elapsed >= 0 then
-            self.elapsed = self.elapsed - dt * self.burnIntensity * 15
+        if self.growTimer < self.growTime then
+            self.growTimer = self.growTimer + dt * self.burnIntensity
 
         else
             shrink(self)
-            self.elapsed = self.growTime
         end
         grow.burn(self)
         self.burning = true
@@ -161,10 +179,12 @@ local function update(self, dt)
         end
     end
 end
+
+
 return {
+    new = new,
+    update = update,
     collided = collided,
     draw = draw,
     getHitbox = getHitbox,
-    init = init,
-    update = update
 }
