@@ -16,8 +16,8 @@ local function new(self, sav)
         growTime = 1,
         -- timer to know when to grow
         growTimer = 1,
-        -- how long it takes to remove a tree stage
-        burnTimer = .5,
+        -- timer to know when to stop burning
+        burnTimer = 0,
         -- branch colorscheme
         cs_branch = {.5, .7, .2, .4, .2, .3},
         -- leaf colorscheme
@@ -97,8 +97,8 @@ local function draw(self)
                 local px, py = v.p[1], v.p[2]
                 local nx, ny = v.n[1], v.n[2]
                 if i == l then
-                    nx = px + (nx - px) * (self.growTime / self.growTimer)
-                    ny = py + (ny - py) * (self.growTime / self.growTimer)
+                    nx = px + (nx - px) / (self.growTime / self.growTimer)
+                    ny = py + (ny - py) / (self.growTime / self.growTimer)
                     if leaf then
                         leaf.color[4] = (self.growTimer / self.growTime)
                     end
@@ -140,18 +140,17 @@ local function update(self, dt)
     local l = #self.branches
     if self.burnTimer <= 0 then
         if l < self.maxStage then
-            self.growTimer = self.growTimer - dt
-            if self.growTimer <= 0 then
+            self.growTimer = self.growTimer + dt
+            if self.growTimer >= self.growTime then
                 grow.now(self)
-                self.growTimer = self.growTime
+                self.growTimer = 0
             end
         end
         grow.heal(self)
         self.burning = false
     elseif l > 0 then
-        if self.growTimer < self.growTime then
-            self.growTimer = self.growTimer + dt * self.burnIntensity
-
+        if self.growTimer > 0 then
+            self.growTimer = self.growTimer - dt * self.burnIntensity
         else
             shrink(self)
         end
@@ -162,6 +161,7 @@ local function update(self, dt)
 
     -- have this seperate in case the tree is dead but particles need to die
     if self.burning then
+        print(self.burning)
         if not self.fire and l > 0 then
             self.fire = Fire()
             self.fire:setPosition(self.x, self.y)
