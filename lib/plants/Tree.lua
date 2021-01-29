@@ -1,6 +1,7 @@
 local Fire = require "lib.ps.Fire"
 
 local grow = require "lib.plants.grow"
+local lyra = require "lib.lyra"
 
 local gr = love.graphics
 
@@ -66,6 +67,7 @@ local function getHitbox(self)
 end
 
 local function init(self, sav)
+    sav = sav or {}
     -- default values
 	local tmpl = {
         elapsed = 0,
@@ -87,7 +89,7 @@ local function init(self, sav)
 
     -- replace with sav data
     for k,v in pairs(tmpl) do
-         self[k] = sav[k] or v
+        self[k] = sav[k] or v
     end
 
     do -- fill branches table with data
@@ -96,7 +98,7 @@ local function init(self, sav)
         local h = sav.h or 32
         local p = {0, self.y}
         local n = {0, self.y - h}
-        local branch = {color = grow.rndColor(self.branchScheme), deg = -90, h = h, n = n, p = p, w = w}
+        local branch = {color = lyra.getColor(self.branchScheme), deg = -90, h = h, n = n, p = p, w = w}
         if sav.branches and #sav.branches > 0 then
             self.branches = sav.branches
         else
