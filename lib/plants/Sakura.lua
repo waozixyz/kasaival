@@ -1,30 +1,27 @@
-local Main = require "lib.trees.Tree"
+local Main = require "lib.plants.Tree"
 local copy = require "lib.copy"
 
 local ma = love.math
 
 return function(x, y, scale, randStage)
+    x, y, scale = x or 400, y or 400, scale or 1
     local w = ma.random(22, 27) * scale
-    local h = ma.random(62, 96) * scale
+    local h = ma.random(72, 86) * scale
 
     local tree = copy(Main)
 
     local maxStage = ma.random(7, 8)
     local currentStage = nil
     if randStage then currentStage = ma.random(0, maxStage) else currentStage = 0 end
-    local growTime = ma.random(3, 4)
-    local bcs1 = {.4, .5, .3, .4, .2, .2}
-    local bcs2 = {.5, .6, .2, .3, .2, .3}
-    local bcs3 = {.4, .5, .2, .3, .2, .3}
+    local growTime = ma.random(4, 7)
 
-    local lcs1 = {.2, .4, .4, .5, .2, .3}
-    local lcs2 = {.2, .3, .4, .5, .2, .4}
-    local lcs3 = {.1, .2, .4, .5, .3, .4}
+    local bc = {.4, .5, 0, 0, .2, .3}
 
-    local bc = ({bcs1, bcs2, bcs3})[ma.random(1, 3)]
-    local lc = ({lcs1, lcs2, lcs3})[ma.random(1, 3)]
+    local lc = {.8, 1, .6, .7, .7, .8}
+    
     tree:init(
         {
+            special = "sakura",
             branchScheme = bc,
             leafScheme = lc,
             currentStage = currentStage,
@@ -32,6 +29,7 @@ return function(x, y, scale, randStage)
             h = h,
             maxStage = maxStage,
             scale = scale,
+            splitAngle = {30, 40},
             w = w,
             x = x,
             y = y

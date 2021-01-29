@@ -6,6 +6,7 @@ local push = require("lib.push")
 local serpent = require("lib.serpent")
 
 -- Main components
+local Background = require "lib.Background"
 local Ground = require("lib.Ground")
 local HUD = require("lib.ui.HUD")
 local Music = require("lib.Music")
@@ -14,10 +15,11 @@ local Saves = require "lib.Saves"
 local Sky = require "lib.Sky"
 local Spawner = require "lib.Spawner"
 
--- Trees
-local MainTree = require "lib.trees.Tree"
-local SakuraTree = require "lib.trees.Sakura"
-local OakTree = require "lib.trees.Oak"
+-- plants
+local Tree = require "lib.plants.Tree"
+local Sakura = require "lib.plants.Sakura"
+local Oak = require "lib.plants.Oak"
+local Kali = require "lib.plants.Kali"
 
 -- aliases
 local ev = love.event
@@ -38,17 +40,21 @@ local function init(self)
     -- set the ground height 
     lyra.gh = H * .5
     -- set the stagewidth
-    lyra.gw = 3000
-    -- create a player
-    self.player = copy(Player:init())
-    -- init head up display
-    HUD:init()
-    -- init Sky
-    Sky:init(stage.sky)
+    lyra.gw = 6000
+    -- init Background
+    Background:init(stage.background)
     -- init Ground
     Ground:init(stage.ground)
-
-    lyra:init(Ground, self.player)
+    -- init head up display
+    HUD:init()
+    -- init Kali
+    Kali:init()
+    -- create a player
+    self.player = copy(Player:init())
+    -- init Sky
+    Sky:init(stage.sky)
+    -- add here for auto draw update
+    lyra:init(Ground, Kali, self.player)
 end
 
 local function keypressed(...)
@@ -62,7 +68,8 @@ end
 
 local function draw(self)
     Sky:draw()
-
+    Background:draw()
+    
     -- translate with camera x
     gr.translate(lyra.cx, 0)
 

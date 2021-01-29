@@ -13,10 +13,10 @@ local Saves = require "lib.Saves"
 local Sky = require "lib.Sky"
 local Spawner = require "lib.Spawner"
 
--- Trees
-local MainTree = require "lib.trees.Tree"
-local SakuraTree = require "lib.trees.Sakura"
-local OakTree = require "lib.trees.Oak"
+-- plants
+local MainTree = require "lib.plants.Tree"
+local SakuraTree = require "lib.plants.Sakura"
+local OakTree = require "lib.plants.Oak"
 
 -- aliases
 local fi = love.filesystem
@@ -35,8 +35,8 @@ local function addTree(self, randStage)
     else
         tree = SakuraTree(x, y, scale, randStage)
     end
-    -- add to trees table
-    table.insert(self.trees, tree)
+    -- add to plants table
+    table.insert(self.plants, tree)
 end
 
 local function getProp(e)
@@ -54,7 +54,7 @@ local function save(self)
     sav["p"] = getProp(self.player)
     sav["g"] = getProp(self.ground)
     local t = {}
-    for _, v in ipairs(self.trees) do table.insert(t, getProp(v)) end
+    for _, v in ipairs(self.plants) do table.insert(t, getProp(v)) end
     sav["t"] = t
     sav["cx"] = self.cx
     sav["elapsed"] = self.elapsed
@@ -98,7 +98,7 @@ local function init(self, _, saveFile)
     self.cx = sav.cx or 0
 
 
-    self.trees = {}
+    self.plants = {}
     local sky, p, g, t = sav.sky or {}, sav.p or {}, sav.g or {}, sav.t or nil
 
     -- init sky
@@ -110,11 +110,11 @@ local function init(self, _, saveFile)
     -- ini player
     self.player = copy(Player):init(p)
 
-    -- init trees
+    -- init plants
     if t and #t > 0 then
         for _, v in ipairs(t) do
-            table.insert(self.trees, copy(MainTree))
-            local tree = self.trees[#self.trees]
+            table.insert(self.plants, copy(MainTree))
+            local tree = self.plants[#self.plants]
             tree:init(v)
         end
     else
@@ -148,7 +148,7 @@ local function draw(self)
 
     -- make entities table
     local entities = {self.player}
-    for _, tree in ipairs(self.trees) do
+    for _, tree in ipairs(self.plants) do
         if self:checkVisible(tree.x, 200) then
             table.insert(entities, tree)
         end
@@ -207,7 +207,7 @@ local function update(self, dt, set_mode)
         self.player.scale = (self.player.y / H) * self.player.hp * 0.01
 
         self.player:update(dt, self)
-        for i, tree in ipairs(self.trees) do
+        for i, tree in ipairs(self.plants) do
             if tree.x + self.cx < self.width * -0.5 then
                 tree.x = tree.x + self.width
             elseif tree.x + self.cx > self.width * 0.5 then
@@ -221,7 +221,7 @@ local function update(self, dt, set_mode)
             if tree.dead then
                 self.player.xp = self.player.xp + 10
                 self.player.hp = self.player.hp + 1
-                table.remove(self.trees, i)
+                table.remove(self.plants, i)
             end
         end
         self.sky:update(dt)

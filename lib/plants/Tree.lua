@@ -1,6 +1,6 @@
 local Fire = require "lib.ps.Fire"
 
-local grow = require "lib.trees.grow"
+local grow = require "lib.plants.grow"
 
 local gr = love.graphics
 

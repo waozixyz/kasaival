@@ -154,7 +154,7 @@ return {
     getHitbox = getHitbox,
     init = init,
     oh = 32, -- height
-    ow = 32, -- width
+    ow = 22, -- width
     dp = .5, -- destroy power
     scale = 2,
     update = update,

@@ -1,23 +1,17 @@
+local lyra = require "lib.lyra"
+
 local ma = love.math
 
 local deg_to_rad = math.pi / 180
 
-local function rnc(l, r)
-    return ma.random(l * 10, r * 10) * .1
-end
-
-local function rndColor(cs)
-    return {rnc(cs[1], cs[2]), rnc(cs[3], cs[4]), rnc(cs[5], cs[6]), 1}
-end
-
 local function addLeaf(self, x, y, w)
-    return { x = x, y = y, color = rndColor(self.leafScheme), w = w * ma.random(8, 10) * .1, h = w * ma.random(8, 10) * .1 }
+    return { x = x, y = y, color = lyra.getColor(self.leafScheme), w = w * ma.random(8, 10) * .1, h = w * ma.random(8, 10) * .1 }
 end
 
 local function getLine(self, v, angle)
     local w, h = v.w * 0.9, v.h * 0.95
     local rtn = {}
-    rtn.color = rndColor(self.branchScheme)
+    rtn.color = lyra.getColor(self.branchScheme)
     rtn.deg, rtn.w, rtn.h = angle, w, h
     local nx = math.floor(v.n[1] + math.cos(angle * deg_to_rad) * h)
     local ny = math.floor(v.n[2] + math.sin(angle * deg_to_rad) * h)
@@ -99,4 +93,4 @@ local function heal(self)
 end
 
 
-return {now = now, rndColor = rndColor, burn = burn, heal = heal}
+return {now = now, burn = burn, heal = heal}
