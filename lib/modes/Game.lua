@@ -7,6 +7,7 @@ local serpent = require("lib.serpent")
 
 -- Main components
 local Background = require "lib.scene.Background"
+local Focus = require "lib.sys.Focus"
 local Ground = require("lib.scene.Ground")
 local HUD = require("lib.ui.HUD")
 local Music = require("lib.sys.Music")
@@ -86,7 +87,7 @@ local function draw(self)
 end
 
 local function focus(...)
-    HUD:focus(...)
+    Focus(...)
 end
 
 local function update(self, dt, set_mode)

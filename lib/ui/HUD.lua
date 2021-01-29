@@ -6,6 +6,8 @@ local Cursor = require "lib.ui.Cursor"
 local Music = require "lib.sys.Music"
 local Font = require "lib.ui.Font"
 local Text = require "lib.ui.Text"
+
+
 local gr = love.graphics
 
 -- get text for overlay
@@ -41,28 +43,6 @@ end
 
 
 local function toggle(val) if val then return false else return true end end
-
-local function focus(self, game, f)
-    if not f then
-        if not game.paused then
-            self.unpause = true
-            game.paused = true
-        end
-        if not game.muted then
-            game.muted = true
-            self.unmute = true
-        end
-    else
-        if self.unmute then
-            game.muted = false
-            self.unmute = false
-        end
-        if self.unpause then
-            game.paused = false
-            self.unpause = false
-        end
-    end
-end
 
 local function drawOverlay(item)
     local W, H = push:getDimensions()
@@ -136,7 +116,7 @@ local function update(self, game)
         game.paused = toggle(game.paused)
     end
     local music_image = self.music
-    if Music:muted() then
+    if Music:isMuted() then
         music_image = self.nomusic
     end
     local music_button = suit.ImageButton(music_image, W - 128, 20)

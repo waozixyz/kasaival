@@ -9,7 +9,7 @@ local function toggle(self)
     end
 end
 
-local function muted(self)
+local function isMuted(self)
     if self.bgm and self.bgm:isPlaying() then
         return false
     else
@@ -58,4 +58,4 @@ end
 local function down(self)
     self.bgm:setVolume(self.bgm:getVolume() - .1)
 end
-return { next = next, up = up, muted = muted, down = down, toggle = toggle, song = {}, dir = "assets/music/", mute = mute, play = play }
+return { next = next, up = up, isMuted = isMuted, down = down, toggle = toggle, song = {}, dir = "assets/music/", mute = mute, play = play }
