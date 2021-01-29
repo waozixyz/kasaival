@@ -9,8 +9,16 @@ local ground = {
 }
 
 local music = {
-    ["Insydnis"] = "The Desert of Dreams.mp3",
-    ["Spring"] = "Simple Desert.ogg"
+    {
+        author = "Insydnis",
+        title = "The Desert of Dreams",
+        ext = "mp3"
+    },
+    {
+        author = "Spring",
+        title = "Simple Desert",
+        ext = "ogg"
+    },
 }
 
 local sky = { y = 0 }

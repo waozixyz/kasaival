@@ -49,6 +49,8 @@ local function init(self)
     HUD:init()
     -- init Kali
     Kali:init()
+    -- init Music
+    Music:play(stage.music)
     -- create a player
     self.player = copy(Player:init())
     -- init Sky

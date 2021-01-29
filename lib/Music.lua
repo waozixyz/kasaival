@@ -6,25 +6,19 @@ local function mute(self)
         return (self.bgm):pause()
     end
 end
-local function play(self)
+local function play(self, songs)
     if self.bgm then
-        if not (self.bgm):isPlaying() then
-            return (self.bgm):play()
+        if not self.bgm:isPlaying() then
+            self.bgm:play()
         end
     else
-        local title = self.songTitle
-        while (title == self.songTitle) do
-            self.songTitle = self.songs[ma.random(#self.songs)]
+        local song = songs[ma.random(1, #songs)]
+        while song == self.songTitle do
+            song = songs[ma.random(1, #songs)]
         end
-        self.bgm = au.newSource((self.dir .. self.songTitle .. self.ext), "stream")
-        return au.play(self.bgm)
+        self.songTitle = song
+        self.bgm = au.newSource(self.dir .. song.author .. "/" .. song.title .. song.ext, "stream")
+        au.play(self.bgm)
     end
 end
-return {
-    dir = "assets/music/",
-    ext = ".ogg",
-    mute = mute,
-    play = play,
-    songAuthor = "TeknoAXE",
-    songs = {"Running_On_Air", "Robot_Disco_Dance", "Supersonic", "Caught_in_the_Drift"}
-}
+return { dir = "assets/music/", mute = mute, play = play }
