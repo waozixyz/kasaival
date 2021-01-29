@@ -93,7 +93,7 @@ local function update(self, dt, set_mode)
     if self.restart then
         set_mode("Game")
     end
-    -- HUD:update(self)
+    HUD:update(self)
     if not self.paused then
     --    self.player:update(dt)
         lyra:update(dt)
