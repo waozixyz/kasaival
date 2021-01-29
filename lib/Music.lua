@@ -12,13 +12,20 @@ local function play(self, songs)
             self.bgm:play()
         end
     else
-        local song = songs[ma.random(1, #songs)]
-        while song == self.songTitle do
-            song = songs[ma.random(1, #songs)]
+        local newSong
+        while newSong == self.title do
+            newSong = ma.random(1, #songs)
         end
-        self.songTitle = song
-        self.bgm = au.newSource(self.dir .. song.author .. "/" .. song.title .. song.ext, "stream")
+        newSong = songs[newSong]
+        -- add audio source
+        self.bgm = au.newSource(self.dir .. newSong.author .. "/" .. newSong.title .. "." .. newSong.ext, "stream")
+
+        -- add current song title and author to state
+        self.title = newSong.title
+        self.author = newSong.author
+
+        -- start playing song
         au.play(self.bgm)
     end
 end
-return { dir = "assets/music/", mute = mute, play = play }
+return { song = {}, dir = "assets/music/", mute = mute, play = play }

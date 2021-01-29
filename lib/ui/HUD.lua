@@ -4,6 +4,7 @@ local push = require "lib.push"
 
 local Cursor = require "lib.ui.Cursor"
 local Music = require "lib.Music"
+local Font = require "lib.ui.Font"
 local Text = require "lib.ui.Text"
 local gr = love.graphics
 
@@ -87,11 +88,9 @@ local function draw(self, game)
     end
 
     if Music.songTitle then
-        gr.setFont(self.font)
         gr.setColor({1, 1, 1})
-        local title = "\240\159\142\182 " .. Music.songAuthor .. " - " .. Music.songTitle .. " \240\159\142\182"
-        local w = (self.font):getWidth(title)
-        gr.print(title, W - w - 20, H - 40)
+        local title = gr.newText(Font, "\240\159\142\182 " .. Music.author .. " - " .. Music.title .. " \240\159\142\182")
+        gr.draw(title, W - 20, H - 40)
     end
 end
 local function tk( game)
