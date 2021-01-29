@@ -52,7 +52,7 @@ local function init(self)
     -- init Sky
     Sky:init(stage.sky)
     -- add here for auto draw update
-    lyra:init(self.player, Plant:new("Sakura"))
+    lyra:init(Ground, self.player, Plant:new("Sakura"))
 end
 
 local function keypressed(...)
