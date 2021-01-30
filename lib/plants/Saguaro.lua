@@ -1,13 +1,13 @@
 local ma = love.math
 
 return {
-    special = "sakura",
+    type = "cactus",
     cs_branch = {.4, .5, 0, 0, .2, .3},
     cs_leaf = {.8, 1, .6, .7, .7, .8},
-    splitAngle = {10, 15},
     growTime = ma.random(1, 2),
     maxStage = ma.random(7, 8),
     w = ma.random(22, 27),
     h = ma.random(72, 86),
+    splitChance = 6,
     startSpilt = false,
 }

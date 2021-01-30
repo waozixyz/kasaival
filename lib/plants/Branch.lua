@@ -8,8 +8,10 @@ local function addLeaf(x, y, w, cs)
     return { x = x, y = y, color = lyra.getColor(cs), w = w * ma.random(8, 10) * .1, h = w * ma.random(8, 10) * .1 }
 end
 
-return function(l, v, angle, cs_b, cs_l)
-    local w, h = v.w * 0.9, v.h * 0.95
+return function(self, v, angle, oh)
+    local l = #self.branches
+    local cs_b, cs_l = self.cs_branch, self.cs_leaf
+    local w, h = v.w * self.changeW, v.h * self.changeH
     local rtn = {}
     rtn.color = lyra.getColor(cs_b)
     rtn.deg, rtn.w, rtn.h = angle, w, h
@@ -19,6 +21,11 @@ return function(l, v, angle, cs_b, cs_l)
     rtn.p = v.n
     if l > 2 then
         rtn.leaf = addLeaf(ma.random(-w, w), ma.random(-2, 2), w, cs_l)
+    end
+    -- add speciol variable of original height
+    -- used for cactus grow function
+    if oh then
+        rtn.oh = oh
     end
     return rtn
 end

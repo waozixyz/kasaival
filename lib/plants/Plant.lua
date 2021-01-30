@@ -1,10 +1,9 @@
-local Branch = require "lib.plants.Branch"
+local Grow = require "lib.plants.Grow"
 local Fire = require "lib.ps.Fire"
 
 local lyra = require "lib.lyra"
 
 local gr = love.graphics
-local ma = love.math
 
 
 local function burnColor(c)
@@ -17,8 +16,6 @@ local function burnColor(c)
     end
     return {r, g, b}
 end
-
-
 
 local function healColor(c)
     local r, g, b = c[1], c[2], c[3]
@@ -49,37 +46,13 @@ local function changeColor(self, action)
     end
 end
 
-local function grow(self)
-    local l = #self.branches
-    local cs_b, cs_l = self.cs_branch, self.cs_leaf
-    if l > 0 then
-        local prev = self.branches[#self.branches]
-        local row = {}
-
-        for _, v in ipairs(prev) do
-            -- decide if branch should split into two
-            local split = ma.random(1, self.splitChance)
-            if split > 1 or (#prev < 3 and self.startSplit) then
-                local sa = self.splitAngle
-                local rd = v.deg - ma.random(sa[1], sa[2])
-                table.insert(row, Branch(l, v, rd, cs_b, cs_l))
-                rd = v.deg + ma.random(sa[1], sa[2])
-                table.insert(row, Branch(l, v, rd, cs_b, cs_l))
-            end
-            if split == 1 then
-                table.insert(row, Branch(l, v, v.deg + ma.random(-10, 10), cs_b, cs_l))
-            end
-        
-        end
-        table.insert(self.branches, row)
-    end
-end
-
 local function new(self, sav)
     -- default template
     local plant = {
         -- element is obvious, but used for collisions
         element = "plant",
+        -- default type of plant
+        type = "tree",
         -- special powerups, nothing is default
         special = "",
         -- how long it takes to grow
@@ -103,11 +76,17 @@ local function new(self, sav)
         -- the random angle divergence
         splitAngle = {20, 30},
         -- set the frequency of splitting up branhes
-        splitChance = 3,
+        -- generates random number from 1 - 10
+        -- if > splitChance then split
+        -- else do not split
+        splitChance = 4,
         -- split branches at the beginnig
         startSplit = true,
         -- how fast this material burns
         burnIntensity = 15,
+        -- the scale of how the size should change at each growth
+        changeW = .9,
+        changeH = .95,
     }
     -- if sav is a string, then its not from the savefile
     -- loads a new tree usinge the name stored in sav
@@ -137,7 +116,7 @@ local function new(self, sav)
         end
         -- grow to currentStage
         for _ = #self.branches, currentStage do
-            grow(prop)
+            table.insert(self.branches, Grow(prop))
         end
     end
     -- return the new plant
@@ -216,7 +195,7 @@ local function update(self, dt)
         if l < self.maxStage then
             self.growTimer = self.growTimer + dt
             if self.growTimer >= self.growTime then
-                grow(self)
+                table.insert(self.branches, Grow(self))
                 self.growTimer = 0
             end
         end
