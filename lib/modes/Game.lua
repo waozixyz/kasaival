@@ -15,10 +15,10 @@ local Player = require "lib.player.Player"
 local Saves = require "lib.sys.Saves"
 local Sky = require "lib.scene.Sky"
 local Spawner = require "lib.plants.Spawner"
+local dog = require "lib.mobs.dog"
 
 -- plants
 local Plant = require "lib.plants.Plant"
-local Kali = require "lib.plants.Kali"
 
 -- aliases
 local ev = love.event
@@ -53,7 +53,8 @@ local function init(self)
     -- init Sky
     Sky:init(stage.sky)
     -- add here for auto draw update
-    lyra:init(Ground, Kali:init(), self.player, Plant:new("Saguaro"))
+    lyra:init(Ground, self.player, Plant:new("Saguaro"))
+    dog:init(self)
 end
 
 local function keypressed(...)
@@ -68,6 +69,7 @@ end
 local function draw(self)
     Sky:draw()
     Background:draw()
+    dog:draw()
 --<<<<<<< BEGIN MERGE CONFLICT: local copy shown first <<<<<<<<<<<<<<<
    
     
@@ -105,5 +107,6 @@ local function update(self, dt, set_mode)
         ev.quit()
     end
     HUD:update(self)
+    dog:update()
 end
 return {draw = draw, init = init, keypressed = keypressed, touch = touch, focus = focus, update = update}
