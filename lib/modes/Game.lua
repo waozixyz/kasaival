@@ -14,7 +14,7 @@ local Music = require "lib.sys.Music"
 local Player = require "lib.player.Player"
 local Saves = require "lib.sys.Saves"
 local Sky = require "lib.scene.Sky"
-local Spawner = require "lib.plants.Spawner"
+local Spawner = require "lib.utils.Spawner"
 
 -- plants
 local Plant = require "lib.plants.Plant"
@@ -52,7 +52,11 @@ local function init(self)
     -- init Sky
     Sky:init(stage.sky)
     -- add here for auto draw update
-    lyra:init(Ground, self.player, Plant:new("Saguaro"))
+    lyra:init(Ground, self.player)
+    -- spawn some trees
+    for i = 0, 100 do
+        table.insert(lyra.items, Plant:new("Saguaro", Spawner()))
+    end
 end
 
 local function keypressed(...)

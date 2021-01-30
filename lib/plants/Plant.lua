@@ -1,10 +1,60 @@
 local Grow = require "lib.plants.Grow"
 local Fire = require "lib.ps.Fire"
 
+local copy = require "lib.copy"
 local lyra = require "lib.lyra"
 
 local gr = love.graphics
 
+    
+-- default template
+local template = {
+    -- element is obvious, but used for collisions
+    element = "plant",
+    -- default type of plant
+    type = "tree",
+    -- special powerups, nothing is default
+    special = "",
+    -- how long it takes to grow
+    growTime = 1,
+    -- timer to know when to stop burning
+    burnTimer = 0,
+    -- branch colorscheme
+    cs_branch = {.5, .7, .2, .4, .2, .3},
+    -- leaf colorscheme
+    cs_leaf = {.2, .2, .5, .6, .2, .4},
+    -- how many layers the tree will have
+    maxStage = 7,
+    -- coords
+    x = 600, y = 800,
+    -- scale
+    scale = 1,
+    -- size of leaves
+    leafSize = 1,
+    -- chance of growing a leaf, 0 - 10, 0 is to grow always
+    leafChance = 0,
+    -- table of all branches, each layer in their of table
+    branches = {},
+    -- table of all layer
+    leaves = {},
+    -- the random angle divergence
+    splitAngle = {20, 30},
+    -- set the frequency of splitting up branhes
+    -- generates random number from 1 - 10
+    -- if > splitChance then split
+    -- else do not split
+    splitChance = 4,
+    -- split branches at the beginnig
+    startSplit = true,
+    -- how fast this material burns
+    burnIntensity = 15,
+    -- the scale of how the size should change at each growth
+    changeW = .9,
+    changeH = .95,
+    -- used for first branch
+    currentStage = 0,
+    w = 12, h = 32,
+ }
 
 local function burnColor(c)
     local r, g, b = c[1], c[2], c[3]
@@ -45,80 +95,46 @@ local function changeColor(self, action)
         end
     end
 end
+-- fill self with properties of plant or prop
+local function fill_self(self, props)
+    for k,v in pairs(copy(props)) do
+        self[k] = v
+    end
+end
 
-local function new(self, sav)
-    -- default template
-    local plant = {
-        -- element is obvious, but used for collisions
-        element = "plant",
-        -- default type of plant
-        type = "tree",
-        -- special powerups, nothing is default
-        special = "",
-        -- how long it takes to grow
-        growTime = 1,
-        -- timer to know when to stop burning
-        burnTimer = 0,
-        -- branch colorscheme
-        cs_branch = {.5, .7, .2, .4, .2, .3},
-        -- leaf colorscheme
-        cs_leaf = {.2, .2, .5, .6, .2, .4},
-        -- how many layers the tree will have
-        maxStage = 7,
-        -- coords
-        x = 600, y = 800,
-        -- scale
-        scale = 1,
-        -- table of all branches, each layer in their of table
-        branches = {},
-        -- table of all layer
-        leaves = {},
-        -- the random angle divergence
-        splitAngle = {20, 30},
-        -- set the frequency of splitting up branhes
-        -- generates random number from 1 - 10
-        -- if > splitChance then split
-        -- else do not split
-        splitChance = 4,
-        -- split branches at the beginnig
-        startSplit = true,
-        -- how fast this material burns
-        burnIntensity = 15,
-        -- the scale of how the size should change at each growth
-        changeW = .9,
-        changeH = .95,
-    }
-    -- if sav is a string, then its not from the savefile
-    -- loads a new tree usinge the name stored in sav
-    local prop = {}
-    if type(sav) == "string" then
-        prop = require ("lib.plants." .. sav)
-    elseif type(sav) == "table" then
-        prop = sav
+local function new(self, name, sav)
+    -- fill with template
+    fill_self(self, template)
+    -- fill with name of plant if provided
+    if name then
+        assert(type(name) == "string", "name of plant needs to be string")
+        local props = require ("lib.plants." .. name)
+        assert(type(props) == "table", "props from name need to be a table of key values")
+        fill_self(self, props)
     end
-    -- fill self with properties of plant or prop
-    for k,v in pairs(plant) do
-        self[k] = prop[k] or v
+    -- fill with table if provided
+    if sav then
+        assert(type(sav) == "table", "save needs to be a table of key values")
+        fill_self(self, sav)
     end
+
     -- set timer value for values counting to 0
     self.growTimer = self.growTime
-    do -- fill branches table with data
-        local currentStage = sav.currentStage or 0
-        local w = sav.w or prop.w or 12
-        local h = sav.h or prop.h or 32
-        local p = {0, self.y}
-        local n = {0, self.y - h}
-        local branch = {color = lyra.getColor(self.cs_branch), deg = -90, h = h, n = n, p = p, w = w}
-        if sav.branches and #sav.branches > 0 then
-            self.branches = sav.branches
-        else
+    do
+        -- make one start branch if no branches given
+        if #self.branches == 0 then
+            local w, h = self.w, self.h
+            local p = {0, self.y}
+            local n = {0, self.y - h}
+            local branch = {color = lyra.getColor(self.cs_branch), deg = -90, h = h, n = n, p = p, w = w}
             table.insert(self.branches, {branch})
         end
         -- grow to currentStage
-        for _ = #self.branches, currentStage do
-            table.insert(self.branches, Grow(prop))
+        for _ = #self.branches, self.currentStage do
+            table.insert(self.branches, Grow(self))
         end
     end
+
     -- return the new plant
     return copy(self)
 end

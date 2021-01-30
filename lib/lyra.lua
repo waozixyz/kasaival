@@ -40,6 +40,7 @@ local function getColor(cs)
 end
 
 return {
+    items = {},
     init = init,
     update = update,
     draw = draw,

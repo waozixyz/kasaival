@@ -4,7 +4,6 @@ local ma = love.math
 
 return function(self)
     local l = #self.branches
-    local cs_b, cs_l = self.cs_branch, self.cs_leaf
     if l > 0 then
         local prev = self.branches[l]
         local row = {}
@@ -12,20 +11,16 @@ return function(self)
         for _, v in ipairs(prev) do
             if v.oh and v.h ~= v.oh then v.h = v.oh end
             -- decide if branch should split into two
-            local split = ma.random(1, 10)
-            -- exception for trees
-            local exception = false
-            if self.type == "tree" then
-                exception = #prev < 3 and self.startSplit
-            end
-            if split > self.splitChance or exception then
+            local split = ma.random(0, 10)
+      
+            if split > self.splitChance or #prev < 3 and self.startSplit then
                 local sa = self.splitAngle
                 --- CACTUS
                 if self.type == "cactus" then
                     table.insert(row, Branch(self, v, -90))
                     local rd = v.deg + ma.random(30, 40) * ma.random(-1, 1)
                     local oh = v.h
-                    v.h = oh * .5
+                    v.h = oh * .6
                     table.insert(row, Branch(self, v, rd, oh))
                 else -- TREE
                     local rd = v.deg - ma.random(sa[1], sa[2])
