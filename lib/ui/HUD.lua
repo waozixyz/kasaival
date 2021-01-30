@@ -6,8 +6,6 @@ local Cursor = require "lib.ui.Cursor"
 local Font = require "lib.ui.Font"
 local Overlay = require "lib.ui.Overlay"
 local Music = require "lib.sys.Music"
-local Text = require "lib.ui.Text"
-
 
 local gr = love.graphics
 

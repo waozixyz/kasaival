@@ -1,3 +1,4 @@
+local copy = require "lib.copy"
 local push = require "lib.push"
 
 local Font = require "lib.ui.Font"
@@ -10,7 +11,7 @@ local function init(self, text, size, y, c)
     self.color = c or {.7, 0, .34}
     local w, h = self.text:getDimensions()
     self.x, self.y = W * .5 - w * .5, (y or H * .4)
-    return self
+    return copy(self)
 end
 
 local function update(self, dt)

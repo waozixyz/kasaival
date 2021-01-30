@@ -9,8 +9,8 @@ local gr = love.graphics
 local function getText(title, subtitle, bckg)
     local H = push:getHeight()
     local rtn = {}
-    rtn.title = copy(Text:init(title, 64, H * .4))
-    rtn.subtitle = copy(Text:init(subtitle, 42, H * .5))
+    rtn.title = Text:init(title, 64, H * .4)
+    rtn.subtitle = Text:init(subtitle, 42, H * .5)
     rtn.bckg = bckg or { 0, 0, 0, 0 }
     return rtn
 end

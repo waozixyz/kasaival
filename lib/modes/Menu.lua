@@ -13,9 +13,9 @@ local function init(self)
     self.alpha = 1
     self.next = false
     Bckg:init()
-    self.title = copy(Text:init("KASAIVAL", 256, H * .1))
-    self.subtitle = copy(Text:init("an out of control flame trying to survive", 64, H * .4))
-    self.continue = copy(Text:init("touch to start burning", 64, H * .8, {1, .6, .4}))
+    self.title = Text:init("KASAIVAL", 256, H * .1)
+    self.subtitle = Text:init("an out of control flame trying to survive", 64, H * .4)
+    self.continue = Text:init("touch to start burning", 64, H * .8, {1, .6, .4})
     lyra:init(self.title, self.subtitle, self.continue)
 end
 
