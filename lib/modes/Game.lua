@@ -54,7 +54,7 @@ local function init(self)
     Sky:init(stage.sky)
     -- add here for auto draw update
     lyra:init(Ground, self.player, Plant:new("Saguaro"))
-    dog:init(self)
+    dog:init()
 end
 
 local function keypressed(...)
