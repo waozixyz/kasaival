@@ -42,17 +42,17 @@ local function init(self)
     -- init Background
     Background:init(stage.background)
     -- init Ground
-    Ground:init(stage.ground)
+    self.ground = Ground:init(stage.ground)
     -- init head up display
     HUD:init()
     -- init Music
     Music:play(stage.music)
     -- create a player
-    self.player = copy(Player:init())
+    self.player = Player:init()
     -- init Sky
     Sky:init(stage.sky)
     -- add here for auto draw update
-    lyra:init(Ground, self.player)
+    lyra:init(self.player)
     -- spawn some trees
     for i = 0, 100 do
         table.insert(lyra.items, Plant:new("Saguaro", Spawner()))
@@ -75,6 +75,8 @@ local function draw(self)
     -- translate with camera x
     gr.translate(lyra.cx, 0)
 
+    -- draw Ground
+    self.ground:draw()
     -- draw entities
     lyra:draw()
 
@@ -95,7 +97,8 @@ local function update(self, dt, set_mode)
     end
     if not self.paused then
         lyra:update(dt)
-        Ground:collide(self.player)
+        self.ground:update(dt)
+        self.ground:collide(self.player)
     end
     if self.exit == 1 then
         ev.quit()

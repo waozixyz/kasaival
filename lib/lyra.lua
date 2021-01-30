@@ -1,3 +1,5 @@
+local lume = require "lib.lume"
+
 local ma = love.math
 
 local function init(self, ...)
@@ -19,7 +21,8 @@ local function update(self, dt)
 end
 
 local function draw(self, ...)
-    for _, v in ipairs(self.items) do
+    local items = lume.sort(self.items, "y")
+    for _, v in ipairs(items) do
         if v.draw then
             v:draw(...)
         end

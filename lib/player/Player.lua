@@ -1,8 +1,9 @@
-local lyra = require("lib.lyra")
-local push = require("lib.push")
+local copy = require "lib.copy"
+local lyra = require "lib.lyra"
+local push = require "lib.push"
 
-local Controller = require("lib.player.Controller")
-local Flame = require("lib.ps.Flame")
+local Controller = require "lib.player.Controller"
+local Flame = require "lib.ps.Flame"
 
 -- aliases
 local gr = love.graphics
@@ -65,7 +66,7 @@ local function init(self, sav)
     self.sizes = {1, 1, 1, 1, 1, 1, 1, 1}
     self.elapsed = 0
     self.boost = false
-    return self
+    return copy(self)
 end
 
 local function returnTable(t)

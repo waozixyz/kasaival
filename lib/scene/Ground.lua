@@ -1,3 +1,4 @@
+local copy = require "lib.copy"
 local lyra = require "lib.lyra"
 local push = require "lib.push"
 
@@ -154,7 +155,7 @@ local function init(self, sav)
             y = y + h
         end
     end
-    return self
+    return copy(self)
 end
 local function update(self, dt)
     for _, row in ipairs(self.grid) do
