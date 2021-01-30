@@ -18,16 +18,7 @@ local function burnColor(c)
     return {r, g, b}
 end
 
-local function burn(self)
-    for _, row in ipairs(self.branches) do
-        for _, v in ipairs(row) do
-            v.color = burnColor(v.color)
-            if v.leaf then
-                v.leaf.color = burnColor(v.leaf.color)
-            end
-        end
-    end
-end
+
 
 local function healColor(c)
     local r, g, b = c[1], c[2], c[3]
@@ -43,17 +34,20 @@ local function healColor(c)
     return {r, g, b}
 end
 
-local function heal(self)
+
+local function changeColor(self, action)
+    if action == "heal" then action = healColor
+    elseif action == "burn" then action = burnColor end
+
     for _, row in ipairs(self.branches) do
         for _, v in ipairs(row) do
-            v.color = healColor(v.color)
+            v.color = action(v.color)
             if v.leaf then
-                v.leaf.color = healColor(v.leaf.color)
+                v.leaf.color = action(v.leaf.color)
             end
         end
     end
 end
-
 
 local function grow(self)
     local l = #self.branches
@@ -222,7 +216,7 @@ local function update(self, dt)
                 self.growTimer = 0
             end
         end
-        heal(self)
+        changeColor(self, "heal")
         self.burning = false
     elseif l > 0 then
         if self.growTimer > 0 then
@@ -230,7 +224,7 @@ local function update(self, dt)
         else
             shrink(self)
         end
-        burn(self)
+        changeColor(self, "burn")
         self.burning = true
         self.burnTimer = self.burnTimer - dt
     else self.burning = false self.dying = true end
