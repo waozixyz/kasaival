@@ -58,8 +58,8 @@ local function grow(self)
 
         for _, v in ipairs(prev) do
             -- decide if branch should split into two
-            local split = ma.random(1, 3)
-            if split > 1 or #prev < 3 then
+            local split = ma.random(1, self.splitChance)
+            if split > 1 or (#prev < 3 and self.startSplit) then
                 local sa = self.splitAngle
                 local rd = v.deg - ma.random(sa[1], sa[2])
                 table.insert(row, Branch(l, v, rd, cs_b, cs_l))
@@ -84,8 +84,6 @@ local function new(self, sav)
         special = "",
         -- how long it takes to grow
         growTime = 1,
-        -- timer to know when to grow
-        growTimer = 1,
         -- timer to know when to stop burning
         burnTimer = 0,
         -- branch colorscheme
@@ -104,6 +102,10 @@ local function new(self, sav)
         leaves = {},
         -- the random angle divergence
         splitAngle = {20, 30},
+        -- set the frequency of splitting up branhes
+        splitChance = 3,
+        -- split branches at the beginnig
+        startSplit = true,
         -- how fast this material burns
         burnIntensity = 15,
     }
@@ -119,6 +121,8 @@ local function new(self, sav)
     for k,v in pairs(plant) do
         self[k] = prop[k] or v
     end
+    -- set timer value for values counting to 0
+    self.growTimer = self.growTime
     do -- fill branches table with data
         local currentStage = sav.currentStage or 0
         local w = sav.w or prop.w or 12
