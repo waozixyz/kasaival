@@ -39,4 +39,14 @@ local function getColor(cs)
     return {rnc(cs[1], cs[2]), rnc(cs[3], cs[4]), rnc(cs[5], cs[6]), 1}
 end
 
-return {init = init, update = update, draw = draw, checkVisible = checkVisible, getColor = getColor, cx = 0, gh = 600, gw = 3000, startx = -100}
+return {
+    init = init,
+    update = update,
+    draw = draw,
+    checkVisible = checkVisible,
+    getColor = getColor,
+    cx = 0,
+    gh = 600,
+    gw = 3000,
+    startx = -100
+}
