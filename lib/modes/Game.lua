@@ -18,6 +18,7 @@ local Spawner = require "lib.plants.Spawner"
 
 -- plants
 local Plant = require "lib.plants.Plant"
+local Kali = require "lib.plants.Kali"
 
 -- aliases
 local ev = love.event
@@ -52,7 +53,7 @@ local function init(self)
     -- init Sky
     Sky:init(stage.sky)
     -- add here for auto draw update
-    lyra:init(Ground, self.player, Plant:new("Saguaro"))
+    lyra:init(Ground, Kali:init(), self.player, Plant:new("Saguaro"))
 end
 
 local function keypressed(...)
