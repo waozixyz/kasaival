@@ -1,3 +1,9 @@
+local background = {
+    name = "desert",
+    sy = 0.6,
+    scx = 0.3
+}
+
 local ground = {
     cs = {
         {0.85, 0.92, 0.55, 0.6, 0.38, 0.38 },
@@ -6,6 +12,8 @@ local ground = {
         {0.96, 0.96, 0.44, 0.54, 0.38, 0.38 },
         {0.87, 0.92, 0.49, 0.55, 0.4, 0.42 },
         {0.85, 0.92, 0.55, 0.6, 0.38, 0.38 },
+        {0.77, 0.87, 0.62, 0.68, 0.38, 0.38 },
+        {0.72, 0.77, 0.62, 0.68, 0.25, 0.32 },
 
     },
 }
@@ -25,4 +33,4 @@ local music = {
 
 local sky = { y = 0 }
 
-return {width = 9000, background = "desert", ground = ground, music = music, sky = sky,}
+return {width = 9000, background = background, ground = ground, music = music, sky = sky,}
