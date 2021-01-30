@@ -9,8 +9,8 @@ local function touch(self, obj, x, y)
     local px, py = obj.x, obj.y
     x = x - lyra.cx
     local nx, ny = x - px, y - py
-    local w = obj.scale * obj.ow * 0.2
-    local h = obj.scale * obj.oh * 0.2
+    local w = obj.scale * obj.w * 0.2
+    local h = obj.scale * obj.h * 0.2
     if nx < w and nx > -w and ny < h and ny > -h then
         nx = nil
         ny = nil

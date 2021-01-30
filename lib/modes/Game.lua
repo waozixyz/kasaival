@@ -53,9 +53,12 @@ local function init(self)
     Sky:init(stage.sky)
     -- add here for auto draw update
     lyra:init(self.player)
+
     -- spawn some trees
     for i = 0, 100 do
-        table.insert(lyra.items, Plant:new("Saguaro", Spawner()))
+        local tree = Plant:init("Saguaro", Spawner())
+        tree.id = #lyra.items
+        table.insert(lyra.items, tree)
     end
 end
 

@@ -9,6 +9,8 @@ local gr = love.graphics
     
 -- default template
 local template = {
+    -- set the item propert
+    static = true,
     -- element is obvious, but used for collisions
     element = "plant",
     -- default type of plant
@@ -102,7 +104,7 @@ local function fill_self(self, props)
     end
 end
 
-local function new(self, name, sav)
+local function init(self, name, sav)
     -- fill with template
     fill_self(self, template)
     -- fill with name of plant if provided
@@ -134,7 +136,6 @@ local function new(self, name, sav)
             table.insert(self.branches, Grow(self))
         end
     end
-
     -- return the new plant
     return copy(self)
 end
@@ -194,9 +195,8 @@ local function draw(self)
 end
 
 local function getHitbox(self)
-    local first = self.branches[1][1]
-    local w = first.w * self.scale * 2
-    local h = first.h * self.scale * 2
+    local w = self.w * self.scale * 2
+    local h = self.h * self.scale * 2
     return self.x - w, self.x + w, self.y - h, self.y + h
 end
 
@@ -230,7 +230,6 @@ local function update(self, dt)
 
     -- have this seperate in case the tree is dead but particles need to die
     if self.burning then
-        print(self.burning)
         if not self.fire and l > 0 then
             self.fire = Fire()
             self.fire:setPosition(self.x, self.y)
@@ -251,7 +250,7 @@ end
 
 
 return {
-    new = new,
+    init = init,
     update = update,
     collided = collided,
     draw = draw,
