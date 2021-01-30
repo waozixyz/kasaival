@@ -1,15 +1,12 @@
+local ma = love.math
+
 return {
-    growTimer = 1,
-    collapseTime = 0,
-    branchScheme = {.5, .7, .2, .4, .2, .3},
-    leafScheme = {.2, .2, .5, .6, .2, .4},
-    special = "",
-    maxStage = 7,
-    x = 0, y = 0,
-    scale = 1,
-    branches = {},
-    leaves = {},
-    burnTimer = 0,
-    burnIntensity = 1,
-    splitAngle = {20, 30}
+    special = "sakura",
+    cs_branch = {.4, .5, 0, 0, .2, .3},
+    cs_leaf = {.8, 1, .6, .7, .7, .8},
+    splitAngle = {30, 40},
+    growTime = ma.random(4, 7),
+    maxStage = ma.random(7, 8),
+    w = ma.random(22, 27),
+    h = ma.random(72, 86),
 }
