@@ -55,10 +55,12 @@ local function init(self)
     lyra:init(self.player)
 
     -- spawn some trees
-    for i = 0, 100 do
-        local tree = Plant:init("Saguaro", Spawner())
-        tree.id = #lyra.items
-        table.insert(lyra.items, tree)
+    for k, v in pairs(stage.trees) do
+        for i = 1, v.amount do
+            local tree = Plant:init(k, Spawner(v.startx))
+            tree.id = #lyra.items
+            table.insert(lyra.items, tree)
+        end
     end
 end
 

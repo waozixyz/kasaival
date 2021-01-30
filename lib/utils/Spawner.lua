@@ -4,15 +4,14 @@ local lyra = require "lib.lyra"
 local ma = love.math
 
 
-return function(x, y)
+return function(start_x)
     local H = push:getHeight()
 
-    y = y or ma.random(0, H - lyra.gh)
+    local y = ma.random(0, H - lyra.gh)
     local scale = (y + lyra.gh) / H
 
     local W = lyra.gw
-    x = x or ma.random(lyra.startx, W + lyra.startx)
-
+    local x = ma.random(lyra.startx + start_x, W + lyra.startx)
     local vir_x = x / scale
 
     local rat_x = x / vir_x
