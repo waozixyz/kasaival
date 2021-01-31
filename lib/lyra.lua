@@ -6,6 +6,9 @@ local ma = love.math
 local function init(self, ...)
     self.items = {}
     for _, v in ipairs({...}) do
+        if v.id == "player" then
+            self.player = v
+        end
         table.insert(self.items, v)
     end
     self.visible_items = self.items
@@ -37,10 +40,19 @@ local function checkCollision(o1, o2)
     end
 end
 
-local function update(self, dt)
-    for _, v in ipairs(self.items) do
+local function update(self, game, dt)
+    for i, v in ipairs(self.items) do
         if v.update then
             v:update(dt)
+        end
+        if v.dead then
+            self.player.xp = self.player.xp + 10
+            self.player.hp = self.player.hp + 1
+            if not game.kill_count[v.type] then
+                game.kill_count[v.type] = 0
+            end
+            game.kill_count[v.type] = game.kill_count[v.type] + 1
+            table.remove(self.items, i)
         end
     end
     local static_items, kinetic_items = get_sm_items(self.visible_items)

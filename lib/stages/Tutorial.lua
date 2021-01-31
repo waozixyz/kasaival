@@ -1,3 +1,17 @@
+local quests = {
+    ["kill"] = {
+        type = "cactus",
+        head = "Burn down a",
+        amount = 100,
+        tail = "cactuses"
+    },
+    ["survive"] = {
+        head = "Survive for",
+        amount = 100,
+        tail = "seconds"
+    },
+}
+
 local background = {
     name = "desert",
     sy = 0.6,
@@ -40,4 +54,4 @@ local trees = {
     } 
 }
 
-return {width = 9000, background = background, ground = ground, music = music, sky = sky, trees = trees}
+return {width = 9000, background = background, ground = ground, music = music, sky = sky, trees = trees, quests = quests}
