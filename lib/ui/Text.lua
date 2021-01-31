@@ -1,25 +1,46 @@
+local copy = require "lib.copy"
 local push = require "lib.push"
 
 local Font = require "lib.ui.Font"
 
 local gr = love.graphics
 
-local function init(self, text, size, y, c)
+local function init(self, text, prop)
     local W, H = push:getDimensions()
-    self.text = gr.newText(Font(size or 42), text or "KASAIVAL")
-    self.color = c or {.7, 0, .34}
-    local w, h = self.text:getDimensions()
-    self.x, self.y = W * .5 - w * .5, (y or H * .4)
-    return self
+    local tmpl = {
+        align = "center",
+        size = 42,
+        x = W * .5,
+        y = H * .4,
+        color = {.7, 0, .34}
+    }
+    for k, v in pairs(tmpl) do
+        self[k] = prop[k] or v
+    end
+    self.text = gr.newText(Font(self.size), text)
+    self.w = self.text:getWidth()
+    return copy(self)
 end
 
-local function update(self, dt)
+local function update(self, text)
+    if text and type(text) == "string" then
+        self.text = gr.newText(Font(self.size), text)
+    end
 end
 
+local function getAlignX(align, x, w)
+    if align == "center" then
+        return x - w * .5
+    elseif align == "left" then
+        return x
+    elseif align == "right" then
+        return x - w
+    end
+end
 local function draw(self, alpha)
     self.color[4] = alpha
     gr.setColor(self.color)
-    gr.draw(self.text, self.x, self.y)
+    gr.draw(self.text, getAlignX(self.align, self.x, self.w), self.y)
 end
 
 return {init = init, update = update, draw = draw}

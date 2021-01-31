@@ -19,13 +19,14 @@ return function(self, v, angle, oh)
     local ny = math.floor(v.n[2] + math.sin(angle * deg_to_rad) * h)
     rtn.n = {nx, ny}
     rtn.p = v.n
-    if l > 2 then
-        rtn.leaf = addLeaf(ma.random(-w, w), ma.random(-2, 2), w, cs_l)
+    local grow_leaf = ma.random(0, 10)
+    if l > 2 and grow_leaf > self.leafChance  then
+        rtn.leaf = addLeaf(ma.random(-w, w), ma.random(-2, 2), w * self.leafSize, cs_l)
     end
-    -- add speciol variable of original height
+    -- add special variable of original height
     -- used for cactus grow function
     if oh then
-        rtn.oh = oh
+        rtn.oh = oh * .7
     end
     return rtn
 end

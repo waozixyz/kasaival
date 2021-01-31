@@ -1,4 +1,4 @@
-function copy(obj, seen)
+local function copy(obj, seen)
   -- Handle non-tables and previously-seen tables.
   if type(obj) ~= 'table' then return obj end
   if seen and seen[obj] then return seen[obj] end

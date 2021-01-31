@@ -14,7 +14,7 @@ local Music = require "lib.sys.Music"
 local Player = require "lib.player.Player"
 local Saves = require "lib.sys.Saves"
 local Sky = require "lib.scene.Sky"
-local Spawner = require "lib.plants.Spawner"
+local Spawner = require "lib.utils.Spawner"
 local dog = require "lib.mobs.dog"
 
 -- plants
@@ -43,17 +43,41 @@ local function init(self)
     -- init Background
     Background:init(stage.background)
     -- init Ground
-    Ground:init(stage.ground)
+    self.ground = Ground:init(stage.ground)
     -- init head up display
-    HUD:init()
+    HUD:init(stage.quests)
     -- init Music
     Music:play(stage.music)
     -- create a player
-    self.player = copy(Player:init())
+    self.player = Player:init()
     -- init Sky
     Sky:init(stage.sky)
     -- add here for auto draw update
-    lyra:init(Ground, self.player, Plant:new("Saguaro"))
+    lyra:init(self.player)
+
+    -- spawn some trees
+    for k, v in pairs(stage.trees) do
+        for _ = 1, v.amount do
+            local tree = Plant:init(k, Spawner(v.startx))
+            tree.id = #lyra.items
+            table.insert(lyra.items, tree)
+        end
+    end
+
+    -- link self.quests to stage.quests
+    self.quests = stage.quests
+    -- store time elapsed in game
+    self.elapsed = 0
+    -- kill count will store the death of a plant or mob in multiple tables
+    -- the key is used to determine what type died
+    self.kill_count = {}
+    for k, v in pairs(self.quests) do
+        if k == "kill" then
+            if not self.kill_count[v.type] then
+                self.kill_count[v.type] = 0
+            end
+        end
+    end
     dog:init()
 end
 
@@ -83,6 +107,8 @@ local function draw(self)
     -- translate with camera x
     gr.translate(lyra.cx, 0)
 
+    -- draw Ground
+    self.ground:draw()
     -- draw entities
     lyra:draw()
 
@@ -100,13 +126,27 @@ local function focus(...)
     Focus(...)
 end
 
+local function update_quests(self, dt)
+    for k, v in pairs(self.quests) do
+        if k == "survive" then
+            v.amount = v.amount - dt
+        end
+        if v.amount <= 0 then
+            self.quests[k] = nil
+        end
+    end
+end
+
 local function update(self, dt, set_mode)
+    self.elapsed = self.elapsed + dt
     if self.restart then
         set_mode("Game")
     end
     if not self.paused then
-        lyra:update(dt)
-        Ground:collide(self.player)
+        lyra:update(self, dt)
+        self.ground:update(dt)
+        self.ground:collide(self.player)
+        update_quests(self, dt)
     end
     if self.exit == 1 then
         ev.quit()

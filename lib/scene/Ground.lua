@@ -1,3 +1,4 @@
+local copy = require "lib.copy"
 local lyra = require "lib.lyra"
 local push = require "lib.push"
 
@@ -93,7 +94,7 @@ local function collide(self, obj)
     for _, row in ipairs(self.grid) do
         for _, v in ipairs(row) do
             if v.x <= r and v.x + v.w >= l and v.y - v.h <= d and v.y >= u then
-                obj:collided(v.color)
+                obj:collided(v)
                 v.color = burnTile(v)
             end
         end
@@ -103,7 +104,7 @@ end
 local function draw(self)
     for _, row in ipairs(self.grid) do
         for i, tile in ipairs(row) do
-            if lyra:checkVisible(tile.x, tile.w) then
+            if lyra:checkVisible(tile) then
                 gr.setColor(tile.color)
                 gr.polygon("fill", getTile(i, tile))
             end
@@ -154,7 +155,7 @@ local function init(self, sav)
             y = y + h
         end
     end
-    return self
+    return copy(self)
 end
 local function update(self, dt)
     for _, row in ipairs(self.grid) do

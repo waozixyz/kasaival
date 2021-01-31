@@ -1,8 +1,9 @@
-local lyra = require("lib.lyra")
-local push = require("lib.push")
+local copy = require "lib.copy"
+local lyra = require "lib.lyra"
+local push = require "lib.push"
 
-local Controller = require("lib.player.Controller")
-local Flame = require("lib.ps.Flame")
+local Controller = require "lib.player.Controller"
+local Flame = require "lib.ps.Flame"
 
 -- aliases
 local gr = love.graphics
@@ -20,24 +21,24 @@ local function stopBoost(self)
     self.speed = self.speed / 1.5
 end
 
-local function collided(self, oc, s, full)
-    if type(oc) == "table" then self.hp = self.hp + oc[2] - oc[3] end
-    if oc == "plant" then
+local function collided(self, obj)
+    if not obj.element and obj.color then self.hp = self.hp + obj.color[2] - obj.color[3]
+    elseif obj.element == "plant" then
         self.hp = self.hp + .5
-        if full and s == "sakura" then
+        if #obj.branches == obj.stages and obj.special == "sakura" then
             self.boostTime = 10
             if not self.boost then
                 startBoost(self)
             end
-        elseif full then
+        elseif #obj.branches == obj.stages then
             self.hp = self.hp + 1
         end
     end
 end
 
 local function getHitbox(self)
-    local w = (self.ow * self.scale)
-    local h = (self.oh * self.scale)
+    local w = self.w * self.scale
+    local h = self.h * self.scale
     return self.x - w * 0.5, self.x + w * 0.5, self.y - h * 0.5, self.y + h * .5
 end
 
@@ -55,6 +56,7 @@ end
 local function init(self, sav)
     sav = sav or {}
     local W, H = push:getDimensions()
+    self.id = "player"
     self.x = sav.x or W * .5
     self.y = sav.y or H * .7
     self.xp = sav.xp or 0
@@ -65,7 +67,7 @@ local function init(self, sav)
     self.sizes = {1, 1, 1, 1, 1, 1, 1, 1}
     self.elapsed = 0
     self.boost = false
-    return self
+    return copy(self)
 end
 
 local function returnTable(t)
@@ -153,10 +155,11 @@ return {
     element = "fire",
     getHitbox = getHitbox,
     init = init,
-    oh = 32, -- height
-    ow = 22, -- width
+    h = 32, -- height
+    w = 22, -- width
     dp = .5, -- destroy power
     scale = 2,
     update = update,
     burnRate = .1,
+    kinetic = true,
 }
