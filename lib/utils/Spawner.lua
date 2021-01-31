@@ -5,6 +5,7 @@ local ma = love.math
 
 
 return function(start_x)
+    start_x = start_x or  0
     local H = push:getHeight()
 
     local y = ma.random(0, H - lyra.gh)

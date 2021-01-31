@@ -15,6 +15,7 @@ local Player = require "lib.player.Player"
 local Saves = require "lib.sys.Saves"
 local Sky = require "lib.scene.Sky"
 local Spawner = require "lib.utils.Spawner"
+local Dog = require "lib.mobs.Dog"
 
 -- plants
 local Plant = require "lib.plants.Plant"
@@ -63,6 +64,12 @@ local function init(self)
         end
     end
 
+
+    -- spawn some Dog
+    for _ = 1, 30 do
+        table.insert(lyra.items, Dog:init( Spawner()))
+    end
+
     -- link self.quests to stage.quests
     self.quests = stage.quests
     -- store time elapsed in game
@@ -89,6 +96,7 @@ local function touch(self, ...)
 end
 
 local function draw(self)
+    
     Sky:draw()
     Background:draw()
 
@@ -105,6 +113,8 @@ local function draw(self)
 
     -- draw head up display
     HUD:draw(self)
+
+    
 end
 
 local function focus(...)
