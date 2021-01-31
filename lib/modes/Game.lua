@@ -116,7 +116,7 @@ local function update_quests(self, dt)
         if k == "survive" then
             v.amount = v.amount - dt
         end
-        if v.amount <= 0 then
+        if v.amount <= 0 or v.amount == self.kill_count[v.type] then
             self.quests[k] = nil
         end
     end
