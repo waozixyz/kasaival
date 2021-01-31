@@ -7,7 +7,7 @@ local ma = love.math
 local function new_anime(image, width, height, duration)
     local anime = {}
     anime.spriteSheet = image
-    
+
     anime.quads = {}
 
     for y = 0, image:getHeight() - height, height do
@@ -28,7 +28,6 @@ local function init(self, pos)
     self.pinkelpause = false
     self.anime = new_anime(gr.newImage("assets/mobs/dog_sprite.png"), 46, 27, 1)
     self.zeito = ma.random(0, 11)
-    
     -- add random color to dogs
     self.color = lyra.getColor({.4, 1, .4, 1, .4, 1})
 
@@ -37,14 +36,18 @@ end
 
 local function get_sprite_num(self)
     local add, mult = 1, 3
-    if self.pinkelpause then add = add + 3 end
+    if self.pinkelpause then
+        add = add + 3
+    end
     return math.floor(self.anime.currentTime / self.anime.duration * mult) + add
 end
 
 local function draw(self)
     local sx, sy = 2, 2
 
-    if self.direction > 0 then sx = sx * -1 end
+    if self.direction > 0 then
+        sx = sx * -1
+    end
     gr.setColor(self.color)
     gr.draw(self.anime.spriteSheet, self.anime.quads[get_sprite_num(self)], self.x, self.y, 0, sx, sy)
 end
