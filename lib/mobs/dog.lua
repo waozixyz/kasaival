@@ -22,16 +22,15 @@ end
 local function init(self)
     self.dampf=1
     self.spawnmodifikator=0
-     self.dog= love.graphics.newImage( "solodog.png" )
+     self.dog= love.graphics.newImage( "assets/dog/solodog.png" )
        
      self.spawnx = 0
      self.dogdirection = 1
      
-     self.animation = newe(love.graphics.newImage("dog_sprite.png"), 46, 28, 1)
+     self.animation = newe(love.graphics.newImage("assets/dog/dog_sprite.png"), 46, 28, 1)
 
 
     return self
-    
 end
 
 
@@ -50,7 +49,7 @@ local function draw(self)
     
     
         --verschiedene herumwandernde Etwas
-        love.graphics.draw(self.animation.spriteSheet, self.animation.quads[spriteNum], 1000-(self.spawnmodifikator+self.dampf)*30, 464+math.sin(self.spawnmodifikator)*6, 0, self.dogdirection, 1)
+        love.graphics.draw(self.animation.spriteSheet, self.animation.quads[spriteNum], 1000-(self.spawnmodifikator+self.dampf)*30, 464+math.sin(self.spawnmodifikator*20)*6, 0, self.dogdirection, 1)
         love.graphics.setColor(1,0,0)
         love.graphics.draw(self.animation.spriteSheet, self.animation.quads[spriteNum], 750-(self.spawnmodifikator+self.dampf)*54, 464+math.sin(self.spawnmodifikator)*6,0, self.dogdirection,1)
         love.graphics.setColor(0,1,0)
