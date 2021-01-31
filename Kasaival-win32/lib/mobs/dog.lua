@@ -49,17 +49,19 @@ local function draw(self)
     
     
         --verschiedene herumwandernde Etwas
-        love.graphics.draw(self.animation.spriteSheet, self.animation.quads[spriteNum], 1000-(self.spawnmodifikator+self.dampf)*30, 464+math.sin(self.spawnmodifikator*20)*6, 0, self.dogdirection, 1)
-        love.graphics.setColor(1,0,0)
-        love.graphics.draw(self.animation.spriteSheet, self.animation.quads[spriteNum], 750-(self.spawnmodifikator+self.dampf)*54, 464+math.sin(self.spawnmodifikator)*6,0, self.dogdirection,1)
-        love.graphics.setColor(0,1,0)
-        love.graphics.draw(self.animation.spriteSheet, self.animation.quads[spriteNum], 1100+(self.spawnmodifikator+self.dampf)*37, 464+math.sin(self.spawnmodifikator)*self.spawnmodifikator, 0, self.dogdirection*(-1),1)
-        love.graphics.setColor(0,0,1)
-        love.graphics.draw(self.animation.spriteSheet, self.animation.quads[spriteNum], 1150-self.spawnmodifikator*100-self.spawnmodifikator, 464+math.sin(self.spawnmodifikator)*5, 0, self.dogdirection, 1)
-        
-        love.graphics.draw(self.animation.spriteSheet, self.animation.quads[spriteNum], 1400-self.spawnmodifikator*70,464+math.sin(self.spawnmodifikator)*6, 0, self.dogdirection, 1)
+
+        love.graphics.draw(self.animation.spriteSheet, self.animation.quads[spriteNum], 1400-self.spawnmodifikator*70,464+math.sin(self.spawnmodifikator*10)*6, 0, self.dogdirection, 1)
        
-        love.graphics.draw(self.animation.spriteSheet, self.animation.quads[spriteNum], 800+self.spawnmodifikator*40,464+math.sin(self.spawnmodifikator)*6, 0, self.dogdirection*(-1), 1)
+        love.graphics.draw(self.animation.spriteSheet, self.animation.quads[spriteNum], 800+self.spawnmodifikator*40,464+math.sin(self.spawnmodifikator*12)*6, 0, self.dogdirection*(-1), 1)
+        love.graphics.draw(self.animation.spriteSheet, self.animation.quads[spriteNum], 1000-(self.spawnmodifikator+self.dampf)*30, 464+math.sin(self.spawnmodifikator*15)*6, 0, self.dogdirection, 1)
+        love.graphics.setColor(1,0,0)
+        love.graphics.draw(self.animation.spriteSheet, self.animation.quads[spriteNum], 750-(self.spawnmodifikator+self.dampf)*54, 464+math.sin(self.spawnmodifikator*7)*6,0, self.dogdirection,1)
+        love.graphics.setColor(0,1,0)
+        love.graphics.draw(self.animation.spriteSheet, self.animation.quads[spriteNum], 1100+(self.spawnmodifikator+self.dampf)*37, 464+math.sin(self.spawnmodifikator*17)*6, 0, self.dogdirection*(-1),1)
+        love.graphics.setColor(0,0,1)
+        love.graphics.draw(self.animation.spriteSheet, self.animation.quads[spriteNum], 1150-self.spawnmodifikator*100-self.spawnmodifikator, 464+math.sin(self.spawnmodifikator*13)*6, 0, self.dogdirection, 1)
+        
+        
     end
     
     
