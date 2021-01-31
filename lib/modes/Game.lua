@@ -64,6 +64,14 @@ local function init(self)
         end
     end
 
+
+    -- spawn some dog
+     print(Spawner().x)
+    for _ = 1, 20 do
+        local dog = dog:init( Spawner())
+        table.insert(lyra.items, dog)
+    end
+
     -- link self.quests to stage.quests
     self.quests = stage.quests
     -- store time elapsed in game
@@ -78,7 +86,6 @@ local function init(self)
             end
         end
     end
-    dog:init()
 end
 
 local function keypressed(...)
@@ -94,7 +101,7 @@ local function draw(self)
     
     Sky:draw()
     Background:draw()
-    dog:draw()
+
     
 --<<<<<<< BEGIN MERGE CONFLICT: local copy shown first <<<<<<<<<<<<<<<
 
@@ -118,7 +125,6 @@ local function draw(self)
     -- draw head up display
     HUD:draw(self)
 
-    --dog
     
 end
 
@@ -152,6 +158,5 @@ local function update(self, dt, set_mode)
         ev.quit()
     end
     HUD:update(self)
-    dog:update(dt)
 end
 return {draw = draw, init = init, keypressed = keypressed, touch = touch, focus = focus, update = update}
