@@ -28,6 +28,9 @@ local function init(self, pos)
     self.pinkelpause = false
     self.anime = new_anime(gr.newImage("assets/mobs/dog_sprite.png"), 46, 27, 1)
     self.zeito = ma.random(0, 11)
+    
+    -- add random color to dogs
+    self.color = lyra.getColor({.4, 1, .4, 1, .4, 1})
 
     return copy(self)
 end
@@ -42,6 +45,7 @@ local function draw(self)
     local sx, sy = 2, 2
 
     if self.direction > 0 then sx = sx * -1 end
+    gr.setColor(self.color)
     gr.draw(self.anime.spriteSheet, self.anime.quads[get_sprite_num(self)], self.x, self.y, 0, sx, sy)
 end
 
