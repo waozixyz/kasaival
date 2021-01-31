@@ -67,11 +67,13 @@ local function touch(self, ...)
 end
 
 local function draw(self)
+    
     Sky:draw()
     Background:draw()
     dog:draw()
+    
 --<<<<<<< BEGIN MERGE CONFLICT: local copy shown first <<<<<<<<<<<<<<<
-   
+
     
 --||||||| COMMON ANCESTOR content follows ||||||||||||||||||||||||||||
     
@@ -89,6 +91,9 @@ local function draw(self)
 
     -- draw head up display
     HUD:draw(self)
+
+    --dog
+    
 end
 
 local function focus(...)
@@ -107,6 +112,6 @@ local function update(self, dt, set_mode)
         ev.quit()
     end
     HUD:update(self)
-    dog:update()
+    dog:update(dt)
 end
 return {draw = draw, init = init, keypressed = keypressed, touch = touch, focus = focus, update = update}
