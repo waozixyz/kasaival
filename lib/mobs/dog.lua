@@ -26,13 +26,14 @@ local function init(self,pos)
     self.dampf=1
     self.spawnmodifikator=0
      self.dog= love.graphics.newImage( "assets/dog/solodog.png" )
+     self.pinkeldog = love.graphics.newImage( "assets/dog/pinkel.png" )
     self.x=pos.x
     self.y=pos.y
      self.spawnx = 0
      self.dogdirection = 1
-     
+     self.pinkelpause=1
      self.animation = newe(love.graphics.newImage("assets/dog/dog_sprite.png"), 46, 28, 1)
-
+     self.zeito=0
 
     return copy(self)
 end
@@ -52,10 +53,15 @@ local function draw(self)
     
     
     
-        --verschiedene herumwandernde Etwas
-
+        --verschiedene herumwandernde Etwas dogs
+         if self.pinkelpause >=1 
+         then
         love.graphics.draw(self.animation.spriteSheet, self.animation.quads[spriteNum], self.x+self.spawnmodifikator*30-self.spawnmodifikator, self.y+math.sin(self.spawnmodifikator*13)*6, 0, self.dogdirection*(-1), 1)
-
+         else 
+            love.graphics.draw(self.pinkeldog, self.x+self.spawnmodifikator*30-self.spawnmodifikator, self.y+math.sin(self.spawnmodifikator*13)*6, 0, self.dogdirection*(-1), 1)
+         end
+         if self.pinkelpause >=1 
+         then
         love.graphics.draw(self.animation.spriteSheet, self.animation.quads[spriteNum], 1400-self.spawnmodifikator*70,464+math.sin(self.spawnmodifikator*10)*6, 0, self.dogdirection, 1)
        
         love.graphics.draw(self.animation.spriteSheet, self.animation.quads[spriteNum], 800+self.spawnmodifikator*40,464+math.sin(self.spawnmodifikator*12)*6, 0, self.dogdirection*(-1), 1)
@@ -66,10 +72,21 @@ local function draw(self)
         love.graphics.draw(self.animation.spriteSheet, self.animation.quads[spriteNum], 1100+(self.spawnmodifikator+self.dampf)*37, 464+math.sin(self.spawnmodifikator*17)*6, 0, self.dogdirection*(-1),1)
     
         love.graphics.draw(self.animation.spriteSheet, self.animation.quads[spriteNum], 1150-self.spawnmodifikator*100-self.spawnmodifikator, 464+math.sin(self.spawnmodifikator*13)*6, 0, self.dogdirection, 1)
+         
+    else
+        love.graphics.draw(self.pinkeldog, 1400-self.spawnmodifikator*70,464+math.sin(self.spawnmodifikator*10)*6, 0, self.dogdirection, 1)
+       
+        love.graphics.draw(self.pinkeldog, 800+self.spawnmodifikator*40,464+math.sin(self.spawnmodifikator*12)*6, 0, self.dogdirection*(-1), 1)
+        love.graphics.draw(self.pinkeldog, 1000-(self.spawnmodifikator+self.dampf)*30, 464+math.sin(self.spawnmodifikator*15)*6, 0, self.dogdirection, 1)
         
-
+        love.graphics.draw(self.pinkeldog, 750-(self.spawnmodifikator+self.dampf)*54, 464+math.sin(self.spawnmodifikator*7)*6,0, self.dogdirection,1)
         
+        love.graphics.draw(self.pinkeldog, 1100+(self.spawnmodifikator+self.dampf)*37, 464+math.sin(self.spawnmodifikator*17)*6, 0, self.dogdirection*(-1),1)
+    
+        love.graphics.draw(self.pinkeldog, 1150-self.spawnmodifikator*100-self.spawnmodifikator, 464+math.sin(self.spawnmodifikator*13)*6, 0, self.dogdirection, 1)
+         
         
+    end
     end
     
     
@@ -86,9 +103,17 @@ local function update(self, dt, animation )
         self.animation.currentTime = self.animation.currentTime -self.animation.duration
     end
 
+
+      self.zeito=self.zeito+dt
+       if self.zeito>8 then self.pinkelpause=0
+       end
+       if self.zeito>11 then self.pinkelpause=1
+         self.zeito=0
+       end
+
     if self.spawnx<1 then
         
-        self.spawnmodifikator=self.spawnmodifikator+2*dt
+        self.spawnmodifikator=self.spawnmodifikator+2*dt*self.pinkelpause
     
        if  660+math.sin(self.spawnmodifikator)*self.spawnmodifikator*self.spawnmodifikator > 800 then
        self.dampf=self.dampf+dt
@@ -105,7 +130,7 @@ local function update(self, dt, animation )
     end
     --bei größer 50 wandert er wieder zurück auf start
     if self.spawnx>1 then 
-        self.spawnmodifikator=self.spawnmodifikator-2*dt
+        self.spawnmodifikator=self.spawnmodifikator-2*dt*self.pinkelpause
         self.dampf=self.dampf-2*dt
         --dogrichtung
         self.dogdirection=-1
