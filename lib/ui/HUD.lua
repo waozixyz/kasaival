@@ -1,5 +1,6 @@
 local suit = require "lib.suit"
 local push = require "lib.push"
+local lume = require "lib.lume"
 
 local Cursor = require "lib.ui.Cursor"
 local Font = require "lib.ui.Font"
@@ -18,13 +19,11 @@ local function init(self, quests)
     self.gamesaving = Overlay.getText("Game Saving", "please wait patiently...", {0, 0.2, 0, 0.5})
     -- load quest text
     self.questHeading = Text:init("Quests to complete", {size = 64, y = 20, x = W - 20, align = "right"})
-    local id = 1
-    self.quests = {}
+    local i = 1
     for _, v in pairs(quests) do
-        v.id = id
         local size = 48
-        table.insert(self.quests, Text:init(v.head .. " " .. v.amount .. " " .. v.tail, {size = size, y = 40 + (size + 8) * id, x = W - 20, align = "right"}))
-        id = id + 1
+        v.text = Text:init(v.head .. " " .. v.amount .. " " .. v.tail, {size = size, y = 40 + (size + 8) * i, x = W - 20, align = "right"})
+        i = i + 1
     end
     
     -- load icons
@@ -61,9 +60,11 @@ local function draw(self, game)
         Overlay.draw(self.gamesaving)
     end
     -- current quests
-    self.questHeading:draw()
-    for _, v in ipairs(self.quests) do
-        v:draw()
+    if lume.count(game.quests) > 0 then
+        self.questHeading:draw()
+    end
+    for _, v in pairs(game.quests) do
+        v.text:draw()
     end
     
     -- current music playing
@@ -102,7 +103,6 @@ local function keypressed(self, game, key)
 end
 
 local function update(self, game)
-    local W = push:getWidth()
     local exit_button = suit.ImageButton(self.exit, 20, 20)
     if exit_button.hit == true and game.exit and game.exit < 1 then
         game.exit = 1
@@ -132,7 +132,7 @@ local function update(self, game)
         if k == "kill" then
             amount = amount - game.kill_count[v.type]
         end
-        self.quests[v.id]:update(v.head .. " " .. math.floor(amount) .. " " .. v.tail)
+        v.text:update(v.head .. " " .. math.floor(amount) .. " " .. v.tail)
     end
 end
 return {draw = draw, init = init, keypressed = keypressed, touch = touch, update = update}

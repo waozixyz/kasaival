@@ -116,6 +116,9 @@ local function update_quests(self, dt)
         if k == "survive" then
             v.amount = v.amount - dt
         end
+        if v.amount <= 0 then
+            self.quests[k] = nil
+        end
     end
 end
 

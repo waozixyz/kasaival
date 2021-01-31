@@ -7,7 +7,7 @@ local quests = {
     },
     ["survive"] = {
         head = "Survive for",
-        amount = 100,
+        amount = 80,
         tail = "seconds"
     },
 }
