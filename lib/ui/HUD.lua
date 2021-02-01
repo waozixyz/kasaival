@@ -1,83 +1,32 @@
-local suit = require("lib.suit")
-local push = require("lib.push")
+local suit = require "lib.suit"
+local push = require "lib.push"
+local lume = require "lib.lume"
 
-local Cursor = require("lib.ui.Cursor")
-local Music = require("lib.Music")
+local Cursor = require "lib.ui.Cursor"
+local Font = require "lib.ui.Font"
+local Overlay = require "lib.ui.Overlay"
+local Music = require "lib.sys.Music"
+local Text = require "lib.ui.Text"
 
 local gr = love.graphics
 
-local function toggle(val) if val then return false else return true end end
-
-local function drawText(text, font, size, xpad, ypad)
-    local W, H = push:getDimensions()
-
-    xpad = xpad or 0
-    ypad = ypad or 0
-    local w = font:getWidth(text)
-
-    gr.setFont(font)
-    gr.print(text, W * 0.5 - w * 0.5 + xpad, H * 0.5 + ypad)
-end
-
-local function drawOverlay(self, title, subtitle, color, font, fontSize)
-    local W, H = push:getDimensions()
-    fontSize = fontSize or self.fontSize
-    font = font or self.bigFont
-    gr.setFont(font)
-    gr.setColor(color or {0, 0, 0, 0.5})
-    gr.rectangle("fill", 0, 0, W, H)
-    gr.setColor(.6, 0, .3)
-    drawText(title or "", self.bigFont, self.fontSize, 0, 0)
-    drawText(subtitle or "", font, fontSize, 0, fontSize)
-end
-local function focus(self, game, f)
-    if not f then
-        if not game.paused then
-            game.unpause = true
-            game.paused = true
-        end
-        if not game.muted then
-            game.muted = true
-            game.unmute = true
-        end
-    else
-        if game.unmute then
-            game.muted = false
-            game.unmute = false
-        end
-        if game.unpause then
-            game.paused = false
-            game.unpause = false
-        end
-    end
-end
-local function draw(self, game)
-    local W, H = push:getDimensions()
-    local hp = game.player.hp
-
-    gr.setColor(.2, 0, 0, 1 - (hp / 100))
-    gr.rectangle("fill", 0, 0, W, H)
-    if hp <= 0 then
-        drawOverlay(self, "GameOver", "touch anywhere or press any key to try again", {0, 0, 0, 0.5})
-    elseif game.paused == true and game.exit == 0 then
-        drawOverlay(self, "Game Paused", "touch anywhere or press any key to unpause", {1, 1, 1, 0.5})
-    elseif game.exit == 1 or game.exit == 2 then
-        drawOverlay(self, "Game Saving", "please wait patiently...", {0, 0.2, 0, 0.5})
-    end
-
-    if Music.songTitle then
-        gr.setFont(self.font)
-        gr.setColor({1, 1, 1})
-        local title = "\240\159\142\182 " .. Music.songAuthor .. " - " .. Music.songTitle .. " \240\159\142\182"
-        local w = (self.font):getWidth(title)
-        gr.print(title, W - w - 20, H - 40)
-    end
-end
-local function init(self)
+local function init(self, quests)
+    local W = push:getWidth()
     Cursor:init()
-    self.fontSize = 48
-    self.bigFont = gr.newFont("assets/fonts/hintedSymbola.ttf", self.fontSize)
-    self.font = gr.newFont("assets/fonts/hintedSymbola.ttf", 32)
+    -- load text
+    self.gameover = Overlay.getText("GameOver", "touch anywhere or press any key to try again", {0, 0, 0, 0.5})
+    self.gamepaused = Overlay.getText("Game Paused", "touch anywhere or press any key to unpause", {1, 1, 1, 0.5})
+    self.gamesaving = Overlay.getText("Game Saving", "please wait patiently...", {0, 0.2, 0, 0.5})
+    -- load quest text
+    self.questHeading = Text:init("Quests to complete", {size = 64, y = 20, x = W - 20, align = "right"})
+    local i = 1
+    for _, v in pairs(quests) do
+        local size = 48
+        v.text = Text:init(v.head .. " " .. v.amount .. " " .. v.tail, {size = size, y = 40 + (size + 8) * i, x = W - 20, align = "right"})
+        i = i + 1
+    end
+    
+    -- load icons
     self.exit = gr.newImage("assets/icons/exit.png")
     self.resume = gr.newImage("assets/icons/resume.png")
     self.pause = {
@@ -90,8 +39,43 @@ local function init(self)
     self.sound = gr.newImage("assets/icons/sound.png")
     self.nosound = gr.newImage("assets/icons/nosound.png")
 end
+
+
+local function toggle(val) if val then return false else return true end end
+
+
+local function draw(self, game)
+    local W, H = push:getDimensions()
+    local hp = game.player.hp
+
+    gr.setColor(.2, 0, 0, 1 - (hp / 100))
+    gr.rectangle("fill", 0, 0, W, H)
+
+    -- overlays for special states
+    if hp <= 0 then
+        Overlay.draw(self.gameover)
+    elseif game.paused == true and (not game.exit or game.exit == 0) then
+        Overlay.draw(self.gamepaused)
+    elseif game.exit == 1 or game.exit == 2 then
+        Overlay.draw(self.gamesaving)
+    end
+    -- current quests
+    if lume.count(game.quests) > 0 then
+        self.questHeading:draw()
+    end
+    for _, v in pairs(game.quests) do
+        v.text:draw()
+    end
+    
+    -- current music playing
+    if Music.songTitle then
+        gr.setColor({1, 1, 1})
+        local title = gr.newText(Font, "\240\159\142\182 " .. Music.author .. " - " .. Music.title .. " \240\159\142\182")
+        gr.draw(title, W - 20, H - 40)
+    end
+end
 local function tk( game)
-    if game.paused then 
+    if game.paused then
         game.paused = toggle(game.paused)
         return true
     end
@@ -101,7 +85,7 @@ local function tk( game)
     end
 end
 local function touch(self, game, x, y)
-    local w, h =self.pause.img:getDimensions()
+    local w, h = self.pause.img:getDimensions()
     if x > w + self.pause.x or y > h + self.pause.y then
         tk(game)
     end
@@ -109,19 +93,18 @@ end
 
 local function keypressed(self, game, key)
     if not tk(game) then
-        if key == "kp+" then Music.bgm:setVolume(Music.bgm:getVolume() + .1) end
-        if key == "kp-" then Music.bgm:setVolume(Music.bgm:getVolume() - .1) end
-        if key == "n" then Music.bgm:stop() end
-        if key == "m" then game.muted = toggle(game.muted) end
+        if key == "kp+" then Music:up() end
+        if key == "kp-" then Music:down() end
+        if key == "n" then Music:next() end
+        if key == "m" then Music:toggle() end
         if key == "p" or key == "pause" or key == "space" then game.paused = toggle(game.paused) end
-        if key == "escape" and game.exit < 1 then game.exit = 1 end
+        if key == "escape" and (not game.exit or game.exit < 1) then game.exit = 1 end
     end
 end
 
 local function update(self, game)
-    local W = push:getWidth()
     local exit_button = suit.ImageButton(self.exit, 20, 20)
-    if exit_button.hit == true and game.exit < 1 then
+    if exit_button.hit == true and game.exit and game.exit < 1 then
         game.exit = 1
     end
     local pause_image = self.pause.img
@@ -133,13 +116,23 @@ local function update(self, game)
         game.paused = toggle(game.paused)
     end
     local music_image = self.music
-    if game.muted then
+    if Music:isMuted() then
         music_image = self.nomusic
     end
-    local music_button = suit.ImageButton(music_image, W - 128, 20)
-    if (music_button.hit == true) then
-        game.muted = toggle(game.muted)
+    local music_button = suit.ImageButton(music_image, self.pause.x + 120, 20)
+    if music_button.hit == true then
+        Music:toggle()
     end
     Cursor:update()
+
+    -- update quest Text
+ 
+    for k, v in pairs(game.quests) do
+        local amount = v.amount
+        if k == "kill" then
+            amount = amount - game.kill_count[v.type]
+        end
+        v.text:update(v.head .. " " .. math.floor(amount) .. " " .. v.tail)
+    end
 end
-return {focus = focus, draw = draw, init = init, keypressed = keypressed, touch = touch, update = update}
+return {draw = draw, init = init, keypressed = keypressed, touch = touch, update = update}

@@ -1,11 +1,12 @@
+local Font = require "lib.ui.Font"
 local gr = love.graphics
 
-local function init(self, txt, x, y, size, delay, speed, color, font)
+local function init(self, txt, x, y, size, speed, delay, color, font)
 	-- position of text
 	self.x, self.y = x or 200, y or 200
 	-- The font to use
 	self.size = size or 42
-	self.font = font or gr.newFont("assets/fonts/hintedSymbola.ttf", self.size)
+	self.font(Font(self.size))
 	-- The color to print
 	self.color = color or {.7, 0, .34}
 	-- The text to write
