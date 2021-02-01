@@ -118,7 +118,12 @@ local function completeQuest(self, key)
         end
     end
 end
-
+local function getKillCount(self, type)
+    if not self.kill_count[type] then
+        self.kill_count[type] = 0
+    end
+    return self.kill_count[type]
+end
 return {
     scenes = {},
     items = {},
@@ -134,6 +139,7 @@ return {
     getWidth = getWidth,
     currentScene = 1,
     kill_count = {},
+    getKillCount = getKillCount,
     getCurrentQuests = getCurrentQuests,
     completeQuest = completeQuest,
     loadNextStage = false,

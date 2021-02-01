@@ -11,6 +11,17 @@ local Text = require "lib.ui.Text"
 
 local gr = love.graphics
 
+local function setCurrentQuests(self)
+    local W = push:getWidth()
+
+    local i = 1
+    for _, v in pairs(lyra:getCurrentQuests()) do
+        local size = 48
+        v.text = Text:init(v.head .. " " .. v.amount .. " " .. v.tail, {size = size, y = 40 + (size + 8) * i, x = W - 20, align = "right"})
+        i = i + 1
+    end
+end
+
 local function init(self)
     local W, H = push:getDimensions()
     Cursor:init()
@@ -20,12 +31,7 @@ local function init(self)
     self.gamesaving = Overlay.getText("Game Saving", "please wait patiently...", {0, 0.2, 0, 0.5})
     -- load quest text
     self.questHeading = Text:init("Quests to complete", {size = 64, y = 20, x = W - 20, align = "right"})
-    local i = 1
-    for _, v in pairs(lyra:getCurrentQuests()) do
-        local size = 48
-        v.text = Text:init(v.head .. " " .. v.amount .. " " .. v.tail, {size = size, y = 40 + (size + 8) * i, x = W - 20, align = "right"})
-        i = i + 1
-    end
+    setCurrentQuests(self)
     -- load kelvin meter
     self.kelvin = Text:init("", {x = 20, y = H - 50, align = "left"})
     -- load icons
@@ -137,7 +143,10 @@ local function update(self, game)
     for k, v in pairs(lyra:getCurrentQuests()) do
         local amount = v.amount
         if k == "kill" then
-            amount = amount - lyra.kill_count[v.type]
+            amount = amount - lyra:getKillCount(v.type)
+        end
+        if v.text == nil then
+            setCurrentQuests(self)
         end
         v.text:update(v.head .. " " .. math.floor(amount) .. " " .. v.tail)
     end

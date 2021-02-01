@@ -5,7 +5,12 @@ local scenes = {
                 type = "kelvin",
                 head = "Reach a temperature of",
                 amount = 2200,
-                tail = "kelvin"
+                tail = "kelvin",
+                fnc = function(self, lyra)
+                    if lyra.player.kelvin >= self.amount then
+                        return true
+                    else return false end
+                end
             },
         },
         mobs = { 
@@ -20,7 +25,12 @@ local scenes = {
                 type = "cactus",
                 head = "Burn down a",
                 amount = 50,
-                tail = "cactuses"
+                tail = "cactuses",
+                fnc = function(self, lyra)
+                    if lyra.kill_count[self.type] >= self.amount then
+                        return true
+                    else return false end
+                end
             },
         },
         plants = { 

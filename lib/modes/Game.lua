@@ -26,7 +26,6 @@ local gr = love.graphics
 
 local function load_scene()
     local scene = lyra.scenes[lyra.currentScene]
-
     if scene.plants then
         -- spawn plants for current Scene
         for k, v in pairs(scene.plants) do
@@ -83,15 +82,7 @@ local function load_stage(self, stage_name)
 
 
 
-    -- kill count will store the death of a plant or mob in multiple tables
-    -- the key is used to determine what type died
-    for k, v in pairs(lyra:getCurrentQuests()) do
-        if k == "kill" then
-            if not lyra.kill_count[v.type] then
-                lyra.kill_count[v.type] = 0
-            end
-        end
-    end
+
     load_scene()
 end
 
@@ -139,7 +130,7 @@ local function update_quests(dt)
         if k == "survive" then
             v.amount = v.amount - dt
         end
-        if v.amount <= 0 or v.amount == lyra.kill_count[v.type] then
+        if v:fnc(lyra) then
             lyra:completeQuest(k)
         end
     end
