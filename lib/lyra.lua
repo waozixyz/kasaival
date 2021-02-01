@@ -105,11 +105,11 @@ local function getColor(cs)
 end
 
 local function getWidth(self)
-    return (self.gw / #self.scenes) * self.currentQuest
+    return (self.gw / #self.scenes) * self.currentQuests
 end
 
-local function getQuest(self)
-    return self.scenes.quests[self.currentQuest]
+local function getCurrentQuests(self)
+    return self.scenes[self.currentQuests]
 end
 
 return {
@@ -125,6 +125,6 @@ return {
     gw = 3000,
     startx = -100,
     getWidth = getWidth,
-    currentQuest = 1,
-    getQuest = getQuest
+    currentQuests = 1,
+    getCurrentQuests = getCurrentQuests
 }

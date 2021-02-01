@@ -1,6 +1,7 @@
 local suit = require "lib.suit"
 local push = require "lib.push"
 local lume = require "lib.lume"
+local lyra = require "lib.lyra"
 
 local Cursor = require "lib.ui.Cursor"
 local Font = require "lib.ui.Font"
@@ -10,7 +11,7 @@ local Text = require "lib.ui.Text"
 
 local gr = love.graphics
 
-local function init(self, quests)
+local function init(self)
     local W = push:getWidth()
     Cursor:init()
     -- load text
@@ -20,7 +21,7 @@ local function init(self, quests)
     -- load quest text
     self.questHeading = Text:init("Quests to complete", {size = 64, y = 20, x = W - 20, align = "right"})
     local i = 1
-    for _, v in pairs(quests) do
+    for _, v in pairs(lyra:getCurrentQuests()) do
         local size = 48
         v.text = Text:init(v.head .. " " .. v.amount .. " " .. v.tail, {size = size, y = 40 + (size + 8) * i, x = W - 20, align = "right"})
         i = i + 1
@@ -60,10 +61,10 @@ local function draw(self, game)
         Overlay.draw(self.gamesaving)
     end
     -- current quests
-    if lume.count(game.quests) > 0 then
+    if lume.count(lyra:getCurrentQuests()) > 0 then
         self.questHeading:draw()
     end
-    for _, v in pairs(game.quests) do
+    for _, v in pairs(lyra:getCurrentQuests()) do
         v.text:draw()
     end
     
@@ -127,7 +128,7 @@ local function update(self, game)
 
     -- update quest Text
  
-    for k, v in pairs(game.quests) do
+    for k, v in pairs(lyra:getCurrentQuests()) do
         local amount = v.amount
         if k == "kill" then
             amount = amount - game.kill_count[v.type]
