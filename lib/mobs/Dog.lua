@@ -67,19 +67,31 @@ local function draw(self)
     if self.direction > 0 then
         sx = sx * -1
     end
+    
+
+    if self.pinkelpause then
+        self.ps:setPosition(self.x-70*self.direction, self.y+18)
+        self.ps:setSizes(0.06)
+        --pinkel direction
+        if self.direction <1 then
+        self.ps:setDirection(2.2236430644989)
+        else
+        self.ps:setDirection(1)
+        end
+        gr.setColor(1,1,1)
+        gr.draw(self.ps)
+       end
+
     gr.setColor(self.color)
     gr.draw(self.anime.spriteSheet, self.anime.quads[get_sprite_num(self)], self.x, self.y, 0, sx, sy)
 
-    if self.pinkelpause then
-     self.ps:moveTo(self.x-20*self.direction, self.y+10)
-     gr.draw(self.ps)
-    end
+    
 
 
 end
 
 local function update(self, dt)
-    self.ps:update(dt)
+    
     self.anime.currentTime = self.anime.currentTime + dt
     if self.anime.currentTime >= self.anime.duration then
         self.anime.currentTime = 0
@@ -103,6 +115,7 @@ local function update(self, dt)
     elseif self.x > lyra.gw + lyra.startx then
         self.direction = -1
     end
+    self.ps:update(dt)
 end
 
 return {init = init, draw = draw, update = update}
