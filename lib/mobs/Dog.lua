@@ -79,6 +79,7 @@ local function draw(self)
 end
 
 local function update(self, dt)
+    self.ps:update(dt)
     self.anime.currentTime = self.anime.currentTime + dt
     if self.anime.currentTime >= self.anime.duration then
         self.anime.currentTime = 0
