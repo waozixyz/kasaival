@@ -7,6 +7,11 @@ local scenes = {
                 amount = 2200,
                 tail = "kelvin"
             },
+        },
+        mobs = { 
+            ["Dog"] = {
+                amount = 50,
+            }
         }
     },
     {
@@ -17,6 +22,12 @@ local scenes = {
                 amount = 50,
                 tail = "cactuses"
             },
+        },
+        plants = { 
+            ["Saguaro"] = {
+                amount = 100,
+                startx = 2000,
+            } 
         }
     }
 }
@@ -55,12 +66,5 @@ local music = {
 }
 
 local sky = { y = 0 }
-
-local trees = { 
-    ["Saguaro"] = {
-        amount = 100,
-        startx = 2000,
-    } 
-}
 
 return {scenes = scenes, width = 9000, background = background, ground = ground, music = music, sky = sky, trees = trees, nextStage = "Grassland"}

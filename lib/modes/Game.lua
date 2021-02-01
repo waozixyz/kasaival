@@ -22,10 +22,32 @@ local Plant = require "lib.plants.Plant"
 
 -- aliases
 local ev = love.event
-local fi = love.filesystem
 local gr = love.graphics
-local ke = love.keyboard
-local ma = love.math
+
+local function load_scene()
+    local scene = lyra.scenes[lyra.currentScene]
+
+    if scene.plants then
+        -- spawn plants for current Scene
+        for k, v in pairs(scene.plants) do
+            for _ = 1, v.amount do
+                local plant = Plant:init(k, Spawner(v.startx))
+                plant.id = #lyra.items
+                table.insert(lyra.items, plant)
+            end
+        end
+    end
+    -- spawn mobs for current Scene
+    if scene.mobs then
+        for k, v in pairs(scene.mobs) do
+            for _ = 1, v.amount do
+                local mob = require("lib.mobs." .. k):init(Spawner())
+                mob.id = #lyra.items
+                table.insert(lyra.items, mob)
+            end
+        end
+    end
+end
 
 local function load_stage(self, stage_name)
     local H = push:getHeight()
@@ -40,6 +62,8 @@ local function load_stage(self, stage_name)
     lyra.gw = stage.width
     -- set up next stage if stage completed
     lyra.nextStage = stage.nextStage
+    -- set up empty table for items
+    lyra.items = {}
 
 
     -- init Background
@@ -58,22 +82,6 @@ local function load_stage(self, stage_name)
     -- add here for auto draw update
     lyra:init(self.player)
 
-    -- spawn some trees
-    for k, v in pairs(stage.trees) do
-        for _ = 1, v.amount do
-            local tree = Plant:init(k, Spawner(v.startx))
-            tree.id = #lyra.items
-            table.insert(lyra.items, tree)
-        end
-    end
-
-    -- spawn some Dog
-    for _ = 1, 12 do
-        table.insert(lyra.items, Dog:init( Spawner()))
-    end
-
-    -- store time elapsed in game
-    self.elapsed = 0
     -- kill count will store the death of a plant or mob in multiple tables
     -- the key is used to determine what type died
     for k, v in pairs(lyra:getCurrentQuests()) do
@@ -83,6 +91,7 @@ local function load_stage(self, stage_name)
             end
         end
     end
+    load_scene()
 end
 
 local function init(self)
@@ -139,7 +148,6 @@ local function update(self, dt, set_mode)
     if lyra.loadNextStage then
         load_stage(self, lyra.nextStage)
     end
-    self.elapsed = self.elapsed + dt
     if self.restart then
         set_mode("Game")
     end

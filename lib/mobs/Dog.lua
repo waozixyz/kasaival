@@ -22,16 +22,6 @@ local function new_anime(image, width, height, duration)
 end
 
 
-
-
-
-
-
-
-
-
-
-
 local function init(self, pos)
     self.x = pos.x
     self.y = pos.y

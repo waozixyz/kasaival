@@ -105,17 +105,17 @@ local function getColor(cs)
 end
 
 local function getWidth(self)
-    return (self.gw / #self.scenes) * self.currentQuests
+    return (self.gw / #self.scenes) * self.currentScene
 end
 
 local function getCurrentQuests(self)
-    return self.scenes[self.currentQuests].quests
+    return self.scenes[self.currentScene].quests
 end
 
 local function completeQuest(self, key)
     self:getCurrentQuests()[key] = nil
     if #self:getCurrentQuests() <= 0 then
-        self.currentQuests = self.currentQuests + 1
+        self.currentScene = self.currentScene + 1
         if self:getCurrentQuests() == nil then
             self.nextStage = true
         end
@@ -135,7 +135,7 @@ return {
     gw = 3000,
     startx = -100,
     getWidth = getWidth,
-    currentQuests = 1,
+    currentScene = 1,
     kill_count = {},
     getCurrentQuests = getCurrentQuests,
     completeQuest = completeQuest,
