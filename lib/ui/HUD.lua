@@ -46,7 +46,7 @@ local function toggle(val) if val then return false else return true end end
 
 local function draw(self, game)
     local W, H = push:getDimensions()
-    local hp = game.player.hp
+    local hp = game.player.kelvin
 
     gr.setColor(.2, 0, 0, 1 - (hp / 100))
     gr.rectangle("fill", 0, 0, W, H)
@@ -79,7 +79,7 @@ local function tk( game)
         game.paused = toggle(game.paused)
         return true
     end
-    if game.player.hp <= 0 then
+    if game.player.kelvin <= 0 then
         game.restart = true
         return true
     end

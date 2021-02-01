@@ -47,7 +47,7 @@ local function update(self, game, dt)
         end
         if v.dead then
             self.player.xp = self.player.xp + 10
-            self.player.hp = self.player.hp + 1
+            self.player.kelvin = self.player.kelvin + 1
             if not game.kill_count[v.type] then
                 game.kill_count[v.type] = 0
             end
@@ -104,7 +104,16 @@ local function getColor(cs)
     return {rnc(cs[1], cs[2]), rnc(cs[3], cs[4]), rnc(cs[5], cs[6]), 1}
 end
 
+local function getWidth(self)
+    return (self.gw / #self.scenes) * self.currentQuest
+end
+
+local function getQuest(self)
+    return self.scenes.quests[self.currentQuest]
+end
+
 return {
+    scenes = {},
     items = {},
     init = init,
     update = update,
@@ -114,5 +123,8 @@ return {
     cx = 0,
     gh = 600,
     gw = 3000,
-    startx = -100
+    startx = -100,
+    getWidth = getWidth,
+    currentQuest = 1,
+    getQuest = getQuest
 }

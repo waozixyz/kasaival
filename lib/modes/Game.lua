@@ -6,14 +6,14 @@ local push = require "lib.push"
 local serpent = require "lib.serpent"
 
 -- Main components
-local Background = require "lib.scene.Background"
+local Background = require "lib.scenery.Background"
 local Focus = require "lib.sys.Focus"
-local Ground = require "lib.scene.Ground"
+local Ground = require "lib.scenery.Ground"
 local HUD = require "lib.ui.HUD" 
 local Music = require "lib.sys.Music"
 local Player = require "lib.player.Player"
 local Saves = require "lib.sys.Saves"
-local Sky = require "lib.scene.Sky"
+local Sky = require "lib.scenery.Sky"
 local Spawner = require "lib.utils.Spawner"
 local Dog = require "lib.mobs.Dog"
 
@@ -34,6 +34,8 @@ end
 local function init(self)
     local stage = load_stage("Tutorial")
     local H = push:getHeight()
+    -- load scenes
+    lyra.scenes = stage.scenes
     -- set camera x
     lyra.cx = 0
     -- set the ground height
