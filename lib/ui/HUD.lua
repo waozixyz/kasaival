@@ -21,7 +21,6 @@ local function init(self)
     -- load quest text
     self.questHeading = Text:init("Quests to complete", {size = 64, y = 20, x = W - 20, align = "right"})
     local i = 1
-    print(#lyra:getCurrentQuests())
     for _, v in pairs(lyra:getCurrentQuests()) do
         local size = 48
         v.text = Text:init(v.head .. " " .. v.amount .. " " .. v.tail, {size = size, y = 40 + (size + 8) * i, x = W - 20, align = "right"})
@@ -132,7 +131,7 @@ local function update(self, game)
     for k, v in pairs(lyra:getCurrentQuests()) do
         local amount = v.amount
         if k == "kill" then
-            amount = amount - game.kill_count[v.type]
+            amount = amount - lyra.kill_count[v.type]
         end
         v.text:update(v.head .. " " .. math.floor(amount) .. " " .. v.tail)
     end

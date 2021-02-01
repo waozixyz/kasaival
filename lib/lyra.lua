@@ -112,6 +112,16 @@ local function getCurrentQuests(self)
     return self.scenes[self.currentQuests].quests
 end
 
+local function completeQuest(self, key)
+    self:getCurrentQuests()[key] = nil
+    if #self:getCurrentQuests() <= 0 then
+        self.currentQuests = self.currentQuests + 1
+        if self:getCurrentQuests() == nil then
+            self.nextStage = true
+        end
+    end
+end
+
 return {
     scenes = {},
     items = {},
@@ -126,5 +136,9 @@ return {
     startx = -100,
     getWidth = getWidth,
     currentQuests = 1,
-    getCurrentQuests = getCurrentQuests
+    kill_count = {},
+    getCurrentQuests = getCurrentQuests,
+    completeQuest = completeQuest,
+    loadNextStage = false,
+    nextStage = nil,
 }

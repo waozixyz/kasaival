@@ -21,20 +21,6 @@ local scenes = {
     }
 }
 
-local quests = {
-    ["kill"] = {
-        type = "cactus",
-        head = "Burn down a",
-        amount = 100,
-        tail = "cactuses"
-    },
-    ["survive"] = {
-        head = "Survive for",
-        amount = 80,
-        tail = "seconds"
-    },
-}
-
 local background = {
     name = "desert",
     sy = 0.6,
