@@ -6,9 +6,6 @@ local ma = love.math
 local function init(self, ...)
     self.items = {}
     for _, v in ipairs({...}) do
-        if v.id == "player" then
-            self.player = v
-        end
         table.insert(self.items, v)
     end
     self.visible_items = self.items

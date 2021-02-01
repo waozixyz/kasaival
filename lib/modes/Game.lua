@@ -64,7 +64,10 @@ local function load_stage(self, stage_name)
     lyra.nextStage = stage.nextStage
     -- set up empty table for items
     lyra.items = {}
-
+    -- create a player inside lyra
+    lyra.player = Player:init()
+    -- init lyra and make sure lyra.player is also in lyra.items
+    lyra:init(lyra.player)
 
     -- init Background
     Background:init(stage.background)
@@ -74,13 +77,11 @@ local function load_stage(self, stage_name)
     HUD:init()
     -- init Music
     Music:play(stage.music)
-    -- create a player
-    self.player = Player:init()
+
     -- init Sky
     Sky:init(stage.sky)
 
-    -- add here for auto draw update
-    lyra:init(self.player)
+
 
     -- kill count will store the death of a plant or mob in multiple tables
     -- the key is used to determine what type died
@@ -104,7 +105,7 @@ end
 
 local function touch(self, ...)
     HUD:touch(self, ...)
-    self.player:touch(...)
+    lyra.player:touch(...)
 end
 
 local function draw(self)
@@ -154,7 +155,7 @@ local function update(self, dt, set_mode)
     if not self.paused then
         lyra:update(self, dt)
         self.ground:update(dt)
-        self.ground:collide(self.player)
+        self.ground:collide(lyra.player)
         update_quests(dt)
     end
     if self.exit == 1 then
