@@ -27,7 +27,7 @@ local scenes = {
                 amount = 50,
                 tail = "cactuses",
                 fnc = function(self, lyra)
-                    if lyra.kill_count[self.type] >= self.amount then
+                    if lyra.kill_count[self.type] and lyra.kill_count[self.type] >= self.amount then
                         return true
                     else return false end
                 end
@@ -77,4 +77,4 @@ local music = {
 
 local sky = { y = 0 }
 
-return {scenes = scenes, width = 9000, background = background, ground = ground, music = music, sky = sky, trees = trees, nextStage = "Grassland"}
+return {scenes = scenes, width = 9000, background = background, ground = ground, music = music, sky = sky, next = "Grassland"}

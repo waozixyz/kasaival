@@ -103,8 +103,8 @@ local function move(self, dx, dy, dt)
     end
     if y > H then
         y = H
-    elseif y < H - lyra:getWidth() then
-        y = H - lyra:getWidth()
+    elseif y < H - lyra.gh then
+        y = H - lyra.gh
     end
     self.flame:setPosition(x, y)
     self.flame:setSizes(returnTable(self.sizes))

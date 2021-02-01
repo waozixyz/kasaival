@@ -207,7 +207,7 @@ end
 
 local function update(self, dt)
     local l = #self.branches
-    if self.burnTimer <= 0 then
+    if l > 0 and self.burnTimer <= 0 then
         if l < self.maxStage then
             self.growTimer = self.growTimer + dt
             if self.growTimer >= self.growTime then

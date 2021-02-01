@@ -11,7 +11,8 @@ local Text = require "lib.ui.Text"
 
 local gr = love.graphics
 
-local function setCurrentQuests(self)
+
+local function setCurrentQuests()
     local W = push:getWidth()
 
     local i = 1
@@ -73,6 +74,9 @@ local function draw(self, game)
         self.questHeading:draw()
     end
     for _, v in pairs(lyra:getCurrentQuests()) do
+        if not v.text then
+            setCurrentQuests()
+        end
         v.text:draw()
     end
 
@@ -146,7 +150,7 @@ local function update(self, game)
             amount = amount - lyra:getKillCount(v.type)
         end
         if v.text == nil then
-            setCurrentQuests(self)
+            setCurrentQuests()
         end
         v.text:update(v.head .. " " .. math.floor(amount) .. " " .. v.tail)
     end
