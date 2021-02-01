@@ -109,7 +109,7 @@ local function getWidth(self)
 end
 
 local function getCurrentQuests(self)
-    return self.scenes[self.currentQuests]
+    return self.scenes[self.currentQuests].quests
 end
 
 return {

@@ -21,6 +21,7 @@ local function init(self)
     -- load quest text
     self.questHeading = Text:init("Quests to complete", {size = 64, y = 20, x = W - 20, align = "right"})
     local i = 1
+    print(#lyra:getCurrentQuests())
     for _, v in pairs(lyra:getCurrentQuests()) do
         local size = 48
         v.text = Text:init(v.head .. " " .. v.amount .. " " .. v.tail, {size = size, y = 40 + (size + 8) * i, x = W - 20, align = "right"})

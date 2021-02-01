@@ -4,7 +4,7 @@ local scenes = {
             ["reach"] = {
                 type = "kelvin",
                 head = "Reach a temperature of",
-                amount = 100,
+                amount = 2200,
                 tail = "kelvin"
             },
         }
