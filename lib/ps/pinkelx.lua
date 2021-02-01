@@ -12,9 +12,9 @@ module = {
 }
 ]]
 local LG        = love.graphics
-local particles = {}
+local function rtn()
 
-local image1 = LG.newImage("assets/lightDot.png")
+local image1 = LG.newImage("assets/lightBlur.png")
 image1:setFilter("linear", "linear")
 
 local ps = LG.newParticleSystem(image1, 36)
@@ -38,6 +38,10 @@ ps:setSpin(0, 0)
 ps:setSpinVariation(0)
 ps:setSpread(0.46115121245384)
 ps:setTangentialAcceleration(0, 0)
-table.insert(particles, {system=ps, kickStartSteps=0, kickStartDt=0, emitAtStart=0, blendMode="add", shader=nil, texturePath="light.png", texturePreset="light", shaderPath="", shaderFilename=""})
 
-return particles
+
+return ps
+
+end
+
+return rtn

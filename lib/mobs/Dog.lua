@@ -44,7 +44,7 @@ local function init(self, pos)
 
 
     --pinkelsystem initiieren
-    self.ps = pinkel:particles.system
+    self.ps = pinkel()
 
 
 
@@ -71,7 +71,7 @@ local function draw(self)
     gr.draw(self.anime.spriteSheet, self.anime.quads[get_sprite_num(self)], self.x, self.y, 0, sx, sy)
 
     if self.pinkelpause then
-     self.ps:setPosition(self.x-20*self.direction, self.y+10)
+     self.ps:moveTo(self.x-20*self.direction, self.y+10)
      gr.draw(self.ps)
     end
 
