@@ -12,11 +12,6 @@ local scenes = {
                     else return false end
                 end
             },
-        },
-        mobs = { 
-            ["Dog"] = {
-                amount = 50,
-            }
         }
     },
     {
@@ -38,6 +33,11 @@ local scenes = {
                 amount = 100,
                 startx = 2000,
             } 
+        },
+        mobs = { 
+            ["Dog"] = {
+                amount = 50,
+            }
         }
     }
 }
