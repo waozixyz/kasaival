@@ -66,7 +66,7 @@ local function init(self)
 
 
     -- spawn some Dog
-    for _ = 1, 30 do
+    for _ = 1, 12 do
         table.insert(lyra.items, Dog:init( Spawner()))
     end
 

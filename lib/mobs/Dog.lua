@@ -1,5 +1,6 @@
 local copy = require "lib.copy"
 local lyra = require "lib.lyra"
+local pinkel = require "lib.ps.pinkelx"
 
 local gr = love.graphics
 local ma = love.math
@@ -20,8 +21,18 @@ local function new_anime(image, width, height, duration)
     return anime
 end
 
+
+
+
+
+
+
+
+
+
+
+
 local function init(self, pos)
-    self.dampf = 1
     self.x = pos.x
     self.y = pos.y
     self.direction = -1
@@ -31,8 +42,16 @@ local function init(self, pos)
     -- add random color to dogs
     self.color = lyra.getColor({.4, 1, .4, 1, .4, 1})
 
+
+    --pinkelsystem initiieren
+    self.ps = pinkel()
+
+
+
     return copy(self)
 end
+
+
 
 local function get_sprite_num(self)
     local add, mult = 1, 3
@@ -48,11 +67,31 @@ local function draw(self)
     if self.direction > 0 then
         sx = sx * -1
     end
+    
+
+    if self.pinkelpause then
+        self.ps:setPosition(self.x-70*self.direction, self.y+18)
+        self.ps:setSizes(0.06)
+        --pinkel direction
+        if self.direction <1 then
+        self.ps:setDirection(2.2236430644989)
+        else
+        self.ps:setDirection(1)
+        end
+        gr.setColor(1,1,1)
+        gr.draw(self.ps)
+       end
+
     gr.setColor(self.color)
     gr.draw(self.anime.spriteSheet, self.anime.quads[get_sprite_num(self)], self.x, self.y, 0, sx, sy)
+
+    
+
+
 end
 
 local function update(self, dt)
+    
     self.anime.currentTime = self.anime.currentTime + dt
     if self.anime.currentTime >= self.anime.duration then
         self.anime.currentTime = 0
@@ -69,15 +108,14 @@ local function update(self, dt)
     if not self.pinkelpause then
         self.x = self.x + 200 * dt * self.direction
 
-        if 660 + math.sin(self.x) * self.x * self.x > 800 then
-            self.dampf = self.dampf + dt
-        end
+       
     end
     if self.x < lyra.startx then
         self.direction = 1
     elseif self.x > lyra.gw + lyra.startx then
         self.direction = -1
     end
+    self.ps:update(dt)
 end
 
 return {init = init, draw = draw, update = update}
