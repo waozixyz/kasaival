@@ -57,6 +57,8 @@ local function load_stage(self, stage_name)
     local stage = copy(require("lib.stages." .. stage_name))
     -- load scenes
     lyra.scenes = stage.scenes
+    -- set current scene to 1
+    lyra.currentScene = 1
     -- set camera x
     lyra.cx = 0
     -- set the ground height
@@ -80,7 +82,7 @@ local function load_stage(self, stage_name)
     -- init head up display
     HUD:init()
     -- init Music
-    Music:play(stage.music)
+    Music:next(stage.music)
 
     -- init Sky
     Sky:init(stage.sky)
@@ -155,7 +157,6 @@ local function update(self, dt, set_mode)
     local W = push:getWidth()
  
     if self.nextStage then
-        print("load Stage")
         load_stage(self, lyra.next)
     else
         if self.nextScene then
