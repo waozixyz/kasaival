@@ -13,13 +13,16 @@ end
 
 
 
+
+
 local function draw(self)
  --windpfeil darstellung, nur die richtung
  love.graphics.setColor(0, 0, 0)
  love.graphics.line( 200, 200, 200+self.windx,200+ self.windy)
+ love.graphics.setColor(1, 1, 1)
 end
 
-
+-- ich weiß, eher umständlich, aber einmal gemacht ist einmal gemacht ^^
 local function update(self, dt)
     self.zeito=self.zeito+dt
     if self.spawnx<1 then
@@ -41,7 +44,7 @@ local function update(self, dt)
         end
     
     end
-
+     --wind soll sich nur seltener verändern
     if self.zeito >3 then 
         self.test =love.math.random(1, 10)
         if 5 < (self.spawnmodifikator/(self.test+(self.spawnmodifikator/10))) then 
@@ -58,6 +61,16 @@ local function update(self, dt)
         self.windstark=(self.spawnmodifikator/(self.test+(self.spawnmodifikator/10)))*10
         
         end 
-        
+
+
+        local function getWind(self)
+           
+            windx= self.windx*self.windstark
+            windy= self.windy*self.windstark
+                
+        return windx , windy
+       end 
+
+       
         return {init = init, draw = draw, update = update}
 

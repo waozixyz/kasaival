@@ -18,6 +18,8 @@ local Spawner = require "lib.utils.Spawner"
 local Dog = require "lib.mobs.Dog"
 local Tornado = require "lib.weather.Tornado"
 local Frog = require "lib.mobs.Frog"
+local Rain = require "lib.weather.Rain"
+local Wind = require "lib.weather.Wind"
 
 -- plants
 local Plant = require "lib.plants.Plant"
@@ -74,7 +76,7 @@ local function load_stage(self, stage_name)
     -- create a player inside lyra
     lyra.player = Player:init()
     -- init lyra and make sure lyra.player is also in lyra.items
-    lyra:init(lyra.player,Tornado:init(),Frog:init())
+    lyra:init(lyra.player,Tornado:init(),Frog:init(),Rain:init(),Wind:init())
 
     load_scene(self)
     -- init Background
