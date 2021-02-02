@@ -67,7 +67,8 @@ end
 
 local function checkVisible(self, v)
     local W = push:getWidth()
-    if v.x + self.cx < W + v.w and v.x + self.cx > -v.w then return true else return false end
+    local w = v.w + 200 -- add a little extro space
+    if v.x + self.cx < W + w and v.x + self.cx > -w then return true else return false end
 end
 
 local function sort_for_draw(self, tbl)
