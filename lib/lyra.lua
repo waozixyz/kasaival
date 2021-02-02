@@ -37,7 +37,7 @@ local function checkCollision(o1, o2)
     end
 end
 
-local function update(self, game, dt)
+local function update(self, dt)
     for i, v in ipairs(self.items) do
         if v.update then
             v:update(dt)
@@ -45,10 +45,10 @@ local function update(self, game, dt)
         if v.dead then
             self.player.xp = self.player.xp + 10
             self.player.kelvin = self.player.kelvin + 1
-            if not game.kill_count[v.type] then
-                game.kill_count[v.type] = 0
+            if not self.kill_count[v.type] then
+                self.kill_count[v.type] = 0
             end
-            game.kill_count[v.type] = game.kill_count[v.type] + 1
+            self.kill_count[v.type] = self.kill_count[v.type] + 1
             table.remove(self.items, i)
         end
     end
@@ -67,7 +67,8 @@ end
 
 local function checkVisible(self, v)
     local W = push:getWidth()
-    if v.x + self.cx < W + v.w and v.x + self.cx > -v.w then return true else return false end
+    local w = v.w + 200 -- add a little extro space
+    if v.x + self.cx < W + w and v.x + self.cx > -w then return true else return false end
 end
 
 local function sort_for_draw(self, tbl)
@@ -106,19 +107,17 @@ local function getWidth(self)
 end
 
 local function getCurrentQuests(self)
-    return self.scenes[self.currentScene].quests
+    if self.scenes[self.currentScene] and self.scenes[self.currentScene].quests then
+        return self.scenes[self.currentScene].quests
+    else return {} end
 end
 
-local function completeQuest(self, key)
-    self:getCurrentQuests()[key] = nil
-    if #self:getCurrentQuests() <= 0 then
-        self.currentScene = self.currentScene + 1
-        if self:getCurrentQuests() == nil then
-            self.nextStage = true
-        end
+local function getKillCount(self, type)
+    if not self.kill_count[type] then
+        self.kill_count[type] = 0
     end
+    return self.kill_count[type]
 end
-
 return {
     scenes = {},
     items = {},
@@ -132,10 +131,9 @@ return {
     gw = 3000,
     startx = -100,
     getWidth = getWidth,
-    currentScene = 1,
     kill_count = {},
+    getKillCount = getKillCount,
     getCurrentQuests = getCurrentQuests,
-    completeQuest = completeQuest,
-    loadNextStage = false,
-    nextStage = nil,
+    currentScene = 1,
+    next = nil,
 }

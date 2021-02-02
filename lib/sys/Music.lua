@@ -23,10 +23,12 @@ local function mute(self)
     end
 end
 
-local function next(self)
-    self.bgm:stop()
-    self.bgm = nil
-    self:play()
+local function next(self, songs)
+    if self.bgm then
+        self.bgm:stop()
+        self.bgm = nil
+    end
+    self:play(songs)
 end
 
 local function play(self, songs)

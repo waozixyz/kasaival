@@ -5,6 +5,7 @@ local copy = require "lib.copy"
 local lyra = require "lib.lyra"
 
 local gr = love.graphics
+local ma = love.math
 
     
 -- default template
@@ -55,6 +56,7 @@ local template = {
     changeH = .95,
     -- used for first branch
     currentStage = 0,
+    randCurrentStage = false,
     w = 12, h = 32,
  }
 
@@ -122,6 +124,10 @@ local function init(self, name, sav)
 
     -- set timer value for values counting to 0
     self.growTimer = self.growTime
+
+    if self.randCurrentStage then
+        self.currentStage = ma.random(0, self.maxStage)
+    end
     do
         -- make one start branch if no branches given
         if #self.branches == 0 then
@@ -207,7 +213,7 @@ end
 
 local function update(self, dt)
     local l = #self.branches
-    if self.burnTimer <= 0 then
+    if l > 0 and self.burnTimer <= 0 then
         if l < self.maxStage then
             self.growTimer = self.growTimer + dt
             if self.growTimer >= self.growTime then

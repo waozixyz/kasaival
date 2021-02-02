@@ -5,13 +5,13 @@ local scenes = {
                 type = "kelvin",
                 head = "Reach a temperature of",
                 amount = 2200,
-                tail = "kelvin"
+                tail = "kelvin",
+                fnc = function(self, lyra)
+                    if lyra.player.kelvin >= self.amount then
+                        return true
+                    else return false end
+                end
             },
-        },
-        mobs = { 
-            ["Dog"] = {
-                amount = 50,
-            }
         }
     },
     {
@@ -20,7 +20,12 @@ local scenes = {
                 type = "cactus",
                 head = "Burn down a",
                 amount = 50,
-                tail = "cactuses"
+                tail = "cactuses",
+                fnc = function(self, lyra)
+                    if lyra.kill_count[self.type] and lyra.kill_count[self.type] >= self.amount then
+                        return true
+                    else return false end
+                end
             },
         },
         plants = { 
@@ -28,6 +33,11 @@ local scenes = {
                 amount = 100,
                 startx = 2000,
             } 
+        },
+        mobs = { 
+            ["Dog"] = {
+                amount = 50,
+            }
         }
     }
 }
@@ -67,4 +77,4 @@ local music = {
 
 local sky = { y = 0 }
 
-return {scenes = scenes, width = 9000, background = background, ground = ground, music = music, sky = sky, trees = trees, nextStage = "Grassland"}
+return {scenes = scenes, width = 9000, background = background, ground = ground, music = music, sky = sky, next = "Grassland"}

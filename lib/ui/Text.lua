@@ -23,7 +23,7 @@ local function init(self, text, prop)
 end
 
 local function update(self, text)
-    if text then
+    if text and type(text) == "string" then
         self.text = gr.newText(Font(self.size), text)
     end
 end

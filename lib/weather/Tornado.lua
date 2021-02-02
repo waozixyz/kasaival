@@ -19,8 +19,6 @@ end
 
 local function draw(self)
     local sx, sy = 2, 2
-    print(self.zeito)
-    print(self.randomreset)
     gr.draw(self.anime.spriteSheet, self.anime.quads[self.anime:spritenumber()],self.x+self.zeito*(math.sin(self.kreiselzeit)*100), self.y+math.cos(self.kreiselzeit)*140, 0, sx*self.zeito, sy*self.zeito)
 end
 
