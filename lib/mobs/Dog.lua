@@ -1,34 +1,10 @@
 local copy = require "lib.copy"
 local lyra = require "lib.lyra"
 local pinkel = require "lib.ps.pinkelx"
+local Animation = require "lib.utils.Animation"
 
 local gr = love.graphics
 local ma = love.math
-
-local function new_anime(image, width, height, duration)
-    local anime = {}
-    anime.spriteSheet = image
-
-    anime.quads = {}
-
-    for y = 0, image:getHeight() - height, height do
-        for x = 0, image:getWidth() - width, width do
-            table.insert(anime.quads, gr.newQuad(x, y, width, height, image:getDimensions()))
-        end
-    end
-    anime.duration = duration
-    anime.currentTime = 0
-    return anime
-end
-
-
-
-
-
-
-
-
-
 
 
 
@@ -37,7 +13,7 @@ local function init(self, pos)
     self.y = pos.y
     self.direction = -1
     self.pinkelpause = false
-    self.anime = new_anime(gr.newImage("assets/mobs/dog_sprite.png"), 46, 27, 1)
+    self.anime = Animation:init(gr.newImage("assets/mobs/dog_sprite.png"), 46, 27, 1)
     self.zeito = ma.random(0, 11)
     -- add random color to dogs
     self.color = lyra.getColor({.4, 1, .4, 1, .4, 1})
@@ -112,7 +88,7 @@ local function update(self, dt)
     end
     if self.x < lyra.startx then
         self.direction = 1
-    elseif self.x > lyra.gw + lyra.startx then
+    elseif self.x > lyra:getWidth() + lyra.startx then
         self.direction = -1
     end
     self.ps:update(dt)

@@ -1,6 +1,7 @@
 local suit = require "lib.suit"
 local push = require "lib.push"
 local lume = require "lib.lume"
+local lyra = require "lib.lyra"
 
 local Cursor = require "lib.ui.Cursor"
 local Font = require "lib.ui.Font"
@@ -10,8 +11,8 @@ local Text = require "lib.ui.Text"
 
 local gr = love.graphics
 
-local function init(self, quests)
-    local W = push:getWidth()
+local function init(self)
+    local W, H = push:getDimensions()
     Cursor:init()
     -- load text
     self.gameover = Overlay.getText("GameOver", "touch anywhere or press any key to try again", {0, 0, 0, 0.5})
@@ -20,12 +21,13 @@ local function init(self, quests)
     -- load quest text
     self.questHeading = Text:init("Quests to complete", {size = 64, y = 20, x = W - 20, align = "right"})
     local i = 1
-    for _, v in pairs(quests) do
+    for _, v in pairs(lyra:getCurrentQuests()) do
         local size = 48
         v.text = Text:init(v.head .. " " .. v.amount .. " " .. v.tail, {size = size, y = 40 + (size + 8) * i, x = W - 20, align = "right"})
         i = i + 1
     end
-    
+    -- load kelvin meter
+    self.kelvin = Text:init("", {x = 20, y = H - 50, align = "left"})
     -- load icons
     self.exit = gr.newImage("assets/icons/exit.png")
     self.resume = gr.newImage("assets/icons/resume.png")
@@ -46,13 +48,14 @@ local function toggle(val) if val then return false else return true end end
 
 local function draw(self, game)
     local W, H = push:getDimensions()
-    local hp = game.player.hp
+    local kelvin = lyra.player.kelvin
+    local kelvin_death = lyra.player.kelvin_death
 
-    gr.setColor(.2, 0, 0, 1 - (hp / 100))
+    gr.setColor(.2, 0, 0, 1 - (kelvin / kelvin_death))
     gr.rectangle("fill", 0, 0, W, H)
 
     -- overlays for special states
-    if hp <= 0 then
+    if kelvin <= kelvin_death then
         Overlay.draw(self.gameover)
     elseif game.paused == true and (not game.exit or game.exit == 0) then
         Overlay.draw(self.gamepaused)
@@ -60,12 +63,15 @@ local function draw(self, game)
         Overlay.draw(self.gamesaving)
     end
     -- current quests
-    if lume.count(game.quests) > 0 then
+    if lume.count(lyra:getCurrentQuests()) > 0 then
         self.questHeading:draw()
     end
-    for _, v in pairs(game.quests) do
+    for _, v in pairs(lyra:getCurrentQuests()) do
         v.text:draw()
     end
+
+    -- draw kelvin meter
+    self.kelvin:draw()
     
     -- current music playing
     if Music.songTitle then
@@ -79,7 +85,7 @@ local function tk( game)
         game.paused = toggle(game.paused)
         return true
     end
-    if game.player.hp <= 0 then
+    if lyra.player.kelvin <= lyra.player.kelvin_death then
         game.restart = true
         return true
     end
@@ -124,13 +130,14 @@ local function update(self, game)
         Music:toggle()
     end
     Cursor:update()
-
+    -- update kelvin meter
+    self.kelvin:update("current temperature: " .. math.floor(lyra.player.kelvin / 100) * .1 .. "K kelvin")
     -- update quest Text
  
-    for k, v in pairs(game.quests) do
+    for k, v in pairs(lyra:getCurrentQuests()) do
         local amount = v.amount
         if k == "kill" then
-            amount = amount - game.kill_count[v.type]
+            amount = amount - lyra.kill_count[v.type]
         end
         v.text:update(v.head .. " " .. math.floor(amount) .. " " .. v.tail)
     end

@@ -25,10 +25,6 @@ local function update(self, dt)
     if self.spawnx<1 then
 
         self.spawnmodifikator=self.spawnmodifikator+2*dt
-    
-       if  660+math.sin(self.spawnmodifikator)*self.spawnmodifikator*self.spawnmodifikator > 800 then
-       self.dampf=self.dampf+dt
-       end 
     --spawnmodifikatoer größe checken
        if self.spawnmodifikator> 50 then
         self.spawnx=1.5

@@ -11,7 +11,7 @@ return function(start_x)
     local y = ma.random(0, H - lyra.gh)
     local scale = (y + lyra.gh) / H
 
-    local W = lyra.gw
+    local W = lyra:getWidth()
     local x = ma.random(lyra.startx + start_x, W + lyra.startx)
     local vir_x = x / scale
 

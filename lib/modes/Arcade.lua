@@ -5,12 +5,12 @@ local push = require("lib.push")
 local serpent = require("lib.serpent")
 
 -- Main components
-local Ground = require("lib.scene.Ground")
+local Ground = require("lib.scenery.Ground")
 local HUD = require("lib.ui.HUD")
 local Music = require("lib.sys.Music")
 local Player = require "lib.player.Player"
 local Saves = require "lib.sys.Saves"
-local Sky = require "lib.scene.Sky"
+local Sky = require "lib.scenery.Sky"
 local Spawner = require "lib.plants.Spawner"
 
 -- plants
@@ -197,14 +197,14 @@ local function update(self, dt, set_mode)
             Music.bgm:pause()
         end
         love.event.quit()
-    elseif not self.paused and self.player.hp > 0 then
+    elseif not self.paused and self.player.kelvin > 0 then
         self.treeTime = self.treeTime + dt
         if self.treeTime > 1 then
             addTree(self)
             self.treeTime = 0
         end
         self.elapsed = self.elapsed + dt
-        self.player.scale = (self.player.y / H) * self.player.hp * 0.01
+        self.player.scale = (self.player.y / H) * self.player.kelvin * 0.01
 
         self.player:update(dt, self)
         for i, tree in ipairs(self.plants) do
@@ -220,7 +220,7 @@ local function update(self, dt, set_mode)
             tree:update(dt)
             if tree.dead then
                 self.player.xp = self.player.xp + 10
-                self.player.hp = self.player.hp + 1
+                self.player.kelvin = self.player.kelvin + 1
                 table.remove(self.plants, i)
             end
         end

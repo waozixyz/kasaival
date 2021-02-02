@@ -7,7 +7,6 @@ local Flame = require "lib.ps.Flame"
 
 -- aliases
 local gr = love.graphics
-local ly = lyra
 
 local function startBoost(self)
     self.dp = self.dp * 1.5
@@ -22,16 +21,16 @@ local function stopBoost(self)
 end
 
 local function collided(self, obj)
-    if not obj.element and obj.color then self.hp = self.hp + obj.color[2] - obj.color[3]
+    if not obj.element and obj.color then self.kelvin = self.kelvin + obj.color[2] - obj.color[3]
     elseif obj.element == "plant" then
-        self.hp = self.hp + .5
+        self.kelvin = self.kelvin + .5
         if #obj.branches == obj.stages and obj.special == "sakura" then
             self.boostTime = 10
             if not self.boost then
                 startBoost(self)
             end
         elseif #obj.branches == obj.stages then
-            self.hp = self.hp + 1
+            self.kelvin = self.kelvin + 1
         end
     end
 end
@@ -60,9 +59,11 @@ local function init(self, sav)
     self.x = sav.x or W * .5
     self.y = sav.y or H * .7
     self.xp = sav.xp or 0
-    self.hp = sav.hp or 200
+    self.kelvin = sav.kelvin or 200
     self.lvl = sav.lvl or 0
     self.speed = sav.speed or 10
+    self.kelvin = 1600
+    self.kelvin_death = 1000
     self.flame = Flame()
     self.sizes = {1, 1, 1, 1, 1, 1, 1, 1}
     self.elapsed = 0
@@ -90,20 +91,20 @@ local function move(self, dx, dy, dt)
     local s = self.speed * self.scale * dt * 20
     dx, dy = dx * s, dy * s
     local x, y = self.x + dx, self.y + dy
-    if x + ly.cx < W / 5 and -ly.cx > ly.startx then
-        ly.cx = ly.cx - dx
-    elseif x + ly.cx > W - (W / 5) and -ly.cx + W < ly.gw + ly.startx then
-        ly.cx = ly.cx - dx
+    if x + lyra.cx < W / 5 and -lyra.cx > lyra.startx then
+        lyra.cx = lyra.cx - dx
+    elseif x + lyra.cx > W - (W / 5) and -lyra.cx + W < lyra:getWidth() + lyra.startx then
+        lyra.cx = lyra.cx - dx
     end
-    if x + ly.cx > W then
-        x = W - ly.cx
-    elseif x + ly.cx < 0 then
+    if x + lyra.cx > W then
+        x = W - lyra.cx
+    elseif x + lyra.cx < 0 then
         x = 0
     end
     if y > H then
         y = H
-    elseif y < H - ly.gh then
-        y = H - ly.gh
+    elseif y < H - lyra:getWidth() then
+        y = H - lyra:getWidth()
     end
     self.flame:setPosition(x, y)
     self.flame:setSizes(returnTable(self.sizes))
@@ -133,16 +134,8 @@ local function update(self, dt)
         self.elapsed = 0
     end
     
-    self.hp = self.hp - (self.hp / 100) * self.burnRate
-    if self.hp > 300 then
-        self.hp = self.hp - 10
-    elseif self.hp > 230 then
-        self.hp = self.hp - self.burnRate
-    elseif self.hp > 150 or self.hp < 50 then
-        self.hp = self.hp - 0.5 * self.burnRate
-    elseif self.hp < 80 or self.hp > 120 then
-        self.hp = self.hp - 0.2 * self.burnRate
-    end
+    self.kelvin = self.kelvin - (self.kelvin / self.kelvin_death) * self.burnRate
+
     self.flame:update(dt)
 
 end
@@ -160,6 +153,6 @@ return {
     dp = .5, -- destroy power
     scale = 2,
     update = update,
-    burnRate = .1,
+    burnRate = .5,
     kinetic = true,
 }

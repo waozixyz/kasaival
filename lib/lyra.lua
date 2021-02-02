@@ -6,9 +6,6 @@ local ma = love.math
 local function init(self, ...)
     self.items = {}
     for _, v in ipairs({...}) do
-        if v.id == "player" then
-            self.player = v
-        end
         table.insert(self.items, v)
     end
     self.visible_items = self.items
@@ -47,7 +44,7 @@ local function update(self, game, dt)
         end
         if v.dead then
             self.player.xp = self.player.xp + 10
-            self.player.hp = self.player.hp + 1
+            self.player.kelvin = self.player.kelvin + 1
             if not game.kill_count[v.type] then
                 game.kill_count[v.type] = 0
             end
@@ -104,7 +101,26 @@ local function getColor(cs)
     return {rnc(cs[1], cs[2]), rnc(cs[3], cs[4]), rnc(cs[5], cs[6]), 1}
 end
 
+local function getWidth(self)
+    return (self.gw / #self.scenes) * self.currentScene
+end
+
+local function getCurrentQuests(self)
+    return self.scenes[self.currentScene].quests
+end
+
+local function completeQuest(self, key)
+    self:getCurrentQuests()[key] = nil
+    if #self:getCurrentQuests() <= 0 then
+        self.currentScene = self.currentScene + 1
+        if self:getCurrentQuests() == nil then
+            self.nextStage = true
+        end
+    end
+end
+
 return {
+    scenes = {},
     items = {},
     init = init,
     update = update,
@@ -114,5 +130,12 @@ return {
     cx = 0,
     gh = 600,
     gw = 3000,
-    startx = -100
+    startx = -100,
+    getWidth = getWidth,
+    currentScene = 1,
+    kill_count = {},
+    getCurrentQuests = getCurrentQuests,
+    completeQuest = completeQuest,
+    loadNextStage = false,
+    nextStage = nil,
 }

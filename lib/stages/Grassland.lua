@@ -1,15 +1,24 @@
-local quests = {
-    ["kill"] = {
-        type = "cactus",
-        head = "Burn down a",
-        amount = 100,
-        tail = "cactuses"
+local scenes = {
+    {
+        quests = {
+            ["reach"] = {
+                type = "kelvin",
+                head = "Reach a temperature of",
+                amount = 2200,
+                tail = "kelvin"
+            },
+        }
     },
-    ["survive"] = {
-        head = "Survive for",
-        amount = 80,
-        tail = "seconds"
-    },
+    {
+        quests = {
+            ["kill"] = {
+                type = "cactus",
+                head = "Burn down a",
+                amount = 50,
+                tail = "cactuses"
+            },
+        }
+    }
 }
 
 local background = {
@@ -54,4 +63,4 @@ local trees = {
     } 
 }
 
-return {width = 9000, background = background, ground = ground, music = music, sky = sky, trees = trees, quests = quests}
+return {scenes = scenes, width = 9000, background = background, ground = ground, music = music, sky = sky, trees = trees, quests = quests}
