@@ -81,7 +81,7 @@ local function load_stage(self, stage_name)
     -- create a player inside lyra
     lyra.player = Player:init()
     -- init lyra and make sure lyra.player is also in lyra.items
-    lyra:init(lyra.player,Tornado:init(),Frog:init())
+    lyra:init(lyra.player)
 
     load_scene(self)
     -- init Background
