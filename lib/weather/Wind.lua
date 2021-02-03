@@ -43,7 +43,7 @@ local function update(self, dt)
         end
         --wind soll sich nur seltener und zufällig verändern
         if self.zeito > 3 then
-            if 5 < (self.spawnmodifikator / (ma.random(1, 10) + (self.spawnmodifikator / 10))) then
+            if 5 < (self.spawnmodifikator / (10 + (self.spawnmodifikator / 10))) then
                 --zufall windrichtung
                 self.windx = math.sin(2*math.pi * (self.spawnmodifikator/50))
                 self.zeit0 = 0
@@ -51,7 +51,7 @@ local function update(self, dt)
         end
     
         --windstaärke ist immer da, ist smoothlaufend
-        self.windstark = (self.spawnmodifikator / (ma.random(1, 10) + (self.spawnmodifikator / 10))) * 10
+        self.windstark = (self.spawnmodifikator / 10 + (self.spawnmodifikator / 10))*2
     end 
 
 
