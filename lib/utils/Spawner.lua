@@ -4,7 +4,7 @@ local lyra = require "lib.lyra"
 local ma = love.math
 
 
-return function(start_x)
+return function(start_x, himmel)
     start_x = start_x or  0
     local H = push:getHeight()
 
@@ -17,6 +17,12 @@ return function(start_x)
 
     local rat_x = x / vir_x
     y =  lyra.gh + (y * rat_x)
+
+
+if himmel then
+    y = 0 
+end
+
 
     return { x = x, y = y, scale = scale }
 end

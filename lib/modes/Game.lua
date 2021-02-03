@@ -53,6 +53,12 @@ local function load_scene(self)
                 end
             end
         end
+
+
+       for _=0 , 100  do
+        table.insert(lyra.items,Rain:init(Spawner(nil, true)))
+        end
+
     end
 end
 
@@ -76,7 +82,8 @@ local function load_stage(self, stage_name)
     -- create a player inside lyra
     lyra.player = Player:init()
     -- init lyra and make sure lyra.player is also in lyra.items
-    lyra:init(lyra.player,Tornado:init(),Frog:init(),Rain:init(),Wind:init())
+    Wind:init()
+    lyra:init(lyra.player,Tornado:init(),Frog:init())
 
     load_scene(self)
     -- init Background
@@ -134,6 +141,7 @@ local function draw(self)
 
     -- draw head up display
     HUD:draw(self)
+    Wind:draw()
 
 end
 
@@ -191,6 +199,7 @@ local function update(self, dt, set_mode)
                 ev.quit()
             end
             HUD:update(self)
+            Wind:update(dt)
         
         end
     end

@@ -4,10 +4,10 @@ local lyra = require "lib.lyra"
 local Wind = require "lib.weather.Wind"
 
 
-local function init(self)
+local function init(self, spawn)
     self.kreiselzeit=1
-    self.x = 400
-    self.y = 409
+    self.x = spawn.x or 400
+    self.y = spawn.y or 400
     self.windx , self.windy = Wind:getWind()
     self.image=gr.newImage("assets/scenery/grassland/Dreieck.png")
     return copy(self)
