@@ -25,7 +25,8 @@ end
 
 
 local function update(self, dt)
-        self.zeito = self.zeito + dt
+        
+        self.zeito = self.zeito + 1/3*dt
         if self.rest < 1 then
             self.spawnmodifikator = self.spawnmodifikator + 2 * dt
             --spawnmodifikatoer größe checken
@@ -36,22 +37,21 @@ local function update(self, dt)
         --bei größer 50 wandert er wieder zurück auf start
         if self.rest > 1 then
             self.spawnmodifikator = self.spawnmodifikator - 2 * dt
+          
             --bei startangekommen steigt er wie zuvor
             if self.spawnmodifikator < 5 then
                 self.rest = 0.5
-            end
-        end
-        --wind soll sich nur seltener und zufällig verändern
-        if self.zeito > 3 then
-            if 5 < (self.spawnmodifikator / (10 + (self.spawnmodifikator / 10))) then
-                --zufall windrichtung
-                self.windx = math.sin(2*math.pi * (self.spawnmodifikator/50))
-                self.zeit0 = 0
+              
             end
         end
     
+                self.windx = math.sin(self.zeito)*5
+               
+        
+        
+    
         --windstaärke ist immer da, ist smoothlaufend
-        self.windstark = (self.spawnmodifikator / 10 + (self.spawnmodifikator / 10))*2
+        self.windstark = (self.spawnmodifikator / 10 + (self.spawnmodifikator / 10))
     end 
 
 
