@@ -16,10 +16,12 @@ local Saves = require "lib.sys.Saves"
 local Sky = require "lib.scenery.Sky"
 local Spawner = require "lib.utils.Spawner"
 local Dog = require "lib.mobs.Dog"
-local Tornado = require "lib.weather.Tornado"
+local Tornado = require "lib.mobs.Tornado"
 local Frog = require "lib.mobs.Frog"
-local Rain = require "lib.weather.Rain"
-local Wind = require "lib.weather.Wind"
+
+ -- Weather 
+local Weather = require "lib.scenery.Weather"
+
 
 -- plants
 local Plant = require "lib.plants.Plant"
@@ -54,11 +56,6 @@ local function load_scene(self)
             end
         end
 
-
-       for _=0 , 100  do
-        table.insert(lyra.items,Rain:init(Spawner(nil, true)))
-        end
-
     end
 end
 
@@ -82,7 +79,6 @@ local function load_stage(self, stage_name)
     -- create a player inside lyra
     lyra.player = Player:init()
     -- init lyra and make sure lyra.player is also in lyra.items
-    Wind:init()
     lyra:init(lyra.player,Tornado:init(),Frog:init())
 
     load_scene(self)
@@ -97,6 +93,7 @@ local function load_stage(self, stage_name)
 
     -- init Sky
     Sky:init(stage.sky)
+    Weather:init()
 
     self.nextStage = false
     self.nextScene = false
@@ -141,8 +138,7 @@ local function draw(self)
 
     -- draw head up display
     HUD:draw(self)
-    Wind:draw()
-
+    Weather:draw()
 end
 
 local function focus(...)
@@ -199,7 +195,7 @@ local function update(self, dt, set_mode)
                 ev.quit()
             end
             HUD:update(self)
-            Wind:update(dt)
+            Weather:update(dt)
         
         end
     end

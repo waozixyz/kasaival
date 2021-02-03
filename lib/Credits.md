@@ -9,6 +9,8 @@ Music:
  - Map
 ## Author: rgs_dev
 Background: grassland
+## Author: tgfcoder
+Sprite: Frog
 
 # License: CC BY 4.0
 ## Author: TeknoAXE
