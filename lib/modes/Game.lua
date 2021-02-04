@@ -15,7 +15,15 @@ local Player = require "lib.player.Player"
 local Saves = require "lib.sys.Saves"
 local Sky = require "lib.scenery.Sky"
 local Spawner = require "lib.utils.Spawner"
+
+--mobs
 local Dog = require "lib.mobs.Dog"
+local Tornado = require "lib.mobs.Tornado"
+local Frog = require "lib.mobs.Frog"
+
+ -- Weather 
+local Weather = require "lib.scenery.Weather"
+
 
 -- plants
 local Plant = require "lib.plants.Plant"
@@ -49,6 +57,7 @@ local function load_scene(self)
                 end
             end
         end
+
     end
 end
 
@@ -86,6 +95,7 @@ local function load_stage(self, stage_name)
 
     -- init Sky
     Sky:init(stage.sky)
+    Weather:init()
 
     self.nextStage = false
     self.nextScene = false
@@ -93,6 +103,9 @@ end
 
 local function init(self)
     load_stage(self, "Desert")
+    if Testing then
+        Music:toggle()
+    end
 end
 
 local function scene_pause(self)
@@ -130,6 +143,7 @@ local function draw(self)
 
     -- draw head up display
     HUD:draw(self)
+    Weather:draw()
 end
 
 local function focus(...)
@@ -186,6 +200,8 @@ local function update(self, dt, set_mode)
                 ev.quit()
             end
             HUD:update(self)
+            Weather:update(dt)
+        
         end
     end
 end
