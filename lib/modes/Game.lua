@@ -1,9 +1,7 @@
 -- library functions
 local copy = require "lib.copy"
-local lume = require "lib.lume"
 local lyra = require "lib.lyra"
 local push = require "lib.push"
-local serpent = require "lib.serpent"
 
 -- Main components
 local Background = require "lib.scenery.Background"
@@ -12,14 +10,8 @@ local Ground = require "lib.scenery.Ground"
 local HUD = require "lib.ui.HUD"
 local Music = require "lib.sys.Music"
 local Player = require "lib.player.Player"
-local Saves = require "lib.sys.Saves"
 local Sky = require "lib.scenery.Sky"
 local Spawner = require "lib.utils.Spawner"
-
---mobs
-local Dog = require "lib.mobs.Dog"
-local Tornado = require "lib.mobs.Tornado"
-local Frog = require "lib.mobs.Frog"
 
  -- Weather 
 local Weather = require "lib.scenery.Weather"
@@ -51,7 +43,7 @@ local function load_scene(self)
         if scene.mobs then
             for k, v in pairs(scene.mobs) do
                 for _ = 1, v.amount do
-                    local mob = require("lib.mobs." .. k):init(Spawner())
+                    local mob = require("lib.mobs." .. k):init(Spawner(lyra:getPrevWidth()))
                     mob.id = #lyra.items
                     table.insert(lyra.items, mob)
                 end
@@ -92,17 +84,19 @@ local function load_stage(self, stage_name)
     HUD:init()
     -- init Music
     Music:next(stage.music)
-
+    if Testing then
+        Music:toggle()
+    end
     -- init Sky
     Sky:init(stage.sky)
-    Weather:init()
+    Weather:init(stage.weather)
 
     self.nextStage = false
     self.nextScene = false
 end
 
 local function init(self)
-    load_stage(self, "Desert")
+    load_stage(self, "Grassland")
 end
 
 local function scene_pause(self)

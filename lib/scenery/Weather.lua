@@ -3,58 +3,65 @@ local Spawner = require "lib.utils.Spawner"
 local Wind = require "lib.weather.Wind"
 local push = require "lib.push"
 local lyra = require "lib.lyra"
+local Wolke = require "lib.weather.Wolke"
 
 local ma = love.math
 local gr = love.graphics
 
+local function init(self, prop)
+  self.prop = prop
+  Wind:init()
+  self.items = {}
 
-local function init(self )
-    Wind:init()
-    self.items = {}
-    
-  self.zeito=1
-    return self
+  self.zeito = 1
+  return self
 end
 
 
 local function addrain(self)
+  local H = push:getHeight()
 
-local H = push:getHeight()
-
-  for _=0 , 150  do
+  for _ = 0, 150 do
     table.insert(self.items, Rain:init(Spawner(nil, -H)))
-    end
+  end
 end
 
-
+local function addwolke(self)
+  local H = push:getHeight()
+  for _ = 0, 100 do
+    table.insert(self.items, Wolke:init(Spawner(nil, 0)))
+  end
+end
 
 local function draw(self)
-    for i , v in ipairs(self.items) do
-      v:draw()
-    end
-    
+  for i, v in ipairs(self.items) do
+    v:draw()
+  end
 end
 
-
 local function update(self, dt)
-    local H = push:getHeight()
-    self.zeito =self.zeito +dt
-    Wind:update(dt)
+  local H = push:getHeight()
+  self.zeito = self.zeito + dt
+  Wind:update(dt)
 
-  if 4 <= (self.zeito/(ma.random(1,10)))
-  
-   then addrain(self)
-   
-   self.zeito=0
+  if 4 <= (self.zeito / (ma.random(1, 10))) then
+    if self.prop ~= "dry" then
+      addrain(self)
+      addwolke(self)
+    end
+    self.zeito = 0
   end
 
-  for i , v in ipairs(self.items) do
+  for i, v in ipairs(self.items) do
     v:update(dt)
-    if v.y > H - lyra.gh then 
+    if v.y > H - lyra.gh then
       table.remove(self.items, i)
     end
+    if 4 <= (self.zeito / (ma.random(1, 10))) then
+      table.remove(self.items, 150+ma.random(2,20))
+        
+    end
   end
-
-    end 
+end
 
 return {init = init, draw = draw, update = update}

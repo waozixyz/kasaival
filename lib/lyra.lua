@@ -105,6 +105,9 @@ end
 local function getWidth(self)
     return (self.gw / #self.scenes) * self.currentScene
 end
+local function getPrevWidth(self)
+    return (self.gw / #self.scenes) * (self.currentScene - 1)
+end
 
 local function getCurrentQuests(self)
     if self.scenes[self.currentScene] and self.scenes[self.currentScene].quests then
@@ -131,6 +134,7 @@ return {
     gw = 3000,
     startx = -100,
     getWidth = getWidth,
+    getPrevWidth = getPrevWidth,
     kill_count = {},
     getKillCount = getKillCount,
     getCurrentQuests = getCurrentQuests,

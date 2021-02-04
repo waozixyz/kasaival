@@ -9,7 +9,7 @@ local mo = love.mouse
 local sy = love.system
 
 local gameWidth, gameHeight = 1920, 1080
-Testing = false
+Testing = true
 
 local mode
 local function set_mode(mode_name, ...)

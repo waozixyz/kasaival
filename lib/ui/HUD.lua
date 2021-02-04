@@ -120,8 +120,8 @@ end
 
 local function update(self, game)
     local exit_button = suit.ImageButton(self.exit, 20, 20)
-    if exit_button.hit == true and game.exit and game.exit < 1 then
-        game.exit = 1
+    if exit_button.hit == true then
+        love.event.quit()
     end
     local pause_image = self.pause.img
     if game.paused then
