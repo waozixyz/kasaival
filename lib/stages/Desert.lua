@@ -1,6 +1,26 @@
 local scenes = {
     {
         quests = {
+            ["kill"] = {
+                type = "cactus",
+                head = "Burn down a",
+                amount = 50,
+                tail = "cactuses",
+                fnc = function(self, lyra)
+                    if lyra.kill_count[self.type] and lyra.kill_count[self.type] >= self.amount then
+                        return true
+                    else return false end
+                end
+            },
+        },
+        mobs = { 
+            ["Dog"] = {
+                amount = 50,
+            }
+        }
+    },
+    {
+        quests = {
             ["reach"] = {
                 type = "kelvin",
                 head = "Reach a temperature of",
@@ -14,32 +34,6 @@ local scenes = {
             },
         }
     },
-    {
-        quests = {
-            ["kill"] = {
-                type = "cactus",
-                head = "Burn down a",
-                amount = 50,
-                tail = "cactuses",
-                fnc = function(self, lyra)
-                    if lyra.kill_count[self.type] and lyra.kill_count[self.type] >= self.amount then
-                        return true
-                    else return false end
-                end
-            },
-        },
-        plants = { 
-            ["Saguaro"] = {
-                amount = 100,
-                startx = 2000,
-            } 
-        },
-        mobs = { 
-            ["Dog"] = {
-                amount = 50,
-            }
-        }
-    }
 }
 
 local background = {
@@ -77,4 +71,4 @@ local music = {
 
 local sky = { y = 0 }
 
-return {scenes = scenes, width = 9000, background = background, ground = ground, music = music, sky = sky, next = "Grassland"}
+return {weather = "dry", scenes = scenes, width = 9000, background = background, ground = ground, music = music, sky = sky, next = "Grassland"}

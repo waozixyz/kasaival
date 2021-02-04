@@ -7,8 +7,7 @@ local lyra = require "lib.lyra"
 local ma = love.math
 local gr = love.graphics
 
-local function init(self, prop)
-  self.prop = prop
+local function init(self)
   Wind:init()
   self.items = {}
 
@@ -36,9 +35,8 @@ local function update(self, dt)
   Wind:update(dt)
 
   if 4 <= (self.zeito / (ma.random(1, 10))) then
-    if self.prop ~= "dry" then
-      addrain(self)
-    end
+    addrain(self)
+
     self.zeito = 0
   end
 
