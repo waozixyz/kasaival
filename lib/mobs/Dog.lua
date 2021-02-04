@@ -38,7 +38,7 @@ local function get_sprite_num(self)
 end
 
 local function draw(self)
-    local sx, sy = 2
+    local sx, sy = 2, 2
 
     if self.direction > 0 then
         sx = sx * -1
