@@ -44,9 +44,7 @@ local function draw(self)
         sx = sx * -1
     end
     
-
     if self.pinkelpause then
-        gr.setColor(1, 1, 1, 1)
         self.ps:setPosition(self.x-70*self.direction, self.y+18)
         self.ps:setSizes(0.06)
         --pinkel direction
@@ -58,9 +56,13 @@ local function draw(self)
         gr.setColor(1,1,1)
         gr.draw(self.ps)
        end
-
+    
     gr.setColor(self.color)
     gr.draw(self.anime.spriteSheet, self.anime.quads[get_sprite_num(self)], self.x, self.y, 0, sx, sy)
+
+
+   
+
 
     
 
