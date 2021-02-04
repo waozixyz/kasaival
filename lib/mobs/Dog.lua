@@ -38,9 +38,13 @@ local function draw(self)
     if self.direction > 0 then
         sx = sx * -1
     end
-
+    
     gr.setColor(self.color)
     gr.draw(self.anime.spriteSheet, self.anime.quads[get_sprite_num(self)], self.x, self.y, 0, sx, sy)
+
+
+   
+
 
     if self.pinkelpause then
         gr.setColor(1, 1, 1)
