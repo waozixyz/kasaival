@@ -38,7 +38,7 @@ local function get_sprite_num(self)
 end
 
 local function draw(self)
-    local sx, sy = 2, 2
+    local sx, sy = 2
 
     if self.direction > 0 then
         sx = sx * -1
@@ -46,6 +46,7 @@ local function draw(self)
     
 
     if self.pinkelpause then
+        gr.setColor(1, 1, 1, 1)
         self.ps:setPosition(self.x-70*self.direction, self.y+18)
         self.ps:setSizes(0.06)
         --pinkel direction
@@ -67,7 +68,7 @@ local function draw(self)
 end
 
 local function update(self, dt)
-    
+    self.ps:update(dt)
     self.anime.currentTime = self.anime.currentTime + dt
     if self.anime.currentTime >= self.anime.duration then
         self.anime.currentTime = 0
@@ -91,7 +92,7 @@ local function update(self, dt)
     elseif self.x > lyra:getWidth() + lyra.startx then
         self.direction = -1
     end
-    self.ps:update(dt)
+    
 end
 
 return {init = init, draw = draw, update = update}
