@@ -16,7 +16,7 @@ local function init(self, spawn)
     self.windstark = 1
     self.spawnmodifikator = 0
     self.image=gr.newImage("assets/scenery/grassland/Dreieck.png")
-    self.drehmodi=ma.random(1,7)
+    self.drehmodi=ma.random(1,10)
     self.zeito = 1
     return copy(self)
 end

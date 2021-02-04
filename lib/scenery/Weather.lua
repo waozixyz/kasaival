@@ -2,6 +2,7 @@ local Rain = require "lib.weather.Rain"
 local Spawner = require "lib.utils.Spawner"
 local Wind = require "lib.weather.Wind"
 local push = require "lib.push"
+local lyra = require "lib.lyra"
 
 local ma = love.math
 local gr = love.graphics
@@ -20,7 +21,7 @@ local function addrain(self)
 
 local H = push:getHeight()
 
-  for _=0 , 100  do
+  for _=0 , 150  do
     table.insert(self.items, Rain:init(Spawner(nil, -H)))
     end
 end
@@ -28,7 +29,6 @@ end
 
 
 local function draw(self)
-    Wind:draw()
     for i , v in ipairs(self.items) do
       v:draw()
     end
@@ -50,7 +50,7 @@ local function update(self, dt)
 
   for i , v in ipairs(self.items) do
     v:update(dt)
-    if v.y > H then 
+    if v.y > H - lyra.gh then 
       table.remove(self.items, i)
     end
   end

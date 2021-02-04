@@ -18,19 +18,20 @@ end
 
 local function draw(self)
     --windpfeil darstellung, nur die richtung
-    gr.setColor(0, 0, 0)
-    gr.line(200, 200, 200 + self.windx*self.windstark,200 )
-    gr.setColor(1, 1, 1,1 )
+    --gr.setColor(0, 0, 0)
+    --gr.line(200, 200, 200 + self.windx*self.windstark,200 )
+    --gr.setColor(1, 1, 1,1 )
 end
 
 
 local function update(self, dt)
-        
-        self.zeito = self.zeito + 1/3*dt
+    
+    self.zeito = self.zeito + dt
+     
         if self.rest < 1 then
             self.spawnmodifikator = self.spawnmodifikator + 2 * dt
             --spawnmodifikatoer größe checken
-            if self.spawnmodifikator > 50 then
+            if self.spawnmodifikator > 20 then
                 self.rest = 1.5
             end
         end
@@ -45,13 +46,15 @@ local function update(self, dt)
             end
         end
     
-                self.windx = math.sin(self.zeito)*5
-               
+                self.windx = math.sin(self.zeito) + self. spawnmodifikator/30
+             if self.zeito>=math.pi*2 then
+                self.zeito=0
+             end  
         
-        
+            
     
         --windstaärke ist immer da, ist smoothlaufend
-        self.windstark = (self.spawnmodifikator / 10 + (self.spawnmodifikator / 10))
+        self.windstark = 3*self.spawnmodifikator / 10
     end 
 
 
