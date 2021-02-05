@@ -12,28 +12,14 @@ local function init(self, ...)
     return self
 end
 
--- seperate kinetics and static items
--- since it does not make sense to check collision for static + static
-local function get_sm_items(tbl)
-    local static = {}
-    local kinetic = {}
-    for _, v in ipairs(tbl) do
-        if v.static then
-            table.insert(static, v)
-        elseif v.kinetic then
-            table.insert(kinetic, v)
-        end
-    end
-    return static, kinetic
-end
 local function checkCollision(o1, o2)
-    local l1, r1, u1, d1 = o1:getHitbox()
-    local l2, r2, u2, d2 = o2:getHitbox()
-
-    if l1 <= r2 and r1 >= l2 and u1 <= d2 and d1 >= u2 then
-        return true
-    else
-        return false
+    if o1.getHitbox and o2.getHitbox and o1.collided and o2.collided then
+        local l1, r1, u1, d1 = o1:getHitbox()
+        local l2, r2, u2, d2 = o2:getHitbox()
+        if l1 <= r2 and r1 >= l2 and u1 <= d2 and d1 >= u2 then
+            o1:collided(o2)
+            o2:collided(o1)
+        end
     end
 end
 
@@ -52,14 +38,11 @@ local function update(self, dt)
             table.remove(self.items, i)
         end
     end
-    local static_items, kinetic_items = get_sm_items(self.visible_items)
-    for _, mv in ipairs(kinetic_items) do
-        for _, st in ipairs(static_items) do
-            if st.getHitbox and mv.getHitbox and st.collided and mv.collided then
-                if checkCollision(mv, st) then
-                    mv:collided(st)
-                    st:collided(mv)
-                end
+    do
+        local o1 = self.player
+        for _, o2 in ipairs(self.visible_items) do
+            if o1 ~= o2 then
+                checkCollision(o1, o2)
             end
         end
     end

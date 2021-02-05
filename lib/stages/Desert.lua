@@ -15,7 +15,7 @@ local scenes = {
         },
         mobs = { 
             ["Dog"] = {
-                amount = 50,
+                amount = 20,
             }
         }
     },
