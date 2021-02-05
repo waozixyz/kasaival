@@ -32,6 +32,13 @@ end
 
 local function collided(self, obj)
 --  print(obj.element)
+    if obj.element == "fire" then
+        local r, g, b = self.color[1],self.color[2], self.color[3]
+        r = r + .1
+        g = g - .1
+        b = b - .1
+        self.color = {r, g, b}
+    end
 end
 
 local function draw(self)
@@ -40,7 +47,9 @@ local function draw(self)
     if self.direction > 0 then sx = sx * -1 end
     
     gr.setColor(self.color)
-    gr.draw(self.anime.spriteSheet, self.anime.quads[self.anime:spritenumber()], self.x, self.y, 0, sx, sy, self.w * .5, self.h)
+    local add = 1
+    if self.pinkelpause then add = add + 3 end
+    gr.draw(self.anime.spriteSheet, self.anime.quads[self.anime:spritenumber(add)], self.x, self.y, 0, sx, sy, self.w * .5, self.h)
 
     if self.pinkelpause then
         gr.setColor(1, 1, 1)
