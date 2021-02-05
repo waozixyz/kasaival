@@ -39,7 +39,7 @@ local function collided(self, obj)
         b = b - .1
         self.color = {r, g, b}
         self.dying = true
-        self.zeito = 7.7
+        self.zeito = 7.8
     end
 end
 
@@ -75,7 +75,7 @@ local function update(self, dt)
         self.pinkelpause = false
         self.zeito = 0
     end
-    if self.zeito > 8.3 and self.dying then
+    if self.zeito > 8.2 and self.dying then
         self.dead = true
     end
     if not self.pinkelpause and not self.dying then
