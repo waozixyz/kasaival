@@ -2,9 +2,9 @@ local suit = require "lib.suit"
 local push = require "lib.push"
 local lume = require "lib.lume"
 local lyra = require "lib.lyra"
+local font= require "lib.ui.font"
 
 local Cursor = require "lib.ui.Cursor"
-local font= require "lib.ui.font"
 local Overlay = require "lib.ui.Overlay"
 local Music = require "lib.sys.Music"
 local Text = require "lib.ui.Text"
@@ -86,7 +86,7 @@ local function draw(self, game)
     -- current music playing
     if Music.songTitle then
         gr.setColor({1, 1, 1})
-        local title = gr.newText(Font, "\240\159\142\182 " .. Music.author .. " - " .. Music.title .. " \240\159\142\182")
+        local title = gr.newText(font, "\240\159\142\182 " .. Music.author .. " - " .. Music.title .. " \240\159\142\182")
         gr.draw(title, W - 20, H - 40)
     end
 end

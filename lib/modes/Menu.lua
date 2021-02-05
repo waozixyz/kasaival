@@ -1,4 +1,3 @@
-local copy = require "lib.copy"
 local push = require "lib.push"
 local lyra = require "lib.lyra"
 
