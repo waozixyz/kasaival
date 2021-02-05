@@ -43,7 +43,9 @@ local function collided(self, obj)
         b = b - .1
         self.color = {r, g, b}
         self.dying = true
-        self.zeito = 7.8
+        if self.zeito < 7.8 or self.zeito > 8.2 then
+            self.zeito = 7.8
+        end
     end
 end
 

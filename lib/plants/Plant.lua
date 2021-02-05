@@ -45,10 +45,6 @@ local template = {
     -- if > splitChance then split
     -- else do not split
     splitChance = 4,
-    -- split branches at the beginnig
-    startSplit = true,
-    -- start with two branches
-    twoBranch = false,
     -- how fast this material burns
     burnIntensity = 15,
     -- the amount of fuel this plant provides
@@ -58,53 +54,14 @@ local template = {
     changeH = .95,
     -- used for first branch
     currentStage = 0,
-    randCurrentStage = false,
+    changeColor = {0, 0, 0},
     w = 12, h = 32,
  }
 
-local function burnColor(c)
-    local r, g, b = c[1], c[2], c[3]
-    if r < .9 then
-        r = r + .03
-    end
-    if b > .1 then
-        b = b - .01
-    end
-    return {r, g, b}
-end
 
-local function healColor(c, cs)
-    local r1, g1, b1 = c[1], c[2], c[3]
-    local r2, g2, b2 = cs[2], cs[3], cs[5]
-    if r1 > r2 then
-        r1 = r1 - .0013
-    end
-    if g1 < g2 then
-        g1 = g1 + .0007
-    end
-    if b1 < b2 then
-        b1 = b1 + .0007
-    end
-    return {r1, g1, b1}
-end
-
-
-local function changeColor(self, action)
-    if action == "heal" then action = healColor
-    elseif action == "burn" then action = burnColor end
-
-    for _, row in ipairs(self.branches) do
-        for _, v in ipairs(row) do
-            v.color = action(v.color, self.cs_branch)
-            if v.leaf then
-                v.leaf.color = action(v.leaf.color, self.cs_leaf)
-            end
-        end
-    end
-end
 -- fill self with properties of plant or prop
 local function fill_self(self, props)
-    for k,v in pairs(copy(props)) do
+    for k, v in pairs(copy(props)) do
         self[k] = v
     end
 end
@@ -128,7 +85,7 @@ local function init(self, name, sav)
     -- set timer value for values counting to 0
     self.growTimer = self.growTime
 
-    if self.randCurrentStage then
+    if self.randStage then
         self.currentStage = ma.random(0, self.maxStage)
     end
     do
@@ -177,6 +134,51 @@ end
 local function shrink(self)
     table.remove(self.branches, #self.branches)
 end
+local function burnColor(r, g, b)
+    if r < .9 then
+        r = r + .03
+    end
+    if b > .1 then
+        b = b - .01
+    end
+    return r, g, b
+end
+
+local function healColor(r1, g1, b1, cs)
+    local r2, g2, b2 = cs[2], cs[3], cs[5]
+    if r1 > r2 then
+        r1 = r1 - .0013
+    end
+    if g1 < g2 then
+        g1 = g1 + .0007
+    end
+    if b1 < b2 then
+        b1 = b1 + .0007
+    end
+    return r1, g1, b1
+end
+
+
+local function getColor(self, v, cs)
+    local r, g, b = v.color[1], v.color[2], v.color[3]
+    if self.burning then
+        r, g, b = burnColor(r, g, b)
+    else 
+        r, g, b = healColor(r, g, b, cs)
+    end
+    -- save this as permanent change
+    v.color = {r, g, b}
+
+    -- get current color 
+    local cc = self.changeColor
+    if cc then
+        local growth = #self.branches / self.maxStage
+        r = r + cc[1] * growth
+        g = g + cc[2] * growth
+        b = b + cc[3] * growth
+    end
+    return r, g, b
+end
 
 local function draw(self)
     local leaves = {}
@@ -197,7 +199,7 @@ local function draw(self)
                     end
                 end
                 px, nx = x + px, x + nx
-                gr.setColor(v.color)
+                gr.setColor(getColor(self, v, self.cs_branch))
                 gr.setLineWidth(v.w * self.scale)
                 gr.line(px, py, nx, ny)
                 if leaf then
@@ -206,7 +208,7 @@ local function draw(self)
             end
         end
         for _, v in ipairs(leaves) do
-            gr.setColor(v.color)
+            gr.setColor(getColor(self, v, self.cs_leaf))
             gr.ellipse("fill", v.x, v.y, v.w, v.h)
         end
     end
@@ -238,7 +240,6 @@ local function update(self, dt)
                 self.growTimer = 0
             end
         end
-        changeColor(self, "heal")
         self.burning = false
     elseif l > 0 then
         if self.growTimer > 0 then
@@ -246,7 +247,6 @@ local function update(self, dt)
         else
             shrink(self)
         end
-        changeColor(self, "burn")
         self.burning = true
         self.burnTimer = self.burnTimer - dt
     else self.burning = false self.dying = true end
