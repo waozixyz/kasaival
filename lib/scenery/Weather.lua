@@ -34,12 +34,12 @@ end
 
 local function draw(self)
   for i, v in ipairs(self.items) do
-    if v.wolke then 
+    if not v.wolke then 
     v:draw()
     end
   end
   for i, v in ipairs(self.items) do
-    if not v.wolke then 
+    if v.wolke then 
     v:draw()
     end
   end
