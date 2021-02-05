@@ -40,6 +40,16 @@ local scenes = {
             }
         }
     },
+    {
+        quests = {
+            ["survive"] = {
+                type = "time",
+                head = "Survive for",
+                amount = 100,
+                tail = "seconds",
+            }
+        }
+    }
 }
 
 local background = {
