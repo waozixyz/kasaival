@@ -14,22 +14,21 @@ local function init(self, prop)
   self.items = {}
 
   self.zeito = 1
+  self.hilfszeit = 0
   return self
 end
 
-
-local function addrain(self)
-  local H = push:getHeight()
-
-  for _ = 0, 150 do
-    table.insert(self.items, Rain:init(Spawner(nil, -H)))
+local function addwolke(self)
+  for _ = 0, 15, 1 do
+    table.insert(self.items, Wolke:init(Spawner(nil, 0)))
   end
 end
 
-local function addwolke(self)
-  local H = push:getHeight()
-  for _ = 0, 100 do
-    table.insert(self.items, Wolke:init(Spawner(nil, 0)))
+local function addrain(self)
+  for i, v in ipairs(self.items) do
+    if v.wolke then
+      table.insert(self.items, Rain:init(v:pos()))
+    end
   end
 end
 
@@ -42,12 +41,20 @@ end
 local function update(self, dt)
   local H = push:getHeight()
   self.zeito = self.zeito + dt
+  self.hilfszeit = self.hilfszeit + dt
   Wind:update(dt)
 
+  --if 4 <= self.hilfszeit / ma.random(1, 10) then
+   -- if self.prop ~= "dry" then
+   --   addrain(self)
+  -- end
+ ---  self.hilfszeit = 0
+ --end
   if 4 <= (self.zeito / (ma.random(1, 10))) then
     if self.prop ~= "dry" then
-      addrain(self)
+      
       addwolke(self)
+      addrain(self)
     end
     self.zeito = 0
   end
@@ -57,9 +64,16 @@ local function update(self, dt)
     if v.y > H - lyra.gh then
       table.remove(self.items, i)
     end
-    if 4 <= (self.zeito / (ma.random(1, 10))) then
-      table.remove(self.items, 150+ma.random(2,20))
-        
+  end
+  --wolken despanw idee
+  if  15 <= self.hilfszeit+ma.random (1,10)then
+    for i, v in ipairs(self.items) do
+      if v.wolke then
+        if 5 < ma.random(1, 7) then
+          table.remove(self.items, i)
+        end
+      end
+      self.hilfszeit = 0
     end
   end
 end
