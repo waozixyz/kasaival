@@ -1,5 +1,5 @@
 local Rain = require "lib.weather.Rain"
-local Spawner = require "lib.utils.Spawner"
+local spawner = require "lib.utils.spawner"
 local Wind = require "lib.weather.Wind"
 local push = require "lib.push"
 local lyra = require "lib.lyra"
@@ -20,7 +20,7 @@ end
 
 local function addwolke(self)
   for _ = 0, 15, 1 do
-    table.insert(self.items, Wolke:init(Spawner(nil, 0)))
+    table.insert(self.items, Wolke:init(spawner(nil, 0)))
   end
 end
 

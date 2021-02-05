@@ -1,7 +1,7 @@
 local copy = require "lib.copy"
 local push = require "lib.push"
 
-local Font = require "lib.ui.Font"
+local font = require "lib.ui.font"
 
 local gr = love.graphics
 
@@ -17,14 +17,14 @@ local function init(self, text, prop)
     for k, v in pairs(tmpl) do
         self[k] = prop[k] or v
     end
-    self.text = gr.newText(Font(self.size), text)
+    self.text = gr.newText(font(self.size), text)
     self.w = self.text:getWidth()
     return copy(self)
 end
 
 local function update(self, text)
     if text and type(text) == "string" then
-        self.text = gr.newText(Font(self.size), text)
+        self.text = gr.newText(font(self.size), text)
     end
 end
 

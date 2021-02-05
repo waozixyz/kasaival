@@ -5,13 +5,13 @@ local push = require "lib.push"
 
 -- Main components
 local Background = require "lib.scenery.Background"
-local Focus = require "lib.sys.Focus"
+local focus = require "lib.sys.focus"
 local Ground = require "lib.scenery.Ground"
 local HUD = require "lib.ui.HUD"
 local Music = require "lib.sys.Music"
 local Player = require "lib.player.Player"
 local Sky = require "lib.scenery.Sky"
-local Spawner = require "lib.utils.Spawner"
+local spawner = require "lib.utils.spawner"
 
  -- Weather 
 local Weather = require "lib.scenery.Weather"
@@ -33,7 +33,7 @@ local function load_scene(self)
             -- spawn plants for current Scene
             for k, v in pairs(scene.plants) do
                 for _ = 1, v.amount do
-                    local plant = Plant:init(k, Spawner(v.startx))
+                    local plant = Plant:init(k, spawner(v.startx))
                     plant.id = #lyra.items
                     table.insert(lyra.items, plant)
                 end
@@ -43,7 +43,7 @@ local function load_scene(self)
         if scene.mobs then
             for k, v in pairs(scene.mobs) do
                 for _ = 1, v.amount do
-                    local mob = require("lib.mobs." .. k):init(Spawner(lyra:getPrevWidth()))
+                    local mob = require("lib.mobs." .. k):init(spawner(lyra:getPrevWidth()))
                     mob.id = #lyra.items
                     table.insert(lyra.items, mob)
                 end
@@ -137,9 +137,6 @@ local function draw(self)
     Weather:draw()
 end
 
-local function focus(...)
-    Focus(...)
-end
 local function completeQuest(self, key)
     lyra:getCurrentQuests()[key] = nil
     if #lyra:getCurrentQuests() <= 0 then

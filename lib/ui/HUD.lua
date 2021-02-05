@@ -4,7 +4,7 @@ local lume = require "lib.lume"
 local lyra = require "lib.lyra"
 
 local Cursor = require "lib.ui.Cursor"
-local Font = require "lib.ui.Font"
+local font= require "lib.ui.font"
 local Overlay = require "lib.ui.Overlay"
 local Music = require "lib.sys.Music"
 local Text = require "lib.ui.Text"

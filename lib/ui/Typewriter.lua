@@ -1,4 +1,4 @@
-local Font = require "lib.ui.Font"
+local font= require "lib.ui.font"
 local gr = love.graphics
 
 local function init(self, txt, x, y, size, speed, delay, color, font)
