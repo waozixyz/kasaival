@@ -8,6 +8,7 @@ local ma = love.math
 
 local function init(self, pos)
     self.element = "earth"
+    self.type = "dog"
     self.w, self.h = 46, 27
     self.x, self.y = pos.x, pos.y
     self.scale = 2
@@ -31,27 +32,28 @@ local function getHitbox(self)
 end
 
 local function collided(self, obj)
---  print(obj.element)
     if obj.element == "fire" then
         local r, g, b = self.color[1],self.color[2], self.color[3]
         r = r + .1
         g = g - .1
         b = b - .1
         self.color = {r, g, b}
+        self.dying = true
+        self.zeito = 7.7
     end
 end
 
 local function draw(self)
     local sx, sy = self.scale, self.scale
-
     if self.direction > 0 then sx = sx * -1 end
     
     gr.setColor(self.color)
     local add = 1
+    if self.dying then add = add + 6 end
     if self.pinkelpause then add = add + 3 end
     gr.draw(self.anime.spriteSheet, self.anime.quads[self.anime:spritenumber(add)], self.x, self.y, 0, sx, sy, self.w * .5, self.h)
 
-    if self.pinkelpause then
+    if self.pinkelpause and not self.dying then
         gr.setColor(1, 1, 1)
         gr.draw(self.ps, self.x + 26 * self.direction * -1, self.y + 12, 0, self.direction * -1, 1, self.w * .5, self.h)
     end
@@ -73,7 +75,10 @@ local function update(self, dt)
         self.pinkelpause = false
         self.zeito = 0
     end
-    if not self.pinkelpause then
+    if self.zeito > 8.3 and self.dying then
+        self.dead = true
+    end
+    if not self.pinkelpause and not self.dying then
         self.x = self.x + 200 * dt * self.direction
     end
     if self.x < lyra.startx then
