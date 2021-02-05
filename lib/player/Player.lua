@@ -71,6 +71,10 @@ local function init(self, sav)
     return copy(self)
 end
 
+local function addFuel(self, fuel)
+    self.kelvin = self.kelvin + fuel
+end
+
 local function returnTable(t)
     return t[1], t[2], t[3], t[4], t[5], t[6], t[7]
 end
@@ -141,6 +145,7 @@ local function update(self, dt)
 end
 
 return {
+    addFuel = addFuel,
     boostTime = 0,
     collided = collided,
     touch = touch,

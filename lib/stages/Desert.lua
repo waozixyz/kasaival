@@ -12,6 +12,12 @@ local scenes = {
                     else return false end
                 end
             },
+        },
+        plants = {
+            ["Kali"] = {
+                amount = 50
+            }
+
         }
     },
     {

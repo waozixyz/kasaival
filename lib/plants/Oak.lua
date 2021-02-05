@@ -1,7 +1,7 @@
 local ma = love.math
 
 return {
-    type = "oak",
+    type = "tree",
     cs_branch = {.5, .6, .2, .3, .2, .3},
     cs_leaf = {.2, .4, .4, .5, .2, .3},
     growTime = ma.random(3, 4),

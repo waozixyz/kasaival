@@ -16,6 +16,7 @@ local function init(self, pos)
     self.x, self.y = pos.x, pos.y
     self.scale = 2
     self.direction = -1
+    self.fuel = 5
     self.pinkelpause = false
     self.anime = Animation:init(gr.newImage("assets/mobs/dog_sprite.png"), self.w, self.h, 1)
     self.zeito = ma.random(0, 8)

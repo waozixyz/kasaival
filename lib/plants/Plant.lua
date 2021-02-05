@@ -10,8 +10,6 @@ local ma = love.math
     
 -- default template
 local template = {
-    -- set the item propert
-    static = true,
     -- element is obvious, but used for collisions
     element = "plant",
     -- default type of plant
@@ -49,8 +47,12 @@ local template = {
     splitChance = 4,
     -- split branches at the beginnig
     startSplit = true,
+    -- start with two branches
+    twoBranch = false,
     -- how fast this material burns
     burnIntensity = 15,
+    -- the amount of fuel this plant provides
+    fuel = 20,
     -- the scale of how the size should change at each growth
     changeW = .9,
     changeH = .95,
@@ -71,18 +73,19 @@ local function burnColor(c)
     return {r, g, b}
 end
 
-local function healColor(c)
-    local r, g, b = c[1], c[2], c[3]
-    if r > .3 then
-        r = r - .0013
+local function healColor(c, cs)
+    local r1, g1, b1 = c[1], c[2], c[3]
+    local r2, g2, b2 = cs[2], cs[3], cs[5]
+    if r1 > r2 then
+        r1 = r1 - .0013
     end
-    if g < .2 then
-        g = g + .0007
+    if g1 < g2 then
+        g1 = g1 + .0007
     end
-    if b < .12 then
-        b = b + .0007
+    if b1 < b2 then
+        b1 = b1 + .0007
     end
-    return {r, g, b}
+    return {r1, g1, b1}
 end
 
 
@@ -92,9 +95,9 @@ local function changeColor(self, action)
 
     for _, row in ipairs(self.branches) do
         for _, v in ipairs(row) do
-            v.color = action(v.color)
+            v.color = action(v.color, self.cs_branch)
             if v.leaf then
-                v.leaf.color = action(v.leaf.color)
+                v.leaf.color = action(v.leaf.color, self.cs_leaf)
             end
         end
     end
@@ -134,8 +137,23 @@ local function init(self, name, sav)
             local w, h = self.w, self.h
             local p = {0, self.y}
             local n = {0, self.y - h}
-            local branch = {color = lyra.getColor(self.cs_branch), deg = -90, h = h, n = n, p = p, w = w}
-            table.insert(self.branches, {branch})
+            local branch = {}
+            if not self.twoBranch then
+                local b = {deg = -90, h = h, n = n, p = p, w = w}
+                b.color = lyra.getColor(self.cs_branch)
+                table.insert(branch, b)
+            else
+                n = {ma.random(5,10), self.y - h}
+                local b1 = {deg = -100, h = h, n = n, p = p, w = w}
+                b1.color = lyra.getColor(self.cs_branch)
+                table.insert(branch, b1)
+                n = {ma.random(-10,-5), self.y - h}
+                local b2 = {deg = -80, h = h, n = n, p = p, w = w}
+                b2.color = lyra.getColor(self.cs_branch)
+                table.insert(branch, b2)
+            end
+            table.insert(self.branches, branch)
+            
         end
         -- grow to currentStage
         for _ = #self.branches, self.currentStage do
@@ -149,7 +167,6 @@ end
 local function collided(self, obj)
     if obj.element == "fire" then
         -- reduce hp based on the object destroy power
-        self.burnIntensity = obj.dp
         self.burnTimer = 4
         if self.fire then
             self.fire:setEmissionRate(20)

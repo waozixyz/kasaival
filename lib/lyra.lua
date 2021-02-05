@@ -29,8 +29,7 @@ local function update(self, dt)
             v:update(dt)
         end
         if v.dead then
-            self.player.xp = self.player.xp + 10
-            self.player.kelvin = self.player.kelvin + 1
+            self.player:addFuel(v.fuel)
             if not self.kill_count[v.type] then
                 self.kill_count[v.type] = 0
             end
