@@ -2,8 +2,8 @@ local gr = love.graphics
 local copy = require "lib.copy"
 
 
-local function get_sprite_num(self,add, mult)
-    local add, mult = add or 1, mult or 3
+local function spritenumber(self, add, mult)
+    add, mult = add or 1, mult or 3
     return math.floor(self.currentTime / self.duration * mult) + add
 end
 
@@ -24,4 +24,4 @@ local function init(self, image, width, height, duration)
 
 end
 
-return {init = init, spritenumber = get_sprite_num} 
+return {init = init, spritenumber = spritenumber} 
