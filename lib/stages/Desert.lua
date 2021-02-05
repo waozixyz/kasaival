@@ -1,6 +1,21 @@
 local scenes = {
     {
         quests = {
+            ["reach"] = {
+                type = "kelvin",
+                head = "Reach a temperature of",
+                amount = 2200,
+                tail = "kelvin",
+                fnc = function(self, lyra)
+                    if lyra.player.kelvin >= self.amount then
+                        return true
+                    else return false end
+                end
+            },
+        }
+    },
+    {
+        quests = {
             ["kill"] = {
                 type = "cactus",
                 head = "Burn down a",
@@ -17,21 +32,6 @@ local scenes = {
             ["Dog"] = {
                 amount = 20,
             }
-        }
-    },
-    {
-        quests = {
-            ["reach"] = {
-                type = "kelvin",
-                head = "Reach a temperature of",
-                amount = 2200,
-                tail = "kelvin",
-                fnc = function(self, lyra)
-                    if lyra.player.kelvin >= self.amount then
-                        return true
-                    else return false end
-                end
-            },
         }
     },
 }

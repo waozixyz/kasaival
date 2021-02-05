@@ -1,7 +1,9 @@
 local copy = require "lib.copy"
 local lyra = require "lib.lyra"
-local pinkel = require "lib.ps.Pinkel"
+
 local Animation = require "lib.utils.Animation"
+local Pinkel = require "lib.ps.Pinkel"
+local Plant = require "lib.plants.Plant"
 
 local gr = love.graphics
 local ma = love.math
@@ -9,6 +11,7 @@ local ma = love.math
 local function init(self, pos)
     self.element = "earth"
     self.type = "dog"
+    self.ability = "Saguaro"
     self.w, self.h = 46, 27
     self.x, self.y = pos.x, pos.y
     self.scale = 2
@@ -16,11 +19,11 @@ local function init(self, pos)
     self.pinkelpause = false
     self.anime = Animation:init(gr.newImage("assets/mobs/dog_sprite.png"), self.w, self.h, 1)
     self.zeito = ma.random(0, 8)
-    -- add random color to dogs
-    self.color = lyra.getColor({.4, 1, .4, 1, .4, 1})
+    -- add color variation to dogs
+    self.color = lyra.getColor({.4, 1, .4, 1, .3, 1})
 
     --pinkelsystem initiieren
-    self.ps = pinkel()
+    self.ps = Pinkel()
 
     return copy(self)
 end
@@ -58,7 +61,9 @@ local function draw(self)
         gr.draw(self.ps, self.x + 26 * self.direction * -1, self.y + 12, 0, self.direction * -1, 1, self.w * .5, self.h)
     end
 end
-
+local function use_ability(self)
+    table.insert(lyra.items, Plant:init(self.ability, {x = self.x, y = self.y }))
+end
 local function update(self, dt)
     self.ps:update(dt)
 
@@ -73,6 +78,7 @@ local function update(self, dt)
     end
     if self.zeito > 11 then
         self.pinkelpause = false
+        use_ability(self)
         self.zeito = 0
     end
     if self.zeito > 8.2 and self.dying then
@@ -88,4 +94,4 @@ local function update(self, dt)
     end
 end
 
-return {kinetic = true, init = init, draw = draw, update = update, getHitbox = getHitbox, collided = collided}
+return {init = init, draw = draw, update = update, getHitbox = getHitbox, collided = collided}
