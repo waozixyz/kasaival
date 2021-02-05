@@ -5,6 +5,7 @@ local Player = require "lib.player.Player"
 local Sakura = require "lib.plants.Sakura"
 local Typewriter = require "lib.ui.Typewriter"
 local Dog = require "lib.mobs.Dog"
+local Wolke = require "lib.weather.Wolke"
 
 local gr = love.graphics
 local ke = love.keyboard
@@ -23,10 +24,12 @@ end
 
 local function update(self, dt, set_mode)
     self.dog:update(dt)
+
 end
 
 local function draw(self)
     self.dog:draw()
+    
 end
 
 return {draw = draw, init = init, touch = touch, keypressed = keypressed, update = update}

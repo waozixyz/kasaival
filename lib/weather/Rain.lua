@@ -6,13 +6,13 @@ local gr = love.graphics
 
 
 local function init(self, spawn)
+    self.wolke = false
     self.kreiselzeit = 1
     self.r = 1 
     self.x = 1
     self.y = 1
     self.spawnx = spawn.x or 400
-    self.spawny = spawn.y or 400
-    self.rest = 0.5 
+    self.spawny = spawn.y-ma.random(1,200)
     self.windstark = 1
     self.spawnmodifikator = 0
     self.image=gr.newImage("assets/scenery/grassland/Dreieck.png")
@@ -27,7 +27,7 @@ end
 
 
 local function draw(self)
-    gr.setColor(0, 0, 1, 1)
+    gr.setColor(0, 0, 1, 0.7)
     gr.draw(self.image,self.x ,self.y ,self.r, 0.1, 0.1, self.image:getWidth()/2, self.image:getHeight()/2) 
     gr.setColor(1, 1, 1,1 )
 end

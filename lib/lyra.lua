@@ -37,7 +37,7 @@ local function update(self, dt)
             table.remove(self.items, i)
         end
     end
-    do
+    if self.player then
         local o1 = self.player
         for _, o2 in ipairs(self.visible_items) do
             if o1 ~= o2 then
