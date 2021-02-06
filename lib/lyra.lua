@@ -17,10 +17,16 @@ local function checkCollision(o1, o2)
         local l1, r1, u1, d1 = o1:getHitbox()
         local l2, r2, u2, d2 = o2:getHitbox()
         if l1 <= r2 and r1 >= l2 and u1 <= d2 and d1 >= u2 then
-            o1:collided(o2)
-            o2:collided(o1)
+            o1:collided(o2, o2:collided(o1))
         end
     end
+end
+
+local function addDeathCount(self, v)
+    if not self.kill_count[v.type] then
+        self.kill_count[v.type] = 0
+    end
+    self.kill_count[v.type] = self.kill_count[v.type] + 1
 end
 
 local function update(self, dt)
@@ -28,12 +34,17 @@ local function update(self, dt)
         if v.update then
             v:update(dt)
         end
-        if v.dead then
-            self.player:addFuel(v.fuel)
-            if not self.kill_count[v.type] then
-                self.kill_count[v.type] = 0
+        if v.dying then
+            if not v.recordedDeath then
+                addDeathCount(self, v)
+                v.recordedDeath = true
             end
-            self.kill_count[v.type] = self.kill_count[v.type] + 1
+        end
+        if v.dead then
+            if not v.recordedDeath then
+                addDeathCount(self, v)
+            end
+
             table.remove(self.items, i)
         end
     end

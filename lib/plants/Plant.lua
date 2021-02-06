@@ -122,13 +122,19 @@ local function init(self, name, sav)
 end
 
 local function collided(self, obj)
+    local burnedFuel = 0
     if obj.element == "fire" then
-        -- reduce hp based on the object destroy power
+        local f = self.fuel - obj.bp * self.burnIntensity
+        if f < 0 then f = 0 end
+        burnedFuel = self.fuel - f
+        self.fuel = f
         self.burnTimer = 4
         if self.fire then
             self.fire:setEmissionRate(20)
         end
+        self.dp = obj.db
     end
+    return burnedFuel
 end
 
 local function shrink(self)

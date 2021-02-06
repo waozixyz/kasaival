@@ -5,10 +5,11 @@ local lyra = require "lib.lyra"
 local font= require "lib.ui.font"
 
 local Cursor = require "lib.ui.Cursor"
+local Fuel = require "lib.player.Fuel"
 local Overlay = require "lib.ui.Overlay"
 local Music = require "lib.sys.Music"
+local Tank = require "lib.ui.Tank"
 local Text = require "lib.ui.Text"
-local KelvinMeter = require "lib.ui.KelvinMeter"
 
 local gr = love.graphics
 
@@ -54,7 +55,7 @@ local function init(self)
     self.questHeading = Text:init("Quests to complete", {size = 64, y = 20, x = W - 20, align = "right"})
     setCurrentQuests()
     -- load kelvin meter
-    self.kelvin = KelvinMeter:init()
+    self.tank = Tank:init()
 
     
     -- load images of button icons
@@ -74,14 +75,11 @@ local function toggle(val) if val then return false else return true end end
 
 local function draw(self, game)
     local W, H = push:getDimensions()
-    local kelvin = lyra.player.kelvin
-    local kelvin_death = lyra.player.kelvin_death
-
-    gr.setColor(.2, 0, 0, 1 - (kelvin / kelvin_death))
+    gr.setColor(.2, 0, 0, 1 - Fuel.amount / Fuel.max * 2)
     gr.rectangle("fill", 0, 0, W, H)
 
     -- overlays for special states
-    if kelvin <= kelvin_death then
+    if Fuel.amount <= 0 then
         self.gameover:draw()
     elseif game.paused == true and (not game.exit or game.exit == 0) then
         self.gamepaused:draw()
@@ -100,7 +98,7 @@ local function draw(self, game)
     end
 
     -- draw kelvin meter
-    self.kelvin:draw()
+    self.tank:draw()
     
     -- current music playing
     if Music.songTitle then
@@ -114,7 +112,7 @@ local function tk( game)
         game.paused = toggle(game.paused)
         return true
     end
-    if lyra.player.kelvin <= lyra.player.kelvin_death then
+    if Fuel.amount <= 0 then
         game.restart = true
         return true
     end
@@ -138,7 +136,7 @@ local function keypressed(self, game, key)
 end
 
 local function updateButtons(self, game)
-    local x, y = 120, 20
+    local x, y = 64, 20
     local padd = 120
     for _, v in pairs(btns) do
         v.x, v.y = x, y
@@ -160,7 +158,7 @@ local function update(self, game)
     updateButtons(self, game)
     Cursor:update()
     -- update kelvin meter
-    self.kelvin:update()
+    self.tank:update()
     -- update quest Text
  
     for k, v in pairs(lyra:getCurrentQuests()) do

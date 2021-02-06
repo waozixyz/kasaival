@@ -4,6 +4,7 @@ local push = require "lib.push"
 
 local Controller = require "lib.player.Controller"
 local Flame = require "lib.ps.Flame"
+local Fuel = require "lib.player.Fuel"
 
 -- aliases
 local gr = love.graphics
@@ -20,17 +21,19 @@ local function stopBoost(self)
     self.speed = self.speed / 1.5
 end
 
-local function collided(self, obj)
-    if not obj.element and obj.color then self.kelvin = self.kelvin + obj.color[2] - obj.color[3]
-    elseif obj.element == "plant" then
-        self.kelvin = self.kelvin + .5
+
+local function collided(self, obj, burnedFuel)
+    if burnedFuel then
+        Fuel:add(burnedFuel)
+    end
+    if obj and obj.element == "plant" then
         if #obj.branches == obj.stages and obj.special == "sakura" then
             self.boostTime = 10
             if not self.boost then
                 startBoost(self)
             end
         elseif #obj.branches == obj.stages then
-            self.kelvin = self.kelvin + 1
+            Fuel:add(5)
         end
     end
 end
@@ -59,11 +62,8 @@ local function init(self, sav)
     self.x = sav.x or W * .5
     self.y = sav.y or H * .7
     self.xp = sav.xp or 0
-    self.kelvin = sav.kelvin or 200
     self.lvl = sav.lvl or 0
     self.speed = sav.speed or 10
-    self.kelvin = 1600
-    self.kelvin_death = 1000
     self.flame = Flame()
     self.sizes = {1, 1, 1, 1, 1, 1, 1, 1}
     self.elapsed = 0
@@ -71,9 +71,6 @@ local function init(self, sav)
     return copy(self)
 end
 
-local function addFuel(self, fuel)
-    self.kelvin = self.kelvin + fuel
-end
 
 local function returnTable(t)
     return t[1], t[2], t[3], t[4], t[5], t[6], t[7]
@@ -123,7 +120,7 @@ local function touch(self, x, y, dt)
 end
 
 local function update(self, dt)
-    local dx, dy = Controller:update(self, dt)
+    local dx, dy = Controller:update()
     if dx and dy then
         move(self, dx, dy, dt)
     end
@@ -137,15 +134,12 @@ local function update(self, dt)
         self.sizes = getSizes(self.sizes, self.scale * .5)
         self.elapsed = 0
     end
-    
-    self.kelvin = self.kelvin - self.burnRate
-
+    Fuel:burn(self.burnRate)
     self.flame:update(dt)
 
 end
 
 return {
-    addFuel = addFuel,
     boostTime = 0,
     collided = collided,
     touch = touch,
@@ -155,9 +149,8 @@ return {
     init = init,
     h = 32, -- height
     w = 22, -- width
-    dp = .5, -- destroy power
+    bp = .5, -- burn power
     scale = 2,
     update = update,
     burnRate = 2,
-    kinetic = true,
 }

@@ -9,7 +9,7 @@ local spawner = require "lib.utils.spawner"
 local Background = require "lib.scenery.Background"
 local Ground = require "lib.scenery.Ground"
 local HUD = require "lib.ui.HUD"
-local KelvinMeter = require "lib.ui.KelvinMeter"
+local Tank = require "lib.ui.Tank"
 local Music = require "lib.sys.Music"
 local Plant = require "lib.plants.Plant"
 local Player = require "lib.player.Player"
@@ -118,7 +118,7 @@ local function draw(self)
     Background:draw()
 
     -- translate with camera x
-    gr.translate(lyra.cx + KelvinMeter.w, 0)
+    gr.translate(lyra.cx + Tank.w, 0)
 
     -- draw Ground
     self.ground:draw()
@@ -126,7 +126,7 @@ local function draw(self)
     lyra:draw()
 
     -- undo translation
-    gr.translate(-lyra.cx - KelvinMeter.w, 0)
+    gr.translate(-lyra.cx - Tank.w, 0)
 
     -- draw head up display
     HUD:draw(self)

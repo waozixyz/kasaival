@@ -25,6 +25,7 @@ end
 local function update(self, text)
     if text and type(text) == "string" then
         self.text = gr.newText(font(self.size), text)
+        self.w = self.text:getWidth()
     end
 end
 

@@ -1,13 +1,13 @@
 local scenes = {
     {
         quests = {
-            ["reach"] = {
-                type = "kelvin",
-                head = "Reach a temperature of",
-                amount = 2200,
-                tail = "kelvin",
+            ["kill"] = {
+                type = "shrub",
+                head = "Burn down",
+                amount = 20,
+                tail = "tumblweeds",
                 fnc = function(self, lyra)
-                    if lyra.player.kelvin >= self.amount then
+                    if lyra.kill_count[self.type] and lyra.kill_count[self.type] >= self.amount then
                         return true
                     else return false end
                 end
