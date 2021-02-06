@@ -45,8 +45,13 @@ local scenes = {
             ["survive"] = {
                 type = "time",
                 head = "Survive for",
-                amount = 100,
+                amount = 60,
                 tail = "seconds",
+                fnc = function(self)
+                    if self.amount <= 0 then
+                        return true
+                    else return false end
+                end
             }
         }
     }

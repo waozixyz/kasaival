@@ -138,7 +138,7 @@ local function update(self, dt)
         self.elapsed = 0
     end
     
-    self.kelvin = self.kelvin - (self.kelvin / self.kelvin_death) * self.burnRate
+    self.kelvin = self.kelvin - self.burnRate
 
     self.flame:update(dt)
 
@@ -158,6 +158,6 @@ return {
     dp = .5, -- destroy power
     scale = 2,
     update = update,
-    burnRate = .5,
+    burnRate = 1,
     kinetic = true,
 }

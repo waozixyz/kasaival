@@ -1,24 +1,20 @@
 -- library functions
 local copy = require "lib.copy"
+local focus = require "lib.sys.focus"
 local lyra = require "lib.lyra"
 local push = require "lib.push"
+local spawner = require "lib.utils.spawner"
 
 -- Main components
 local Background = require "lib.scenery.Background"
-local Focus = require "lib.sys.Focus"
 local Ground = require "lib.scenery.Ground"
 local HUD = require "lib.ui.HUD"
+local KelvinMeter = require "lib.ui.KelvinMeter"
 local Music = require "lib.sys.Music"
+local Plant = require "lib.plants.Plant"
 local Player = require "lib.player.Player"
 local Sky = require "lib.scenery.Sky"
-local Spawner = require "lib.utils.Spawner"
-
- -- Weather 
 local Weather = require "lib.scenery.Weather"
-
-
--- plants
-local Plant = require "lib.plants.Plant"
 
 -- aliases
 local ev = love.event
@@ -33,7 +29,7 @@ local function load_scene(self)
             -- spawn plants for current Scene
             for k, v in pairs(scene.plants) do
                 for _ = 1, v.amount do
-                    local plant = Plant:init(k, Spawner(v.startx))
+                    local plant = Plant:init(k, spawner(v.startx))
                     plant.id = #lyra.items
                     table.insert(lyra.items, plant)
                 end
@@ -43,7 +39,7 @@ local function load_scene(self)
         if scene.mobs then
             for k, v in pairs(scene.mobs) do
                 for _ = 1, v.amount do
-                    local mob = require("lib.mobs." .. k):init(Spawner(lyra:getPrevWidth()))
+                    local mob = require("lib.mobs." .. k):init(spawner(lyra:getPrevWidth()))
                     mob.id = #lyra.items
                     table.insert(lyra.items, mob)
                 end
@@ -96,7 +92,7 @@ local function load_stage(self, stage_name)
 end
 
 local function init(self)
-    load_stage(self, "Grassland")
+    load_stage(self, "Desert")
 end
 
 local function scene_pause(self)
@@ -122,7 +118,7 @@ local function draw(self)
     Background:draw()
 
     -- translate with camera x
-    gr.translate(lyra.cx, 0)
+    gr.translate(lyra.cx + KelvinMeter.w, 0)
 
     -- draw Ground
     self.ground:draw()
@@ -130,16 +126,13 @@ local function draw(self)
     lyra:draw()
 
     -- undo translation
-    gr.translate(-lyra.cx, 0)
+    gr.translate(-lyra.cx - KelvinMeter.w, 0)
 
     -- draw head up display
     HUD:draw(self)
     Weather:draw()
 end
 
-local function focus(...)
-    Focus(...)
-end
 local function completeQuest(self, key)
     lyra:getCurrentQuests()[key] = nil
     if #lyra:getCurrentQuests() <= 0 then

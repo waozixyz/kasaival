@@ -4,7 +4,7 @@ local scenes = {
             ["reach"] = {
                 type = "kelvin",
                 head = "Reach a temperature of",
-                amount = 4200,
+                amount = 1000,
                 tail = "kelvin",
                 fnc = function(self, lyra)
                     if lyra.player.kelvin >= self.amount then
@@ -21,32 +21,29 @@ local scenes = {
             }
         },
 
-
-        plants = { 
+        plants = {
             ["Oak"] = {
+                amount = 100
+            }
+        }
+    },
+    {
+
+        quests = { 
+          ["kill"] = {
                 type ="tree",
                 head = "Burn down a",
                 amount = 30,
                 tail = "trees",
-                startx = 2000,
-                fnc = function(self, lyra)
+               fnc = function(self, lyra)
                     if lyra.kill_count[self.type] and lyra.kill_count[self.type] >= self.amount then
-                        return true
+                       return true
                     else return false end
                 end
-            } 
+           } 
         },
-    },
-    {
-        quests = {
-            ["kill"] = {
-                type = "cactus",
-                head = "Burn down a",
-                amount = 50,
-                tail = "cactuses"
-            },
-        }
-    }
+    },   
+    
 }
 
 local background = {

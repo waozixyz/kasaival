@@ -6,21 +6,20 @@ local Text = require "lib.ui.Text"
 local gr = love.graphics
 
 -- get text for overlay
-local function getText(title, subtitle, bckg)
+local function init(self,title, subtitle, bckg)
     local H = push:getHeight()
-    local rtn = {}
-    rtn.title = Text:init(title, {size = 64, y = H * .4})
-    rtn.subtitle = Text:init(subtitle, {size = 42, y = H * .5})
-    rtn.bckg = bckg or { 0, 0, 0, 0 }
-    return rtn
+    self.title = Text:init(title, {size = 64, y = H * .4})
+    self.subtitle = Text:init(subtitle, {size = 42, y = H * .5})
+    self.bckg = bckg or { 0, 0, 0, 0 }
+    return copy(self)
 end
 
-local function draw(item)
+local function draw(self)
     local W, H = push:getDimensions()
-    gr.setColor(item.bckg)
+    gr.setColor(self.bckg)
     gr.rectangle("fill", 0, 0, W, H)
-    item.title:draw()
-    item.subtitle:draw()
+    self.title:draw()
+    self.subtitle:draw()
 end
 
-return { getText = getText, draw = draw}
+return { init = init, draw = draw}

@@ -2,12 +2,13 @@ local suit = require "lib.suit"
 local push = require "lib.push"
 local lume = require "lib.lume"
 local lyra = require "lib.lyra"
+local font= require "lib.ui.font"
 
 local Cursor = require "lib.ui.Cursor"
-local Font = require "lib.ui.Font"
 local Overlay = require "lib.ui.Overlay"
 local Music = require "lib.sys.Music"
 local Text = require "lib.ui.Text"
+local KelvinMeter = require "lib.ui.KelvinMeter"
 
 local gr = love.graphics
 
@@ -23,30 +24,48 @@ local function setCurrentQuests()
     end
 end
 
+local btns = {
+    exit = {
+        img = "exit.png",
+        fnc = function() love.event.quit() end
+    },
+    pause = {
+        isOn = function(game) if game.paused then return true end end,
+        on = "resume.png",
+        off = "pause.png",
+        fnc = function(game, toggle) game.paused = toggle(game.paused) end
+    },
+    music = {
+        isOn = function() if Music:isMuted() then return false else return true end end,
+        on = "music.png",
+        off = "nomusic.png",
+        fnc = function() Music:toggle() end
+    },
+}
+
 local function init(self)
-    local W, H = push:getDimensions()
+    local W = push:getWidth()
     Cursor:init()
     -- load text
-    self.gameover = Overlay.getText("GameOver", "touch anywhere or press any key to try again", {0, 0, 0, 0.5})
-    self.gamepaused = Overlay.getText("Game Paused", "touch anywhere or press any key to unpause", {1, 1, 1, 0.5})
-    self.gamesaving = Overlay.getText("Game Saving", "please wait patiently...", {0, 0.2, 0, 0.5})
+    self.gameover = Overlay:init("GameOver", "touch anywhere or press any key to try again", {0, 0, 0, 0.5})
+    self.gamepaused = Overlay:init("Game Paused", "touch anywhere or press any key to unpause", {1, 1, 1, 0.5})
+    self.gamesaving = Overlay:init("Game Saving", "please wait patiently...", {0, 0.2, 0, 0.5})
     -- load quest text
     self.questHeading = Text:init("Quests to complete", {size = 64, y = 20, x = W - 20, align = "right"})
-    setCurrentQuests(self)
+    setCurrentQuests()
     -- load kelvin meter
-    self.kelvin = Text:init("", {x = 20, y = H - 50, align = "left"})
-    -- load icons
-    self.exit = gr.newImage("assets/icons/exit.png")
-    self.resume = gr.newImage("assets/icons/resume.png")
-    self.pause = {
-        img = gr.newImage("assets/icons/pause.png"),
-        x = 140,
-        y = 20
-    }
-    self.music = gr.newImage("assets/icons/music.png")
-    self.nomusic = gr.newImage("assets/icons/nomusic.png")
-    self.sound = gr.newImage("assets/icons/sound.png")
-    self.nosound = gr.newImage("assets/icons/nosound.png")
+    self.kelvin = KelvinMeter:init()
+
+    
+    -- load images of button icons
+    local path = "assets/icons/"
+    for _, v in pairs(btns) do
+        for k, img in pairs(v) do
+            if (k == "on" or k == "off" or k == "img") and type(img) == "string" then
+                v[k] = gr.newImage(path .. img)
+            end
+        end
+    end
 end
 
 
@@ -63,11 +82,11 @@ local function draw(self, game)
 
     -- overlays for special states
     if kelvin <= kelvin_death then
-        Overlay.draw(self.gameover)
+        self.gameover:draw()
     elseif game.paused == true and (not game.exit or game.exit == 0) then
-        Overlay.draw(self.gamepaused)
+        self.gamepaused:draw()
     elseif game.exit == 1 or game.exit == 2 then
-        Overlay.draw(self.gamesaving)
+        self.gamesaving:draw()
     end
     -- current quests
     if lume.count(lyra:getCurrentQuests()) > 0 then
@@ -86,7 +105,7 @@ local function draw(self, game)
     -- current music playing
     if Music.songTitle then
         gr.setColor({1, 1, 1})
-        local title = gr.newText(Font, "\240\159\142\182 " .. Music.author .. " - " .. Music.title .. " \240\159\142\182")
+        local title = gr.newText(font, "\240\159\142\182 " .. Music.author .. " - " .. Music.title .. " \240\159\142\182")
         gr.draw(title, W - 20, H - 40)
     end
 end
@@ -101,8 +120,8 @@ local function tk( game)
     end
 end
 local function touch(self, game, x, y)
-    local w, h = self.pause.img:getDimensions()
-    if x > w + self.pause.x or y > h + self.pause.y then
+    local w, h = btns.pause.img:getDimensions()
+    if x > w + btns.pause.x or y > h + btns.pause.y then
         tk(game)
     end
 end
@@ -118,30 +137,30 @@ local function keypressed(self, game, key)
     end
 end
 
+local function updateButtons(self, game)
+    local x, y = 120, 20
+    local padd = 120
+    for _, v in pairs(btns) do
+        v.x, v.y = x, y
+        if v.isOn and v.isOn(game) then
+            v.img = v.on
+        elseif v.off then
+            v.img = v.off
+        end
+        local button = suit.ImageButton(v.img, v.x, v.y)
+        if button.hit == true then
+            v.fnc(game, toggle)
+        end
+        x = x + padd
+    end
+
+end
+
 local function update(self, game)
-    local exit_button = suit.ImageButton(self.exit, 20, 20)
-    if exit_button.hit == true then
-        love.event.quit()
-    end
-    local pause_image = self.pause.img
-    if game.paused then
-        pause_image = self.resume
-    end
-    local pause_button = suit.ImageButton(pause_image, self.pause.x, self.pause.y)
-    if pause_button.hit == true then
-        game.paused = toggle(game.paused)
-    end
-    local music_image = self.music
-    if Music:isMuted() then
-        music_image = self.nomusic
-    end
-    local music_button = suit.ImageButton(music_image, self.pause.x + 120, 20)
-    if music_button.hit == true then
-        Music:toggle()
-    end
+    updateButtons(self, game)
     Cursor:update()
     -- update kelvin meter
-    self.kelvin:update("current temperature: " .. math.floor(lyra.player.kelvin / 100) * .1 .. "K kelvin")
+    self.kelvin:update()
     -- update quest Text
  
     for k, v in pairs(lyra:getCurrentQuests()) do
