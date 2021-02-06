@@ -72,7 +72,7 @@ local function burnTile(tile)
     elseif element == "sand" then
         if g > oc[2] - .13 then
             r = r - .005
-            g = g - .01
+            g = g - .02
             b = b - .007
         end
     end
