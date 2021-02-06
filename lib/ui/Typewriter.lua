@@ -1,4 +1,4 @@
-local font= require "lib.ui.font"
+local font = require "lib.ui.font"
 local gr = love.graphics
 
 local function init(self, txt, x, y, size, speed, delay, color, font)
@@ -6,7 +6,7 @@ local function init(self, txt, x, y, size, speed, delay, color, font)
 	self.x, self.y = x or 200, y or 200
 	-- The font to use
 	self.size = size or 42
-	self.font(Font(self.size))
+	self.font(font(self.size))
 	-- The color to print
 	self.color = color or {.7, 0, .34}
 	-- The text to write

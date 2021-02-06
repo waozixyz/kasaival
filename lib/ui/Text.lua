@@ -15,7 +15,7 @@ local function init(self, text, prop)
         color = {.7, 0, .34}
     }
     for k, v in pairs(tmpl) do
-        self[k] = prop[k] or v
+        self[k] = (prop and prop[k]) or v
     end
     self.text = gr.newText(font(self.size), text)
     self.w = self.text:getWidth()
