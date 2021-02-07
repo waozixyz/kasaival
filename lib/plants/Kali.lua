@@ -11,6 +11,7 @@ return {
     startSpilt = true,
     splitAngle = {40, 60},
     burnIntensity = 100,
-    fuel = 20,
+    fuel = 4,
+    addFuel = 2,
     randStage = true,
 }
