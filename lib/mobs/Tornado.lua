@@ -2,6 +2,7 @@
 local gr = love.graphics
 local ma = love.math
 local Animation = require "lib.utils.Animation"
+local copy = require "lib.copy"
 
 
 
@@ -13,7 +14,7 @@ local function init(self)
     
     self.tgrow=true
     self.anime = Animation:init(gr.newImage("assets/mobs/whirlwind.png"), 15.7, 19, 1)
-    return self
+    return copy(self)
 end
 
 

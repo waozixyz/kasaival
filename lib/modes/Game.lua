@@ -46,6 +46,13 @@ local function load_scene(self)
             end
         end
 
+        -- spawn weather
+        if scene.weather then
+            Weather:addProp(scene.weather)
+
+
+        end
+
     end
 end
 

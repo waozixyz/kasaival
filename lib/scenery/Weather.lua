@@ -10,7 +10,7 @@ local ma = love.math
 local gr = love.graphics
 
 local function init(self, prop)
-  self.prop = prop
+  self.prop = prop or {}
   Wind:init()
   
   self.items = {}
@@ -21,10 +21,14 @@ local function init(self, prop)
   return self
 end
 
-
+local function addProp(self, prop)
+  for k, v in pairs(prop) do
+    self.prop[k]=v
+  end
+end
 
 local function addSandstorms(self)
-  for i = 0, 24, 1 do
+  for i = 0, 60, 1 do
     table.insert(self.sandstorms, Sandstorm:init(i))
   
   end
@@ -60,11 +64,7 @@ local function draw(self)
     v:draw()
     end
   end
-  for i, v in ipairs(self.items) do
-    if not v.wolke then 
-    v:draw()
-    end
-  end
+
   for i, v in ipairs(self.items) do
     if v.wolke then 
     v:draw()
@@ -91,10 +91,10 @@ local function update(self, dt)
  --end
   if 4 <= (self.zeito / (ma.random(1, 10))) then
     
-    if self.prop ~= "dry" then
+    if not self.prop.dry then
       addwolke(self)
       addrain(self)
-    else 
+    elseif self.prop.sandstorm then
       addSandstorms(self)
 
     end
@@ -120,4 +120,4 @@ local function update(self, dt)
   end
 end
 
-return {init = init, draw = draw, update = update}
+return {init = init, draw = draw, update = update, addProp = addProp}

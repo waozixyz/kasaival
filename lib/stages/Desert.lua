@@ -53,7 +53,14 @@ local scenes = {
                     else return false end
                 end
             }
+        },
+        weather = {sandstorm =true},
+        mobs = { 
+            ["Tornado"] = {
+                amount = 20,
+            }
         }
+
     }
 }
 
@@ -91,5 +98,5 @@ local music = {
 }
 
 local sky = { y = 0 }
-
-return {weather = "dry", scenes = scenes, width = 9000, background = background, ground = ground, music = music, sky = sky, next = "Grassland"}
+local weather = {dry=true}
+return {weather = weather , scenes = scenes, width = 9000, background = background, ground = ground, music = music, sky = sky, next = "Grassland"}
