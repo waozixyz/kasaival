@@ -29,7 +29,9 @@ local function load_scene(self)
             -- spawn plants for current Scene
             for k, v in pairs(scene.plants) do
                 for _ = 1, v.amount do
-                    local plant = Plant:init(k, spawner(v.startx))
+                    local props = v.props or {}
+                    for ki,vi in pairs(spawner(v.startx)) do props[ki] = vi end
+                    local plant = Plant:init(k, props)
                     plant.id = #lyra.items
                     table.insert(lyra.items, plant)
                 end

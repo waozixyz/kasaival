@@ -1,4 +1,4 @@
-local Grow = require "lib.plants.Grow"
+local grow = require "lib.plants.grow"
 local Fire = require "lib.ps.Fire"
 
 local copy = require "lib.copy"
@@ -66,7 +66,7 @@ local function fill_self(self, props)
     end
 end
 
-local function init(self, name, sav)
+local function init(self, name, props)
     -- fill with template
     fill_self(self, template)
     -- fill with name of plant if provided
@@ -77,9 +77,9 @@ local function init(self, name, sav)
         fill_self(self, props)
     end
     -- fill with table if provided
-    if sav then
-        assert(type(sav) == "table", "save needs to be a table of key values")
-        fill_self(self, sav)
+    if props then
+        assert(type(props) == "table", "props needs to be a table of key values")
+        fill_self(self, props)
     end
 
     -- set timer value for values counting to 0
@@ -114,7 +114,7 @@ local function init(self, name, sav)
         end
         -- grow to currentStage
         for _ = #self.branches, self.currentStage do
-            table.insert(self.branches, Grow(self))
+            table.insert(self.branches, grow(self))
         end
     end
     -- return the new plant
@@ -166,7 +166,7 @@ end
 
 
 local function getColor(self, v, cs)
-    local r, g, b = v.color[1], v.color[2], v.color[3]
+    local r, g, b, a = v.color[1], v.color[2], v.color[3], v.color[4]
     if self.burning then
         r, g, b = burnColor(r, g, b)
     else 
@@ -183,7 +183,7 @@ local function getColor(self, v, cs)
         g = g + cc[2] * growth
         b = b + cc[3] * growth
     end
-    return r, g, b
+    return r, g, b, a
 end
 
 local function draw(self)
@@ -242,7 +242,7 @@ local function update(self, dt)
         if l < self.maxStage then
             self.growTimer = self.growTimer + dt
             if self.growTimer >= self.growTime then
-                table.insert(self.branches, Grow(self))
+                table.insert(self.branches, grow(self))
                 self.growTimer = 0
             end
         end

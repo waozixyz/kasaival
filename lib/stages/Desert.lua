@@ -11,9 +11,11 @@ local scenes = {
         },
         plants = {
             ["Kali"] = {
-                amount = 50
-            }
-
+                amount = 50,
+                props = {
+                    randStage = true,
+                }
+            },
         }
     },
     {
@@ -40,7 +42,12 @@ local scenes = {
                 amount = 60,
                 tail = "seconds"
             }
-        }
+        },
+        mobs = { 
+            ["Dog"] = {
+                amount = 10,
+            }
+        },
     }
 }
 

@@ -1,16 +1,15 @@
-local ma = love.math
-
 return {
     type = "cactus",
-    cs_branch = {.8, .9, .73, .78, .3, .35},
-    cs_leaf = {.9, 1, .75, .9, .7, .8},
-    growTime = 3,
+    cs_branch = {.5, .7, .48, .63, .3, .35},
+    cs_leaf = {.6, .8, .75, .9, .6, .7},
+    changeColor = {-.1, -.3, -.2},
+    growTime = 2,
     maxStage = 7,
     w = 14,
     h = 42,
-    splitChance = 7,
+    splitChance = 4,
     leafSize = .7,
     leafChance = 4,
-    startSpilt = false,
+    startSpilt = true,
     randStage = false,
 }
