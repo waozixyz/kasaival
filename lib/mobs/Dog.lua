@@ -38,9 +38,7 @@ end
 local function collided(self, obj)
     if obj.element == "fire" then
         local r, g, b = self.color[1],self.color[2], self.color[3]
-        r = r + .1
-        g = g - .1
-        b = b - .1
+        r, g, b = r + .1, g - .1, b - .1
         self.color = {r, g, b}
         self.dying = true
         if self.zeito < 7.8 or self.zeito > 8.2 then

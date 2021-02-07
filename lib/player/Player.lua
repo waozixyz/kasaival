@@ -151,7 +151,7 @@ return {
     bp = .5, -- burn power
     scale = 2,
     update = update,
-    burnRate = 2,
+    burnRate = 1,
     fuel = 1000,
     fuelCapacity = 3000
 }

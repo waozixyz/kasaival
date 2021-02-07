@@ -4,7 +4,7 @@ local function rtn()
 	image1:setFilter("linear", "linear")
 
 	local ps = gr.newParticleSystem(image1, 8)
-	ps:setColors(0.7, 0.8, 0, 1, 0.6, 0.67, 0, 0.6, 0.8, 1, 0, 0.8, 0.9, 1, 0, 0.7)
+	ps:setColors(0.7, 0.8, 0, 1)
 	ps:setEmissionArea("none", 0, 0, 0, false)
 	ps:setEmissionRate(8)
 	ps:setInsertMode("top")

@@ -1,5 +1,6 @@
 local copy = require "lib.copy"
 local push = require "lib.push"
+local lyra = require "lib.lyra"
 
 local Player = require "lib.player.Player"
 local Sakura = require "lib.plants.Sakura"
@@ -12,6 +13,7 @@ local ke = love.keyboard
 local ev = love.event
 
 local function init(self)
+    lyra:init()
     self.dog = Dog:init({x = 300, y = 700})
 end
 
