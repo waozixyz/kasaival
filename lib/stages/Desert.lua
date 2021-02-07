@@ -1,16 +1,12 @@
 local scenes = {
     {
         quests = {
-            ["kill"] = {
-                type = "shrub",
+            {
+                type = "kill",
+                item = "shrub",
                 head = "Burn down",
                 amount = 20,
-                tail = "tumblweeds",
-                fnc = function(self, lyra)
-                    if lyra.kill_count[self.type] and lyra.kill_count[self.type] >= self.amount then
-                        return true
-                    else return false end
-                end
+                tail = "shrubs"
             },
         },
         plants = {
@@ -22,36 +18,27 @@ local scenes = {
     },
     {
         quests = {
-            ["kill"] = {
-                type = "cactus",
+            {
+                type = "kill",
+                item = "cactus",
                 head = "Burn down a",
                 amount = 50,
-                tail = "cactuses",
-                fnc = function(self, lyra)
-                    if lyra.kill_count[self.type] and lyra.kill_count[self.type] >= self.amount then
-                        return true
-                    else return false end
-                end
+                tail = "cactuses"
             },
         },
         mobs = { 
             ["Dog"] = {
-                amount = 20,
+                amount = 10,
             }
         }
     },
     {
         quests = {
-            ["survive"] = {
+            {
                 type = "time",
                 head = "Survive for",
                 amount = 60,
-                tail = "seconds",
-                fnc = function(self)
-                    if self.amount <= 0 then
-                        return true
-                    else return false end
-                end
+                tail = "seconds"
             }
         }
     }
@@ -66,13 +53,13 @@ local background = {
 local ground = {
     cs = {
         {0.85, 0.92, 0.55, 0.6, 0.38, 0.38 },
-        {0.92, 0.96, 0.52, 0.57, 0.28, 0.38 },
-        {0.96, 0.96, 0.44, 0.54, 0.38, 0.38 },
-        {0.96, 0.96, 0.44, 0.54, 0.38, 0.38 },
-        {0.87, 0.92, 0.49, 0.55, 0.4, 0.42 },
+        {0.92, 0.96, 0.49, 0.55, 0.28, 0.38 },
+        {0.92, 0.94, 0.44, 0.50, 0.38, 0.38 },
+        {0.94, 0.96, 0.44, 0.50, 0.38, 0.38 },
+        {0.87, 0.92, 0.49, 0.51, 0.4, 0.42 },
         {0.85, 0.92, 0.55, 0.6, 0.38, 0.38 },
-        {0.77, 0.87, 0.62, 0.68, 0.38, 0.38 },
-        {0.72, 0.77, 0.62, 0.68, 0.25, 0.32 },
+        {0.77, 0.87, 0.62, 0.68, 0.38, 0.4 },
+        {0.85, 0.92, 0.62, 0.68, 0.25, 0.32 },
 
     },
 }

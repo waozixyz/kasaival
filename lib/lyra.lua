@@ -5,6 +5,16 @@ local ma = love.math
 
 local function init(self, ...)
     self.items = {}
+    self.cx = 0
+    self.gh = 600
+    self.gw = 3000
+    self.startx = -100
+    self.scenes = {}
+    self.items = {}
+    self.currentScene = 1
+    self.next = nil
+    self.kill_count = {}
+
     for _, v in ipairs({...}) do
         table.insert(self.items, v)
     end
@@ -108,29 +118,21 @@ local function getCurrentQuests(self)
     else return {} end
 end
 
-local function getKillCount(self, type)
-    if not self.kill_count[type] then
-        self.kill_count[type] = 0
+local function getKillCount(self, item)
+    if not self.kill_count[item] then
+        self.kill_count[item] = 0
     end
-    return self.kill_count[type]
+    return self.kill_count[item]
 end
+
 return {
-    scenes = {},
-    items = {},
     init = init,
     update = update,
     draw = draw,
     checkVisible = checkVisible,
     getColor = getColor,
-    cx = 0,
-    gh = 600,
-    gw = 3000,
-    startx = -100,
     getWidth = getWidth,
     getPrevWidth = getPrevWidth,
-    kill_count = {},
     getKillCount = getKillCount,
     getCurrentQuests = getCurrentQuests,
-    currentScene = 1,
-    next = nil,
 }

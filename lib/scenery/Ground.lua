@@ -137,7 +137,7 @@ local function init(self, sav)
                 -- decide which colocscheme to used based on x position of tile
                 if type(cs[1]) == "table" then
                     local offset = lyra.startx - w
-                    local id = (#cs * (x - offset) / (lyra:getWidth() - offset)) + 1
+                    local id = (#cs * (x - offset) / (lyra.gw - offset)) + 1
                     local r = id - math.floor(id)
                     id = math.floor(ma.random(math.floor(r*10), 10) / 10) + math.floor(id)
                     if id < 1 then id = 1 end

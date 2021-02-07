@@ -1,7 +1,6 @@
 local lyra = require "lib.lyra"
 local push = require "lib.push"
 
-local Fuel = require "lib.player.Fuel"
 local Text = require "lib.ui.Text"
 
 local gr = love.graphics
@@ -19,7 +18,7 @@ local function draw(self)
     gr.setColor(0, 0, 0)
     gr.rectangle("fill", 0, 0, self.w, H)
     gr.setColor(.5, 0, .2)
-    local h = Fuel.amount / Fuel.max * H
+    local h = lyra.player.fuel / lyra.player.fuelCapacity * H
     gr.rectangle("fill", 0, H - h, self.w, h)
     gr.setColor(1, 1, 1)
     self.text:draw()

@@ -4,7 +4,6 @@ local push = require "lib.push"
 
 local Controller = require "lib.player.Controller"
 local Flame = require "lib.ps.Flame"
-local Fuel = require "lib.player.Fuel"
 
 -- aliases
 local gr = love.graphics
@@ -24,7 +23,7 @@ end
 
 local function collided(self, obj, burnedFuel)
     if burnedFuel then
-        Fuel:add(burnedFuel)
+        self.fuel = self.fuel + burnedFuel
     end
     if obj and obj.element == "plant" then
         if #obj.branches == obj.stages and obj.special == "sakura" then
@@ -33,7 +32,7 @@ local function collided(self, obj, burnedFuel)
                 startBoost(self)
             end
         elseif #obj.branches == obj.stages then
-            Fuel:add(5)
+            self.fuel = self.fuel + 5
         end
     end
 end
@@ -134,7 +133,7 @@ local function update(self, dt)
         self.sizes = getSizes(self.sizes, self.scale * .5)
         self.elapsed = 0
     end
-    Fuel:burn(self.burnRate)
+    self.fuel = self.fuel - self.burnRate - (1 - self.fuel / self.fuelCapacity)
     self.flame:update(dt)
 
 end
@@ -153,4 +152,6 @@ return {
     scale = 2,
     update = update,
     burnRate = 2,
+    fuel = 1000,
+    fuelCapacity = 3000
 }

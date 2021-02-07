@@ -178,7 +178,7 @@ local function getColor(self, v, cs)
     -- get current color 
     local cc = self.changeColor
     if cc then
-        local growth = #self.branches / self.maxStage
+        local growth = (#self.branches +  self.growTimer / self.growTime) / self.maxStage 
         r = r + cc[1] * growth
         g = g + cc[2] * growth
         b = b + cc[3] * growth

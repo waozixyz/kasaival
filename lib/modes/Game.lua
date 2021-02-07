@@ -52,24 +52,31 @@ end
 local function load_stage(self, stage_name)
     local H = push:getHeight()
     local stage = copy(require("lib.stages." .. stage_name))
+
+    -- init lyra and make sure lyra.player is also in lyra.items
+    lyra:init()
+    
+    -- current stage name
+    lyra.current = stage_name
     -- load scenes
     lyra.scenes = stage.scenes
     -- set current scene to 1
     lyra.currentScene = 1
     -- set camera x
     lyra.cx = 0
+    -- set to 1 to exit game
+    lyra.exit = 0
+    -- if true, restart current stage
+    lyra.restart = false
     -- set the ground height
     lyra.gh = H * .5
     -- set the stagewidth
     lyra.gw = stage.width
     -- set up next stage if stage completed
     lyra.next = stage.next
-    -- set up empty table for items
-    lyra.items = {}
     -- create a player inside lyra
     lyra.player = Player:init()
-    -- init lyra and make sure lyra.player is also in lyra.items
-    lyra:init(lyra.player)
+    table.insert(lyra.items, lyra.player)
 
     load_scene(self)
     -- init Background
@@ -101,19 +108,18 @@ local function scene_pause(self)
     else return false end
 end
 
-local function keypressed(...)
-    HUD:keypressed(...)
+local function keypressed(self, ...)
+    HUD.keypressed(...)
 end
 
 local function touch(self, ...)
-    HUD:touch(self, ...)
+    HUD.touch(...)
     if not scene_pause(self) then
         lyra.player:touch(...)
     end
 end
 
 local function draw(self)
-
     Sky:draw()
     Background:draw()
 
@@ -124,36 +130,50 @@ local function draw(self)
     self.ground:draw()
     -- draw entities
     lyra:draw()
+    Weather:draw()
 
     -- undo translation
     gr.translate(-lyra.cx - Tank.w, 0)
 
     -- draw head up display
-    HUD:draw(self)
-    Weather:draw()
+    HUD:draw()
 end
 
-local function completeQuest(self, key)
-    lyra:getCurrentQuests()[key] = nil
+local function completeQuest(self, id)
+    lyra:getCurrentQuests()[id] = nil
     if #lyra:getCurrentQuests() <= 0 then
         self.nextScene = true
     end
 end
 
 local function update_quests(self, dt)
-    for k, v in pairs(lyra:getCurrentQuests()) do
-        if k == "survive" then
+    for i, v in ipairs(lyra:getCurrentQuests()) do
+        if v.type == "time" then
             v.amount = v.amount - dt
-        end
-        if v.fnc and v:fnc(lyra) then
-            completeQuest(self, k)
+            if v.amount == 0 then
+                completeQuest(self, i)
+            end
+        elseif v.type == "kill" then
+            if lyra.kill_count[v.item] and lyra.kill_count[v.item] >= v.amount then
+                completeQuest(self, i)
+            end
         end
     end
 end
 
-local function update(self, dt, set_mode)
+local function update(self, dt)
     local W = push:getWidth()
- 
+    HUD:update()
+    if lyra.restart then
+        if self.count then self.count = self.count + 1 end
+        if self.count == 1 then
+            load_stage(self, lyra.current)
+        end
+        self.count = 0
+    end
+    if lyra.exit == 1 then
+        ev.quit()
+    end
     if self.nextStage then
         load_stage(self, lyra.next)
     else
@@ -171,21 +191,13 @@ local function update(self, dt, set_mode)
                 self.load_cx = nil
             end
         else
-            if self.restart then
-                set_mode("Game")
-            end
-            if not self.paused then
+            if not lyra.paused then
                 lyra:update(dt)
                 self.ground:update(dt)
                 self.ground:collide(lyra.player)
                 update_quests(self, dt)
             end
-            if self.exit == 1 then
-                ev.quit()
-            end
-            HUD:update(self)
             Weather:update(dt)
-        
         end
     end
 end
