@@ -14,7 +14,7 @@ local ev = love.event
 
 local function init(self)
     lyra:init()
-    self.dog = Dog:init({x = 300, y = 700})
+    self.dog = Dog:init({x = 1000, y = 700})
 end
 
 local function touch(self)

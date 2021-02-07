@@ -47,7 +47,7 @@ function love.load()
         {fullscreen = fullscreen, highdpi = true, resizable = resizable}
     )
     if Testing then
-        set_mode("Test")
+        set_mode("Game")
     else
         set_mode("Menu")
     end

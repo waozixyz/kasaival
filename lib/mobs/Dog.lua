@@ -20,6 +20,7 @@ local function init(self, pos)
     self.pinkelpause = false
     self.anime = Animation:init(gr.newImage("assets/mobs/dog_sprite.png"), self.w, self.h, 1)
     self.zeito = ma.random(0, 8)
+    self.zeito = 8
     -- add color variation to dogs
     self.color = lyra.getColor({.4, 1, .4, 1, .3, 1})
 
@@ -66,7 +67,9 @@ local function use_ability(self)
     table.insert(lyra.items, Plant:init(self.ability, {x = self.x, y = self.y }))
 end
 local function update(self, dt)
-    self.ps:update(dt)
+    if self.pinkelpause and not self.dying then
+        self.ps:update(dt)
+    end
 
     self.anime.currentTime = self.anime.currentTime + dt
     if self.anime.currentTime >= self.anime.duration then
