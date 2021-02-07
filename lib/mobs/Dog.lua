@@ -20,7 +20,6 @@ local function init(self, pos)
     self.pinkelpause = false
     self.anime = Animation:init(gr.newImage("assets/mobs/dog_sprite.png"), self.w, self.h, 1)
     self.zeito = ma.random(0, 8)
-    self.zeito = 8
     -- add color variation to dogs
     self.color = lyra.getColor({.4, 1, .4, 1, .3, 1})
 
