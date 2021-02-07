@@ -37,5 +37,6 @@ return function(self)
             end
         end
     end
+    self.fuel = self.fuel + self.addFuel
     return row
 end

@@ -4,19 +4,36 @@ local Wind = require "lib.weather.Wind"
 local push = require "lib.push"
 local lyra = require "lib.lyra"
 local Wolke = require "lib.weather.Wolke"
+local Sandstorm = require "lib.weather.Sandstorm"
 
 local ma = love.math
 local gr = love.graphics
 
 local function init(self, prop)
-  self.prop = prop
+  self.prop = prop or {}
   Wind:init()
+  
   self.items = {}
+  self.sandstorms = {}
 
   self.zeito = 1
   self.hilfszeit = 0
   return self
 end
+
+local function addProp(self, prop)
+  for k, v in pairs(prop) do
+    self.prop[k]=v
+  end
+end
+
+local function addSandstorms(self)
+  for i = 0, 60, 1 do
+    table.insert(self.sandstorms, Sandstorm:init(i))
+  
+  end
+end
+
 
 local function addwolke(self)
   for _ = 0, 15, 1 do
@@ -33,11 +50,21 @@ local function addrain(self)
 end
 
 local function draw(self)
+
+  for i, v in ipairs(self.sandstorms) do
+    v:draw()
+    end
+
+
+
+
+
   for i, v in ipairs(self.items) do
     if not v.wolke then 
     v:draw()
     end
   end
+
   for i, v in ipairs(self.items) do
     if v.wolke then 
     v:draw()
@@ -51,6 +78,11 @@ local function update(self, dt)
   self.hilfszeit = self.hilfszeit + dt
   Wind:update(dt)
 
+  for i, v in ipairs(self.sandstorms) do
+    v:update(dt)
+    end
+  
+
   --if 4 <= self.hilfszeit / ma.random(1, 10) then
    -- if self.prop ~= "dry" then
    --   addrain(self)
@@ -58,10 +90,13 @@ local function update(self, dt)
  ---  self.hilfszeit = 0
  --end
   if 4 <= (self.zeito / (ma.random(1, 10))) then
-    if self.prop ~= "dry" then
-      
+    
+    if not self.prop.dry then
       addwolke(self)
       addrain(self)
+    elseif self.prop.sandstorm then
+      addSandstorms(self)
+
     end
     self.zeito = 0
   end
@@ -85,4 +120,4 @@ local function update(self, dt)
   end
 end
 
-return {init = init, draw = draw, update = update}
+return {init = init, draw = draw, update = update, addProp = addProp}

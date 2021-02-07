@@ -30,7 +30,7 @@ local function load_scene(self)
             for k, v in pairs(scene.plants) do
                 for _ = 1, v.amount do
                     local props = v.props or {}
-                    for ki,vi in pairs(spawner(v.startx)) do props[ki] = vi end
+                    for ki,vi in pairs(spawner(lyra:getPrevWidth())) do props[ki] = vi end
                     local plant = Plant:init(k, props)
                     plant.id = #lyra.items
                     table.insert(lyra.items, plant)
@@ -46,6 +46,13 @@ local function load_scene(self)
                     table.insert(lyra.items, mob)
                 end
             end
+        end
+
+        -- spawn weather
+        if scene.weather then
+            Weather:addProp(scene.weather)
+
+
         end
 
     end

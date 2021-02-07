@@ -3,28 +3,47 @@ local scenes = {
         quests = {
             ["reach"] = {
                 type = "kelvin",
-                head = "",
-                amount = 10200,
-                tail = ""
+                head = "Reach a temperature of",
+                amount = 1000,
+                tail = "kelvin",
+                fnc = function(self, lyra)
+                    if lyra.player.kelvin >= self.amount then
+                        return true
+                    else return false end
+                end
             },
         },
-        plants = { 
-            ["Oak"] = {
-                amount = 100,
-                startx = 2000,
-            } 
+
+
+        mobs = { 
+            ["Frog"] = {
+                amount = 3,
+            }
         },
+
+        plants = {
+            ["Oak"] = {
+                amount = 100
+            }
+        }
     },
     {
-        quests = {
-            ["kill"] = {
-                type = "cactus",
+
+        quests = { 
+          ["kill"] = {
+                type ="tree",
                 head = "Burn down a",
-                amount = 50,
-                tail = "cactuses"
-            },
-        }
-    }
+                amount = 70,
+                tail = "trees",
+               fnc = function(self, lyra)
+                    if lyra.kill_count[self.type] and lyra.kill_count[self.type] >= self.amount then
+                       return true
+                    else return false end
+                end
+           } 
+        },
+    },   
+    
 }
 
 local background = {

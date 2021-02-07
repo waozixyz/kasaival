@@ -48,7 +48,9 @@ local template = {
     -- how fast this material burns
     burnIntensity = 15,
     -- the amount of fuel this plant provides
-    fuel = 20,
+    fuel = 5,
+    -- add fuel per branch layer
+    addFuel = 3,
     -- the scale of how the size should change at each growth
     changeW = .9,
     changeH = .95,

@@ -28,6 +28,14 @@ local scenes = {
                 tail = "cactuses"
             },
         },
+        plants = {
+            ["Saguaro"] = {
+                amount = 20,
+                props = {
+                    randStage = true
+                }
+            }
+        },
         mobs = { 
             ["Dog"] = {
                 amount = 10,
@@ -43,11 +51,13 @@ local scenes = {
                 tail = "seconds"
             }
         },
-        mobs = { 
+        weather = {sandstorm =true},
+        mobs = {
             ["Dog"] = {
                 amount = 10,
             }
-        },
+        }
+
     }
 }
 
@@ -85,5 +95,5 @@ local music = {
 }
 
 local sky = { y = 0 }
-
-return {weather = "dry", scenes = scenes, width = 9000, background = background, ground = ground, music = music, sky = sky, next = "Grassland"}
+local weather = {dry=true}
+return {weather = weather , scenes = scenes, width = 9000, background = background, ground = ground, music = music, sky = sky, next = "Grassland"}
