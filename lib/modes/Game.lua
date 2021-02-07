@@ -159,7 +159,7 @@ local function update_quests(self, dt)
     for i, v in ipairs(lyra:getCurrentQuests()) do
         if v.type == "time" then
             v.amount = v.amount - dt
-            if v.amount == 0 then
+            if v.amount <= 0 then
                 completeQuest(self, i)
             end
         elseif v.type == "kill" then
