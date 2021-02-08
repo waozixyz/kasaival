@@ -14,7 +14,6 @@ local function init(self, prop)
   Wind:init()
 
   self.items = {}
-  self.sandstorms = {}
 
   self.zeito = 1
   self.hilfszeit = 0
@@ -67,7 +66,10 @@ local function update(self, dt)
     if not self.storm then
       self.storm = Sandstorm()
       self.storm:moveTo(300, 300)
+      Wind:setWind(100)
     end
+    self.storm:setEmissionRate(self.storm:getEmissionRate()+1000*dt)
+    self.storm:setSpeed(0, Wind:getWind())
     self.storm:update(dt)
   end
 end

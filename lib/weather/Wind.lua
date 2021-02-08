@@ -8,6 +8,7 @@ local function init(self)
   self.windstark = 1
   self.spawnmodifikator = 0
   self.zeito = 1
+  self.mod=1
   return copy(self)
 end
 
@@ -44,12 +45,17 @@ local function update(self, dt)
   end
 
   --windstaärke ist immer da, ist smoothlaufend
-  self.windstark = 3 * self.spawnmodifikator / 10
+  self.windstark = self.mod*3 * self.spawnmodifikator / 10
 end
+
+local function setWind(self, mod)
+self.mod = mod 
+end
+
 
 local function getWind(self)
   local windx = self.windx * self.windstark
 
   return windx
 end
-return {init = init, draw = draw, update = update, getWind = getWind}
+return {init = init, draw = draw, update = update, getWind = getWind, setWind = setWind}

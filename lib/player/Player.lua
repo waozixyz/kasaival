@@ -133,7 +133,7 @@ local function update(self, dt)
         self.sizes = getSizes(self.sizes, self.scale * .5)
         self.elapsed = 0
     end
-    self.fuel = self.fuel - self.burnRate - (1 - self.fuel / self.fuelCapacity)
+    self.fuel = self.fuel - (self.burnRate + (1 - self.fuel / self.fuelCapacity))*dt*30
     self.flame:update(dt)
 
 end
