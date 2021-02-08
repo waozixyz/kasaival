@@ -14,7 +14,7 @@ local Music = require "lib.sys.Music"
 local Plant = require "lib.plants.Plant"
 local Player = require "lib.player.Player"
 local Sky = require "lib.scenery.Sky"
-local Weather = require "lib.scenery.Weather"
+local Weather = require "lib.weather.Weather"
 
 -- aliases
 local ev = love.event
@@ -48,11 +48,9 @@ local function load_scene(self)
             end
         end
 
-        -- spawn weather
+        -- add weather conditions
         if scene.weather then
             Weather:addProp(scene.weather)
-
-
         end
 
     end
