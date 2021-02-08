@@ -93,7 +93,7 @@ local function move(self, dx, dy, dt)
     local x, y = self.x + dx, self.y + dy
     if x + lyra.cx < W / 5 and -lyra.cx > lyra.startx then
         lyra.cx = lyra.cx - dx
-    elseif x + lyra.cx > W - (W / 5) and -lyra.cx + W < lyra:getWidth() + lyra.startx then
+    elseif x + lyra.cx > W - (W / 5) and -lyra.cx + W < lyra.ground.width + lyra.startx then
         lyra.cx = lyra.cx - dx
     end
     if x + lyra.cx > W then
@@ -103,8 +103,8 @@ local function move(self, dx, dy, dt)
     end
     if y > H then
         y = H
-    elseif y < H - lyra.gh then
-        y = H - lyra.gh
+    elseif y < H - lyra.ground.height then
+        y = H - lyra.ground.height
     end
     self.flame:setPosition(x, y)
     self.flame:setSizes(returnTable(self.sizes))

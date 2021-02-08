@@ -25,12 +25,33 @@ local function load_scene(self)
         self.nextStage = true
     else
         local scene = lyra.scenes[lyra.currentScene]
+   
+        -- current color schemes stored here
+        local cs = {}
+        do -- load last colorscheme into cs
+            if lyra.currentScene > 1 then
+                local pg = lyra.scenes[lyra.currentScene - 1].ground
+                if pg.cs and pg.cs[#pg.cs] then
+                    table.insert(cs, pg.cs[#pg.cs])
+                end
+            end
+            if scene.ground then
+                for _, v in ipairs(scene.ground.cs) do
+                    table.insert(cs, v)
+                end
+            end
+        end
+        -- previous ground width used for mobs and plants
+        local pgw = lyra.ground.width or 0
+        if scene.ground then
+            lyra.ground:add(scene.ground.add, cs)
+        end
         if scene.plants then
             -- spawn plants for current Scene
             for _, v in ipairs(scene.plants) do
                 for _ = 1, v.amount do
                     local props = v.props or {}
-                    for ki,vi in pairs(spawner(lyra:getPrevWidth())) do props[ki] = vi end
+                    for ki,vi in pairs(spawner(pgw)) do props[ki] = vi end
                     local plant = Plant:init(v.name, props)
                     plant.id = #lyra.items
                     table.insert(lyra.items, plant)
@@ -41,7 +62,7 @@ local function load_scene(self)
         if scene.mobs then
             for _, v in ipairs(scene.mobs) do
                 for _ = 1, v.amount do
-                    local mob = require("lib.mobs." .. v.name):init(spawner(lyra:getPrevWidth()))
+                    local mob = require("lib.mobs." .. v.name):init(spawner(pgw))
                     mob.id = #lyra.items
                     table.insert(lyra.items, mob)
                 end
@@ -52,7 +73,6 @@ local function load_scene(self)
         if scene.weather then
             Weather:addProp(scene.weather)
         end
-
     end
 end
 
@@ -75,21 +95,16 @@ local function load_stage(self, stage_name)
     lyra.exit = 0
     -- if true, restart current stage
     lyra.restart = false
-    -- set the ground height
-    lyra.gh = H * .5
-    -- set the stagewidth
-    lyra.gw = stage.width
     -- set up next stage if stage completed
     lyra.next = stage.next
     -- create a player inside lyra
     lyra.player = Player:init()
     table.insert(lyra.items, lyra.player)
 
-    load_scene(self)
     -- init Background
     Background:init(stage.background)
     -- init Ground
-    self.ground = Ground:init(stage.ground)
+    lyra.ground = Ground:init(stage.ground, H * .5)
     -- init head up display
     HUD:init()
     -- init Music
@@ -103,10 +118,11 @@ local function load_stage(self, stage_name)
 
     self.nextStage = false
     self.nextScene = false
+    load_scene(self)
 end
 
 local function init(self)
-    load_stage(self, "Grassland")
+    load_stage(self, "Desert")
 end
 
 local function scene_pause(self)
@@ -134,7 +150,7 @@ local function draw(self)
     gr.translate(lyra.cx + Tank.w, 0)
 
     -- draw Ground
-    self.ground:draw()
+    lyra.ground:draw()
     -- draw entities
     lyra:draw()
     Weather:draw()
@@ -200,8 +216,8 @@ local function update(self, dt)
         else
             if not lyra.paused and  lyra.player.fuel > 0 then
                 lyra:update(dt)
-                self.ground:update(dt)
-                self.ground:collide(lyra.player)
+                lyra.ground:update(dt)
+                lyra.ground:collide(lyra.player)
                 update_quests(self, dt)
                 Weather:update(dt)
             end

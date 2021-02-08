@@ -105,13 +105,6 @@ local function getColor(cs)
     return {rnc(cs[1], cs[2]), rnc(cs[3], cs[4]), rnc(cs[5], cs[6]), 1}
 end
 
-local function getWidth(self)
-    return (self.gw / #self.scenes) * self.currentScene
-end
-local function getPrevWidth(self)
-    return (self.gw / #self.scenes) * (self.currentScene - 1)
-end
-
 local function getCurrentQuests(self)
     if self.scenes[self.currentScene] and self.scenes[self.currentScene].quests then
         return self.scenes[self.currentScene].quests

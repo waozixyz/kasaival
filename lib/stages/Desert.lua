@@ -1,51 +1,72 @@
 local scenes = {
     {
+        ground = {
+            add = 3000,
+            cs = {
+                {0.85, 0.92, 0.55, 0.6, 0.38, 0.38},
+                {0.92, 0.96, 0.49, 0.55, 0.28, 0.38}
+            }
+        },
         quests = {
             {
                 type = "kill",
                 item = "shrub",
                 head = "Burn down",
-                amount = 5,
+                amount = 10,
                 tail = "shrubs"
-            },
+            }
         },
         plants = {
-          {
-            name = "Kali",
-            amount = 50,
-            props = {
-              randStage = true,
+            {
+                name = "Kali",
+                amount = 50,
+                props = {
+                    randStage = true
+                }
             }
-          },
         }
     },
     {
+        ground = {
+            add = 2000,
+            cs = {
+                {0.85, 0.93, 0.45, 0.52, 0.28, 0.38}
+            },
+        },
         quests = {
             {
                 type = "kill",
                 item = "cactus",
                 head = "Burn down a",
-                amount = 0,
+                amount = 10,
                 tail = "cactuses"
-            },
+            }
         },
         plants = {
-          {
-            name = "Saguaro",
-            amount = 20,
-            props = {
-              randStage = true
+            {
+                name = "Saguaro",
+                amount = 20,
+                props = {
+                    randStage = true
+                }
             }
-          }
         },
-        mobs = { 
-          {
-            name = "Dog",
-            amount = 10,
-          }
+        mobs = {
+            {
+                name = "Dog",
+                amount = 10
+            }
         }
     },
     {
+        ground = {
+            add = 6000,
+            cs = {
+                {0.84, 0.90, 0.43, 0.49, 0.28, 0.34},
+                {0.82, 0.87, 0.45, 0.52, 0.30, 0.32},
+                {0.85, 0.87, 0.48, 0.52, 0.25, 0.32},
+            },
+        },
         quests = {
             {
                 type = "time",
@@ -55,33 +76,32 @@ local scenes = {
             }
         },
         weather = {
-          sandstorm = {
-            lifetime = 60
-          }
+            sandstorm = {
+                lifetime = 60
+            }
         },
-        mobs = { 
-          {
-            name = "Dog",
-            amount = 10,
-          }
+        mobs = {
+            {
+                name = "Dog",
+                amount = 10
+            }
         },
         plants = {
-          {
-            name = "Saguaro",
-            amount = 20,
-            props = {
-              randStage = true
+            {
+                name = "Saguaro",
+                amount = 20,
+                props = {
+                    randStage = true
+                }
+            },
+            {
+                name = "Kali",
+                amount = 50,
+                props = {
+                    randStage = true
+                }
             }
-          },
-          {
-            name = "Kali",
-            amount = 50,
-            props = {
-                randStage = true,
-            }
-        },
-      },
-
+        }
     }
 }
 
@@ -89,20 +109,6 @@ local background = {
     name = "desert",
     sy = 0.6,
     scx = 0.3
-}
-
-local ground = {
-    cs = {
-        {0.85, 0.92, 0.55, 0.6, 0.38, 0.38 },
-        {0.92, 0.96, 0.49, 0.55, 0.28, 0.38 },
-        {0.92, 0.94, 0.44, 0.50, 0.38, 0.38 },
-        {0.94, 0.96, 0.44, 0.50, 0.38, 0.38 },
-        {0.87, 0.92, 0.49, 0.51, 0.4, 0.42 },
-        {0.85, 0.92, 0.55, 0.6, 0.38, 0.38 },
-        {0.77, 0.87, 0.62, 0.68, 0.38, 0.4 },
-        {0.85, 0.92, 0.62, 0.68, 0.25, 0.32 },
-
-    },
 }
 
 local music = {
@@ -115,9 +121,16 @@ local music = {
         author = "Spring",
         title = "Simple Desert",
         ext = "ogg"
-    },
+    }
 }
 
-local sky = { y = 0 }
-local weather = {dry=true}
-return {weather = weather , scenes = scenes, width = 9000, background = background, ground = ground, music = music, sky = sky, next = "Grassland"}
+local sky = {y = 0}
+local weather = {dry = true}
+return {
+    weather = weather,
+    scenes = scenes,
+    background = background,
+    music = music,
+    sky = sky,
+    next = "Grassland"
+}

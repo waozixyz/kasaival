@@ -114,9 +114,11 @@ local function tk()
     return false
 end
 local function touch(x, y)
-    local w, h = btns.pause.img:getDimensions()
-    if x > w + btns.pause.x or y > h + btns.pause.y then
-        tk()
+    if btns.pause.img then
+        local w, h = btns.pause.img:getDimensions()
+        if x > w + btns.pause.x or y > h + btns.pause.y then
+            tk()
+        end
     end
 end
 

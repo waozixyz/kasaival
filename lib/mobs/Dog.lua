@@ -92,7 +92,7 @@ local function update(self, dt)
     end
     if self.x < lyra.startx then
         self.direction = 1
-    elseif self.x > lyra:getWidth() + lyra.startx then
+    elseif self.x > lyra.ground.width + lyra.startx then
         self.direction = -1
     end
 end
