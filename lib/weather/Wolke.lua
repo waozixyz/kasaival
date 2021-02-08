@@ -6,7 +6,6 @@ local gr = love.graphics
 
 
 local function init(self, spawn)
-    self.raingot = false
     self.wolke = true
     self.x = spawn.x or 400
     self.y =  10 + ma.random(1,15)

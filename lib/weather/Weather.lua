@@ -13,8 +13,7 @@ local function init(self, prop)
   self.prop = prop or {}
   Wind:init()
 
-  self.items = {}
-
+self.items = {}
   self.zeito = 1
   self.hilfszeit = 0
   return self
@@ -31,6 +30,7 @@ local function addRain(self)
   for _, v in ipairs(self.items) do
     if v.wolke then
       table.insert(self.items, Rain:init(v:pos()))
+    
     end
   end
 end
@@ -38,12 +38,23 @@ end
 local function draw(self)
   gr.setColor(1, 1, 1)
   for _, v in ipairs(self.items) do
+    if v.wolke then 
       v:draw()
+    end
   end
   if self.storm then
     gr.draw(self.storm)
   end
+  for _, v in ipairs(self.items) do
+    if not v.wolke then 
+      v:draw()
+    end
+  end
+gr.setColor(1, 1, 1)
 end
+
+--regen wird nach wolke gezeichnet
+
 
 local function update(self, dt)
   local W = push:getWidth()
@@ -74,6 +85,16 @@ local function update(self, dt)
   else
     self.storm = nil
   end
+
+-- regen entfeernrn 
+for i, v in ipairs(self.items) do
+  if v.y >= push:getHeight()-lyra.gh then
+    table.remove(self.items,i)
+  v:update(dt)
+end
+end
+
+
 end
 
 local function addProp(self, prop)
