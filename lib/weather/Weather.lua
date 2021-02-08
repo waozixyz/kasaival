@@ -36,6 +36,13 @@ local function addRain(self)
 end
 
 local function draw(self)
+  
+
+  for _, v in ipairs(self.items) do
+    if not v.wolke then 
+      v:draw()
+    end
+  end
   gr.setColor(1, 1, 1)
   for _, v in ipairs(self.items) do
     if v.wolke then 
@@ -45,11 +52,7 @@ local function draw(self)
   if self.storm then
     gr.draw(self.storm)
   end
-  for _, v in ipairs(self.items) do
-    if not v.wolke then 
-      v:draw()
-    end
-  end
+  
 gr.setColor(1, 1, 1)
 end
 

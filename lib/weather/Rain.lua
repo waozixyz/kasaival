@@ -29,6 +29,7 @@ end
 local function draw(self)
 
     gr.setColor(0, 0, 1)
+    -- fühle dich gerne frei sie zu drehen :**
     gr.polygon("fill", self.x, self.y, self.x+10, self.y, self.x+5, self.y+10)
     gr.setColor(1, 1, 1, 1 )
 end
