@@ -54,7 +54,11 @@ local scenes = {
                 tail = "seconds"
             }
         },
-        weather = {sandstorm =true},
+        weather = {
+          sandstorm = {
+            lifetime = 60
+          }
+        },
         mobs = { 
           {
             name = "Dog",

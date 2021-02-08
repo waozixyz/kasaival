@@ -2,7 +2,7 @@ return {
     type = "cactus",
     cs_branch = {.5, .7, .48, .63, .3, .35},
     cs_leaf = {.6, .8, .75, .9, .6, .7},
-    changeColor = {-.1, -.3, -.2},
+    changeColor = {-.1, -.25, -.2},
     growTime = 2,
     maxStage = 7,
     w = 14,

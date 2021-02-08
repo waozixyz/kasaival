@@ -64,12 +64,12 @@ local function update(self, dt)
   end
   if self.prop.sandstorm then
     if not self.storm then
-      self.storm = Sandstorm()
-      self.storm:moveTo(300, 300)
-      Wind:setWind(100)
+      self.storm = Sandstorm(self.prop.sandstorm.lifetime)
+      self.storm:setPosition(300, 600)
     end
     self.storm:setEmissionRate(self.storm:getEmissionRate()+1000*dt)
-    self.storm:setSpeed(0, Wind:getWind())
+    local x, y = self.storm:getPosition()
+    self.storm:moveTo(x + Wind:getWind(),y)
     self.storm:update(dt)
   else
     self.storm = nil

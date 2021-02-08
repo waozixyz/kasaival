@@ -198,13 +198,13 @@ local function update(self, dt)
                 self.load_cx = nil
             end
         else
-            if not lyra.paused then
+            if not lyra.paused and  lyra.player.fuel > 0 then
                 lyra:update(dt)
                 self.ground:update(dt)
                 self.ground:collide(lyra.player)
                 update_quests(self, dt)
+                Weather:update(dt)
             end
-            Weather:update(dt)
         end
     end
 end
