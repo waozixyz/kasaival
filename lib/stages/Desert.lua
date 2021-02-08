@@ -5,7 +5,7 @@ local scenes = {
                 type = "kill",
                 item = "shrub",
                 head = "Burn down",
-                amount = 0,
+                amount = 5,
                 tail = "shrubs"
             },
         },
