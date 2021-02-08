@@ -71,6 +71,8 @@ local function update(self, dt)
     self.storm:setEmissionRate(self.storm:getEmissionRate()+1000*dt)
     self.storm:setSpeed(0, Wind:getWind())
     self.storm:update(dt)
+  else
+    self.storm = nil
   end
 end
 

@@ -101,13 +101,6 @@ local function draw(self)
 
     -- draw kelvin meter
     self.tank:draw()
-    
-    -- current music playing
-    if Music.title and not Music:isMuted() then
-        gr.setColor(1, .8, 1)
-        local title = gr.newText(font(), "\240\159\142\182 " .. Music.author .. " - " .. Music.title .. " \240\159\142\182")
-        gr.draw(title, W - title:getWidth() - 40, H - title:getHeight() - 5)
-    end
 end
 local function tk()
     if lyra.paused then

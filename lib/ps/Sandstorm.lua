@@ -9,7 +9,7 @@ local function rtn()
 
 	local ps = gr.newParticleSystem(image1, 50000)
 	ps:setColors(.7, .45, .1, 1)
-	ps:setEmissionArea("normal", W, H, 0, false)
+	ps:setEmissionArea("normal", 64, H, 0, false)
 	ps:setEmissionRate(2000)
 	ps:setInsertMode("top")
 	ps:setLinearDamping(0, 0)

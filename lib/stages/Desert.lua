@@ -10,12 +10,13 @@ local scenes = {
             },
         },
         plants = {
-            ["Kali"] = {
-                amount = 50,
-                props = {
-                    randStage = true,
-                }
-            },
+          {
+            name = "Kali",
+            amount = 50,
+            props = {
+              randStage = true,
+            }
+          },
         }
     },
     {
@@ -29,17 +30,19 @@ local scenes = {
             },
         },
         plants = {
-            ["Saguaro"] = {
-                amount = 20,
-                props = {
-                    randStage = true
-                }
+          {
+            name = "Saguaro",
+            amount = 20,
+            props = {
+              randStage = true
             }
+          }
         },
         mobs = { 
-            ["Dog"] = {
-                amount = 10,
-            }
+          {
+            name = "Dog",
+            amount = 10,
+          }
         }
     },
     {
@@ -52,11 +55,28 @@ local scenes = {
             }
         },
         weather = {sandstorm =true},
-        mobs = {
-            ["Dog"] = {
-                amount = 10,
+        mobs = { 
+          {
+            name = "Dog",
+            amount = 10,
+          }
+        },
+        plants = {
+          {
+            name = "Saguaro",
+            amount = 20,
+            props = {
+              randStage = true
             }
-        }
+          },
+          {
+            name = "Kali",
+            amount = 50,
+            props = {
+                randStage = true,
+            }
+        },
+      },
 
     }
 }

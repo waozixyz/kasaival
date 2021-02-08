@@ -49,10 +49,13 @@ local function healTile(tile)
     
     if g < .07 then g = .07 end
     if b < .07 then b = .07 end
+    if math.floor(tile.fuel * 10) ~= math.floor(tile.orgFuel *10) then
+      tile.fuel = tile.fuel + (tile.orgFuel - tile.fuel) * .1
+    end
     return {r, g, b}
 end
 
-local function burnTile(tile)
+local function burnTile(tile, obj)
     local c = tile.color
     local r, g, b = c[1], c[2], c[3]
     local oc = tile.orgColor
@@ -76,7 +79,11 @@ local function burnTile(tile)
             b = b - .007
         end
     end
-    return {r, g, b}
+    local f = tile.fuel - obj.bp
+    if f < 0 then f = 0 end
+    local burnedFuel = tile.fuel - f
+    tile.fuel = f
+    return {r, g, b}, burnedFuel
 end
 
 local function getTile(i, v)
@@ -94,8 +101,11 @@ local function collide(self, obj)
     for _, row in ipairs(self.grid) do
         for _, v in ipairs(row) do
             if v.x <= r and v.x + v.w >= l and v.y - v.h <= d and v.y >= u then
-                obj:collided(nil, (v.color[2] - v.color[3]) * .5)
-                v.color = burnTile(v)
+              local burnedFuel = 0  
+              v.color, burnedFuel = burnTile(v, obj)
+              v.hit = true
+              --print(burnedFuel)
+              obj:collided(nil, burnedFuel)  
             end
         end
     end
@@ -137,18 +147,20 @@ local function init(self, sav)
                 -- decide which colocscheme to used based on x position of tile
                 if type(cs[1]) == "table" then
                     local offset = lyra.startx - w
-                    local id = (#cs * (x - offset) / (lyra.gw - offset)) + 1
+                    local id = #cs * (x - offset) / (lyra.gw - offset) + 1
                     local r = id - math.floor(id)
                     id = math.floor(ma.random(math.floor(r*10), 10) / 10) + math.floor(id)
                     if id < 1 then id = 1 end
-                    if id > #cs then id = #cs end      
+                    if id > #cs then id = #cs end  
                     cs = cs[id]
                 end
 
                 local c = lyra.getColor(cs)
-                table.insert(row, {color = c, h = h, orgColor = c, w = w, x = x, y = y})
+                local fuel = c[2] - c[3]
+                table.insert(row, {color = c, h = h, orgColor = c, w = w, x = x, y = y, fuel = fuel, orgFuel = fuel})
                 c = lyra.getColor(cs)
-                table.insert(row, {color = c, h = h, orgColor = c, w = w, x = x, y = y})
+                fuel = c[3] - c[2]
+                table.insert(row, {color = c, h = h, orgColor = c, w = w, x = x, y = y, fuel = fuel, orgFuel = fuel})
                 i = i + 2
             end
             table.insert(self.grid, row)
@@ -159,8 +171,11 @@ local function init(self, sav)
 end
 local function update(self, dt)
     for _, row in ipairs(self.grid) do
-        for _, tile in ipairs(row) do
-            tile.color = healTile(tile)
+        for _, v in ipairs(row) do
+            if not v.hit then
+              v.color = healTile(v)
+            end
+            v.hit = false
         end
     end
 end

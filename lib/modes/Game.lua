@@ -27,11 +27,11 @@ local function load_scene(self)
         local scene = lyra.scenes[lyra.currentScene]
         if scene.plants then
             -- spawn plants for current Scene
-            for k, v in pairs(scene.plants) do
+            for _, v in ipairs(scene.plants) do
                 for _ = 1, v.amount do
                     local props = v.props or {}
                     for ki,vi in pairs(spawner(lyra:getPrevWidth())) do props[ki] = vi end
-                    local plant = Plant:init(k, props)
+                    local plant = Plant:init(v.name, props)
                     plant.id = #lyra.items
                     table.insert(lyra.items, plant)
                 end
@@ -39,9 +39,9 @@ local function load_scene(self)
         end
         -- spawn mobs for current Scene
         if scene.mobs then
-            for k, v in pairs(scene.mobs) do
+            for _, v in ipairs(scene.mobs) do
                 for _ = 1, v.amount do
-                    local mob = require("lib.mobs." .. k):init(spawner(lyra:getPrevWidth()))
+                    local mob = require("lib.mobs." .. v.name):init(spawner(lyra:getPrevWidth()))
                     mob.id = #lyra.items
                     table.insert(lyra.items, mob)
                 end
