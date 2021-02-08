@@ -122,7 +122,7 @@ local function load_stage(self, stage_name)
 end
 
 local function init(self)
-    load_stage(self, "Desert")
+    load_stage(self, "Grassland")
 end
 
 local function scene_pause(self)

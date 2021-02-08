@@ -5,41 +5,27 @@ local push = require "lib.push"
 local ma = love.math
 local gr = love.graphics
 
-
-local function init(self, spawn)
-    self.wolke = false
-    self.kreiselzeit = 1
-    self.r = 1 
-    self.x = 1
-    self.y = 1
-    self.spawnx = spawn.x or 400
-    self.spawny = spawn.y-ma.random(1,200)
-    self.windstark = 1
-    self.spawnmodifikator = 0
-    self.drehmodi=ma.random(1,10)
-    self.zeito = 1
+local function init(self, x, y)
+    self.time = 1
+    self.x, self.y = x, y
+    self.r = ma.random(1, 10) * .1
     return copy(self)
 end
 
-
-
-
-
-
 local function draw(self)
-
-    gr.setColor(0, 0, 1)
-    -- fühle dich gerne frei sie zu drehen :**
-    gr.polygon("fill", self.x, self.y, self.x+10, self.y, self.x+5, self.y+10)
-    gr.setColor(1, 1, 1, 1 )
+    gr.setColor(0, 0, 1, .4)
+    local x, y = self.x, self.y
+    local w = 5 * math.sin(self.time * self.r)
+    if w < 1 and w > -1 then
+        w = 5 * math.cos(self.time * self.r)
+    end
+    gr.polygon("fill", x - w, y, x + w * .5, y + 10, x + w, y)
 end
 
-
 local function update(self, dt)
-    self.kreiselzeit =self.kreiselzeit + dt
-    self.x =  self.spawnx+Wind:getWind()*self.kreiselzeit*10
-    self.y = self.spawny+self.kreiselzeit*90
-
-    end 
+    self.time = self.time + dt
+    self.x = self.x + Wind:getWind() * self.time * .05
+    self.y = self.y + self.time
+end
 
 return {init = init, draw = draw, update = update}
