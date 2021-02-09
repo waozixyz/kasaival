@@ -13,6 +13,7 @@ local function init(self, prop)
     self.items = {}
     self.zeito = 1
     self.hilfszeit = 0
+    self.stormmove=1
     return self
 end
 
@@ -31,6 +32,7 @@ end
 --regen wird nach wolke gezeichnet
 
 local function update(self, dt)
+    self.stormmove=self.stormmove+100*dt
     self.zeito = self.zeito + dt
     self.hilfszeit = self.hilfszeit + dt
     Wind:update(dt)
@@ -59,6 +61,18 @@ local function update(self, dt)
     else
         self.storm = nil
     end
+
+    --wolken despanw idee
+  if  15 <= self.hilfszeit+ma.random (1,10)then
+    for i, v in ipairs(self.items) do
+      if v.wolke then
+        if 5 < ma.random(1, 7) then
+          table.remove(self.items, i)
+        end
+      end
+      self.hilfszeit = 0
+    end
+  end
 
 end
 

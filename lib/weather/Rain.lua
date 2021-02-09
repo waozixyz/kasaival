@@ -24,7 +24,7 @@ end
 
 local function update(self, dt)
     self.time = self.time + dt
-    self.x = self.x + Wind:getWind() * self.time * .05
+    self.x = self.x + Wind:getWind() 
     self.y = self.y + self.time
 end
 

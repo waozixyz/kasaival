@@ -7,6 +7,48 @@ local scenes = {
                 {.1, .4, .3, .5, .2, .4}
             }
         },
+
+
+        quests = {
+            {
+                type = "kill",
+                item = "tree",
+                head = "Burn down a",
+                amount = 70,
+                tail = "trees"
+            }
+        },
+
+
+        
+        mobs = {
+            ["Frog"] = {
+                amount = 3
+            }
+        },
+
+
+        plants = {
+            ["Oak"] = {
+                amount = 100
+            }
+        },
+
+
+        
+        
+    },
+    {
+
+        ground = {
+            add = 8000,
+            cs = {
+                {.1, .4, .4, .6, .2, .4},
+                {0, .3, .4, .6, .1, .3}
+            }
+        },
+
+
         quests = {
             {
                 type = "reach",
@@ -16,34 +58,20 @@ local scenes = {
                 tail = ""
             }
         },
-        mobs = {
-            ["Frog"] = {
-                amount = 3
-            }
-        },
+
+
+
+
         plants = {
             ["Oak"] = {
                 amount = 100
             }
-        }
-    },
-    {
-        ground = {
-            add = 8000,
-            cs = {
-                {.1, .4, .4, .6, .2, .4},
-                {0, .3, .4, .6, .1, .3}
-            }
         },
-        quests = {
-            {
-                type = "kill",
-                item = "tree",
-                head = "Burn down a",
-                amount = 70,
-                tail = "trees"
-            }
-        }
+
+
+        
+
+        
     }
 }
 

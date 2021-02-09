@@ -29,7 +29,7 @@ local function draw(self)
 end
 
 local function addRain(self)
-    table.insert(self.items, Rain:init(self.x + ma.random(-20, 20), self.y + 30))
+    table.insert(self.items, Rain:init(self.x + ma.random(-20, 20), self.y + 30 - ma.random(1,100)))
 end
 
 local function update(self, dt)
