@@ -6,7 +6,7 @@ local Tile = require "lib.scenery.Tile"
 
 local ma = love.math
 
-local rows = 13
+local rows = 9
 
 local function add(self, width, cs)
     local H = push:getHeight()
@@ -25,7 +25,6 @@ local function add(self, width, cs)
         while x < right do
             cs = cs or self.cs
             local cs_i = 1
-           -- print(#cs)
             -- decide which colocscheme to used based on x position of tile
             if type(cs[cs_i]) == "table" then
                 local id = #cs * (x - left) / (right - left) + 1
@@ -88,7 +87,6 @@ local function collide(self, obj)
                 local burnedFuel = 0
                 burnedFuel = v:burn(obj)
                 v.hit = true
-                --print(burnedFuel)
                 obj:collided(nil, burnedFuel)
             end
         end

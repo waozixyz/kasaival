@@ -12,7 +12,7 @@ local function init(self)
     self.alpha = 1
     self.next = false
     Bckg:init()
-    self.title = Text:init("KASAIVAL", {size = 256, y = H * .09})
+    self.title = Text:init("KASAIVAL", {size = 256, y = H * .03})
     self.subtitle = Text:init("an out of control flame trying to survive", {size = 64, y = H * .4})
     self.continue = Text:init("touch to start burning", {size = 64, y = H * .8, color = {1, .6, .4}})
     lyra:init(self.title, self.subtitle, self.continue)

@@ -23,7 +23,7 @@ end
 
 local function collided(self, obj, burnedFuel)
     if burnedFuel then
-        self.fuel = self.fuel + burnedFuel
+        self.HP = self.HP + burnedFuel
     end
     if obj and obj.element == "plant" then
         if #obj.branches == obj.stages and obj.special == "sakura" then
@@ -32,7 +32,7 @@ local function collided(self, obj, burnedFuel)
                 startBoost(self)
             end
         elseif #obj.branches == obj.stages then
-            self.fuel = self.fuel + 5
+            self.HP = self.HP + 5
         end
     end
 end
@@ -57,7 +57,6 @@ end
 local function init(self, sav)
     sav = sav or {}
     local W, H = push:getDimensions()
-    self.id = "player"
     self.x = sav.x or W * .5
     self.y = sav.y or H * .7
     self.xp = sav.xp or 0
@@ -133,7 +132,7 @@ local function update(self, dt)
         self.sizes = getSizes(self.sizes, self.scale * .5)
         self.elapsed = 0
     end
-    self.fuel = self.fuel - (self.burnRate + (1 - self.fuel / self.fuelCapacity))*dt
+    self.HP = self.HP - (self.burnRate + (1 - self.HP / self.maxHP))*dt
     self.flame:update(dt)
 
 end
@@ -152,6 +151,6 @@ return {
     scale = 2,
     update = update,
     burnRate = 20,
-    fuel = 1000,
-    fuelCapacity = 3000
+    HP = 1000,
+    maxHP = 3000
 }

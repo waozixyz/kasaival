@@ -1,7 +1,7 @@
 local scenes = {
     {
         ground = {
-            add = 3000,
+            add = 2200,
             cs = {
                 {0.85, 0.92, 0.55, 0.6, 0.38, 0.38},
                 {0.92, 0.96, 0.49, 0.55, 0.28, 0.38}
@@ -9,20 +9,19 @@ local scenes = {
         },
         quests = {
             {
-                type = "kill",
-                item = "shrub",
+                questType = "kill",
+                itemType = "shrub",
                 head = "Burn down",
-                amount = 10,
+                amount = 0,
                 tail = "shrubs"
             }
         },
-        plants = {
+        spawners = {
             {
+                type = "plant",
                 name = "Kali",
-                amount = 50,
-                props = {
-                    randStage = true
-                }
+                interval = 1,
+                props = {}
             }
         }
     },
@@ -31,28 +30,28 @@ local scenes = {
             add = 2000,
             cs = {
                 {0.85, 0.93, 0.45, 0.52, 0.28, 0.38}
-            },
+            }
         },
         quests = {
             {
-                type = "kill",
-                item = "cactus",
+                questType = "kill",
+                itemType = "cactus",
                 head = "Burn down a",
-                amount = 10,
+                amount = 40,
                 tail = "cactuses"
             }
         },
-        plants = {
+        spawn = {
             {
+                type = "plant",
                 name = "Saguaro",
                 amount = 20,
                 props = {
                     randStage = true
                 }
-            }
-        },
-        mobs = {
+            },
             {
+                type = "mob",
                 name = "Dog",
                 amount = 10
             }
@@ -64,8 +63,8 @@ local scenes = {
             cs = {
                 {0.84, 0.90, 0.43, 0.49, 0.28, 0.34},
                 {0.82, 0.87, 0.45, 0.52, 0.30, 0.32},
-                {0.85, 0.87, 0.48, 0.52, 0.25, 0.32},
-            },
+                {0.85, 0.87, 0.48, 0.52, 0.25, 0.32}
+            }
         },
         quests = {
             {

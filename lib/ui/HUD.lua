@@ -1,13 +1,12 @@
 local suit = require "lib.suit"
 local push = require "lib.push"
 local lume = require "lib.lume"
+local lifeBar = require "lib.ui.lifeBar"
 local lyra = require "lib.lyra"
-local font= require "lib.ui.font"
 
 local Cursor = require "lib.ui.Cursor"
 local Overlay = require "lib.ui.Overlay"
 local Music = require "lib.sys.Music"
-local Tank = require "lib.ui.Tank"
 local Text = require "lib.ui.Text"
 
 local gr = love.graphics
@@ -53,11 +52,8 @@ local function init(self)
     self.gamesaving = Overlay:init("Game Saving", "please wait patiently...", {0, 0.2, 0, 0.5})
     self.gamerestart = Overlay:init("Game Restarting", "please wait patiently...", {0, 0.2, 0, 0.5})
     -- load quest text
-    self.questHeading = Text:init("Quests to complete", {size = 64, y = 20, x = W - 20, align = "right"})
+    self.questHeading = Text:init("Current Quest", {size = 64, y = 20, x = W - 20, align = "right"})
     setCurrentQuests()
-    -- load kelvin meter
-    self.tank = Tank:init()
-
     
     -- load images of button icons
     local path = "assets/icons/"
@@ -74,13 +70,13 @@ end
 
 local function draw(self)
     local W, H = push:getDimensions()
-    gr.setColor(.2, 0, 0, 1 - lyra.player.fuel / lyra.player.fuelCapacity * 5)
+    gr.setColor(.2, 0, 0, 1 - lyra.player.HP / lyra.player.maxHP * 5)
     gr.rectangle("fill", 0, 0, W, H)
 
     -- overlays for special states
     if lyra.restart then
         self.gamerestart:draw()
-    elseif lyra.player.fuel <= 0 then
+    elseif lyra.player.HP <= 0 then
         self.gameover:draw()
     elseif lyra.paused == true and (not lyra.exit or lyra.exit == 0) then
         self.gamepaused:draw()
@@ -99,15 +95,15 @@ local function draw(self)
         v.text:draw()
     end
 
-    -- draw kelvin meter
-    self.tank:draw()
+    -- draw LifeBar
+    lifeBar()
 end
 local function tk()
     if lyra.paused then
         lyra.paused = toggle(lyra.paused)
         return true
     end
-    if lyra.player.fuel <= 0 then
+    if lyra.player.HP <= 0 then
         lyra.restart = true
         return true
     end
@@ -155,19 +151,21 @@ end
 local function update(self)
     updateButtons()
     Cursor:update()
-    -- update kelvin meter
-    self.tank:update()
+
     -- update quest Text
- 
-    for i, v in ipairs(lyra:getCurrentQuests()) do
-        local amount = v.amount
-        if v.type == "kill" then
-            amount = amount - lyra:getKillCount(v.item)
+    if #lyra:getCurrentQuests() > 0 then
+        for _, v in ipairs(lyra:getCurrentQuests()) do
+            local amount = v.amount
+            if v.questType == "kill" then
+                amount = amount - lyra:getKillCount(v.itemType)
+            end
+            if v.text == nil then
+                setCurrentQuests()
+            end
+            v.text:update(v.head .. " " .. math.floor(amount) .. " " .. v.tail)
         end
-        if v.text == nil then
-            setCurrentQuests()
-        end
-        v.text:update(v.head .. " " .. math.floor(amount) .. " " .. v.tail)
+    else
+        print("no quest")
     end
 end
 return {draw = draw, init = init, keypressed = keypressed, touch = touch, update = update}

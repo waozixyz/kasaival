@@ -90,31 +90,9 @@ local function init(self, name, props)
     if self.randStage then
         self.currentStage = ma.random(0, self.maxStage)
     end
-    do
-        -- make one start branch if no branches given
-        if #self.branches == 0 then
-            local w, h = self.w, self.h
-            local p = {0, self.y}
-            local n = {0, self.y - h}
-            local branch = {}
-            if not self.twoBranch then
-                local b = {deg = -90, h = h, n = n, p = p, w = w}
-                b.color = lyra.getColor(self.cs_branch)
-                table.insert(branch, b)
-            else
-                n = {ma.random(5,10), self.y - h}
-                local b1 = {deg = -100, h = h, n = n, p = p, w = w}
-                b1.color = lyra.getColor(self.cs_branch)
-                table.insert(branch, b1)
-                n = {ma.random(-10,-5), self.y - h}
-                local b2 = {deg = -80, h = h, n = n, p = p, w = w}
-                b2.color = lyra.getColor(self.cs_branch)
-                table.insert(branch, b2)
-            end
-            table.insert(self.branches, branch)
-            
-        end
-        -- grow to currentStage
+    if self.currentStage == 0 then
+        self.first = true
+    else
         for _ = #self.branches, self.currentStage do
             table.insert(self.branches, grow(self))
         end
@@ -192,7 +170,6 @@ local function draw(self)
     local leaves = {}
     local x = self.x
     local l = #self.branches
-
     if l > 0 then
         for i, row in ipairs(self.branches) do
             for _, v in ipairs(row) do
@@ -202,6 +179,7 @@ local function draw(self)
                 if i == l then
                     nx = px + (nx - px) / (self.growTime / self.growTimer)
                     ny = py + (ny - py) / (self.growTime / self.growTimer)
+                    v.color[4] = (self.growTimer / self.growTime)
                     if leaf then
                         leaf.color[4] = (self.growTimer / self.growTime)
                     end
@@ -234,13 +212,17 @@ local function getHitbox(self)
 end
 
 local function getHeight(self)
-    local h = self.branches[1][1].h * self.scale
-    return #self.branches * h * .7
+    if #self.branches > 0 then
+        local h = self.branches[1][1].h * self.scale
+        return #self.branches * h * .7
+    else
+        return 0
+    end
 end
 
 local function update(self, dt)
     local l = #self.branches
-    if l > 0 and self.burnTimer <= 0 then
+    if (l > 0 or self.first) and self.burnTimer <= 0 then
         if l < self.maxStage then
             self.growTimer = self.growTimer + dt
             if self.growTimer >= self.growTime then

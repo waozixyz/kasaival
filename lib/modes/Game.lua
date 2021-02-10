@@ -9,7 +9,6 @@ local spawner = require "lib.utils.spawner"
 local Background = require "lib.scenery.Background"
 local Ground = require "lib.scenery.Ground"
 local HUD = require "lib.ui.HUD"
-local Tank = require "lib.ui.Tank"
 local Music = require "lib.sys.Music"
 local Plant = require "lib.plants.Plant"
 local Player = require "lib.player.Player"
@@ -20,12 +19,26 @@ local Weather = require "lib.weather.Weather"
 local ev = love.event
 local gr = love.graphics
 
+local function add_item(v, pgw)
+    local props = v.props or {}
+    for ki, vi in pairs(spawner(v.pgw or pgw)) do
+        props[ki] = vi
+    end
+    local item = {}
+    if v.type == "plant" then
+        item = Plant:init(v.name, props)
+    elseif v.type == "mob" then
+        item = require("lib.mobs." .. v.name):init(props)
+    end
+    table.insert(lyra.items, item)
+end
+
 local function load_scene(self)
     if lyra.scenes[lyra.currentScene] == nil then
         self.nextStage = true
     else
         local scene = lyra.scenes[lyra.currentScene]
-   
+
         -- current color schemes stored here
         local cs = {}
         do -- load last colorscheme into cs
@@ -46,26 +59,20 @@ local function load_scene(self)
         if scene.ground then
             lyra.ground:add(scene.ground.add, cs)
         end
-        if scene.plants then
-            -- spawn plants for current Scene
-            for _, v in ipairs(scene.plants) do
+        -- spawn plants and mobs for current Scene
+        if scene.spawn then
+            for _, v in ipairs(scene.spawn) do
                 for _ = 1, v.amount do
-                    local props = v.props or {}
-                    for ki,vi in pairs(spawner(pgw)) do props[ki] = vi end
-                    local plant = Plant:init(v.name, props)
-                    plant.id = #lyra.items
-                    table.insert(lyra.items, plant)
+                    add_item(v, pgw)
                 end
             end
         end
-        -- spawn mobs for current Scene
-        if scene.mobs then
-            for _, v in ipairs(scene.mobs) do
-                for _ = 1, v.amount do
-                    local mob = require("lib.mobs." .. v.name):init(spawner(pgw))
-                    mob.id = #lyra.items
-                    table.insert(lyra.items, mob)
-                end
+        -- add spawners to stage
+        if scene.spawners then
+            for _, v in ipairs(scene.spawners) do
+                v.time = 0
+                v.pgw = pgw
+                table.insert(self.spawn, v)
             end
         end
 
@@ -82,7 +89,7 @@ local function load_stage(self, stage_name)
 
     -- init lyra and make sure lyra.player is also in lyra.items
     lyra:init()
-    
+
     -- current stage name
     lyra.current = stage_name
     -- load scenes
@@ -100,7 +107,6 @@ local function load_stage(self, stage_name)
     -- create a player inside lyra
     lyra.player = Player:init()
     table.insert(lyra.items, lyra.player)
-
     -- init Background
     Background:init(stage.background)
     -- init Ground
@@ -118,26 +124,28 @@ local function load_stage(self, stage_name)
 
     self.nextStage = false
     self.nextScene = false
+    self.spawn = {}
     load_scene(self)
+
 end
 
 local function init(self)
-    load_stage(self, "Grassland")
-end
-
-local function scene_pause(self)
-    if self.nextStage or self.nextScene or self.load_cx then
-        return true
-    else return false end
+    load_stage(self, "Desert")
 end
 
 local function keypressed(self, ...)
     HUD.keypressed(...)
 end
 
+local function scene_pause(self)
+    if self.nextStage or self.nextScene or self.load_cx then
+        return true
+    else return false end
+end 
+
 local function touch(self, ...)
     HUD.touch(...)
-    if not scene_pause(self) then
+    if not lyra.paused and lyra.player.HP > 0 and lyra.player and self.ready and not scene_pause(self) then
         lyra.player:touch(...)
     end
 end
@@ -147,7 +155,7 @@ local function draw(self)
     Background:draw()
 
     -- translate with camera x
-    gr.translate(lyra.cx + Tank.w, 0)
+    gr.translate(lyra.cx, 0)
 
     -- draw Ground
     lyra.ground:draw()
@@ -156,7 +164,7 @@ local function draw(self)
     Weather:draw()
 
     -- undo translation
-    gr.translate(-lyra.cx - Tank.w, 0)
+    gr.translate(-lyra.cx, 0)
 
     -- draw head up display
     HUD:draw()
@@ -171,13 +179,13 @@ end
 
 local function update_quests(self, dt)
     for i, v in ipairs(lyra:getCurrentQuests()) do
-        if v.type == "time" then
+        if v.questType == "time" then
             v.amount = v.amount - dt
             if v.amount <= 0 then
                 completeQuest(self, i)
             end
-        elseif v.type == "kill" then
-            if lyra.kill_count[v.item] and lyra.kill_count[v.item] >= v.amount then
+        elseif v.questType == "kill" then
+            if lyra.kill_count[v.itemType] and lyra.kill_count[v.itemType] >= v.amount then
                 completeQuest(self, i)
             end
         end
@@ -188,7 +196,9 @@ local function update(self, dt)
     local W = push:getWidth()
     HUD:update()
     if lyra.restart then
-        if self.count then self.count = self.count + 1 end
+        if self.count then
+            self.count = self.count + 1
+        end
         if self.count == 1 then
             load_stage(self, lyra.current)
         end
@@ -214,12 +224,20 @@ local function update(self, dt)
                 self.load_cx = nil
             end
         else
-            if not lyra.paused and  lyra.player.fuel > 0 then
+            if not lyra.paused and lyra.player.HP > 0 then
                 lyra:update(dt)
                 lyra.ground:update(dt)
                 lyra.ground:collide(lyra.player)
                 update_quests(self, dt)
                 Weather:update(dt)
+                for _, v in ipairs(self.spawn) do
+                    v.time = v.time + dt
+                    if v.time > v.interval then
+                        add_item(v)
+                        v.time = 0
+                    end
+                end
+                if not self.ready then self.ready = true end
             end
         end
     end

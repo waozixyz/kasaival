@@ -124,8 +124,6 @@ return {
     draw = draw,
     checkVisible = checkVisible,
     getColor = getColor,
-    getWidth = getWidth,
-    getPrevWidth = getPrevWidth,
     getKillCount = getKillCount,
     getCurrentQuests = getCurrentQuests,
 }

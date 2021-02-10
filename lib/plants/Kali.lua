@@ -2,9 +2,9 @@ return {
     type = "shrub",
     cs_branch = {.4, .5, .6, .7, .1, .2},
     changeColor = {-.1, -.3, -.2},
-    growTime = 3,
+    growTime = 2,
     maxStage = 5,
-    w = 22, h = 14,
+    w = 22, h = 22,
     splitChance = 0,
     leafChance = 10,
     twoBranch = true,
@@ -13,5 +13,4 @@ return {
     burnIntensity = 100,
     fuel = 4,
     addFuel = 2,
-    randStage = true,
 }
