@@ -14,10 +14,10 @@ local function add(self, width, cs)
     local w = self.height / rows
     local h = w
     local i = 0
-    local startx = self.lastx or 0
+    local startx = self.lastx or lyra.startx
     -- left and right bound of ground
-    local left = lyra.startx + startx - w
-    local right = lyra.startx + startx + width + w
+    local left = startx - w
+    local right = startx + width + w
     local x
     while y < H + h do
         local row = {}

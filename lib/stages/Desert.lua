@@ -3,8 +3,8 @@ local scenes = {
         ground = {
             add = 2200,
             cs = {
-                {0.85, 0.92, 0.55, 0.6, 0.38, 0.38},
-                {0.92, 0.96, 0.49, 0.55, 0.28, 0.38}
+                {0.79, 0.86, 0.43, 0.51, 0.29, 0.31},
+                {0.86, 0.90, 0.41, 0.48, 0.21, 0.31}
             }
         },
         quests = {
@@ -12,7 +12,7 @@ local scenes = {
                 questType = "kill",
                 itemType = "shrub",
                 head = "Burn down",
-                amount = 20,
+                amount = 0,
                 tail = "shrubs"
             }
         },

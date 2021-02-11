@@ -66,7 +66,7 @@ local function init(self, sav)
     self.y = sav.y or H * .7
     self.xp = sav.xp or 0
     self.lvl = sav.lvl or 0
-    self.speed = sav.speed or 10
+    self.speed = sav.speed or 8
     self.flame = Flame()
     self.sizes = {1, 1, 1, 1, 1, 1, 1, 1}
     self.elapsed = 0
@@ -107,8 +107,8 @@ local function move(self, dx, dy, dt)
     end
     if y > H then
         y = H
-    elseif y < H - lyra.ground.height then
-        y = H - lyra.ground.height
+    elseif y < H - lyra.ground.height - self.h - 42  then
+        y = H - lyra.ground.height - self.h - 42
     end
     self.flame:setPosition(x, y)
     self.flame:setSizes(returnTable(self.sizes))
@@ -150,10 +150,10 @@ return {
     element = "fire",
     getHitbox = getHitbox,
     init = init,
-    h = 32, -- height
-    w = 22, -- width
+    h = 8, -- height
+    w = 8, -- width
     bp = .5, -- burn power
-    scale = 2,
+    scale = 3,
     update = update,
     burnRate = 20,
     HP = 1000,
