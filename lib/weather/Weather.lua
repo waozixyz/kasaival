@@ -23,10 +23,9 @@ local function draw(self)
         v:draw()
     end
     if self.storm then
+        gr.setColor(1, 1, 1)
         gr.draw(self.storm)
     end
-
-    gr.setColor(1, 1, 1)
 end
 
 --regen wird nach wolke gezeichnet
