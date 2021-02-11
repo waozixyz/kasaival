@@ -12,7 +12,7 @@ local scenes = {
                 questType = "kill",
                 itemType = "shrub",
                 head = "Burn down",
-                amount = 0,
+                amount = 20,
                 tail = "shrubs"
             }
         },
@@ -79,14 +79,9 @@ local scenes = {
                 lifetime = 60
             }
         },
-        mobs = {
+        spawn = {
             {
-                name = "Dog",
-                amount = 10
-            }
-        },
-        plants = {
-            {
+                type = "plant",
                 name = "Saguaro",
                 amount = 20,
                 props = {
@@ -94,13 +89,19 @@ local scenes = {
                 }
             },
             {
+                type = "plant",
                 name = "Kali",
                 amount = 50,
                 props = {
                     randStage = true
                 }
+            },
+            {
+                type = "mob",
+                name = "Dog",
+                amount = 10
             }
-        }
+        },
     }
 }
 

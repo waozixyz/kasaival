@@ -72,6 +72,7 @@ local function load_scene(self)
             for _, v in ipairs(scene.spawners) do
                 v.time = 0
                 v.pgw = pgw
+                v.gw = lyra.ground.width
                 table.insert(self.spawn, v)
             end
         end

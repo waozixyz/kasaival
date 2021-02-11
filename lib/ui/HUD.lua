@@ -13,7 +13,7 @@ local gr = love.graphics
 
 local function toggle(val) if val then return false else return true end end
 
-local function setCurrentQuests()
+local function getCurrentQuestsText()
     local W = push:getWidth()
 
     local i = 1
@@ -53,7 +53,7 @@ local function init(self)
     self.gamerestart = Overlay:init("Game Restarting", "please wait patiently...", {0, 0.2, 0, 0.5})
     -- load quest text
     self.questHeading = Text:init("Current Quest", {size = 64, y = 20, x = W - 20, align = "right"})
-    setCurrentQuests()
+    getCurrentQuestsText()
     
     -- load images of button icons
     local path = "assets/icons/"
@@ -90,7 +90,7 @@ local function draw(self)
     end
     for _, v in pairs(lyra:getCurrentQuests()) do
         if not v.text then
-            setCurrentQuests()
+            getCurrentQuestsText()
         end
         v.text:draw()
     end
@@ -160,7 +160,7 @@ local function update(self)
                 amount = amount - lyra:getKillCount(v.itemType)
             end
             if v.text == nil then
-                setCurrentQuests()
+                getCurrentQuestsText()
             end
             v.text:update(v.head .. " " .. math.floor(amount) .. " " .. v.tail)
         end

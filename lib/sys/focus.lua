@@ -2,24 +2,24 @@ local lyra = require "lib.lyra"
 
 local Music = require "lib.sys.Music"
 
-return function(game, f)
+return function(f)
     if not f then
         if not lyra.paused then
-            game.unpause = true
+            lyra.unpause = true
             lyra.paused = true
         end
         if not Music:isMuted() then
             Music:mute()
-            game.unmute = true
+            lyra.unmute = true
         end
     else
-        if game.unmute then
+        if lyra.unmute then
             Music:play()
-            game.unmute = false
+            lyra.unmute = false
         end
-        if game.unpause then
+        if lyra.unpause then
             lyra.paused = false
-            game.unpause = false
+            lyra.unpause = false
         end
     end
 end

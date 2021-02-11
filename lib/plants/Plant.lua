@@ -58,6 +58,7 @@ local template = {
     currentStage = 0,
     changeColor = {0, 0, 0},
     w = 12, h = 32,
+    randStage = false,
  }
 
 

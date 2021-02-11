@@ -12,5 +12,4 @@ return {
     leafSize = 1,
     leafChance = 4,
     startSpilt = true,
-    randStage = true
 }

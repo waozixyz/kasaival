@@ -11,7 +11,6 @@ return {
     leafSize = .7,
     leafChance = 4,
     startSpilt = true,
-    randStage = false,
     fuel = 5,
     addFuel = 3,
 }
