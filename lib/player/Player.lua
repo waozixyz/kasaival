@@ -22,8 +22,9 @@ end
 
 
 local function collided(self, obj, burnedFuel)
+    local HP = self.HP
     if burnedFuel then
-        self.HP = self.HP + burnedFuel
+        HP = HP + burnedFuel
     end
     if obj and obj.element == "plant" then
         if #obj.branches == obj.stages and obj.special == "sakura" then
@@ -32,9 +33,13 @@ local function collided(self, obj, burnedFuel)
                 startBoost(self)
             end
         elseif #obj.branches == obj.stages then
-            self.HP = self.HP + 5
+            HP = HP + 5
         end
     end
+    if HP > self.maxHP then
+        HP = self.maxHP
+    end
+    self.HP = HP
 end
 
 local function getHitbox(self)
