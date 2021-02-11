@@ -12,7 +12,7 @@ local scenes = {
                 questType = "kill",
                 itemType = "shrub",
                 head = "Burn down",
-                amount = 0,
+                amount = 20,
                 tail = "shrubs"
             }
         },
@@ -32,13 +32,20 @@ local scenes = {
                 {0.85, 0.93, 0.45, 0.52, 0.28, 0.38}
             }
         },
+        questHint = "do not burn all the dogs, they can spawn plants with their pee",
         quests = {
             {
                 questType = "kill",
                 itemType = "cactus",
                 head = "Burn down a",
                 amount = 40,
-                tail = "cactuses"
+                tail = "cactuses",
+                fail = function(self, lyra)
+                    local a = lyra.kill_count[self.itemType]
+                    if #lyra:getItems("dog") == 0 and #lyra:getItems("cactus") < self.amount - a then
+                        return true
+                    end
+                end
             }
         },
         spawn = {
@@ -53,7 +60,7 @@ local scenes = {
             {
                 type = "mob",
                 name = "Dog",
-                amount = 10
+                amount = 30,
             }
         }
     },
@@ -101,7 +108,7 @@ local scenes = {
                 name = "Dog",
                 amount = 10
             }
-        },
+        }
     }
 }
 

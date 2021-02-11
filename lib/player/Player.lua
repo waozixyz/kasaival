@@ -24,7 +24,7 @@ end
 local function collided(self, obj, burnedFuel)
     local HP = self.HP
     if burnedFuel then
-        HP = HP + burnedFuel
+        HP = HP + burnedFuel * 0.01
     end
     if obj and obj.element == "plant" then
         if #obj.branches == obj.stages and obj.special == "sakura" then
@@ -33,7 +33,7 @@ local function collided(self, obj, burnedFuel)
                 startBoost(self)
             end
         elseif #obj.branches == obj.stages then
-            HP = HP + 5
+            HP = HP + .05
         end
     end
     if HP > self.maxHP then
@@ -59,14 +59,12 @@ local function draw(self)
     gr.setBlendMode("alpha")
 end
 
-local function init(self, sav)
-    sav = sav or {}
+local function init(self, prop)
+    prop = prop or {}
     local W, H = push:getDimensions()
-    self.x = sav.x or W * .5
-    self.y = sav.y or H * .7
-    self.xp = sav.xp or 0
-    self.lvl = sav.lvl or 0
-    self.speed = sav.speed or 8
+    self.x = prop.x or W * .5
+    self.y = prop.y or H * .7
+    self.speed = prop.speed or 100
     self.flame = Flame()
     self.sizes = {1, 1, 1, 1, 1, 1, 1, 1}
     self.elapsed = 0
@@ -92,7 +90,7 @@ end
 
 local function move(self, dx, dy, dt)
     local W, H = push:getDimensions()
-    local s = self.speed * self.scale * dt * 20
+    local s = self.speed * self.scale * dt
     dx, dy = dx * s, dy * s
     local x, y = self.x + dx, self.y + dy
     if x + lyra.cx < W / 5 and -lyra.cx > lyra.startx then
@@ -150,12 +148,14 @@ return {
     element = "fire",
     getHitbox = getHitbox,
     init = init,
-    h = 8, -- height
-    w = 8, -- width
+    h = 12, -- height
+    w = 12, -- width
     bp = .5, -- burn power
     scale = 3,
     update = update,
-    burnRate = 20,
-    HP = 1000,
-    maxHP = 3000
+    burnRate = .2,
+    HP = 10,
+    XP = 0,
+    maxXP = 100,
+    maxHP = 30
 }

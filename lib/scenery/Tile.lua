@@ -92,8 +92,8 @@ local function heal(self)
     elseif element == "sand" then
 
     end
-    r = r + balanceColor(r, oc[1], .001)
-    g = g + balanceColor(g, oc[2], .0004)
+    r = r + balanceColor(r, oc[1], .0009)
+    g = g + balanceColor(g, oc[2], .0003)
     b = b + balanceColor(b, oc[3], .0001)
     
     if g < .07 then g = .07 end

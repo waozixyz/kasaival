@@ -144,9 +144,15 @@ local function scene_pause(self)
     else return false end
 end 
 
+local function paused()
+    if lyra.paused or lyra.player.HP <= 0 or lyra.questFailed then
+        return true
+    end
+end
+
 local function touch(self, ...)
     HUD.touch(...)
-    if not lyra.paused and lyra.player.HP > 0 and lyra.player and self.ready and not scene_pause(self) then
+    if not paused() and lyra.player and self.ready and not scene_pause(self) then
         lyra.player:touch(...)
     end
 end
@@ -190,6 +196,9 @@ local function update_quests(self, dt)
                 completeQuest(self, i)
             end
         end
+        if v.fail and v:fail(lyra) then
+            lyra.questFailed = true
+        end
     end
 end
 
@@ -225,7 +234,7 @@ local function update(self, dt)
                 self.load_cx = nil
             end
         else
-            if not lyra.paused and lyra.player.HP > 0 then
+            if not paused() then
                 lyra:update(dt)
                 lyra.ground:update(dt)
                 lyra.ground:collide(lyra.player)

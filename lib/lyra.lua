@@ -48,13 +48,15 @@ local function update(self, dt)
             if not v.recordedDeath then
                 addDeathCount(self, v)
                 v.recordedDeath = true
+
+                self.player.XP = self.player.XP + 1
             end
         end
         if v.dead then
             if not v.recordedDeath then
                 addDeathCount(self, v)
+                self.player.XP = self.player.XP + 1
             end
-
             table.remove(self.items, i)
         end
     end
@@ -110,12 +112,28 @@ local function getCurrentQuests(self)
         return self.scenes[self.currentScene].quests
     else return {} end
 end
+local function getCurrentQuestHint(self)
+    if self.scenes[self.currentScene] and self.scenes[self.currentScene].questHint then
+        return self.scenes[self.currentScene].questHint
+    end
+     
+end
 
 local function getKillCount(self, item)
     if not self.kill_count[item] then
         self.kill_count[item] = 0
     end
     return self.kill_count[item]
+end
+
+local function getItems(self, name)
+    local rtn = {}
+    for _, v in ipairs(self.items) do
+        if v.type == name then
+            table.insert(rtn, v)
+        end
+    end
+    return rtn
 end
 
 return {
@@ -126,4 +144,6 @@ return {
     getColor = getColor,
     getKillCount = getKillCount,
     getCurrentQuests = getCurrentQuests,
+    getCurrentQuestHint = getCurrentQuestHint,
+    getItems = getItems,
 }

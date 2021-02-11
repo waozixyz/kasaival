@@ -1,7 +1,7 @@
 local suit = require "lib.suit"
 local push = require "lib.push"
 local lume = require "lib.lume"
-local lifeBar = require "lib.ui.lifeBar"
+local statBar = require "lib.ui.statBar"
 local lyra = require "lib.lyra"
 
 local Cursor = require "lib.ui.Cursor"
@@ -51,6 +51,7 @@ local function init(self)
     self.gamepaused = Overlay:init("Game Paused", "touch anywhere or press any key to unpause", {1, 1, 1, 0.5})
     self.gamesaving = Overlay:init("Game Saving", "please wait patiently...", {0, 0.2, 0, 0.5})
     self.gamerestart = Overlay:init("Game Restarting", "please wait patiently...", {0, 0.2, 0, 0.5})
+    self.questfail = Overlay:init("Quest Failed", "touch anywhere or press any key to try again", {0.1, 0, 0.1, 0.7})
     -- load quest text
     self.questHeading = Text:init("Current Quest", {size = 64, y = 20, x = W - 20, align = "right"})
     getCurrentQuestsText()
@@ -76,6 +77,8 @@ local function draw(self)
     -- overlays for special states
     if lyra.restart then
         self.gamerestart:draw()
+    elseif lyra.questFailed then
+        self.questfail:draw(lyra:getCurrentQuestHint())
     elseif lyra.player.HP <= 0 then
         self.gameover:draw()
     elseif lyra.paused == true and (not lyra.exit or lyra.exit == 0) then
@@ -96,14 +99,15 @@ local function draw(self)
     end
 
     -- draw LifeBar
-    lifeBar()
+    statBar(170,lyra.player.HP, lyra.player.maxHP, "HP", {.5, 0, .2}, true)
+    -- statBar(220,lyra.player.XP, lyra.player.maxXP, "XP", {.2, 0, .5})
 end
 local function tk()
     if lyra.paused then
         lyra.paused = toggle(lyra.paused)
         return true
     end
-    if lyra.player.HP <= 0 then
+    if lyra.player.HP <= 0 or lyra.questFailed then
         lyra.restart = true
         return true
     end
