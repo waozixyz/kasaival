@@ -124,6 +124,7 @@ local function keypressed(key)
         if key == "kp-" then Music:down() end
         if key == "n" then Music:next() end
         if key == "m" then Music:toggle() end
+        if key == "r" then lyra.restart = true end
         if key == "p" or key == "pause" or key == "space" then lyra.paused = toggle(lyra.paused) end
         if key == "escape" and (not lyra.exit or lyra.exit < 1) then lyra.exit = 1 end
     end

@@ -29,7 +29,7 @@ local function add(self, width, cs)
             if type(cs[cs_i]) == "table" then
                 local id = #cs * (x - left) / (right - left) + 1
                 local r = id - math.floor(id)
-                id = math.floor(ma.random(math.floor(r * 10), 10) / 10) + math.floor(id)
+                id = math.floor(ma.random(math.floor(r * 10), 10) / 10 + id)
                 if id < 1 then
                     id = 1
                 end
