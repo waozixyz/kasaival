@@ -5,7 +5,7 @@ local lyra = require "lib.lyra"
 local Player = require "lib.player.Player"
 local Sakura = require "lib.plants.Sakura"
 local Typewriter = require "lib.ui.Typewriter"
-local Dog = require "lib.mobs.Dog"
+local Batterfly = require "lib.mobs.Batterfly"
 local Wolke = require "lib.weather.Wolke"
 
 local gr = love.graphics
@@ -14,7 +14,7 @@ local ev = love.event
 
 local function init(self)
     lyra:init()
-    self.dog = Dog:init({x = 1000, y = 700})
+    self.Batterfly = Batterfly:init({x = 1000, y = 700})
 end
 
 local function touch(self)
@@ -25,12 +25,12 @@ local function keypressed(self, key, set_mode)
 end
 
 local function update(self, dt, set_mode)
-    self.dog:update(dt)
+    self.Batterfly:update(dt)
 
 end
 
 local function draw(self)
-    self.dog:draw()
+    self.Batterfly:draw()
     
 end
 
