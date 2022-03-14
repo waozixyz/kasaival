@@ -3,26 +3,41 @@ const ray = @cImport({
     @cInclude("raylib.h");
 });
 
+const title_screen = @import("screens/title.zig");
+
 pub fn main() void {
+    // Initialization
+    //--------------------------------------------------------------------------------------
     const screenWidth = 800;
     const screenHeight = 450;
-
-    ray.InitWindow(screenWidth, screenHeight, "title");
-    defer ray.CloseWindow();
-
+    ray.SetConfigFlags(ray.FLAG_WINDOW_RESIZABLE);
+    ray.InitWindow(screenWidth, screenHeight, "Kasaival");
     ray.SetTargetFPS(60);
 
+    var screen = title_screen.new();
+    screen.load();
+    //--------------------------------------------------------------------------------------
+
+    // Main game loop
     while (!ray.WindowShouldClose()) {
+        // Update
+        //----------------------------------------------------------------------------------
+        if (ray.IsKeyPressed(ray.KEY_F)) ray.ToggleFullscreen();
+        screen.update();
+        //----------------------------------------------------------------------------------
+
+        // Draw
+        //----------------------------------------------------------------------------------
         ray.BeginDrawing();
-        defer ray.EndDrawing();
-
         ray.ClearBackground(ray.RAYWHITE);
-        ray.DrawCircleV(ray.Vector2{ .x = 20.0, .y = 20.0 }, 20.0, ray.DARKBLUE);
-        drawCircleV(ray.Vector2{ .x = 60.0, .y = 20.0 }, 20.0, ray.DARKBLUE);
+        screen.draw();
+        ray.EndDrawing();
+        //----------------------------------------------------------------------------------
     }
-}
+    // De-Initialization
+    //--------------------------------------------------------------------------------------
+    screen.unload();
+    ray.CloseWindow();
+    //--------------------------------------------------------------------------------------
 
-// Not sure why ray.DrawCircleV doesn't work
-fn drawCircleV(ballPosition: ray.Vector2, radius: f32, ballColor: ray.Color) void {
-    return ray.DrawCircle(@floatToInt(i32, ballPosition.x), @floatToInt(i32, ballPosition.y), radius, ballColor);
 }
