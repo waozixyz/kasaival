@@ -3,19 +3,21 @@ const ray = @cImport({
     @cInclude("raylib.h");
 });
 
+const lyra = @import("../lyra.zig");
+
 const print = std.debug.print;
 
 pub const TitleScreen = struct{
-    value: i32,
     texture: ray.struct_Texture,
     pub fn load(_: *TitleScreen) void {
     }
     pub fn update(_: *TitleScreen) void {
         if (ray.IsMouseButtonPressed(ray.MOUSE_LEFT_BUTTON) or ray.GetKeyPressed() > 0) {
-            print("hi", .{});
+            lyra.next = lyra.Screen.game;
         }
     }
     pub fn draw(self: *TitleScreen) void {
+        ray.ClearBackground(ray.BLACK);
         ray.DrawTexture(self.texture, 0, 0, ray.WHITE);
         ray.DrawText("KASAIVAL", 480, 160, 200, ray.MAROON);
         ray.DrawText("an out of control flame trying to survive", 350, 640, 60, ray.MAROON);
@@ -28,5 +30,5 @@ pub const TitleScreen = struct{
 
 
 pub fn new() TitleScreen {
-    return TitleScreen{.value = 1, .texture = ray.LoadTexture("assets/menu.jpg") };
+    return TitleScreen{.texture = ray.LoadTexture("assets/menu.jpg") };
 }
