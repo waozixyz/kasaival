@@ -16,6 +16,10 @@ const gameHeight: f16 = 1080;
 
 fn min(a: f16, b: f16) f16 { if (a < b) { return a; } else { return b; } }
 
+const Screen = struct {
+    title: title_screen.TitleScreen,
+    game: game_screen.GameScreen,
+};
 pub fn main() void {
     // Initialization
     //--------------------------------------------------------------------------------------
@@ -33,18 +37,11 @@ pub fn main() void {
     ray.InitAudioDevice();
 
     var current = lyra.next;
-
     var title = title_screen.new();
     var game = game_screen.new();
+    var screen = Screen{.title = title, .game = game};
+    screen.title = title_screen.new();
 
-    switch (current) {
-        lyra.Screen.title => {
-            title.load();
-        },
-        lyra.Screen.game => {
-            game.load();
-        },
-    }
 
     //--------------------------------------------------------------------------------------
 
@@ -59,7 +56,6 @@ pub fn main() void {
             switch (current) {
                 lyra.Screen.title => {
                     title.unload();
-                    print("hi", .{});
                 },
                 lyra.Screen.game => {
                     game.unload();
@@ -67,10 +63,10 @@ pub fn main() void {
             }
             switch (lyra.next) {
                 lyra.Screen.title => {
-                    title.load();
+                    title = title_screen.new();
                 },
                 lyra.Screen.game => {
-                    game.load();
+                    game = game_screen.new();
                 },
             }
             current = lyra.next;

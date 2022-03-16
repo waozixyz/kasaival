@@ -9,8 +9,7 @@ const print = std.debug.print;
 
 pub const TitleScreen = struct{
     texture: ray.struct_Texture,
-    pub fn load(_: *TitleScreen) void {
-    }
+
     pub fn update(_: *TitleScreen) void {
         if (ray.IsMouseButtonPressed(ray.MOUSE_LEFT_BUTTON) or ray.GetKeyPressed() > 0) {
             lyra.next = lyra.Screen.game;
