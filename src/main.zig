@@ -16,7 +16,9 @@ const gameHeight: f16 = 1080;
 
 fn min(a: f16, b: f16) f16 { if (a < b) { return a; } else { return b; } }
 
-const Screen = struct {
+
+
+const Screen = union(lyra.ScreenNames) {
     title: title_screen.TitleScreen,
     game: game_screen.GameScreen,
 };
@@ -36,13 +38,8 @@ pub fn main() void {
     // init audio device
     ray.InitAudioDevice();
 
-    var current = lyra.next;
-    var title = title_screen.new();
-    var game = game_screen.new();
-    var screen = Screen{.title = title, .game = game};
-    screen.title = title_screen.new();
 
-
+    var current = Screen{ .title = title_screen.new() };
     //--------------------------------------------------------------------------------------
 
     // Main game loop
@@ -52,33 +49,20 @@ pub fn main() void {
         const scale = min(@intToFloat(f16, ray.GetScreenWidth()) / gameWidth, @intToFloat(f16, ray.GetScreenHeight()) / gameHeight);
 
         if (ray.IsKeyPressed(ray.KEY_F)) ray.ToggleFullscreen();
-        if (lyra.next != current) {
+        if (lyra.next != current) {       
             switch (current) {
-                lyra.Screen.title => {
-                    title.unload();
-                },
-                lyra.Screen.game => {
-                    game.unload();
-                },
+                Screen.title => { current.title.unload(); },
+                Screen.game => { current.game.unload(); },
             }
             switch (lyra.next) {
-                lyra.Screen.title => {
-                    title = title_screen.new();
-                },
-                lyra.Screen.game => {
-                    game = game_screen.new();
-                },
+                lyra.ScreenNames.title => { current = Screen{ .title = title_screen.new() }; },
+                lyra.ScreenNames.game => { current = Screen{ .game = game_screen.new() }; },
             }
-            current = lyra.next;
         }
 
         switch (current) {
-            lyra.Screen.title => {
-                title.update();
-            },
-            lyra.Screen.game => {
-                game.update();
-            },
+            Screen.title => { current.title.update(); },
+            Screen.game => { current.game.update(); },
         }
         //----------------------------------------------------------------------------------
 
@@ -88,12 +72,8 @@ pub fn main() void {
         ray.ClearBackground(ray.BLACK);
         ray.BeginTextureMode(target);
         switch (current) {
-            lyra.Screen.title => {
-                title.draw();
-            },
-            lyra.Screen.game => {
-                game.draw();
-            },
+            Screen.title => { current.title.draw(); },
+            Screen.game => { current.game.draw(); },
         }
         ray.EndTextureMode();
 
@@ -108,12 +88,8 @@ pub fn main() void {
     // De-Initialization
     //--------------------------------------------------------------------------------------
     switch (current) {
-        lyra.Screen.title => {
-            title.unload();
-        },
-        lyra.Screen.game => {
-            game.unload();
-        },
+        Screen.title => { current.title.unload(); },
+        Screen.game => { current.game.unload(); },
     }
     ray.CloseWindow();
     //--------------------------------------------------------------------------------------

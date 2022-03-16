@@ -1,6 +1,5 @@
-pub const Screen = enum {
+pub const ScreenNames = enum {
     title,
     game,
 };
-
-pub var next : Screen = Screen.title;
+pub var next : ScreenNames = ScreenNames.title;

@@ -12,7 +12,7 @@ pub const TitleScreen = struct{
 
     pub fn update(_: *TitleScreen) void {
         if (ray.IsMouseButtonPressed(ray.MOUSE_LEFT_BUTTON) or ray.GetKeyPressed() > 0) {
-            lyra.next = lyra.Screen.game;
+            lyra.next = lyra.ScreenNames.game;
         }
     }
     pub fn draw(self: *TitleScreen) void {
