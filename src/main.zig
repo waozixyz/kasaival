@@ -11,8 +11,6 @@ const lyra = @import("lyra.zig");
 const title_screen = @import("screens/title.zig");
 const game_screen = @import("screens/game.zig");
 
-const gameWidth : f16 = 1920;
-const gameHeight: f16 = 1080;
 
 fn min(a: f16, b: f16) f16 { if (a < b) { return a; } else { return b; } }
 
@@ -32,12 +30,19 @@ pub fn main() void {
     ray.SetTargetFPS(60);
     
     // Render texture initialization, used to hold the rendering result so we can easily resize it
-    var target = ray.LoadRenderTexture(gameWidth, gameHeight);
+    var target = ray.LoadRenderTexture(lyra.screen_width, lyra.screen_height);
     ray.SetTextureFilter(target.texture, ray.TEXTURE_FILTER_BILINEAR);
 
     // init audio device
     ray.InitAudioDevice();
 
+    // setup camera
+    var camera = ray.Camera2D{
+        .offset = ray.Vector2{.x = 0, .y = 0},
+        .target = ray.Vector2{.x = 0, .y = 0},
+        .rotation = 0,
+        .zoom = 1
+    };
 
     var current = Screen{ .title = title_screen.new() };
     //--------------------------------------------------------------------------------------
@@ -46,9 +51,18 @@ pub fn main() void {
     while (!ray.WindowShouldClose()) {
         // Update
         //----------------------------------------------------------------------------------
-        const scale = min(@intToFloat(f16, ray.GetScreenWidth()) / gameWidth, @intToFloat(f16, ray.GetScreenHeight()) / gameHeight);
-
+        // calculate scale for window scaling
+        const scale = min(@intToFloat(f16, ray.GetScreenWidth()) / lyra.screen_width, @intToFloat(f16, ray.GetScreenHeight()) / lyra.screen_height);
+        // quit on escape key
         if (ray.IsKeyPressed(ray.KEY_F)) ray.ToggleFullscreen();
+        // update camera
+        camera.target = ray.Vector2{.x = lyra.cx, .y = 0};
+        camera.zoom = lyra.zoom;
+        // update virtual mouse
+        //var mouse = ray.GetMousePosition();
+        //var virtual_mouse = ray.Vector2{.x = 0, .y = 0};
+        //virtual_mouse.x = (mouse.x - (ray.GetScreenWidth() - ))
+        // if game screen changes, update to the new screen
         if (lyra.next != current) {       
             switch (current) {
                 Screen.title => { current.title.unload(); },
@@ -59,7 +73,7 @@ pub fn main() void {
                 lyra.ScreenNames.game => { current = Screen{ .game = game_screen.new() }; },
             }
         }
-
+        // update current game screen
         switch (current) {
             Screen.title => { current.title.update(); },
             Screen.game => { current.game.update(); },
@@ -71,18 +85,22 @@ pub fn main() void {
         ray.BeginDrawing();
         ray.ClearBackground(ray.BLACK);
         ray.BeginTextureMode(target);
+        ray.BeginMode2D(camera);
         switch (current) {
             Screen.title => { current.title.draw(); },
             Screen.game => { current.game.draw(); },
         }
+        ray.EndMode2D();
         ray.EndTextureMode();
-
         // Draw RenderTexture2D to window, properly scaled
         const texture_rect = ray.Rectangle{.x = 0, .y = 0, .width = @intToFloat(f16, target.texture.width), .height = @intToFloat(f16, -target.texture.height)};
-        const screen_rect = ray.Rectangle{.x = (@intToFloat(f16, ray.GetScreenWidth()) - gameWidth * scale) * 0.5, .y = (@intToFloat(f16, ray.GetScreenHeight()) - gameHeight * scale) * 0.5, .width = gameWidth * scale, .height = gameHeight * scale};
+        const screen_rect = ray.Rectangle{.x = (@intToFloat(f16, ray.GetScreenWidth()) - lyra.screen_width * scale) * 0.5, .y = (@intToFloat(f16, ray.GetScreenHeight()) - lyra.screen_height * scale) * 0.5, .width = lyra.screen_width * scale, .height = lyra.screen_height * scale};
         ray.DrawTexturePro(target.texture, texture_rect, screen_rect, ray.Vector2{.x = 0, .y = 0}, 0.0, ray.WHITE);
        
         ray.EndDrawing();
+      
+        // reset cursor image
+        ray.SetMouseCursor(ray.MOUSE_CURSOR_DEFAULT);
         //----------------------------------------------------------------------------------
     }
     // De-Initialization
@@ -91,6 +109,7 @@ pub fn main() void {
         Screen.title => { current.title.unload(); },
         Screen.game => { current.game.unload(); },
     }
+    ray.CloseAudioDevice();
     ray.CloseWindow();
     //--------------------------------------------------------------------------------------
 
