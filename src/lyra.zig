@@ -8,7 +8,7 @@ pub const screen_width : f16 = 1920;
 pub const screen_height: f16 = 1080;
 
 pub const game_width : f16 = 3000;
-pub const game_height: f16 = 780;
+pub const game_height: f16 = 1080;
 
 pub const key_right = [_]u16{ray.KEY_RIGHT, ray.KEY_D};
 pub const key_left  = [_]u16{ray.KEY_LEFT, ray.KEY_A};

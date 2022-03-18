@@ -42,8 +42,8 @@ pub const Player = struct{
     hp: f16,
     xp: f16,
     speed: f16,
-
-
+    pub fn load(_: *Player) void {
+    }
     pub fn update(self: *Player) void {
         const x = self.position.x;
         const y = self.position.y;

@@ -57,6 +57,10 @@ pub fn main() void {
     };
 
     var current = Screen{ .title = title_screen.new() };
+    switch (current) {
+        Screen.title => { current.title.load(); },
+        Screen.game => { current.game.load(); },
+    }
     //--------------------------------------------------------------------------------------
 
     // Main game loop
@@ -88,6 +92,10 @@ pub fn main() void {
             switch (lyra.next) {
                 lyra.ScreenNames.title => { current = Screen{ .title = title_screen.new() }; },
                 lyra.ScreenNames.game => { current = Screen{ .game = game_screen.new() }; },
+            }
+            switch (current) {
+                Screen.title => { current.title.load(); },
+                Screen.game => { current.game.load(); },
             }
         }
         // update current game screen
