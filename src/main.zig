@@ -13,13 +13,25 @@ const game_screen = @import("screens/game.zig");
 
 
 fn min(a: f16, b: f16) f16 { if (a < b) { return a; } else { return b; } }
-
+fn clamp(val: f16, lower: f16, higher: f16) f16 {
+    if (val < lower) { return lower; }
+    else if (val > higher) { return higher; }
+    else { return val; }
+}
 
 
 const Screen = union(lyra.ScreenNames) {
     title: title_screen.TitleScreen,
     game: game_screen.GameScreen,
 };
+
+fn clamp_value(value: ray.struct_Vector2, low: ray.struct_Vector2, max: ray.struct_Vector2) ray.struct_Vector2 {
+    var ret = value;
+    _ = low;
+    ret.x = if (ret.x > max.x) { max.x; } else { ret.x; };
+    return ret;
+}
+
 pub fn main() void {
     // Initialization
     //--------------------------------------------------------------------------------------
@@ -52,16 +64,21 @@ pub fn main() void {
         // Update
         //----------------------------------------------------------------------------------
         // calculate scale for window scaling
-        const scale = min(@intToFloat(f16, ray.GetScreenWidth()) / lyra.screen_width, @intToFloat(f16, ray.GetScreenHeight()) / lyra.screen_height);
+        var screen_width = @intToFloat(f16, ray.GetScreenWidth());
+        var screen_height = @intToFloat(f16, ray.GetScreenHeight());
+        const scale = min(screen_width / lyra.screen_width, screen_height / lyra.screen_height);
         // quit on escape key
         if (ray.IsKeyPressed(ray.KEY_F)) ray.ToggleFullscreen();
         // update camera
         camera.target = ray.Vector2{.x = lyra.cx, .y = 0};
         camera.zoom = lyra.zoom;
         // update virtual mouse
-        //var mouse = ray.GetMousePosition();
-        //var virtual_mouse = ray.Vector2{.x = 0, .y = 0};
-        //virtual_mouse.x = (mouse.x - (ray.GetScreenWidth() - ))
+        var mouse = ray.GetMousePosition();
+        lyra.mouse_x = (@floatCast(f16, mouse.x) - (screen_width - (lyra.screen_width * scale)) * 0.5) / scale;
+        lyra.mouse_y = (@floatCast(f16, mouse.y) - (screen_height - (lyra.screen_height * scale)) * 0.5) / scale;
+        
+        lyra.mouse_x = clamp(lyra.mouse_x, 0, lyra.screen_width);
+        lyra.mouse_y = clamp(lyra.mouse_y, 0, lyra.screen_height);
         // if game screen changes, update to the new screen
         if (lyra.next != current) {       
             switch (current) {

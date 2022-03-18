@@ -23,7 +23,9 @@ pub const ScreenNames = enum {
 
 pub var next : ScreenNames = ScreenNames.game;
 
-pub var start_x : f32 = 0;
-pub var start_y : f32 = 400;
+pub var start_x : f16 = 0;
+pub var start_y : f16 = 400;
 pub var cx : f32 = 0;
-pub var zoom : f32 = 1;
+pub var zoom : f16 = 1;
+pub var mouse_x : f16 = 0;
+pub var mouse_y : f16 = 0;

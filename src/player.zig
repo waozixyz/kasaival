@@ -27,8 +27,7 @@ fn get_direction(x: f32, y: f32 ) ray.struct_Vector2 {
     if (dir.y == 0 and dir.x == 0) {
         // check mouse press
         if (ray.IsMouseButtonDown(ray.MOUSE_BUTTON_LEFT)) {
-            var m_pos = ray.GetMousePosition();
-            var diff = ray.Vector2{.x = m_pos.x - x + lyra.cx, .y = m_pos.y - y};
+            var diff = ray.Vector2{.x = lyra.mouse_x - x + lyra.cx, .y = lyra.mouse_y - y};
             const offset = 5;
             if (@fabs(diff.x) > offset or @fabs(diff.y) > offset) {
                 dir = get_angle(diff);
