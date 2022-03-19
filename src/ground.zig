@@ -18,15 +18,15 @@ const Tile = struct {
 };
 
 const colors = [_]rl.Color{
-    rl.Color{.r = 20, .g = 200, .b = 5, .a = 200},
-    rl.Color{.r = 18, .g = 190, .b = 7, .a = 200},
-    rl.Color{.r = 16, .g = 180, .b = 9, .a = 200},
-    rl.Color{.r = 18, .g = 175, .b = 7, .a = 200},
-    rl.Color{.r = 20, .g = 170, .b = 5, .a = 200},
-    rl.Color{.r = 22, .g = 165, .b = 9, .a = 200},
-    rl.Color{.r = 24, .g = 160, .b = 12, .a = 200},
-    rl.Color{.r = 26, .g = 155, .b = 15, .a = 200},
-    rl.Color{.r = 28, .g = 150, .b = 20, .a = 200}
+    rl.Color{.r = 20, .g = 200, .b = 10, .a = 200},
+    rl.Color{.r = 50, .g = 190, .b = 12, .a = 200},
+    rl.Color{.r = 16, .g = 180, .b = 15, .a = 200},
+    rl.Color{.r = 18, .g = 175, .b = 20, .a = 200},
+    rl.Color{.r = 60, .g = 170, .b = 22, .a = 200},
+    rl.Color{.r = 22, .g = 165, .b = 26, .a = 200},
+    rl.Color{.r = 24, .g = 160, .b = 32, .a = 200},
+    rl.Color{.r = 26, .g = 155, .b = 45, .a = 200},
+    rl.Color{.r = 28, .g = 150, .b = 40, .a = 200}
 
 };
 pub const Ground = struct{
@@ -38,14 +38,14 @@ pub const Ground = struct{
     pub fn load(self: *Ground) void {
         const rand = std.crypto.random;
 
-        var start_x: f32 = lyra.start_x;
         var height: f32 = 64;
         var width: f32 = 32;
+        var start_y: f32 = lyra.start_y;
 
-        while (start_x < lyra.game_width) {
-            var start_y: f32 = lyra.start_y;
-            while (start_y < lyra.game_height) {
-
+        while (start_y < lyra.game_height + height) {
+            var start_x: f32 = lyra.start_x - width;
+            while (start_x < lyra.game_width + width) {
+        
                 var color = colors[ rand.intRangeAtMost(u64, 0, 8)];
                 var t = Tile{
                     .v1 = rl.Vector2{.x = start_x, .y = start_y},
@@ -56,9 +56,12 @@ pub const Ground = struct{
                 append_tile(self, t) catch |err| {
                     std.log.info("Caught error: {s}", .{ err });
                 };
-                start_y += height * 0.5;
+                start_x += width * 0.5;
             }
-            start_x += width;
+            height *= 1.1;
+            width *= 1.1;
+            start_y += height * 0.5;
+
         } 
     }
     pub fn update(_: *Ground) void {

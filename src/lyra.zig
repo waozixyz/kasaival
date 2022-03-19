@@ -16,7 +16,7 @@ pub const key_down  = [_]rl.KeyboardKey{rl.KeyboardKey.KEY_DOWN, rl.KeyboardKey.
 
 pub const ScreenNames = enum { game, title };
 
-pub var next : ScreenNames = ScreenNames.title;
+pub var next : ScreenNames = ScreenNames.game;
 
 pub var start_x : f16 = 0;
 pub var start_y : f16 = 400;

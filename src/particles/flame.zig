@@ -106,7 +106,7 @@ pub const Flame = struct{
 
 
 pub fn new() Flame {
-    const color = [4]u8{180, 50, 60, 200};
+    const color = [4]u8{180, 50, 60, 160};
     return Flame{
         .particles = ArrayList(Particle).init(test_allocator),
         .radius = 48,
