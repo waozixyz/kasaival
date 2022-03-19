@@ -14,7 +14,7 @@ const Particle = struct{
     vel_start: rl.Vector2,
     vel_end: rl.Vector2,
     shrink_factor: f16,
-    scale: f16,
+    size: f32,
     color: [4]u8,
     color_start: [4]u8,
     color_end: [4]u8,
@@ -24,7 +24,7 @@ const Particle = struct{
 pub const Flame = struct{
     amount: i8,
     lifetime: f16,
-    scale: f16,
+    scale: f32,
     radius: f16,
     color: [4]u8,
     particles: ArrayList(Particle),
@@ -35,8 +35,9 @@ pub const Flame = struct{
         const vel_x = rand.intRangeAtMost(i16, -3, 3);
         const vel_x_end = @intToFloat(f16, rand.intRangeAtMost(i16, -2 - vel_x, 2 - vel_x));
         const shrink_factor = @intToFloat(f16, rand.intRangeAtMost(u8, 90, 99)) * 0.01;
+        const particle_size = @intToFloat(f16, rand.intRangeAtMost(u8, @floatToInt(u8, self.radius * 0.8), @floatToInt(u8, self.radius)));
         return Particle{
-            .scale = self.scale,
+            .size = particle_size * self.scale,
             .lifetime = self.lifetime,
             .position = rl.Vector2{.x = x, .y = y - self.radius * self.scale},
             .vel_start = rl.Vector2{.x = @intToFloat(f16, vel_x), .y = -3},
@@ -63,7 +64,6 @@ pub const Flame = struct{
     fn update_colors(p: *Particle, pp: f16) void {
         for (p.color) |_, i| {
             p.color[i] = @floatToInt(u8, @intToFloat(f16, p.color_start[i]) * pp + @intToFloat(f16, p.color_end[i]) * (1 - pp));
-           // print(" {d} ", .{p.color[i]});
         }
     }
 
@@ -84,7 +84,7 @@ pub const Flame = struct{
                 p.position.y += p.vel_start.y * pp + p.vel_end.y * (1 - pp);
                 update_colors(p, pp);
 
-                p.scale *= p.shrink_factor;
+                p.size *= p.shrink_factor;
 
             }
             p.lifetime -= 0.1;
@@ -94,8 +94,8 @@ pub const Flame = struct{
         //p = self.particles[i];
         for (self.particles.items) |*p, i| {
             _ = i;
-            var x = @floatToInt(i16, p.position.x - self.radius * p.scale * 0.5);
-            rl.DrawCircle(x, @floatToInt(i16, p.position.y), self.radius * p.scale, u8ToColor(p.color));
+            var v = rl.Vector2{.x = p.position.x - p.size * 0.5, .y = p.position.y};
+            rl.DrawCircleV(v, p.size, u8ToColor(p.color));
         }
     }
     
@@ -114,5 +114,5 @@ pub fn new() Flame {
         .color = color,
         .lifetime = 5,
         .amount = 60,
-    };
+        };
 }

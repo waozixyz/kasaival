@@ -56,8 +56,8 @@ pub const Player = struct{
             lyra.cx += dx;
         }
 
-        if (x + dx < lyra.start_x + lyra.cx and dx < 0) {
-            self.position.x = lyra.start_x + lyra.cx;
+        if (x + dx < lyra.start_x + lyra.cx + self.flame.radius and dx < 0) {
+            self.position.x = lyra.start_x + lyra.cx + self.flame.radius;
         }
         else if (x + dx > lyra.start_x + lyra.cx + lyra.screen_width) {
             self.position.x = lyra.start_x + lyra.cx + lyra.screen_width;
@@ -73,6 +73,7 @@ pub const Player = struct{
             self.position.y = lyra.start_y;
         }
         else {
+            self.flame.scale = self.position.y / lyra.game_height;
             self.position.y += dy;
         }
     }
@@ -92,5 +93,6 @@ pub fn new() Player {
         .xp = 100,
         .speed = 20,
         .position = rl.Vector2{.x = 1920 * 0.5, .y = 1080 * 0.5},
-        .flame = flame.new()};
+        .flame = flame.new()
+    };
 }

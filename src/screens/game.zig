@@ -27,6 +27,8 @@ pub const GameScreen = struct{
     pub fn predraw(self: *GameScreen) void {
         rl.ClearBackground(rl.BLACK);
         self.sky.draw();
+        self.ground.predraw();
+
     }
     pub fn draw(self: *GameScreen) void {
         self.ground.draw();

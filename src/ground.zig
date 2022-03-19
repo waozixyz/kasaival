@@ -13,20 +13,21 @@ const test_allocator = std.testing.allocator;
 const Tile = struct {
     v1: rl.Vector2,
     v2: rl.Vector2,
+    v3: rl.Vector2,
     width: f32,
     color: rl.Color,
 };
 
 const colors = [_]rl.Color{
-    rl.Color{.r = 20, .g = 200, .b = 10, .a = 200},
+    rl.Color{.r = 20, .g = 200, .b = 10, .a = 220},
     rl.Color{.r = 50, .g = 190, .b = 12, .a = 200},
-    rl.Color{.r = 16, .g = 180, .b = 15, .a = 200},
+    rl.Color{.r = 16, .g = 180, .b = 15, .a = 210},
     rl.Color{.r = 18, .g = 175, .b = 20, .a = 200},
-    rl.Color{.r = 60, .g = 170, .b = 22, .a = 200},
+    rl.Color{.r = 60, .g = 170, .b = 22, .a = 220},
     rl.Color{.r = 22, .g = 165, .b = 26, .a = 200},
-    rl.Color{.r = 24, .g = 160, .b = 32, .a = 200},
-    rl.Color{.r = 26, .g = 155, .b = 45, .a = 200},
-    rl.Color{.r = 28, .g = 150, .b = 40, .a = 200}
+    rl.Color{.r = 24, .g = 160, .b = 32, .a = 220},
+    rl.Color{.r = 26, .g = 155, .b = 45, .a = 220},
+    rl.Color{.r = 28, .g = 150, .b = 40, .a = 220}
 
 };
 pub const Ground = struct{
@@ -38,41 +39,53 @@ pub const Ground = struct{
     pub fn load(self: *Ground) void {
         const rand = std.crypto.random;
 
-        var height: f32 = 64;
+        var height: f32 = 32;
         var width: f32 = 32;
         var start_y: f32 = lyra.start_y;
 
         while (start_y < lyra.game_height + height) {
-            var start_x: f32 = lyra.start_x - width;
+            var start_x: f32 = lyra.start_x - width - 200;
+            var i: u8 = 0;
             while (start_x < lyra.game_width + width) {
-        
-                var color = colors[ rand.intRangeAtMost(u64, 0, 8)];
-                var t = Tile{
-                    .v1 = rl.Vector2{.x = start_x, .y = start_y},
-                    .v2 = rl.Vector2{.x = start_x, .y = start_y - height},
-                    .width = width,
-                    .color = color
-                };
-                append_tile(self, t) catch |err| {
-                    std.log.info("Caught error: {s}", .{ err });
-                };
-                start_x += width * 0.5;
+                if (start_x > lyra.start_x - width) {
+                    const random_factor = @intToFloat(f16, rand.intRangeAtMost(u8, 0, @floatToInt(u8, width * 0.4))) - width * 0.4 * 0.5;
+                    var color = colors[ rand.intRangeAtMost(u64, 0, 8)];
+                    var v1 = rl.Vector2{.x = start_x - width * 0.5 , .y = start_y};
+                    var v2 = rl.Vector2{.x = start_x + width * 0.5 + random_factor, .y = start_y};
+                    var v3 = rl.Vector2{.x = start_x, .y = start_y - height + random_factor};
+                    if (@mod(i, 2) == 0) {
+                        v1 = rl.Vector2{.x = start_x - width * 0.5, .y = start_y + random_factor};
+                        v2 = rl.Vector2{.x = start_x + random_factor, .y = start_y + height};
+                        v3 = rl.Vector2{.x = start_x + width * 0.5, .y = start_y };
+                    }
+                    var t = Tile{ .v1 = v1, .v2 = v2, .v3 = v3, .width = width, .color = color };
+
+                    append_tile(self, t) catch |err| {
+                        std.log.info("Caught error: {s}", .{ err });
+                    };
+                }
+                start_x += width * 0.4;
+                i += 1;
             }
             height *= 1.1;
             width *= 1.1;
-            start_y += height * 0.5;
+            start_y += height * 0.4;
 
         } 
     }
     pub fn update(_: *Ground) void {
 
     }
+    pub fn predraw(_: *Ground) void {
+        rl.DrawRectangle(0, @floatToInt(u16, lyra.start_y), lyra.game_width, lyra.game_height, colors[0]);
+    }
+
     pub fn draw(self: *Ground) void {
         for (self.tiles.items) |*t, i| {
             _ = i;
 
             // update x pos with lyra camera x 
-            rl.DrawLineEx(t.v1, t.v2, t.width, t.color);
+            rl.DrawTriangle(t.v1, t.v2, t.v3, t.color);
         }
     }
     pub fn unload(_: *Ground) void {
