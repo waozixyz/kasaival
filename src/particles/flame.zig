@@ -1,7 +1,6 @@
 const std = @import("std");
-const ray = @cImport({
-    @cInclude("raylib.h");
-});
+const rl = @import("raylib");
+
 
 const lyra = @import("../lyra.zig");
 
@@ -10,10 +9,10 @@ const ArrayList = std.ArrayList;
 const test_allocator = std.testing.allocator;
 
 const Particle = struct{
-    position: ray.Vector2,
+    position: rl.Vector2,
     lifetime: f16,
-    vel_start: ray.Vector2,
-    vel_end: ray.Vector2,
+    vel_start: rl.Vector2,
+    vel_end: rl.Vector2,
     shrink_factor: f16,
     scale: f16,
     color: [4]u8,
@@ -39,9 +38,9 @@ pub const Flame = struct{
         return Particle{
             .scale = self.scale,
             .lifetime = self.lifetime,
-            .position = ray.Vector2{.x = x, .y = y * 0.8 * self.scale},
-            .vel_start = ray.Vector2{.x = @intToFloat(f16, vel_x), .y = -3},
-            .vel_end = ray.Vector2{.x =  vel_x_end, .y = -3},
+            .position = rl.Vector2{.x = x, .y = y - self.radius * self.scale},
+            .vel_start = rl.Vector2{.x = @intToFloat(f16, vel_x), .y = -3},
+            .vel_end = rl.Vector2{.x =  vel_x_end, .y = -3},
             .color = self.color,
             .color_start = self.color,
             .color_end = [4]u8{100, 30, 20, 200},
@@ -49,8 +48,8 @@ pub const Flame = struct{
             
         };
     }
-    fn u8ToColor(color: [4]u8) ray.Color {
-        return ray.Color{.r = color[0], .g = color[1], .b = color[2], .a = color[3]};
+    fn u8ToColor(color: [4]u8) rl.Color {
+        return rl.Color{.r = color[0], .g = color[1], .b = color[2], .a = color[3]};
     }
 
     fn append_particle(self: *Flame, p: Particle) !void {
@@ -96,7 +95,7 @@ pub const Flame = struct{
         for (self.particles.items) |*p, i| {
             _ = i;
             var x = @floatToInt(i16, p.position.x - self.radius * p.scale * 0.5);
-            ray.DrawCircle(x, @floatToInt(i16, p.position.y), self.radius * p.scale, u8ToColor(p.color));
+            rl.DrawCircle(x, @floatToInt(i16, p.position.y), self.radius * p.scale, u8ToColor(p.color));
         }
     }
     

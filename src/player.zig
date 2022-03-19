@@ -1,7 +1,6 @@
 const std = @import("std");
-const ray = @cImport({
-    @cInclude("raylib.h");
-});
+const rl = @import("raylib");
+
 
 const lyra = @import("lyra.zig");
 
@@ -10,24 +9,24 @@ const flame = @import("particles/flame.zig");
 const print = std.debug.print;
 const math = std.math;
 
-fn get_angle(diff: ray.struct_Vector2) ray.struct_Vector2 {
+fn get_angle(diff: rl.Vector2) rl.Vector2 {
     var angle: f32 = math.atan2(f32, diff.x, diff.y);
     if (angle < 0) {
         angle += math.pi * 2.0;
     }
-    return ray.Vector2{.x = math.sin(angle), .y = math.cos(angle)};
+    return rl.Vector2{.x = math.sin(angle), .y = math.cos(angle)};
 }
 
-fn get_direction(x: f32, y: f32 ) ray.struct_Vector2 {
-    var dir = ray.Vector2{.x = 0.0, .y = 0.0};
-    for (lyra.key_right) |key, i| { _ = i; if (ray.IsKeyDown(key)) { dir.x = 1; } }
-    for (lyra.key_left) |key, i| { _ = i; if (ray.IsKeyDown(key)) { dir.x = -1; } }
-    for (lyra.key_up) |key, i| { _ = i; if (ray.IsKeyDown(key)) { dir.y = -1; } }
-    for (lyra.key_down) |key, i| { _ = i; if (ray.IsKeyDown(key)) { dir.y = 1; } }
+fn get_direction(x: f32, y: f32 ) rl.Vector2 {
+    var dir = rl.Vector2{.x = 0.0, .y = 0.0};
+    for (lyra.key_right) |key, i| { _ = i; if (rl.IsKeyDown(key)) { dir.x = 1; } }
+    for (lyra.key_left) |key, i| { _ = i; if (rl.IsKeyDown(key)) { dir.x = -1; } }
+    for (lyra.key_up) |key, i| { _ = i; if (rl.IsKeyDown(key)) { dir.y = -1; } }
+    for (lyra.key_down) |key, i| { _ = i; if (rl.IsKeyDown(key)) { dir.y = 1; } }
     if (dir.y == 0 and dir.x == 0) {
         // check mouse press
-        if (ray.IsMouseButtonDown(ray.MOUSE_BUTTON_LEFT)) {
-            var diff = ray.Vector2{.x = lyra.mouse_x - x + lyra.cx, .y = lyra.mouse_y - y};
+        if (rl.IsMouseButtonDown(rl.MouseButton.MOUSE_LEFT_BUTTON)) {
+            var diff = rl.Vector2{.x = lyra.mouse_x - x + lyra.cx, .y = lyra.mouse_y - y};
             const offset = 5;
             if (@fabs(diff.x) > offset or @fabs(diff.y) > offset) {
                 dir = get_angle(diff);
@@ -38,7 +37,7 @@ fn get_direction(x: f32, y: f32 ) ray.struct_Vector2 {
 }
 pub const Player = struct{
     flame: flame.Flame,
-    position: ray.Vector2,
+    position: rl.Vector2,
     hp: f16,
     xp: f16,
     speed: f16,
@@ -92,6 +91,6 @@ pub fn new() Player {
         .hp = 100,
         .xp = 100,
         .speed = 20,
-        .position = ray.Vector2{.x = 1920 * 0.5, .y = 1080 * 0.5},
+        .position = rl.Vector2{.x = 1920 * 0.5, .y = 1080 * 0.5},
         .flame = flame.new()};
 }

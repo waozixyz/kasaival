@@ -1,7 +1,5 @@
 const std = @import("std");
-const ray = @cImport({
-    @cInclude("raylib.h");
-});
+const rl = @import("raylib");
 
 
 pub const screen_width : f16 = 1920;
@@ -10,18 +8,15 @@ pub const screen_height: f16 = 1080;
 pub const game_width : f16 = 3000;
 pub const game_height: f16 = 1080;
 
-pub const key_right = [_]u16{ray.KEY_RIGHT, ray.KEY_D};
-pub const key_left  = [_]u16{ray.KEY_LEFT, ray.KEY_A};
-pub const key_up    = [_]u16{ray.KEY_UP, ray.KEY_W};
-pub const key_down  = [_]u16{ray.KEY_DOWN, ray.KEY_S};
+pub const key_right = [_]rl.KeyboardKey{rl.KeyboardKey.KEY_RIGHT, rl.KeyboardKey.KEY_D};
+pub const key_left  = [_]rl.KeyboardKey{rl.KeyboardKey.KEY_LEFT, rl.KeyboardKey.KEY_A};
+pub const key_up    = [_]rl.KeyboardKey{rl.KeyboardKey.KEY_UP, rl.KeyboardKey.KEY_W};
+pub const key_down  = [_]rl.KeyboardKey{rl.KeyboardKey.KEY_DOWN, rl.KeyboardKey.KEY_S};
 
 
-pub const ScreenNames = enum {
-    title,
-    game,
-};
+pub const ScreenNames = enum { game, title };
 
-pub var next : ScreenNames = ScreenNames.game;
+pub var next : ScreenNames = ScreenNames.title;
 
 pub var start_x : f16 = 0;
 pub var start_y : f16 = 400;
