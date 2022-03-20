@@ -77,8 +77,8 @@ pub const Player = struct{
             self.position.y += dy;
         }
     }
-    pub fn draw(self: *Player) void {
-        self.flame.draw();
+    pub fn draw(self: *Player, i: usize) void {
+        self.flame.draw(i);
     }
     pub fn unload(self: *Player) void {
         self.flame.unload();

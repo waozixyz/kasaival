@@ -15,7 +15,7 @@ pub const Sky = struct{
     pub fn update(_: *Sky) void {
 
     }
-    pub fn draw(self: *Sky) void {
+    pub fn predraw(self: *Sky) void {
         // draw blue sky
 
         var color = rl.Color{.r = 30, .g = 10, .b = 150, .a = 200};

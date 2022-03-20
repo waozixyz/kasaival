@@ -80,15 +80,13 @@ pub const Ground = struct{
         rl.DrawRectangle(0, @floatToInt(u16, lyra.start_y), lyra.game_width, lyra.game_height, colors[0]);
     }
 
-    pub fn draw(self: *Ground) void {
-        for (self.tiles.items) |*t, i| {
-            _ = i;
-
-            // update x pos with lyra camera x 
-            rl.DrawTriangle(t.v1, t.v2, t.v3, t.color);
-        }
+    pub fn draw(self: *Ground, i : usize) void {
+        var t =self.tiles.items[i];
+        rl.DrawTriangle(t.v1, t.v2, t.v3, t.color);
     }
-    pub fn unload(_: *Ground) void {
+    pub fn unload(self: *Ground) void {
+        self.tiles.deinit();
+
     }
 
 };

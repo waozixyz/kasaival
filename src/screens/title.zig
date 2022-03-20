@@ -16,7 +16,6 @@ pub const TitleScreen = struct{
         }
     }
     pub fn predraw(self: *TitleScreen) void {
-        rl.ClearBackground(rl.BLACK);
         rl.DrawTexture(self.texture, 0, 0, rl.WHITE);
         rl.DrawText("KASAIVAL", 480, 160, 200, rl.MAROON);
         rl.DrawText("an out of control flame trying to survive", 350, 640, 60, rl.MAROON);

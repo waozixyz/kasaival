@@ -108,6 +108,7 @@ pub fn main() void {
         //----------------------------------------------------------------------------------
         rl.BeginDrawing();
         rl.BeginTextureMode(target);
+        rl.ClearBackground(rl.BLACK);
 
         switch (current) {
             Screen.title => { current.title.predraw(); },
