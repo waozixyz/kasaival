@@ -69,43 +69,29 @@ pub const GameScreen = struct{
         // add ground tiles to_order
         var item_count: usize = 0;
         for (self.ground.tiles.items) |*t, i| {
-            _ = i;  
-            var flag: bool = false;
-            var x:[3]f32 = .{t.v1.x, t.v2.x, t.v3.x};
-            for (x) |xval, j| {
-                _ = j;
-                if (xval > lyra.cx and xval < lyra.cx + lyra.screen_width) {
-                    flag = true;
-                    break;
-                }
-            }
-            if (flag) {
-                // find the lower y value in the tri-vector tile
-                var y:[3]f32 = .{t.v1.y, t.v2.y, t.v3.y};
-                var z:f32 = 999999;
-                for (y) |yval, j| {
-                    _ = j;
 
-                    if (yval < z) {
-                        z = yval;
-                    }
-                }
+            _ = i;  
+
+            var left_x = t.x - t.w * 0.5 * t.scale;
+            var right_x = t.x + t.w * 0.5 * t.scale;
+
+            if ( right_x > lyra.cx and left_x < lyra.cx + lyra.screen_width) {
+
                 // find collision with player
                 var px = self.player.position.x;
                 var py = self.player.position.y;
                 var pr = self.player.get_radius();
-                if (z > py - pr*2 and z < py) {
-                    if (x[0] > px - pr or x[1] > px - pr or x[2] > px - pr) {
-                        if (x[0] < px + pr or x[1] < px + pr or x[2] < px + pr) {
-                            t.burn();
-                        }
+                if (t.y > py - pr*2 and t.y < py) {
+                    pr *= 0.5;
+                    if (right_x > px - pr and left_x < px + pr) {
+                        t.burn();
                     }
 
                 }
                 // make new zentity 
                 var ze = ZEntity{
                     .index = i,
-                    .z = @floatToInt(u16, z),
+                    .z = @floatToInt(u16, t.y),
                     .item = ZEntities.ground
                 };
                 // add to z_entity order list
