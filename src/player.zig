@@ -43,6 +43,9 @@ pub const Player = struct{
     speed: f16,
     pub fn load(_: *Player) void {
     }
+    pub fn get_radius(self: *Player) f32 {
+        return self.flame.radius * self.flame.scale;
+    }
     pub fn update(self: *Player) void {
         const x = self.position.x;
         const y = self.position.y;
@@ -91,7 +94,7 @@ pub fn new() Player {
     return Player{
         .hp = 100,
         .xp = 100,
-        .speed = 20,
+        .speed = 10,
         .position = rl.Vector2{.x = 1920 * 0.5, .y = 1080 * 0.5},
         .flame = flame.new()
     };

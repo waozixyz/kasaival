@@ -37,12 +37,11 @@ pub const Flame = struct{
         const vel_x_end = @intToFloat(f16, rand.intRangeAtMost(i16, -2 - vel_x, 2 - vel_x));
         const shrink_factor = @intToFloat(f16, rand.intRangeAtMost(u8, 90, 99)) * 0.01;
         const particle_size = @intToFloat(f16, rand.intRangeAtMost(u8, @floatToInt(u8, self.radius * 0.8), @floatToInt(u8, self.radius)));
-        const start_y = y - self.radius * self.scale;
         return Particle{
             .size = particle_size * self.scale,
             .lifetime = self.lifetime,
-            .start_y = start_y,
-            .position = rl.Vector2{.x = x, .y = start_y},
+            .start_y = y,
+            .position = rl.Vector2{.x = x, .y = y},
             .vel_start = rl.Vector2{.x = @intToFloat(f16, vel_x), .y = -3},
             .vel_end = rl.Vector2{.x =  vel_x_end, .y = -3},
             .color = self.color,

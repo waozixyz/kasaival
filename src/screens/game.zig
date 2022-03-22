@@ -80,19 +80,35 @@ pub const GameScreen = struct{
                 }
             }
             if (flag) {
+                // find the lower y value in the tri-vector tile
                 var y:[3]f32 = .{t.v1.y, t.v2.y, t.v3.y};
                 var z:f32 = 999999;
                 for (y) |yval, j| {
                     _ = j;
+
                     if (yval < z) {
                         z = yval;
                     }
                 }
+                // find collision with player
+                var px = self.player.position.x;
+                var py = self.player.position.y;
+                var pr = self.player.get_radius();
+                if (z > py - pr*2 and z < py) {
+                    if (x[0] > px - pr or x[1] > px - pr or x[2] > px - pr) {
+                        if (x[0] < px + pr or x[1] < px + pr or x[2] < px + pr) {
+                            t.burn();
+                        }
+                    }
+
+                }
+                // make new zentity 
                 var ze = ZEntity{
                     .index = i,
                     .z = @floatToInt(u16, z),
                     .item = ZEntities.ground
                 };
+                // add to z_entity order list
                 if (item_count >= self.to_order.items.len) {
                     append_to_order(self, ze) catch |err| {
                         std.log.info("Caught error: {s}", .{ err });
@@ -135,7 +151,6 @@ pub const GameScreen = struct{
         }
         var slice = self.to_order.items[0..item_count];
         sort(ZEntity, slice, {}, compareLeq);
-  
     }
     pub fn predraw(self: *GameScreen) void {
         self.sky.predraw();
@@ -148,6 +163,7 @@ pub const GameScreen = struct{
             switch (ze.item) {
                 ZEntities.ground => {
                     self.ground.draw(ze.index);
+
                 },
                 ZEntities.player => {
                     self.player.draw(ze.index);

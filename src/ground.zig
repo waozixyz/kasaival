@@ -16,6 +16,30 @@ const Tile = struct {
     v3: rl.Vector2,
     width: f32,
     color: rl.Color,
+    org_color: rl.Color,
+    pub fn heal(self: *Tile) void {
+        if (self.color.r != self.org_color.r) {
+            self.color.r -= 1;
+        }
+        else if (self.color.g != self.org_color.g) {
+            self.color.g += 1;
+        }
+
+        else if (self.color.b != self.org_color.b) {
+            self.color.b += 1;
+        }
+    }
+    pub fn burn(self: *Tile) void {
+        if (self.color.r < 200) {
+            self.color.r += 14;
+        }
+        if (self.color.g > 60) {
+            self.color.g -= 10;
+        }
+        if (self.color.b > 5) {
+            self.color.b -= 4;
+        }
+    }
 };
 
 const colors = [_]rl.Color{
@@ -38,8 +62,7 @@ pub const Ground = struct{
     }
     pub fn load(self: *Ground) void {
         const rand = std.crypto.random;
-
-        var height: f32 = 32;
+        var height: f32 = 18;
         var width: f32 = 32;
         var start_y: f32 = lyra.start_y;
 
@@ -48,7 +71,7 @@ pub const Ground = struct{
             var i: u8 = 0;
             while (start_x < lyra.game_width + width) {
                 if (start_x > lyra.start_x - width) {
-                    const random_factor = @intToFloat(f16, rand.intRangeAtMost(u8, 0, @floatToInt(u8, width * 0.4))) - width * 0.4 * 0.5;
+                    const random_factor = @intToFloat(f16, rand.intRangeAtMost(u16, 0, @floatToInt(u16, width * 0.4))) - width * 0.4 * 0.5;
                     var color = colors[ rand.intRangeAtMost(u64, 0, 8)];
                     var v1 = rl.Vector2{.x = start_x - width * 0.5 , .y = start_y};
                     var v2 = rl.Vector2{.x = start_x + width * 0.5 + random_factor, .y = start_y};
@@ -58,7 +81,7 @@ pub const Ground = struct{
                         v2 = rl.Vector2{.x = start_x + random_factor, .y = start_y + height};
                         v3 = rl.Vector2{.x = start_x + width * 0.5, .y = start_y };
                     }
-                    var t = Tile{ .v1 = v1, .v2 = v2, .v3 = v3, .width = width, .color = color };
+                    var t = Tile{ .v1 = v1, .v2 = v2, .v3 = v3, .width = width, .color = color, .org_color = color };
 
                     append_tile(self, t) catch |err| {
                         std.log.info("Caught error: {s}", .{ err });
@@ -73,8 +96,11 @@ pub const Ground = struct{
 
         } 
     }
-    pub fn update(_: *Ground) void {
-
+    pub fn update(self: *Ground) void {
+        for (self.tiles.items) |*t, i| {
+            _ = i;
+            t.heal();
+        }
     }
     pub fn predraw(_: *Ground) void {
         rl.DrawRectangle(0, @floatToInt(u16, lyra.start_y), lyra.game_width, lyra.game_height, colors[0]);
