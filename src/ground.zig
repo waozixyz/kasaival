@@ -23,17 +23,13 @@ const Tile = struct {
 
     pub fn burn(self: *Tile) void {
         if (self.color.r < 200) {
-            self.color.r += 14;
+            self.color.r += 20;
         }
-        if (self.color.g > 20) {
+        if (self.color.g > 100) {
             self.color.g -= 10;
-        } else {
-            self.color.g = 20;
         }
         if (self.color.b > 4) {
             self.color.b -= 4;
-        } else {
-            self.color.b = 4;
         }
         
     }
@@ -89,33 +85,29 @@ pub const Ground = struct{
 
         for (self.tiles.items) |*t, i| {
             _ = i;
-            if (t.color.r != t.org_color.r) {
-                t.color.r -= 1;
+            if (t.color.r > t.org_color.r) {
+                t.color.r -= 2;
             }
             if (t.color.r > 60) {
-                if (t.scale > 0.5) {
+                if (t.scale > 0.8) {
                     t.scale -= 0.01;
                 } else {
-                    t.scale = 0.5;
+                    t.scale = 0.8;
                 }
             }
             else {
                 var heal = rand.intRangeAtMost(u16, 0, 10);
                 if (heal > 7) {
                     if (t.color.g != t.org_color.g) {
-                        var ra = rand.intRangeAtMost(u16, 0, 10);
-                        if (ra > 7) {
-                            t.color.g += 1;
-                        }
+                        t.color.g += 1;
                     }
                     else if (t.color.b != t.org_color.b) {
                         t.color.b += 1;
+                    }
+                    if (t.scale < 1) {
+                       t.scale += 0.01;
                     } else {
-                        if (t.scale < 1) {
-                            t.scale += 0.005;
-                        } else {
-                            t.scale = 1;
-                        }
+                        t.scale = 1;
                     }
                 }
             }
