@@ -24,21 +24,16 @@ const ZEntity = struct {
 
 fn compareLeq(context: void, left: ZEntity, right: ZEntity) bool {
     _ = context;
-    if (left.item != ZEntities.none and right.item != ZEntities.none) {
-        if (left.item != right.item) {
-            if (left.z == right.z) {
-                if (left.item == ZEntities.player) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            } else {
-                return left.z < right.z;
+    if (left.item != ZEntities.none and right.item != ZEntities.none and left.item != right.item) {
+        if (left.z == right.z) {
+            if (left.item == ZEntities.player) {
+                return true;
             }
-        }
-        else {
-            return false;
+            else {
+                return false;
+            }
+        } else {
+            return left.z < right.z;
         }
     }
     else {
@@ -72,18 +67,15 @@ pub const GameScreen = struct{
 
             _ = i;  
 
-            var left_x = t.x - t.w * 0.5 * t.scale;
-            var right_x = t.x + t.w * 0.5 * t.scale;
 
-            if ( right_x > lyra.cx and left_x < lyra.cx + lyra.screen_width) {
+            if ( t.get_right_x() > lyra.cx and t.get_left_x() < lyra.cx + lyra.screen_width) {
 
                 // find collision with player
                 var px = self.player.position.x;
                 var py = self.player.position.y;
                 var pr = self.player.get_radius();
-                if (t.y > py - pr*2 and t.y < py) {
-                    pr *= 0.5;
-                    if (right_x > px - pr and left_x < px + pr) {
+                if (t.y > py - pr * 0.5 and t.y - t.h * 0.5 < py + pr * 0.5) {
+                    if (t.get_right_x() > px - pr  and t.get_left_x() < px + pr) {
                         t.burn();
                     }
 
