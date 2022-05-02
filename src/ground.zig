@@ -69,7 +69,7 @@ pub const Ground = struct{
                 if (start_x > lyra.start_x - w * 0.5) {
                     const random_factor = @intToFloat(f16, rand.intRangeAtMost(u16, 0, @floatToInt(u16, w * 0.4))) - w * 0.4 * 0.5;
                     var color = get_color();
-                    var t = Tile{ .x = start_x, .y = start_y, .w = w, .h = h, .scale = 1, .random_factor = random_factor, .color = color, .org_color = color };
+                    var t = Tile{ .x = start_x, .y = start_y, .w = w, .h = h, .scale = @intToFloat(f16, rand.intRangeAtMost(u16, 10, 12)) / 10, .random_factor = random_factor, .color = color, .org_color = color };
                     append_tile(self, t) catch |err| {
                         std.log.info("Caught error: {s}", .{ err });
                     };
@@ -89,10 +89,8 @@ pub const Ground = struct{
                 t.color.r -= 2;
             }
             if (t.color.r > 60) {
-                if (t.scale > 0.8) {
+                if (t.scale > 0.9) {
                     t.scale -= 0.01;
-                } else {
-                    t.scale = 0.8;
                 }
             }
             else {
@@ -104,10 +102,8 @@ pub const Ground = struct{
                     else if (t.color.b != t.org_color.b) {
                         t.color.b += 1;
                     }
-                    if (t.scale < 1) {
+                    if (t.scale < 1.2) {
                        t.scale += 0.01;
-                    } else {
-                        t.scale = 1;
                     }
                 }
             }
