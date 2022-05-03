@@ -16,7 +16,6 @@ const test_allocator = std.testing.allocator;
 const PlantSpawner = struct {
     frequency: f32,
     elapsed: f32,
-    item: plant.Plant,
 };
 const ZEntities = enum {
     player,
@@ -65,7 +64,6 @@ pub const GameScreen = struct{
         var spawner = PlantSpawner{
             .frequency = 2,
             .elapsed = 0,
-            .item = plant.new(),
         };
         self.append_plant_spawner(spawner) catch |err| {
             std.log.info("Caught error: {s}", .{ err });
@@ -80,7 +78,16 @@ pub const GameScreen = struct{
     fn append_to_order(self: *GameScreen, ze: ZEntity) !void {
         _ = try self.to_order.append(ze);
     }
-
+    fn add_to_order(self: *GameScreen, ze: ZEntity, item_count: usize) void {
+        // add to z_entity order list
+        if (item_count >= self.to_order.items.len) {
+            self.append_to_order(ze) catch |err| {
+                std.log.info("Caught error: {s}", .{ err });
+            };
+        } else {
+            self.to_order.items[item_count] = ze;
+        }
+    }
     fn sort_tiles(self: *GameScreen, item_count: usize) usize {
         var rtn = item_count;
         // add ground tiles to_order
@@ -102,15 +109,8 @@ pub const GameScreen = struct{
                     .z = @floatToInt(u16, t.y),
                     .item = ZEntities.ground
                 };
-                // add to z_entity order list
-                if (rtn >= self.to_order.items.len) {
-                    self.append_to_order(ze) catch |err| {
-                        std.log.info("Caught error: {s}", .{ err });
-                    };
-                }
-                else {
-                    self.to_order.items[rtn] = ze;
-                }
+
+                self.add_to_order(ze, rtn);
                 rtn += 1;
             } 
         }
@@ -126,16 +126,27 @@ pub const GameScreen = struct{
                 .z = @floatToInt(u16, p.start_y) + 1,
                 .item = ZEntities.player
             };
-            if (rtn + i >= self.to_order.items.len) {
-                self.append_to_order(ze) catch |err| {
-                    std.log.info("Caught error: {s}", .{ err });
-                };
-            }
-            else {
-                self.to_order.items[rtn + i] = ze;
-            }
+  
+            self.add_to_order(ze, rtn);
+            rtn += 1;
         }
-        rtn += self.player.flame.particles.items.len - 1;
+        return rtn;
+        
+    }
+    // sort plants
+    fn sort_plants(self: *GameScreen, item_count: usize) usize {
+        var rtn = item_count;
+        // add player particles to_order
+        for (self.plants.items) |*t, i| {
+            var ze = ZEntity{
+                .index = i,
+                .z = @floatToInt(u16, t.y),
+                .item = ZEntities.plant
+            };
+
+            self.add_to_order(ze, rtn);
+            rtn += 1;
+        }
         return rtn;
     }
     // main update game loop
@@ -151,16 +162,26 @@ pub const GameScreen = struct{
             _ = i;
             if (self.elapsed_time > s.elapsed + s.frequency) {
                 s.elapsed = self.elapsed_time;
-                self.append_plant(s.item) catch |err| {
+                var p = plant.new();
+                p.load();
+                self.append_plant(p) catch |err| {
                     std.log.info("Caught error: {s}", .{ err });
                 };
             }
         }
+        // update plants
+        for (self.plants.items) |*p, i| {
+            _ = i;
+            p.update();
+        }
+           
         // z order sorting
         var item_count: usize = 0;
         item_count = self.sort_tiles(item_count);
         item_count = self.sort_player_particles(item_count);
-       
+        item_count = self.sort_plants(item_count);
+
+
         // reset unused slots in arraylist to_order
         while (self.to_order.items.len > item_count) {
             var ze = ZEntity{
@@ -194,6 +215,7 @@ pub const GameScreen = struct{
                     self.player.draw(ze.index);
                 },
                 ZEntities.plant => {
+                    self.plants.items[ze.index].draw();
                 },
                 ZEntities.none => {}
 

@@ -107,6 +107,8 @@ pub fn main() void {
         // Draw
         //----------------------------------------------------------------------------------
         rl.BeginDrawing();
+        rl.ClearBackground(rl.BLACK);
+
         rl.BeginTextureMode(target);
         rl.ClearBackground(rl.BLACK);
 
