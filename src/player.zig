@@ -49,7 +49,6 @@ pub const Player = struct{
     pub fn update(self: *Player) void {
         const x = self.position.x;
         const y = self.position.y;
-        self.flame.update(x, y);
         var dir = get_direction(x, y);
         var dx = dir.x * self.speed;
         var dy = dir.y * self.speed;
@@ -79,6 +78,8 @@ pub const Player = struct{
             self.flame.scale = self.position.y / lyra.game_height;
             self.position.y += dy;
         }
+        self.flame.update(self.position);
+
     }
     pub fn draw(self: *Player, i: usize) void {
         self.flame.draw(i);

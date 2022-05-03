@@ -58,6 +58,7 @@ pub const GameScreen = struct{
     plant_spawners: ArrayList(PlantSpawner),
     to_order: ArrayList(ZEntity),
     elapsed_time: f32,
+    item_count: usize,
     pub fn load(self: *GameScreen) void {
         self.sky.load();
         self.ground.load();
@@ -81,18 +82,18 @@ pub const GameScreen = struct{
     fn append_to_order(self: *GameScreen, ze: ZEntity) !void {
         _ = try self.to_order.append(ze);
     }
-    fn add_to_order(self: *GameScreen, ze: ZEntity, item_count: usize) void {
+    fn add_to_order(self: *GameScreen, ze: ZEntity) void {
         // add to z_entity order list
-        if (item_count >= self.to_order.items.len) {
+        if (self.item_count == self.to_order.items.len) {
             self.append_to_order(ze) catch |err| {
                 std.log.info("Caught error: {s}", .{ err });
             };
         } else {
-            self.to_order.items[item_count] = ze;
+            self.to_order.items[self.item_count] = ze;
         }
+        self.item_count += 1;
     }
-    fn sort_tile_rows(self: *GameScreen, item_count: usize) usize {
-        var rtn = item_count;
+    fn sort_tile_rows(self: *GameScreen) void {
         // add ground tiles to_order
         for (self.ground.tiles.items) |*row, i| {
             var t = row.items[0];
@@ -103,10 +104,8 @@ pub const GameScreen = struct{
                 .item = ZEntities.ground
             };
 
-            self.add_to_order(ze, rtn);
-            rtn += 1;
+            self.add_to_order(ze);
         }
-        return rtn;
     }
     fn check_tile_collision(self: *GameScreen) void {
         // check tile collision with player
@@ -130,49 +129,31 @@ pub const GameScreen = struct{
         }
     }
     // go through each flam particle and add it as a zentity for sorting
-    fn sort_player_particles(self: *GameScreen, item_count: usize) usize {
-        var rtn = item_count;
+    fn sort_player_particles(self: *GameScreen) void {
         // add player particles to_order
         for (self.player.flame.particles.items) |*p, i| {
             var ze = ZEntity{
                 .index = .{i, 0, 0},
-                .z = @floatToInt(u16, p.start_y) + 1,
+                .z = p.start_y ,
                 .item = ZEntities.player
             };
   
-            self.add_to_order(ze, rtn);
-            rtn += 1;
+            self.add_to_order(ze);
         }
-        return rtn;
         
     }
     // sort plants
-    fn sort_plants(self: *GameScreen, item_count: usize) usize {
-        var rtn = item_count;
+    fn sort_plants(self: *GameScreen) void {
         // plants to_order
         for (self.plants.items) |*p, i| {
-            for (p.branches.items) |*row, j| {
-                var z: f32 = 0;
-                for (row.items) |*b, k| {
-                    _ = k;
-                    if (z < b.v1.y) {
-                        z = b.v1.y;
-                    }
-                    if (z < b.v2.y) {
-                        z = b.v2.y;
-                    }
-                }
-                var ze = ZEntity{
-                    .index = .{i, j, 0},
-                    .z = @floatToInt(u16, z),
-                    .item = ZEntities.plant
-                };
+            var ze = ZEntity{
+                .index = .{i, 0, 0},
+                .z = @floatToInt(u16, p.get_z()),
+                .item = ZEntities.plant
+            };
 
-                self.add_to_order(ze, rtn);
-                rtn += 1;
-            }
+            self.add_to_order(ze);
         }
-        return rtn;
     }
     fn plant_spawning(self: *GameScreen) void {
         // plant spawning
@@ -209,25 +190,23 @@ pub const GameScreen = struct{
         }
            
         // z order sortingf
-        var item_count: usize = 0;
-        item_count = self.sort_tile_rows(item_count);
-        item_count = self.sort_player_particles(item_count);
-        item_count = self.sort_plants(item_count);
+        self.item_count = 0;
+        self.sort_tile_rows();
+        self.sort_player_particles();
+        self.sort_plants();
 
 
         // reset unused slots in arraylist to_order
-        while (self.to_order.items.len > item_count) {
+        while (self.item_count < self.to_order.items.len) {
             var ze = ZEntity{
                 .index = .{0, 0, 0},
                 .z = 0,
                 .item = ZEntities.none
             };
-            self.to_order.items[item_count] = ze;
-            item_count += 1;
+            self.add_to_order(ze);
         }
-        var slice = self.to_order.items[0..item_count];
+        var slice = self.to_order.items[0..self.item_count];
         sort(ZEntity, slice, {}, compareLeq);
-
 
     }
     // unaffected by camera movement
@@ -249,7 +228,7 @@ pub const GameScreen = struct{
                 },
                 ZEntities.plant => {
                     var p = self.plants.items[ze.index[0]];
-                    p.draw(ze.index[1]);
+                    p.draw();
                 },
                 ZEntities.none => {}
 
@@ -268,6 +247,7 @@ pub const GameScreen = struct{
 pub fn new() GameScreen {
     return GameScreen{
         .elapsed_time = 0,
+        .item_count = 0,
         .sky = sky.new(),
         .ground = ground.new(),
         .player = player.new(),

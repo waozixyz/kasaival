@@ -9,7 +9,7 @@ const ArrayList = std.ArrayList;
 const test_allocator = std.testing.allocator;
 
 const Particle = struct{
-    start_y: f32,
+    start_y: u16,
     position: rl.Vector2,
     lifetime: f16,
     vel_start: rl.Vector2,
@@ -29,7 +29,7 @@ pub const Flame = struct{
     radius: f16,
     color: [4]u8,
     particles: ArrayList(Particle),
-    fn get_particle(self: *Flame, x: f32, y: f32) Particle {
+    fn get_particle(self: *Flame, position: rl.Vector2) Particle {
      
         const rand = std.crypto.random;
 
@@ -40,8 +40,8 @@ pub const Flame = struct{
         return Particle{
             .size = particle_size * self.scale,
             .lifetime = self.lifetime,
-            .start_y = y,
-            .position = rl.Vector2{.x = x, .y = y},
+            .start_y = @floatToInt(u16, position.y),
+            .position = position,
             .vel_start = rl.Vector2{.x = @intToFloat(f16, vel_x), .y = -3},
             .vel_end = rl.Vector2{.x =  vel_x_end, .y = -3},
             .color = self.color,
@@ -69,16 +69,16 @@ pub const Flame = struct{
         }
     }
 
-    pub fn update(self: *Flame, x: f32, y: f32) void {
+    pub fn update(self: *Flame, position: rl.Vector2) void {
         if (self.particles.items.len < self.amount) {
-            var p = self.get_particle(x, y);
+            var p = self.get_particle(position);
             append_particle(self, p) catch |err| {
                 std.log.info("Caught error: {s}", .{ err });
             };
         }
         for (self.particles.items) |*p, i| {
             if (p.lifetime <= 0) {
-                self.particles.items[i] = self.get_particle(x, y);
+                self.particles.items[i] = self.get_particle(position);
             }
             var pp = p.lifetime / self.lifetime;
             if (pp > 0) {
@@ -93,7 +93,6 @@ pub const Flame = struct{
         }
     }
     pub fn draw(self: *Flame, i: usize) void {
-        //p = self.particles[i];
         var p = self.particles.items[i];
         var v = rl.Vector2{.x = p.position.x - p.size * 0.5, .y = p.position.y};
         rl.DrawCircleV(v, p.size, u8ToColor(p.color));
@@ -112,7 +111,7 @@ pub fn new() Flame {
         .radius = 48,
         .scale = 1,
         .color = color,
-        .lifetime = 5,
+        .lifetime = 3,
         .amount = 60,
         };
 }

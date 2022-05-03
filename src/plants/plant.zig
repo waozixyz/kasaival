@@ -39,6 +39,12 @@ fn get_color(cs: [6]u8) rl.Color {
     return rl.Color{ .r = r, .g = g, .b = b, .a = 255};
 }
 
+fn get_rot_x(deg: i32) f32 {
+    return math.cos(@intToFloat(f32, deg) * deg_to_rad);
+}
+fn get_rot_y(deg: i32) f32 {
+    return math.sin(@intToFloat(f32, deg) * deg_to_rad);
+}
 pub const Plant = struct{
     branches: ArrayList(ArrayList(Branch)),
     leaves: ArrayList(Leaf),
@@ -69,12 +75,6 @@ pub const Plant = struct{
     }
     fn get_angle(self: *Plant) i32 {
         return rand.intRangeAtMost(i32, self.split_angle[0], self.split_angle[1]);
-    }
-    fn get_rot_x(deg: i32) f32 {
-        return math.cos(@intToFloat(f32, deg) * deg_to_rad);
-    }
-    fn get_rot_y(deg: i32) f32 {
-        return math.sin(@intToFloat(f32, deg) * deg_to_rad);
     }
     fn add_branch(self: *Plant, deg: i32, b: *Branch) void {
         const w = b.w * 0.9;
@@ -115,6 +115,10 @@ pub const Plant = struct{
             self.right_x = nx + w;
         }   
     }
+    pub fn get_z(self: *Plant) f32 {
+        return self.branches.items[0].items[0].v1.y;
+
+    }
     fn get_next_pos(self: *Plant, a: f32, b: f32) f32 {
         return b + (a - b) * @intToFloat(f32, self.grow_timer) / @intToFloat(f32, self.grow_time); 
     }
@@ -144,10 +148,10 @@ pub const Plant = struct{
         self.append_branch(0, Branch{
             .deg = angle,
             .v1 = rl.Vector2{ .x = x, .y = y},
-            .v2 = rl.Vector2{ .x = x, .y = y},
+            .v2 = rl.Vector2{ .x = x, .y = y - self.h},
             .w = self.w,
             .h = self.h,
-            .color = rl.WHITE,
+            .color = get_color(self.cs_branch),
         }) catch |err| {
             std.log.info("Caught error: {s}", .{ err });
         };
@@ -168,26 +172,28 @@ pub const Plant = struct{
             self.grow_timer = self.grow_time;
         } 
     }
-    pub fn draw(self: *Plant, row: usize) void {
-        for (self.branches.items[row].items) |*b, j| {
-            _ = j;
-                
-            var v2 = b.v2;
+    pub fn draw(self: *Plant) void {
+        for (self.branches.items) |*row, i| {
+            for (row.items) |*b, j| {
+                _ = j;
+                    
+                var v2 = b.v2;
 
-            if (row == self.current_row and self.grow_timer > 0) {
-                v2 = rl.Vector2{
-                    .x = self.get_next_pos(b.v1.x, v2.x),
-                    .y = self.get_next_pos(b.v1.y, v2.y)
-                };
+                if (i == self.current_row and self.grow_timer > 0) {
+                    v2 = rl.Vector2{
+                        .x = self.get_next_pos(b.v1.x, v2.x),
+                        .y = self.get_next_pos(b.v1.y, v2.y)
+                    };
+                }
+            
+                rl.DrawLineEx(b.v1, v2, b.w, b.color);
             }
-         
-            rl.DrawLineEx(b.v1, v2, b.w, b.color);
-        }
-        for (self.leaves.items) |*l, j| {
-            _ = j;
-            if (l.row < row and !(row == self.current_row and self.grow_timer > 0)) {
-                rl.DrawCircleV(l.v1, l.r, l.color);
-                rl.DrawCircleV(l.v2, l.r, l.color);
+            for (self.leaves.items) |*l, j| {
+                _ = j;
+                if (l.row < i and !(i == self.current_row and self.grow_timer > 0)) {
+                    rl.DrawCircleV(l.v1, l.r, l.color);
+                    rl.DrawCircleV(l.v2, l.r, l.color);
+                }
             }
         }
     
