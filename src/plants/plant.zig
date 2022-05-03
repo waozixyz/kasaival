@@ -7,15 +7,22 @@ const ArrayList = std.ArrayList;
 const test_allocator = std.testing.allocator;
 const rand = std.crypto.random;
 
-const Branch = struct{
+pub const Branch = struct {
     deg: i32,
     v1: rl.Vector2,
     v2: rl.Vector2,
     w: f32,
     h: f32,
-    color: rl.Color
+    color: rl.Color,
+    pub fn get_z(self: *Branch) f32 {
+        var rtn = self.v1.y;
+        if (self.v2.y > rtn) {
+            rtn = self.v2.y;
+        }
+        return rtn;
+    }
 };
-const Leaf = struct {
+pub const Leaf = struct {
     row: usize,
     v1: rl.Vector2,
     v2: rl.Vector2,
@@ -37,10 +44,7 @@ pub const Plant = struct{
     leaves: ArrayList(Leaf),
     leaf_chance: f32,
     max_row: i32,
-    x: f32,
-    y: f32,
     current_row: usize,
-    random_row: bool,
     split_chance: i32,
     split_angle: [2]i32,
     cs_branch: [6]u8,
@@ -132,15 +136,15 @@ pub const Plant = struct{
         }
         self.current_row += 1;
     }
-    pub fn load(self: *Plant) void {
+    pub fn load(self: *Plant, x: f32, y: f32, random_row: bool) void {
         var angle: i32 = -90;
         self.append_row() catch |err| {
             std.log.info("Caught error: {s}", .{ err });
         };
         self.append_branch(0, Branch{
             .deg = angle,
-            .v1 = rl.Vector2{ .x = self.x, .y = self.y},
-            .v2 = rl.Vector2{ .x = self.x, .y = self.y},
+            .v1 = rl.Vector2{ .x = x, .y = y},
+            .v2 = rl.Vector2{ .x = x, .y = y},
             .w = self.w,
             .h = self.h,
             .color = rl.WHITE,
@@ -148,7 +152,7 @@ pub const Plant = struct{
             std.log.info("Caught error: {s}", .{ err });
         };
         self.grow_timer = rand.intRangeAtMost(i32, 0, self.grow_time);
-        if (self.random_row) {
+        if (random_row) {
             var grow_to_row = rand.intRangeAtMost(i32, 0, self.max_row);
             while (self.current_row < grow_to_row) {
                 self.grow();
@@ -164,29 +168,26 @@ pub const Plant = struct{
             self.grow_timer = self.grow_time;
         } 
     }
-    pub fn draw(self: *Plant) void {
-        var i: u8 = 0;
-        while (i <= self.current_row) : (i += 1) {
-            for (self.branches.items[i].items) |*b, j| {
-                _ = j;
+    pub fn draw(self: *Plant, row: usize) void {
+        for (self.branches.items[row].items) |*b, j| {
+            _ = j;
                 
-                var v2 = b.v2;
+            var v2 = b.v2;
 
-                if (i == self.current_row and self.grow_timer > 0) {
-                    v2 = rl.Vector2{
-                        .x = self.get_next_pos(b.v1.x, v2.x),
-                        .y = self.get_next_pos(b.v1.y, v2.y)
-                    };
-                }
-         
-                rl.DrawLineEx(b.v1, v2, b.w, b.color);
+            if (row == self.current_row and self.grow_timer > 0) {
+                v2 = rl.Vector2{
+                    .x = self.get_next_pos(b.v1.x, v2.x),
+                    .y = self.get_next_pos(b.v1.y, v2.y)
+                };
             }
-            for (self.leaves.items) |*l, j| {
-                _ = j;
-                if (l.row < i and !(i == self.current_row and self.grow_timer > 0)) {
-                    rl.DrawCircleV(l.v1, l.r, l.color);
-                    rl.DrawCircleV(l.v2, l.r, l.color);
-                }
+         
+            rl.DrawLineEx(b.v1, v2, b.w, b.color);
+        }
+        for (self.leaves.items) |*l, j| {
+            _ = j;
+            if (l.row < row and !(row == self.current_row and self.grow_timer > 0)) {
+                rl.DrawCircleV(l.v1, l.r, l.color);
+                rl.DrawCircleV(l.v2, l.r, l.color);
             }
         }
     
@@ -201,13 +202,10 @@ pub fn new() Plant {
         .branches = ArrayList(ArrayList(Branch)).init(test_allocator),
         .leaves = ArrayList(Leaf).init(test_allocator),
         .leaf_chance = 0.5,
-        .max_row = 12,
+        .max_row = 10,
         .current_row = 0,
-        .x = 400,
-        .y = 500,
         .w = 10,
         .h = 40,
-        .random_row = false,
         .split_chance = 50,
         .split_angle = .{20, 30},
         .cs_branch = .{125, 178, 122, 160, 76, 90},

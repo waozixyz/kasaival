@@ -5,17 +5,19 @@ const lyra = @import("../lyra.zig");
 const player = @import("../player.zig");
 const ground = @import("../ground.zig");
 const sky = @import("../sky.zig");
-const plant = @import("../plant.zig");
-
+const plant = @import("../plants/plant.zig");
+const plants = @import("../plants/plants.zig");
 
 const sort = std.sort.sort;
 const print = std.debug.print;
 const ArrayList = std.ArrayList;
 const test_allocator = std.testing.allocator;
+const rand = std.crypto.random;
 
 const PlantSpawner = struct {
     frequency: f32,
     elapsed: f32,
+    item: plant.Plant,
 };
 const ZEntities = enum {
     player,
@@ -25,7 +27,7 @@ const ZEntities = enum {
 };
 const ZEntity = struct {
     item: ZEntities,
-    index : usize,
+    index : [3]usize,
     z: u16,
 };
 
@@ -64,6 +66,7 @@ pub const GameScreen = struct{
         var spawner = PlantSpawner{
             .frequency = 2,
             .elapsed = 0,
+            .item = plants.oak()
         };
         self.append_plant_spawner(spawner) catch |err| {
             std.log.info("Caught error: {s}", .{ err });
@@ -88,33 +91,43 @@ pub const GameScreen = struct{
             self.to_order.items[item_count] = ze;
         }
     }
-    fn sort_tiles(self: *GameScreen, item_count: usize) usize {
+    fn sort_tile_rows(self: *GameScreen, item_count: usize) usize {
         var rtn = item_count;
         // add ground tiles to_order
-        for (self.ground.tiles.items) |*t, i| {
-            _ = i;  
-            if ( t.get_right_x() > lyra.cx and t.get_left_x() < lyra.cx + lyra.screen_width) {
-                // find collision with player
-                var px = self.player.position.x;
-                var py = self.player.position.y;
-                var pr = self.player.get_radius();
-                if (t.y > py - pr * 0.5 and t.y - t.h * 0.5 < py + pr * 0.5) {
-                    if (t.get_right_x() > px - pr  and t.get_left_x() < px + pr) {
-                        t.burn();
-                    }
-                }
-                // make new zentity 
-                var ze = ZEntity{
-                    .index = i,
-                    .z = @floatToInt(u16, t.y),
-                    .item = ZEntities.ground
-                };
+        for (self.ground.tiles.items) |*row, i| {
+            var t = row.items[0];
+            // make new zentity 
+            var ze = ZEntity{
+                .index = .{i, 0, 0},
+                .z = @floatToInt(u16, t.y),
+                .item = ZEntities.ground
+            };
 
-                self.add_to_order(ze, rtn);
-                rtn += 1;
-            } 
+            self.add_to_order(ze, rtn);
+            rtn += 1;
         }
         return rtn;
+    }
+    fn check_tile_collision(self: *GameScreen) void {
+        // check tile collision with player
+        for (self.ground.tiles.items) |*row, i| {
+            _ = i;
+            for (row.items) |*t, j| {
+                _ = j;
+                if ( t.get_right_x() > lyra.cx and t.get_left_x() < lyra.cx + lyra.screen_width) {
+                    // find collision with player
+                    var px = self.player.position.x;
+                    var py = self.player.position.y;
+                    var pr = self.player.get_radius();
+                    if (t.y > py - pr * 0.5 and t.y - t.h * 0.5 < py + pr * 0.5) {
+                        if (t.get_right_x() > px - pr  and t.get_left_x() < px + pr) {
+                            t.burn();
+                        }
+                    }
+             
+                } 
+            }
+        }
     }
     // go through each flam particle and add it as a zentity for sorting
     fn sort_player_particles(self: *GameScreen, item_count: usize) usize {
@@ -122,7 +135,7 @@ pub const GameScreen = struct{
         // add player particles to_order
         for (self.player.flame.particles.items) |*p, i| {
             var ze = ZEntity{
-                .index = i,
+                .index = .{i, 0, 0},
                 .z = @floatToInt(u16, p.start_y) + 1,
                 .item = ZEntities.player
             };
@@ -136,18 +149,47 @@ pub const GameScreen = struct{
     // sort plants
     fn sort_plants(self: *GameScreen, item_count: usize) usize {
         var rtn = item_count;
-        // add player particles to_order
-        for (self.plants.items) |*t, i| {
-            var ze = ZEntity{
-                .index = i,
-                .z = @floatToInt(u16, t.y),
-                .item = ZEntities.plant
-            };
+        // plants to_order
+        for (self.plants.items) |*p, i| {
+            for (p.branches.items) |*row, j| {
+                var z: f32 = 0;
+                for (row.items) |*b, k| {
+                    _ = k;
+                    if (z < b.v1.y) {
+                        z = b.v1.y;
+                    }
+                    if (z < b.v2.y) {
+                        z = b.v2.y;
+                    }
+                }
+                var ze = ZEntity{
+                    .index = .{i, j, 0},
+                    .z = @floatToInt(u16, z),
+                    .item = ZEntities.plant
+                };
 
-            self.add_to_order(ze, rtn);
-            rtn += 1;
+                self.add_to_order(ze, rtn);
+                rtn += 1;
+            }
         }
         return rtn;
+    }
+    fn plant_spawning(self: *GameScreen) void {
+        // plant spawning
+        for (self.plant_spawners.items) |*s, i| {
+            _ = i;
+            if (self.elapsed_time > s.elapsed + s.frequency) {
+                s.elapsed = self.elapsed_time;
+                var p = s.item;
+                var x = rand.intRangeAtMost(i32, @floatToInt(i32, lyra.start_x), @floatToInt(i32, lyra.game_width + lyra.start_x));
+                var y = rand.intRangeAtMost(i32, @floatToInt(i32, lyra.start_y), @floatToInt(i32, lyra.game_height));
+
+                p.load(@intToFloat(f32, x), @intToFloat(f32, y), false);
+                self.append_plant(p) catch |err| {
+                    std.log.info("Caught error: {s}", .{ err });
+                };
+            }
+        }
     }
     // main update game loop
     pub fn update(self: *GameScreen) void {
@@ -157,27 +199,18 @@ pub const GameScreen = struct{
         self.ground.update();
         self.player.update();
         
-        // plant spawning
-        for (self.plant_spawners.items) |*s, i| {
-            _ = i;
-            if (self.elapsed_time > s.elapsed + s.frequency) {
-                s.elapsed = self.elapsed_time;
-                var p = plant.new();
-                p.load();
-                self.append_plant(p) catch |err| {
-                    std.log.info("Caught error: {s}", .{ err });
-                };
-            }
-        }
+        self.check_tile_collision();
+        self.plant_spawning();
+   
         // update plants
         for (self.plants.items) |*p, i| {
             _ = i;
             p.update();
         }
            
-        // z order sorting
+        // z order sortingf
         var item_count: usize = 0;
-        item_count = self.sort_tiles(item_count);
+        item_count = self.sort_tile_rows(item_count);
         item_count = self.sort_player_particles(item_count);
         item_count = self.sort_plants(item_count);
 
@@ -185,7 +218,7 @@ pub const GameScreen = struct{
         // reset unused slots in arraylist to_order
         while (self.to_order.items.len > item_count) {
             var ze = ZEntity{
-                .index = 0,
+                .index = .{0, 0, 0},
                 .z = 0,
                 .item = ZEntities.none
             };
@@ -209,13 +242,14 @@ pub const GameScreen = struct{
             _ = i;
             switch (ze.item) {
                 ZEntities.ground => {
-                    self.ground.draw(ze.index);
+                    self.ground.draw(ze.index[0]);
                 },
                 ZEntities.player => {
-                    self.player.draw(ze.index);
+                    self.player.draw(ze.index[0]);
                 },
                 ZEntities.plant => {
-                    self.plants.items[ze.index].draw();
+                    var p = self.plants.items[ze.index[0]];
+                    p.draw(ze.index[1]);
                 },
                 ZEntities.none => {}
 

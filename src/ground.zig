@@ -50,60 +50,71 @@ fn get_color() rl.Color {
 }
 
 pub const Ground = struct{
-    tiles : ArrayList(Tile),
-    fn append_tile(self: *Ground, t: Tile) !void {
-        var append = try self.tiles.append(t);
+    tiles : ArrayList(ArrayList(Tile)),
+    fn append_tile(self: *Ground, row: usize,  t: Tile) !void {
+        var append = try self.tiles.items[row].append(t);
+        _ = append;
+    }
+    fn append_row(self: *Ground) !void {
+        var append = try self.tiles.append((ArrayList(Tile).init(test_allocator)));
         _ = append;
     }
     pub fn load(self: *Ground) void {
         var start_y: f32 = lyra.start_y;
-        var th: f16= 124;
-        var tw: f16 = 256;
+        var th: f16= 52;
+        var tw: f16 = 120;
+        var i: usize = 0;
+
         while (start_y < lyra.game_height + th * 0.5) {
             var start_x: f32 = lyra.start_x - 200;
-            var i: u8 = 0;
             var scale = start_y / lyra.game_height;
             var w = tw * scale;
             var h = th * scale;
+            self.append_row() catch |err| {
+                std.log.info("Caught error: {s}", .{ err });
+            };
             while (start_x < lyra.game_width) {
                 if (start_x > lyra.start_x - w * 0.5) {
                     const random_factor = @intToFloat(f16, rand.intRangeAtMost(u16, 0, @floatToInt(u16, w * 0.4))) - w * 0.4 * 0.5;
                     var color = get_color();
                     var t = Tile{ .x = start_x, .y = start_y, .w = w, .h = h, .scale = @intToFloat(f16, rand.intRangeAtMost(u16, 10, 12)) / 10, .random_factor = random_factor, .color = color, .org_color = color };
-                    append_tile(self, t) catch |err| {
+                    append_tile(self, i, t) catch |err| {
                         std.log.info("Caught error: {s}", .{ err });
                     };
                 }
                 start_x += w * 0.4;
-                i += 1;
             }
+            i += 1;
             start_y += h * 0.4;
 
         } 
     }
     pub fn update(self: *Ground) void {
 
-        for (self.tiles.items) |*t, i| {
+        for (self.tiles.items) |*row, i| {
             _ = i;
-            if (t.color.r > t.org_color.r) {
-                t.color.r -= 2;
-            }
-            if (t.color.r > 60) {
-                if (t.scale > 0.9) {
-                    t.scale -= 0.01;
+            for (row.items) |*t, j| {
+                _ = j;
+                if (t.color.r > t.org_color.r) {
+                    t.color.r -= 2;
                 }
-            }
-            else {
-                var heal = rand.intRangeAtMost(u16, 0, 10);
-                if (heal > 7) {
-                    if (t.color.g != t.org_color.g) {
-                        t.color.g += 1;
+                if (t.color.r > 60) {
+                    if (t.scale > 0.9) {
+                        t.scale -= 0.01;
                     }
-                    else if (t.color.b != t.org_color.b) {
-                        t.color.b += 1;
-                    }
-                    if (t.scale < 1.2) {
-                       t.scale += 0.01;
+                }
+                else {
+                    var heal = rand.intRangeAtMost(u16, 0, 10);
+                    if (heal > 7) {
+                        if (t.color.g < t.org_color.g) {
+                            t.color.g += 1;
+                        }
+                        else if (t.color.b < t.org_color.b) {
+                            t.color.b += 1;
+                        }
+                        if (t.scale < 1.2) {
+                        t.scale += 0.01;
+                        }
                     }
                 }
             }
@@ -116,15 +127,17 @@ pub const Ground = struct{
 
         rl.DrawRectangle(0, @floatToInt(u16, lyra.start_y), lyra.game_width, lyra.game_height, color);
     }
-    pub fn draw(self: *Ground, i : usize) void {
-        var t = self.tiles.items[i];
-        var h: f32 = t.h * t.scale;
+    pub fn draw(self: *Ground, row : usize) void {
+        for (self.tiles.items[row].items) |*t, i| {
+            _ = i;
+            var h: f32 = t.h * t.scale;
 
-        var v1 = rl.Vector2{.x = t.get_left_x() , .y = t.y};
-        var v2 = rl.Vector2{.x = t.get_right_x(), .y = t.y};
-        var v3 = rl.Vector2{.x = t.x, .y = t.y - h + t.random_factor};
-                                               
-        rl.DrawTriangle(v1, v2, v3, t.color);
+            var v1 = rl.Vector2{.x = t.get_left_x() , .y = t.y};
+            var v2 = rl.Vector2{.x = t.get_right_x(), .y = t.y};
+            var v3 = rl.Vector2{.x = t.x, .y = t.y - h + t.random_factor};
+                                                
+            rl.DrawTriangle(v1, v2, v3, t.color);
+        }
     }
     pub fn unload(self: *Ground) void {
         self.tiles.deinit();
@@ -136,7 +149,7 @@ pub const Ground = struct{
 
 pub fn new() Ground {
     return Ground{
-        .tiles = ArrayList(Tile).init(test_allocator),
+        .tiles = ArrayList(ArrayList(Tile)).init(test_allocator),
 
     };
 }
