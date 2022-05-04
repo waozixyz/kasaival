@@ -50,8 +50,9 @@ pub const Player = struct{
         const x = self.position.x;
         const y = self.position.y;
         var dir = get_direction(x, y);
-        var dx = dir.x * self.speed;
-        var dy = dir.y * self.speed;
+        print("{d} \n", .{dir});
+        var dx = dir.x * self.speed * self.flame.scale * 2;
+        var dy = dir.y * self.speed * self.flame.scale * 2;
         var eye_bound = lyra.game_width / 5;
         if ((x + dx < lyra.start_x + lyra.cx + eye_bound and lyra.cx > lyra.start_x )
         or (x + dx > lyra.start_x + lyra.cx + lyra.screen_width - eye_bound and lyra.cx < lyra.game_width  + lyra.start_x - lyra.screen_width)) {

@@ -30,17 +30,17 @@ pub const Flame = struct{
     color: [4]u8,
     particles: ArrayList(Particle),
     fn get_particle(self: *Flame, position: rl.Vector2) Particle {
-     
+        
         const rand = std.crypto.random;
-
         const vel_x = rand.intRangeAtMost(i16, -3, 3);
         const vel_x_end = @intToFloat(f16, rand.intRangeAtMost(i16, -2 - vel_x, 2 - vel_x));
         const shrink_factor = @intToFloat(f16, rand.intRangeAtMost(u8, 90, 99)) * 0.01;
         const particle_size = @intToFloat(f16, rand.intRangeAtMost(u8, @floatToInt(u8, self.radius * 0.8), @floatToInt(u8, self.radius)));
+        const size = particle_size * self.scale;
         return Particle{
-            .size = particle_size * self.scale,
+            .size = size,
             .lifetime = self.lifetime,
-            .start_y = @floatToInt(u16, position.y),
+            .start_y = @floatToInt(u16, position.y + size),
             .position = position,
             .vel_start = rl.Vector2{.x = @intToFloat(f16, vel_x), .y = -3},
             .vel_end = rl.Vector2{.x =  vel_x_end, .y = -3},
@@ -85,6 +85,10 @@ pub const Flame = struct{
                 p.position.x += p.vel_start.x * pp + p.vel_end.x * (1 - pp);
                 p.position.y += p.vel_start.y * pp + p.vel_end.y * (1 - pp);
                 update_colors(p, pp);
+                if (pp < 0.2) {
+
+                    p.start_y = @floatToInt(u16, position.y + p.size);
+                }
 
                 p.size *= p.shrink_factor;
 

@@ -72,6 +72,12 @@ pub const GameScreen = struct{
         self.append_plant_spawner(spawner) catch |err| {
             std.log.info("Caught error: {s}", .{ err });
         };
+ 
+        var p = plants.oak();
+        p.load(800, 500, false);
+        self.append_plant(p) catch |err| {
+            std.log.info("Caught error: {s}", .{ err });
+        };
     }
     fn append_plant(self: *GameScreen, p: plant.Plant) !void {
         _ = try self.plants.append(p);
@@ -181,7 +187,7 @@ pub const GameScreen = struct{
         self.player.update();
         
         self.check_tile_collision();
-        self.plant_spawning();
+        //self.plant_spawning();
    
         // update plants
         for (self.plants.items) |*p, i| {
@@ -207,7 +213,6 @@ pub const GameScreen = struct{
         }
         var slice = self.to_order.items[0..self.item_count];
         sort(ZEntity, slice, {}, compareLeq);
-
     }
     // unaffected by camera movement
     pub fn predraw(self: *GameScreen) void {
