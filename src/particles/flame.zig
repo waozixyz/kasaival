@@ -1,12 +1,11 @@
 const std = @import("std");
-const rl = @import("raylib");
+const rl = @import("../raylib/raylib.zig");
 
 
 const lyra = @import("../lyra.zig");
 
 const print = std.debug.print;
 const ArrayList = std.ArrayList;
-const test_allocator = std.testing.allocator;
 
 const Particle = struct{
     start_y: u16,
@@ -23,19 +22,20 @@ const Particle = struct{
 
 
 pub const Flame = struct{
-    amount: i8,
-    lifetime: f16,
-    scale: f32,
-    radius: f16,
-    color: [4]u8,
-    particles: ArrayList(Particle),
+    amount: i8 = 60,
+    lifetime: f16 = 3,
+    scale: f32 = 1,
+    radius: f16 = 48,
+    color: [4]u8 = [4]u8{180, 50, 60, 160},
+    particles: ArrayList(Particle) = undefined,
+    pub fn init(self: *Flame, allocator: std.mem.Allocator) void {
+        self.particles = ArrayList(Particle).init(allocator);
+    }
     fn get_particle(self: *Flame, position: rl.Vector2) Particle {
-        
-        const rand = std.crypto.random;
-        const vel_x = rand.intRangeAtMost(i16, -3, 3);
-        const vel_x_end = @intToFloat(f16, rand.intRangeAtMost(i16, -2 - vel_x, 2 - vel_x));
-        const shrink_factor = @intToFloat(f16, rand.intRangeAtMost(u8, 90, 99)) * 0.01;
-        const particle_size = @intToFloat(f16, rand.intRangeAtMost(u8, @floatToInt(u8, self.radius * 0.8), @floatToInt(u8, self.radius)));
+        const vel_x = rl.GetRandomValue(-3, 3);
+        const vel_x_end = @intToFloat(f16, rl.GetRandomValue(-2 - vel_x, 2 - vel_x));
+        const shrink_factor = @intToFloat(f16, rl.GetRandomValue(90, 99)) * 0.01;
+        const particle_size = @intToFloat(f16, rl.GetRandomValue(@floatToInt(u8, self.radius * 0.8), @floatToInt(u8, self.radius)));
         const size = particle_size * self.scale;
         return Particle{
             .size = size,
@@ -102,20 +102,8 @@ pub const Flame = struct{
         rl.DrawCircleV(v, p.size, u8ToColor(p.color));
     }
     
-    pub fn unload(self: *Flame) void {
+    pub fn deinit(self: *Flame) void {
         self.particles.deinit();
     }
 };
 
-
-pub fn new() Flame {
-    const color = [4]u8{180, 50, 60, 160};
-    return Flame{
-        .particles = ArrayList(Particle).init(test_allocator),
-        .radius = 48,
-        .scale = 1,
-        .color = color,
-        .lifetime = 3,
-        .amount = 60,
-        };
-}

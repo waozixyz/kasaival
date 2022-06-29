@@ -1,10 +1,9 @@
 const std = @import("std");
-const rl = @import("raylib");
-
+const rl = @import("raylib/raylib.zig");
 
 const lyra = @import("lyra.zig");
 
-const flame = @import("particles/flame.zig");
+const Flame = @import("particles/flame.zig").Flame;
 
 const print = std.debug.print;
 const math = std.math;
@@ -25,7 +24,7 @@ fn get_direction(x: f32, y: f32 ) rl.Vector2 {
     for (lyra.key_down) |key, i| { _ = i; if (rl.IsKeyDown(key)) { dir.y = 1; } }
     if (dir.y == 0 and dir.x == 0) {
         // check mouse press
-        if (rl.IsMouseButtonDown(rl.MouseButton.MOUSE_LEFT_BUTTON)) {
+        if (rl.IsMouseButtonDown(rl.MouseButton.MOUSE_BUTTON_LEFT)) {
             var diff = rl.Vector2{.x = lyra.mouse_x - x + lyra.cx, .y = lyra.mouse_y - y};
             const offset = 5;
             if (@fabs(diff.x) > offset or @fabs(diff.y) > offset) {
@@ -36,12 +35,14 @@ fn get_direction(x: f32, y: f32 ) rl.Vector2 {
     return dir;
 }
 pub const Player = struct{
-    flame: flame.Flame,
-    position: rl.Vector2,
-    hp: f16,
-    xp: f16,
-    speed: f16,
-    pub fn load(_: *Player) void {
+    flame: Flame = Flame{},
+    position: rl.Vector2 = undefined,
+    hp: f16 = 100,
+    xp: f16 = 100,
+    speed: f16 = 6,
+    pub fn init(self: *Player, allocator: std.mem.Allocator) void {
+        self.position = rl.Vector2{.x = lyra.screen_width * 0.5, .y = lyra.screen_height * 0.5};
+        self.flame.init(allocator);
     }
     pub fn get_radius(self: *Player) f32 {
         return self.flame.radius * self.flame.scale;
@@ -50,7 +51,6 @@ pub const Player = struct{
         const x = self.position.x;
         const y = self.position.y;
         var dir = get_direction(x, y);
-        print("{d} \n", .{dir});
         var dx = dir.x * self.speed * self.flame.scale * 2;
         var dy = dir.y * self.speed * self.flame.scale * 2;
         var eye_bound = lyra.game_width / 5;
@@ -85,19 +85,9 @@ pub const Player = struct{
     pub fn draw(self: *Player, i: usize) void {
         self.flame.draw(i);
     }
-    pub fn unload(self: *Player) void {
-        self.flame.unload();
+    pub fn deinit(self: *Player) void {
+        self.flame.deinit();
     }
 
 };
 
-
-pub fn new() Player {
-    return Player{
-        .hp = 100,
-        .xp = 100,
-        .speed = 10,
-        .position = rl.Vector2{.x = 1920 * 0.5, .y = 1080 * 0.5},
-        .flame = flame.new()
-    };
-}

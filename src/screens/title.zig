@@ -1,33 +1,41 @@
 const std = @import("std");
-const rl = @import("raylib");
-
-
+const rl = @import("../raylib/raylib.zig");
 const lyra = @import("../lyra.zig");
+const Screen = @import("screen.zig").Screen;
+const ScreenNames = @import("../screens.zig").ScreenNames;
+const screens = @import("../screens.zig");
 
 const print = std.debug.print;
 
-pub const TitleScreen = struct{
-    texture: rl.Texture,
-    pub fn load(_: *TitleScreen) void {
-    }
-    pub fn update(_: *TitleScreen) void {
-        if (rl.IsMouseButtonPressed(rl.MouseButton.MOUSE_LEFT_BUTTON) or rl.GetKeyPressed() > 0) {
-            lyra.next = lyra.ScreenNames.game;
-        }
-    }
-    pub fn predraw(self: *TitleScreen) void {
-        rl.DrawTexture(self.texture, 0, 0, rl.WHITE);
-        rl.DrawText("KASAIVAL", 480, 160, 200, rl.MAROON);
-        rl.DrawText("an out of control flame trying to survive", 350, 640, 60, rl.MAROON);
-        rl.DrawText("touch anywhere to start burning", 480, 1000, 60, rl.BEIGE);
-    }
-    pub fn draw(_: *TitleScreen) void {}
-    pub fn unload(self: *TitleScreen) void {
-        rl.UnloadTexture(self.texture);
-    }
+var texture: rl.Texture2D = undefined;
+
+pub const screen = Screen{
+    .initFn = init,
+    .updateFn = update,
+    .predrawFn = predraw,
+    .deinitFn = deinit,
 };
 
 
-pub fn new() TitleScreen {
-    return TitleScreen{.texture = rl.LoadTexture("assets/menu.jpg") };
+fn init(_: std.mem.Allocator) !void {
+    texture = rl.LoadTexture("assets/menu.png");
 }
+
+fn update(_: std.mem.Allocator, _: f32) !void {
+    if (rl.IsMouseButtonPressed(rl.MouseButton.MOUSE_BUTTON_LEFT) or rl.GetKeyPressed() > 0) {
+        screens.next = ScreenNames.arcade;
+    }
+}
+
+fn predraw() void {
+    rl.DrawTextureEx(texture, rl.Vector2{.x = 0, .y = 0 }, 0, 11, rl.WHITE);    
+        
+    rl.DrawText("KASAIVAL", 200, 90, 80, rl.MAROON);
+    rl.DrawText("an out of control flame trying to survive", 100, 255, 30, rl.MAROON);
+    rl.DrawText("touch anywhere to start burning", 140, 555, 30, rl.BEIGE);
+}
+
+fn deinit() void {
+    rl.UnloadTexture(texture);
+}
+

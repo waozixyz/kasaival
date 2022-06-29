@@ -1,15 +1,10 @@
 const std = @import("std");
-const rl = @import("raylib");
-
-
+const rl = @import("raylib/raylib.zig");
 const lyra = @import("lyra.zig");
 
 const print = std.debug.print;
 const math = std.math;
 const ArrayList = std.ArrayList;
-const test_allocator = std.testing.allocator;
-const rand = std.crypto.random;
-
 
 const Tile = struct {
     x: f32,
@@ -42,24 +37,26 @@ const Tile = struct {
 };
 
 fn get_color() rl.Color {
-    var r = rand.intRangeAtMost(u8, 16, 60);
-    var g = rand.intRangeAtMost(u8, 150, 200);
-    var b = rand.intRangeAtMost(u8, 10, 50);
-    var a = rand.intRangeAtMost(u8, 200, 220);
+    var r = @intCast(u8, rl.GetRandomValue(16, 60));
+    var g = @intCast(u8, rl.GetRandomValue(150, 200));
+    var b = @intCast(u8, rl.GetRandomValue(10, 50));
+    var a = @intCast(u8, rl.GetRandomValue(200, 220));
     return rl.Color{.r = r, .g = g, .b = b, .a = a};
 }
 
-pub const Ground = struct{
-    tiles : ArrayList(ArrayList(Tile)),
+pub const Ground = struct {
+    tiles : ArrayList(ArrayList(Tile)) = undefined,
     fn append_tile(self: *Ground, row: usize,  t: Tile) !void {
         var append = try self.tiles.items[row].append(t);
         _ = append;
     }
-    fn append_row(self: *Ground) !void {
-        var append = try self.tiles.append((ArrayList(Tile).init(test_allocator)));
+    fn append_row(self: *Ground, allocator: std.mem.Allocator) !void {
+        var append = try self.tiles.append((ArrayList(Tile).init(allocator)));
         _ = append;
     }
-    pub fn load(self: *Ground) void {
+    pub fn init(self: *Ground, allocator: std.mem.Allocator) void {
+        self.tiles = ArrayList(ArrayList(Tile)).init(allocator);
+
         var start_y: f32 = lyra.start_y;
         var th: f16= 52;
         var tw: f16 = 120;
@@ -70,14 +67,14 @@ pub const Ground = struct{
             var scale = start_y / lyra.game_height;
             var w = tw * scale;
             var h = th * scale;
-            self.append_row() catch |err| {
+            self.append_row(allocator) catch |err| {
                 std.log.info("Caught error: {s}", .{ err });
             };
             while (start_x < lyra.game_width) {
                 if (start_x > lyra.start_x - w * 0.5) {
-                    const random_factor = @intToFloat(f16, rand.intRangeAtMost(u16, 0, @floatToInt(u16, w * 0.4))) - w * 0.4 * 0.5;
+                    const random_factor = @intToFloat(f16, rl.GetRandomValue(0, @floatToInt(u16, w * 0.4))) - w * 0.4 * 0.5;
                     var color = get_color();
-                    var t = Tile{ .x = start_x, .y = start_y, .w = w, .h = h, .scale = @intToFloat(f16, rand.intRangeAtMost(u16, 10, 12)) / 10, .random_factor = random_factor, .color = color, .org_color = color };
+                    var t = Tile{ .x = start_x, .y = start_y, .w = w, .h = h, .scale = @intToFloat(f16, rl.GetRandomValue(10, 12)) / 10, .random_factor = random_factor, .color = color, .org_color = color };
                     append_tile(self, i, t) catch |err| {
                         std.log.info("Caught error: {s}", .{ err });
                     };
@@ -90,7 +87,6 @@ pub const Ground = struct{
         } 
     }
     pub fn update(self: *Ground) void {
-
         for (self.tiles.items) |*row, i| {
             _ = i;
             for (row.items) |*t, j| {
@@ -104,7 +100,7 @@ pub const Ground = struct{
                     }
                 }
                 else {
-                    var heal = rand.intRangeAtMost(u16, 0, 10);
+                    var heal = rl.GetRandomValue(0, 10);
                     if (heal > 7) {
                         if (t.color.g < t.org_color.g) {
                             t.color.g += 1;
@@ -139,17 +135,14 @@ pub const Ground = struct{
             rl.DrawTriangle(v1, v2, v3, t.color);
         }
     }
-    pub fn unload(self: *Ground) void {
+    pub fn deinit(self: *Ground) void {
+        for (self.tiles.items) |*row, i| {
+            _ = i;
+            row.deinit();
+        }
         self.tiles.deinit();
 
     }
 
 };
 
-
-pub fn new() Ground {
-    return Ground{
-        .tiles = ArrayList(ArrayList(Tile)).init(test_allocator),
-
-    };
-}
