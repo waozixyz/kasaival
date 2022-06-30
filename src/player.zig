@@ -68,12 +68,14 @@ pub const Player = struct{
         else {
             self.position.x += dx;
         }
-
-        if (y + dy > lyra.screen_height and dy > 0) {
-            self.position.y = lyra.screen_height;
+        // y limits
+        var min_y = lyra.start_y - self.get_radius() * 0.5;
+        var max_y = lyra.screen_height - self.get_radius();
+        if (y + dy > max_y and dy > 0) {
+            self.position.y = max_y;
         }
-        else if (y + dy < lyra.start_y and dy < 0) {
-            self.position.y = lyra.start_y;
+        else if (y + dy < min_y and dy < 0) {
+            self.position.y = min_y;
         }
         else {
             self.flame.scale = self.position.y / lyra.game_height * lyra.sx ;

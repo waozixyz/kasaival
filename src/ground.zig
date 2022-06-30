@@ -50,8 +50,8 @@ pub const Ground = struct {
     pub fn init(self: *Ground, allocator: std.mem.Allocator) void {
         self.tiles = ArrayList(ArrayList(Tile)).init(allocator);
 
-        var th: f16= 53;
-        var tw: f16 = 28;
+        var th: f16= 50;
+        var tw: f16 = 26;
 
         var start_y: f32 = lyra.start_y ;
 
