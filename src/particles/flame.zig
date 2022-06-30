@@ -20,14 +20,12 @@ const Particle = struct{
     color_end: [4]u8,
 };
 
-
-
 pub const Flame = struct{
     amount: u8 = 70,
 
     lifetime: f16 = 40,
     scale: f32 = 1,
-    radius: f16 = 28,
+    radius: f16 = 14,
     color_start: [4]u8 = [4]u8{200, 50, 80, 200},
     color_end: [4]u8 = [4]u8{120, 30, 60, 20},
     particles: ArrayList(Particle) = undefined,

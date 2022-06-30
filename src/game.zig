@@ -23,18 +23,8 @@ var target: rl.RenderTexture2D = undefined;
 
 pub fn min(a: f16, b: f16) f16 { if (a < b) { return a; } else { return b; } }
 
-pub fn clamp(val: f16, lower: f16, higher: f16) f16 {
-    if (val < lower) { return lower; }
-    else if (val > higher) { return higher; }
-    else { return val; }
-}
 
-pub fn clamp_value(value: rl.struct_Vector2, low: rl.struct_Vector2, max: rl.struct_Vector2) rl.struct_Vector2 {
-    var ret = value;
-    _ = low;
-    ret.x = if (ret.x > max.x) { max.x; } else { ret.x; };
-    return ret;
-}
+
 
 pub fn start() !void {
     // Initialization
@@ -93,8 +83,8 @@ pub fn loop(dt: f32) void {
     lyra.mouse_x = (@floatCast(f16, mouse.x) - (window_width - (lyra.screen_width * scale)) * 0.5) / scale;
     lyra.mouse_y = (@floatCast(f16, mouse.y) - (window_height - (lyra.screen_height * scale)) * 0.5) / scale;
         
-    lyra.mouse_x = clamp(lyra.mouse_x, 0, lyra.screen_width);
-    lyra.mouse_y = clamp(lyra.mouse_y, 0, lyra.screen_height);
+    lyra.mouse_x = lyra.clamp(lyra.mouse_x, 0, lyra.screen_width);
+    lyra.mouse_y = lyra.clamp(lyra.mouse_y, 0, lyra.screen_height);
     // if game screen changes, update to the new screen
     
     if (current != screens.next) {

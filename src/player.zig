@@ -41,7 +41,7 @@ pub const Player = struct{
     xp: f16 = 0,
     speed: f16 = 4,
     pub fn init(self: *Player, allocator: std.mem.Allocator) void {
-        self.position = rl.Vector2{.x = lyra.screen_width * 0.5, .y = lyra.screen_height * 0.5};
+        self.position = rl.Vector2{.x = lyra.cx + lyra.screen_width * 0.5, .y = lyra.screen_height * 0.8};
         self.flame.init(allocator);
     }
     pub fn get_radius(self: *Player) f32 {

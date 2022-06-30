@@ -7,11 +7,13 @@ const math = std.math;
 const ArrayList = std.ArrayList;
 
 const Tile = struct {
-    x: f32,
-    y: f32,
-    w: f32,
-    h: f32,
-    scale: f32,
+    pos: rl.Vector2,
+    size: rl.Vector2,
+
+    v1: rl.Vector2,
+    v2: rl.Vector2,
+    v3: rl.Vector2,
+
     color: rl.Color,
     org_color: rl.Color,
 
@@ -29,11 +31,29 @@ const Tile = struct {
     }
 };
 
-fn get_color() rl.Color {
-    var r = @intCast(u8, rl.GetRandomValue(16, 60));
-    var g = @intCast(u8, rl.GetRandomValue(150, 180));
-    var b = @intCast(u8, rl.GetRandomValue(10, 50));
-    var a = @intCast(u8, rl.GetRandomValue(240, 250));
+fn rand_u8(min: f16, max: f16) u8 {
+    var rtn: f16 = @intToFloat(f16, rl.GetRandomValue(@floatToInt(i32, min), @floatToInt(i32, max)));
+    rtn = lyra.clamp(rtn , 0, 255);
+    return @floatToInt(u8, rtn);
+}
+
+fn get_color(x: f16, y: f16) rl.Color {
+    var add_b: f16 = 0;
+    var sub_g: f16 = 0;
+    _ = y;
+    if (x < 1000) {
+        var s: f16 = (x / 1000) * 200;
+        add_b = 200 - s;
+        if ( x < 700 ) {
+            var a: f16 = (x / 700) * 100;
+            sub_g = 100 - a;
+        }
+    }
+    var r = rand_u8(16, 60);
+    var g = rand_u8(120 - sub_g, 200 - sub_g);
+    var b = rand_u8(add_b + 10, add_b + 50);
+
+    var a = rand_u8(120, 200);
     return rl.Color{.r = r, .g = g, .b = b, .a = a};
 }
 
@@ -47,31 +67,48 @@ pub const Ground = struct {
         var append = try self.tiles.append((ArrayList(Tile).init(allocator)));
         _ = append;
     }
-    pub fn init(self: *Ground, allocator: std.mem.Allocator) void {
+    pub fn init(self: *Ground, allocator: std.mem.Allocator) !void {
         self.tiles = ArrayList(ArrayList(Tile)).init(allocator);
 
-        var th: f16= 50;
-        var tw: f16 = 26;
+        var th: f16 = 32;
+        var tw: f16 = 32;
+        var scale = lyra.start_y / lyra.game_height * lyra.sx;
 
-        var start_y: f32 = lyra.start_y ;
+        var start_y: f16 = lyra.start_y + th * scale ;
 
         var i: usize = 0;
 
-        while (start_y < lyra.game_height + th * 0.5) {
-            var start_x: f32 = lyra.start_x - 200;
-            var scale = start_y / lyra.game_height * lyra.sx;
-            var w = tw * scale;
-            var h = th * scale;
+        while (start_y < lyra.game_height + th ) {
+            var start_x: f16 = lyra.start_x - 200;
+            scale = start_y / lyra.game_height * lyra.sx;
+
+            var w: f16 = tw * scale;
+            var h: f16 = th * scale;
             self.append_row(allocator) catch |err| {
                 std.log.info("Caught error: {s}", .{ err });
             };
             while (start_x < lyra.game_width + w) {
                 if (start_x > lyra.start_x - w) {
-                    var color = get_color();
-                    var t = Tile{ .x = start_x, .y = start_y, .w = w, .h = h, .scale = 1, .color = color, .org_color = color };
-                    append_tile(self, i, t) catch |err| {
-                        std.log.info("Caught error: {s}", .{ err });
-                    };
+                    var color = get_color(start_x, start_y);
+
+                    var x = start_x;
+                    var y = start_y;
+                    var pos = rl.Vector2{.x = x, .y = y};
+                    var size = rl.Vector2{.x = w, .y = h};
+                    var v1 = rl.Vector2{ .x = x - w, .y = y};
+                    var v2 = rl.Vector2{ .x = x + w, .y = y};
+                    var v3 = rl.Vector2{ .x = x, .y = y - h};
+
+                    var t = Tile{.pos = pos, .size = size, .v1 = v1, .v2 = v2, .v3 = v3, .color = color, .org_color = color };
+                    try append_tile(self, i, t);
+
+
+                    v1 = rl.Vector2{ .x = x, .y = y};
+                    v2 = rl.Vector2{ .x = x + w, .y = y - h};
+                    v3 = rl.Vector2{ .x = x - w , .y = y - h};
+                    t = Tile{.pos = pos, .size = size, .v1 = v1, .v2 = v2, .v3 = v3, .color = color, .org_color = color };
+                    try append_tile(self, i, t);
+
                 }
                 start_x += w;
             }
@@ -112,11 +149,8 @@ pub const Ground = struct {
             _ = i;
             for (row.items) |*t, j| {
                 _ = j;
-                var pos = rl.Vector2{.x = t.x, .y = t.y};
-                var w: f32 = t.w * t.scale;
-                var h: f32 = t.h * t.scale;
-                var size = rl.Vector2{ .x = w, .y = h};
-                rl.DrawRectangleV(pos, size, t.color);
+                
+                rl.DrawTriangle(t.v1, t.v2, t.v3, t.color);
             }
         }
     }

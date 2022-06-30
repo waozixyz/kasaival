@@ -15,9 +15,16 @@ pub const key_down  = [_]rl.KeyboardKey{rl.KeyboardKey.KEY_DOWN, rl.KeyboardKey.
 
 
 pub var start_x : f16 = 0;
-pub var start_y : f32 = 200;
-pub var cx : f32 = 0;
+pub var start_y : f16 = 200;
+pub var cx : f32 = 1000;
 pub var zoom : f16 = 1;
-pub var sx : f32 = 1.4;
+pub var sx : f16 = 1.5;
 pub var mouse_x : f16 = 0;
 pub var mouse_y : f16 = 0;
+
+
+pub fn clamp(val: f16, lower: f16, higher: f16) f16 {
+    if (val < lower) { return lower; }
+    else if (val > higher) { return higher; }
+    else { return val; }
+}

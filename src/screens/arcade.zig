@@ -65,7 +65,7 @@ fn init(allocator: std.mem.Allocator) !void {
     to_order = ArrayList(ZEntity).init(allocator);
 
     sky.init();
-    ground.init(allocator);
+    try ground.init(allocator);
     player.init(allocator);
     
     try plant_spawners.append(.{
@@ -97,6 +97,7 @@ fn sort_plants() void {
     }
 }
 
+
 // spawn plant
 fn plant_spawning(allocator: std.mem.Allocator) !void {
     // plant spawning
@@ -119,17 +120,17 @@ fn check_tile_collision() void {
         _ = i;
         for (row.items) |*t, j| {
             _ = j;
-            if ( t.x > lyra.cx and t.x + t.h < lyra.cx + lyra.screen_width) {
+            if ( t.pos.x + t.size.x > lyra.cx and t.pos.x - t.size.x < lyra.cx + lyra.screen_width) {
                 // find collision with player
                 var px = player.position.x;
                 var py = player.position.y;
                 var pr = player.get_radius();
-                if (t.y + t.h > py - pr * 0.5 and t.y < py + pr * 0.5) {
-                    if (t.x + t.h > px - pr  and t.x < px + pr) {
+    
+                if ( t.pos.y - t.size.y < py + pr and t.pos.y > py - pr) {
+                    if (t.pos.x - t.size.x < px + pr and t.pos.x + t.size.x> px - pr) {
                         t.burn();
                     }
                 }
-            
             } 
         }
     }
