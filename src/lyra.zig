@@ -15,8 +15,9 @@ pub const key_down  = [_]rl.KeyboardKey{rl.KeyboardKey.KEY_DOWN, rl.KeyboardKey.
 
 
 pub var start_x : f16 = 0;
-pub var start_y : f16 = 200;
+pub var start_y : f32 = 200;
 pub var cx : f32 = 0;
 pub var zoom : f16 = 1;
+pub var sx : f32 = 1.4;
 pub var mouse_x : f16 = 0;
 pub var mouse_y : f16 = 0;

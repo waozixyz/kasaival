@@ -38,8 +38,8 @@ pub const Player = struct{
     flame: Flame = Flame{},
     position: rl.Vector2 = undefined,
     hp: f16 = 100,
-    xp: f16 = 100,
-    speed: f16 = 6,
+    xp: f16 = 0,
+    speed: f16 = 4,
     pub fn init(self: *Player, allocator: std.mem.Allocator) void {
         self.position = rl.Vector2{.x = lyra.screen_width * 0.5, .y = lyra.screen_height * 0.5};
         self.flame.init(allocator);
@@ -76,14 +76,14 @@ pub const Player = struct{
             self.position.y = lyra.start_y;
         }
         else {
-            self.flame.scale = self.position.y / lyra.game_height;
+            self.flame.scale = self.position.y / lyra.game_height * lyra.sx ;
             self.position.y += dy;
         }
         self.flame.update(self.position);
 
     }
-    pub fn draw(self: *Player, i: usize) void {
-        self.flame.draw(i);
+    pub fn draw(self: *Player) void {
+        self.flame.draw();
     }
     pub fn deinit(self: *Player) void {
         self.flame.deinit();

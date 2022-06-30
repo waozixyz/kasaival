@@ -6,9 +6,6 @@ const math = std.math;
 const ArrayList = std.ArrayList;
 
 const log = @import("../log.zig");
-const rand = std.crypto.random;
-
-
 
 pub const Branch = struct {
     deg: i32,

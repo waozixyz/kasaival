@@ -21,32 +21,46 @@ const Particle = struct{
 };
 
 
+
 pub const Flame = struct{
-    amount: i8 = 60,
-    lifetime: f16 = 3,
+    amount: i8 = 30,
+    lifetime: f16 = 2,
     scale: f32 = 1,
-    radius: f16 = 48,
-    color: [4]u8 = [4]u8{180, 50, 60, 160},
+    radius: f16 = 32,
+    color_start: [4]u8 = [4]u8{160, 60, 100, 160},
+    color_end: [4]u8 = [4]u8{120, 30, 20, 100},
     particles: ArrayList(Particle) = undefined,
+    shrink_factor: i32 = 5,
+
+    fn get_color_end(self: *Flame, ) [4]u8 {
+        var rtn = self.color_end;
+        rtn[0] -= @intCast(u8, rl.GetRandomValue(0, 40));
+        rtn[1] -= @intCast(u8, rl.GetRandomValue(0, 20));
+        rtn[2] -= @intCast(u8, rl.GetRandomValue(0, 20));
+        rtn[3] -= @intCast(u8, rl.GetRandomValue(0, 20));
+        return rtn;
+    }
+
     pub fn init(self: *Flame, allocator: std.mem.Allocator) void {
         self.particles = ArrayList(Particle).init(allocator);
     }
     fn get_particle(self: *Flame, position: rl.Vector2) Particle {
-        const vel_x = rl.GetRandomValue(-3, 3);
-        const vel_x_end = @intToFloat(f16, rl.GetRandomValue(-2 - vel_x, 2 - vel_x));
-        const shrink_factor = @intToFloat(f16, rl.GetRandomValue(90, 99)) * 0.01;
+        const vel_x: f32 = @intToFloat(f16, rl.GetRandomValue(-3, 3)) * self.scale;
+        const vel_x_end = (@intToFloat(f16, rl.GetRandomValue(-2, 2)) - vel_x) * self.scale;
+        const shrink_factor = @intToFloat(f16, rl.GetRandomValue(100 - self.shrink_factor, 95 - self.shrink_factor)) * 0.01;
         const particle_size = @intToFloat(f16, rl.GetRandomValue(@floatToInt(u8, self.radius * 0.8), @floatToInt(u8, self.radius)));
         const size = particle_size * self.scale;
+        const vel_y = -10 * self.scale;
         return Particle{
             .size = size,
             .lifetime = self.lifetime,
-            .start_y = @floatToInt(u16, position.y + size),
+            .start_y = @floatToInt(u16, position.y),
             .position = position,
-            .vel_start = rl.Vector2{.x = @intToFloat(f16, vel_x), .y = -3},
-            .vel_end = rl.Vector2{.x =  vel_x_end, .y = -3},
-            .color = self.color,
-            .color_start = self.color,
-            .color_end = [4]u8{100, 30, 20, 200},
+            .vel_start = rl.Vector2{.x = vel_x, .y = vel_y },
+            .vel_end = rl.Vector2{.x =  vel_x_end, .y = vel_y},
+            .color = self.color_start,
+            .color_start = self.color_start,
+            .color_end = self.get_color_end(),
             .shrink_factor = shrink_factor,
             
         };
@@ -96,10 +110,12 @@ pub const Flame = struct{
             p.lifetime -= 0.1;
         }
     }
-    pub fn draw(self: *Flame, i: usize) void {
-        var p = self.particles.items[i];
-        var v = rl.Vector2{.x = p.position.x - p.size * 0.5, .y = p.position.y};
-        rl.DrawCircleV(v, p.size, u8ToColor(p.color));
+    pub fn draw(self: *Flame) void {
+        for (self.particles.items) |*p, i| {
+            _ = i;
+            var v = rl.Vector2{.x = p.position.x - p.size * 0.5, .y = p.position.y};
+            rl.DrawCircleV(v, p.size, u8ToColor(p.color));
+        }
     }
     
     pub fn deinit(self: *Flame) void {

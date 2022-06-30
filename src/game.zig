@@ -7,8 +7,6 @@ const Screen = @import("screens/screen.zig").Screen;
 const screens = @import("screens.zig");
 const ScreenNames = @import("screens.zig").ScreenNames;
 
-const print = std.debug.print;
-
 var current_screen: Screen = undefined;
 var current: ScreenNames = ScreenNames.title;
 
@@ -67,7 +65,6 @@ fn switch_screen() !void {
 
         current_screen = e;
         try current_screen.initFn(zalloc.allocator());
-
     }
 
 }
@@ -82,13 +79,12 @@ pub fn stop() void {
     }
 }
 
-
 pub fn loop(dt: f32) void {
     var window_width = @intToFloat(f16, rl.GetScreenWidth());
     var window_height = @intToFloat(f16, rl.GetScreenHeight());
     const scale = min(window_width / lyra.screen_width, window_height / lyra.screen_height);
-    // quit on escape key
-    // if (rl.IsKeyPressed(rl.KEY_F)) rl.ToggleFullscreen();
+    // fullscreen on f press
+    if (rl.IsKeyPressed(rl.KeyboardKey.KEY_F)) rl.ToggleFullscreen();
     // update camera
     camera.target = rl.Vector2{.x = lyra.cx, .y = 0};
     camera.zoom = lyra.zoom;
