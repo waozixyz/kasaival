@@ -33,20 +33,16 @@ const ZEntities = enum {
     none
 };
 const ZEntity = struct {
-    item: ZEntities,
-    index : [3]usize,
-    z: u16,
+    item: ZEntities = ZEntities.none,
+    index : usize = 0,
+    z: u16 = 0,
 };
 
 fn compareLeq(_: void, left: ZEntity, right: ZEntity) bool {
-    if (left.item != ZEntities.none and right.item != ZEntities.none and left.item != right.item) {
-        if (left.z == right.z) {
-            return left.item == ZEntities.player;
-        } else {
-            return left.z < right.z;
-        }
+    if (left.z == right.z) {
+        return left.item == ZEntities.player;
     } else {
-        return false;
+        return left.z < right.z;
     }
 }
 
@@ -62,7 +58,6 @@ var item_count: usize = 0;
 fn init(allocator: std.mem.Allocator) !void {
     plants = ArrayList(Plant).init(allocator);
     plant_spawners = ArrayList(PlantSpawner).init(allocator);
-    to_order = ArrayList(ZEntity).init(allocator);
 
     sky.init();
     try ground.init(allocator);
@@ -72,31 +67,20 @@ fn init(allocator: std.mem.Allocator) !void {
         .frequency = 2,
         .elapsed = 0,
     });
+    try spawn_tree(allocator);
+    try spawn_tree(allocator);
+    try spawn_tree(allocator);
+
 }
 
-fn add_to_order(ze: ZEntity) void {
-    // add to z_entity order list
-    if (item_count == to_order.items.len) {
-        to_order.append(ze) catch |err| log.err("ERROR: {?}", .{err});
-    } else {
-        to_order.items[item_count] = ze;
-    }
-    item_count += 1;
-}
 
-// sort plants
-fn sort_plants() void {
-    // plants to_order
-    for (plants.items) |*p, i| {
-        var ze = ZEntity{
-            .index = .{i, 0, 0},
-            .z = @floatToInt(u16, p.get_z()),
-            .item = ZEntities.plant
-        };
-        add_to_order(ze);
-    }
+fn spawn_tree(allocator: std.mem.Allocator) !void {
+    var p = Plant{};
+    var x = rl.GetRandomValue(1000, @floatToInt(i32, lyra.game_width + lyra.start_x));
+    var y = rl.GetRandomValue(@floatToInt(i32, lyra.start_y), @floatToInt(i32, lyra.game_height));
+    try p.init(allocator, @intToFloat(f32, x), @intToFloat(f32, y), false);
+    try plants.append(p);
 }
-
 
 // spawn plant
 fn plant_spawning(allocator: std.mem.Allocator) !void {
@@ -105,12 +89,9 @@ fn plant_spawning(allocator: std.mem.Allocator) !void {
         _ = i;
         if (elapsed_time > s.elapsed + s.frequency) {
             s.elapsed = elapsed_time;
-            var p = Plant{};
-            var x = rl.GetRandomValue(@floatToInt(i32, lyra.start_x), @floatToInt(i32, lyra.game_width + lyra.start_x));
-            var y = rl.GetRandomValue(@floatToInt(i32, lyra.start_y), @floatToInt(i32, lyra.game_height));
-            try p.init(allocator, @intToFloat(f32, x), @intToFloat(f32, y), false);
-            try plants.append(p);
-        }
+
+            try spawn_tree(allocator);
+        }  
     }
 }
 
@@ -144,37 +125,35 @@ fn update(allocator: std.mem.Allocator, dt: f32) !void {
     player.update();
     
     check_tile_collision();
-    try plant_spawning(allocator);
+    // try plant_spawning(allocator);
 
     // update plants
     for (plants.items) |*p, i| {
         _ = i;
-        p.update(allocator, dt) catch |err| log.err("ERROR: {?}", .{err});
+        try p.update(allocator, dt);
     }
         
     // z order sorting
-    item_count = 0;
-    sort_plants();
+    to_order.deinit();
+    to_order = ArrayList(ZEntity).init(allocator);
 
+    // plants to_order
+    for (plants.items) |*p, i| {
+        var ze = ZEntity{
+            .index = i,
+            .z = @floatToInt(u16, p.start_y),
+            .item = ZEntities.plant
+        };
+        try to_order.append(ze);
+    }
+    // player to sort
     var p_ze = ZEntity{
-        .index = .{0, 0, 0},
         .z = @floatToInt(u16, player.position.y),
         .item = ZEntities.player
     };
+    try to_order.append(p_ze);
 
-    add_to_order(p_ze);
-
-    // reset unused slots in arraylist to_order
-    while (item_count < to_order.items.len) {
-        var ze = ZEntity{
-            .index = .{0, 0, 0},
-            .z = 0,
-            .item = ZEntities.none
-        };
-        add_to_order(ze);
-    }
-    var slice = to_order.items[0..item_count];
-    sort(ZEntity, slice, {}, compareLeq);
+    sort(ZEntity, to_order.items, {}, compareLeq);
 }
 
 // unaffected by camera movement
@@ -194,8 +173,8 @@ pub fn draw() void {
                 player.draw();
             },
             ZEntities.plant => {
-              //  var p = plants.items[ze.index[0]];
-             //   p.draw();
+                var p = plants.items[ze.index];
+                p.draw();
             },
             ZEntities.none => {}
 

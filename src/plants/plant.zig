@@ -4,6 +4,7 @@ const rl = @import("../raylib/raylib.zig");
 const print = std.debug.print;
 const math = std.math;
 const ArrayList = std.ArrayList;
+const lyra = @import("../lyra.zig");
 
 const log = @import("../log.zig");
 
@@ -14,13 +15,6 @@ pub const Branch = struct {
     w: f32,
     h: f32,
     color: rl.Color,
-    pub fn get_z(self: *Branch) f32 {
-        var rtn = self.v1.y;
-        if (self.v2.y > rtn) {
-            rtn = self.v2.y;
-        }
-        return rtn;
-    }
 };
 pub const Leaf = struct {
     row: usize,
@@ -61,8 +55,10 @@ pub const Plant = struct {
     right_x: f32 = -9999999,
     grow_timer: i32 = 0,
     grow_time: i32 = 20,
+    scale: f16 = 1,
     w: f32 = 20,
     h: f32 = 30,
+    start_y: f32 = 0,
     fn append_row(self: *Plant, allocator: std.mem.Allocator) !void {
         var append = try self.branches.append((ArrayList(Branch).init(allocator)));
         _ = append;
@@ -78,6 +74,8 @@ pub const Plant = struct {
         const nx = px + get_rot_x(deg) * bh;
         const ny = py + get_rot_y(deg) * bh;
         const c = get_color(self.cs_branch);
+        
+
         self.branches.items[self.current_row + 1].append(Branch{
             .deg = deg,
             .v1 = rl.Vector2{.x = px, .y = py},
@@ -129,6 +127,8 @@ pub const Plant = struct {
         self.current_row += 1;
     }
     pub fn init(self: *Plant, allocator: std.mem.Allocator, x: f32, y: f32, random_row: bool) anyerror!void {
+        const scale = y / lyra.game_height * lyra.sx;
+        self.start_y = y;
         self.branches = ArrayList(ArrayList(Branch)).init(allocator);
         self.leaves = ArrayList(Leaf).init(allocator);
 
@@ -138,8 +138,8 @@ pub const Plant = struct {
             .deg = angle,
             .v1 = rl.Vector2{ .x = x, .y = y},
             .v2 = rl.Vector2{ .x = x, .y = y - self.h},
-            .w = self.w,
-            .h = self.h,
+            .w = self.w * scale,
+            .h = self.h * scale,
             .color = get_color(self.cs_branch),
         });
         self.grow_timer = rl.GetRandomValue(0, self.grow_time);
