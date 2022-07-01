@@ -122,43 +122,47 @@ fn check_tile_collision() void {
 fn update(allocator: std.mem.Allocator, dt: f32) !void {
     if (fade_in > 10) {
         fade_in -= 10;
-    } else {
-        elapsed_time += dt;
-        sky.update();
-        ground.update(dt);
-        player.update();
-        
-        check_tile_collision();
-        // try plant_spawning(allocator);
-
-        // update plants
-        for (plants.items) |*p, i| {
-            _ = i;
-            try p.update(allocator, dt);
+        player.frozen = true;
+        if (fade_in < 10) {
+            player.frozen = false;
         }
-            
-        // z order sorting
-        to_order.deinit();
-        to_order = ArrayList(ZEntity).init(allocator);
-
-        // plants to_order
-        for (plants.items) |*p, i| {
-            var ze = ZEntity{
-                .index = i,
-                .z = @floatToInt(u16, p.start_y),
-                .item = ZEntities.plant
-            };
-            try to_order.append(ze);
-        }
-        // player to sort
-        var p_ze = ZEntity{
-            .z = @floatToInt(u16, player.position.y),
-            .item = ZEntities.player
-        };
-        try to_order.append(p_ze);
-
-        sort(ZEntity, to_order.items, {}, compareLeq);
     }
+
+    elapsed_time += dt;
+    sky.update();
+    ground.update(dt);
+    player.update();
+    
+    check_tile_collision();
+    // try plant_spawning(allocator);
+
+    // update plants
+    for (plants.items) |*p, i| {
+        _ = i;
+        try p.update(allocator, dt);
+    }
+        
+    // z order sorting
+    to_order.deinit();
+    to_order = ArrayList(ZEntity).init(allocator);
+
+    // plants to_order
+    for (plants.items) |*p, i| {
+        var ze = ZEntity{
+            .index = i,
+            .z = @floatToInt(u16, p.start_y),
+            .item = ZEntities.plant
+        };
+        try to_order.append(ze);
+    }
+    // player to sort
+    var p_ze = ZEntity{
+        .z = @floatToInt(u16, player.position.y),
+        .item = ZEntities.player
+    };
+    try to_order.append(p_ze);
+
+    sort(ZEntity, to_order.items, {}, compareLeq);
 }
 
 // unaffected by camera movement

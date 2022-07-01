@@ -40,6 +40,8 @@ pub const Player = struct{
     hp: f16 = 100,
     xp: f16 = 0,
     speed: f16 = 4,
+    frozen: bool = false,
+
     pub fn init(self: *Player, allocator: std.mem.Allocator) void {
         self.position = rl.Vector2{.x = lyra.cx + lyra.screen_width * 0.5, .y = lyra.screen_height * 0.8};
         self.flame.init(allocator);
@@ -50,7 +52,10 @@ pub const Player = struct{
     pub fn update(self: *Player) void {
         const x = self.position.x;
         const y = self.position.y;
-        var dir = get_direction(x, y);
+        var dir: rl.Vector2 = rl.Vector2{.x = 0, .y = 0};
+        if (! self.frozen) {
+            dir = get_direction(x, y);
+        }
         var dx = dir.x * self.speed * self.flame.scale * 2;
         var dy = dir.y * self.speed * self.flame.scale * 2;
         var eye_bound = lyra.game_width / 5;
