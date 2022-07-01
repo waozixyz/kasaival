@@ -54,7 +54,8 @@ var plant_spawners: ArrayList(PlantSpawner) = undefined;
 var to_order: ArrayList(ZEntity) = undefined;
 var elapsed_time: f32 = 0;
 var item_count: usize = 0;
-
+var playing: bool = true;
+var fade_in: u8 = 255;
 fn init(allocator: std.mem.Allocator) !void {
     plants = ArrayList(Plant).init(allocator);
     plant_spawners = ArrayList(PlantSpawner).init(allocator);
@@ -119,41 +120,48 @@ fn check_tile_collision() void {
 
 // main update game loop
 fn update(allocator: std.mem.Allocator, dt: f32) !void {
-    elapsed_time += dt;
-    sky.update();
-    ground.update();
-    player.update();
-    
-    check_tile_collision();
-    // try plant_spawning(allocator);
-
-    // update plants
-    for (plants.items) |*p, i| {
-        _ = i;
-        try p.update(allocator, dt);
-    }
+    if (fade_in > 10) {
+        fade_in -= 10;
+    } else {
+        elapsed_time += dt;
+        sky.update();
+        ground.update();
+        player.update();
         
-    // z order sorting
-    to_order.deinit();
-    to_order = ArrayList(ZEntity).init(allocator);
+        check_tile_collision();
+        // try plant_spawning(allocator);
 
-    // plants to_order
-    for (plants.items) |*p, i| {
-        var ze = ZEntity{
-            .index = i,
-            .z = @floatToInt(u16, p.start_y),
-            .item = ZEntities.plant
+        // update plants
+        for (plants.items) |*p, i| {
+            _ = i;
+            try p.update(allocator, dt);
+        }
+            
+        // z order sorting
+        to_order.deinit();
+        to_order = ArrayList(ZEntity).init(allocator);
+
+        // plants to_order
+        for (plants.items) |*p, i| {
+            var ze = ZEntity{
+                .index = i,
+                .z = @floatToInt(u16, p.start_y),
+                .item = ZEntities.plant
+            };
+            try to_order.append(ze);
+        }
+        // player to sort
+        var p_ze = ZEntity{
+            .z = @floatToInt(u16, player.position.y),
+            .item = ZEntities.player
         };
-        try to_order.append(ze);
-    }
-    // player to sort
-    var p_ze = ZEntity{
-        .z = @floatToInt(u16, player.position.y),
-        .item = ZEntities.player
-    };
-    try to_order.append(p_ze);
+        try to_order.append(p_ze);
 
-    sort(ZEntity, to_order.items, {}, compareLeq);
+        sort(ZEntity, to_order.items, {}, compareLeq);
+
+
+    }
+
 }
 
 // unaffected by camera movement
@@ -180,6 +188,13 @@ pub fn draw() void {
 
         }
     }
+
+    var start = rl.Vector2{.x = 0, .y = 0 };
+    var end = rl.Vector2{.x = lyra.game_width, .y = lyra.game_height};
+        
+    var color = rl.BLACK;
+    color.a = fade_in;
+    rl.DrawRectangleV(start, end, color);
 }
 pub fn deinit() void {
     sky.deinit();

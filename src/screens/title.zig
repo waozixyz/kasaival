@@ -7,6 +7,9 @@ const screens = @import("../screens.zig");
 
 const print = std.debug.print;
 
+var fade_out: bool = false;
+var black: u8 = 255;
+var alpha: u8 = 255;
 var texture: rl.Texture2D = undefined;
 
 pub const screen = Screen{
@@ -23,16 +26,41 @@ fn init(_: std.mem.Allocator) !void {
 
 fn update(_: std.mem.Allocator, _: f32) !void {
     if (rl.IsMouseButtonPressed(rl.MouseButton.MOUSE_BUTTON_LEFT) or rl.GetKeyPressed() > 0) {
-        screens.next = ScreenNames.arcade;
+        fade_out = true;
+    }
+    if (black > 5) {
+        black -= 5;
+    }
+    if (fade_out) {
+        if (alpha > 10) {
+            alpha -= 10;
+        } else {
+            screens.next = ScreenNames.arcade;
+        }
     }
 }
 
 fn predraw() void {
-    rl.DrawTextureEx(texture, rl.Vector2{.x = 0, .y = 0 }, 0, 11, rl.WHITE);    
-        
-    rl.DrawText("KASAIVAL", 200, 90, 80, rl.MAROON);
-    rl.DrawText("an out of control flame trying to survive", 100, 255, 30, rl.MAROON);
-    rl.DrawText("touch anywhere to start burning", 140, 555, 30, rl.BEIGE);
+    var start = rl.Vector2{.x = 0, .y = 0 };
+    var end = rl.Vector2{.x = lyra.game_width, .y = lyra.game_height};
+    
+    var color = rl.WHITE;
+    color.a = alpha;
+    rl.DrawTextureEx(texture, start, 0, 1, color);    
+    
+    color = rl.MAROON;
+    color.a = alpha;
+    rl.DrawText("KASAIVAL", 200, 90, 80, color);
+    rl.DrawText("an out of control flame trying to survive", 100, 255, 30, color);
+
+    color = rl.BEIGE;
+    color.a = alpha;
+    rl.DrawText("touch anywhere to start burning", 140, 555, 30, color);
+    
+    color = rl.BLACK;
+    color.a = black;
+    rl.DrawRectangleV(start, end, color);
+
 }
 
 fn deinit() void {
