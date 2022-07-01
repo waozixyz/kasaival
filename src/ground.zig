@@ -13,22 +13,9 @@ const Tile = struct {
     v1: rl.Vector2,
     v2: rl.Vector2,
     v3: rl.Vector2,
-
+    burnTimer: f32 = 0,
     color: rl.Color,
     org_color: rl.Color,
-
-    pub fn burn(self: *Tile) void {
-        if (self.color.r < 200) {
-            self.color.r += 20;
-        }
-        if (self.color.g > 100) {
-            self.color.g -= 10;
-        }
-        if (self.color.b > 4) {
-            self.color.b -= 4;
-        }
-        
-    }
 };
 
 fn rand_u8(min: f16, max: f16) u8 {
@@ -70,7 +57,7 @@ pub const Ground = struct {
     pub fn init(self: *Ground, allocator: std.mem.Allocator) !void {
         self.tiles = ArrayList(ArrayList(Tile)).init(allocator);
 
-        var th: f16 = 32;
+        var th: f16 = 33;
         var tw: f16 = 32;
         var scale = lyra.start_y / lyra.game_height * lyra.sx;
 
@@ -117,21 +104,34 @@ pub const Ground = struct {
 
         } 
     }
-    pub fn update(self: *Ground) void {
+    pub fn update(self: *Ground, dt: f32) void {
         for (self.tiles.items) |*row, i| {
             _ = i;
             for (row.items) |*t, j| {
                 _ = j;
-                if (t.color.r > t.org_color.r) {
-                    t.color.r -= 2;
-                }
-                var heal = rl.GetRandomValue(0, 10);
-                if (heal > 7) {
-                    if (t.color.g < t.org_color.g) {
-                        t.color.g += 1;    
+
+                if (t.burnTimer > 0) {
+                    if (t.color.r < 200) {
+                        t.color.r += 20;
                     }
-                    else if (t.color.b < t.org_color.b) {
-                        t.color.b += 1;
+                    if (t.color.g > 100) {
+                        t.color.g -= 10;
+                    }
+                    if (t.color.b > 4) {
+                        t.color.b -= 4;
+                    }
+                    t.burnTimer -= 20 * dt;
+                }
+                else {
+                    var heal = rl.GetRandomValue(0, 10);
+                    if (heal > 7) {
+                        if (t.color.r > t.org_color.r) {
+                            t.color.r -= 2;
+                        } else if (t.color.g < t.org_color.g) {
+                            t.color.g += 1;    
+                        } else if (t.color.b < t.org_color.b) {
+                            t.color.b += 1;
+                        }
                     }
                 }
             }

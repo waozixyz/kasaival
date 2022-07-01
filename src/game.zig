@@ -23,9 +23,6 @@ var target: rl.RenderTexture2D = undefined;
 
 pub fn min(a: f16, b: f16) f16 { if (a < b) { return a; } else { return b; } }
 
-
-
-
 pub fn start() !void {
     // Initialization
     //--------------------------------------------------------------------------------------

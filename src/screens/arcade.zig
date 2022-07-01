@@ -110,7 +110,7 @@ fn check_tile_collision() void {
     
                 if ( t.pos.y - t.size.y < py + pr and t.pos.y > py - pr) {
                     if (t.pos.x - t.size.x < px + pr and t.pos.x + t.size.x> px - pr) {
-                        t.burn();
+                        t.burnTimer = 2;
                     }
                 }
             } 
@@ -125,7 +125,7 @@ fn update(allocator: std.mem.Allocator, dt: f32) !void {
     } else {
         elapsed_time += dt;
         sky.update();
-        ground.update();
+        ground.update(dt);
         player.update();
         
         check_tile_collision();
@@ -158,10 +158,7 @@ fn update(allocator: std.mem.Allocator, dt: f32) !void {
         try to_order.append(p_ze);
 
         sort(ZEntity, to_order.items, {}, compareLeq);
-
-
     }
-
 }
 
 // unaffected by camera movement
