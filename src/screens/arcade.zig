@@ -1,12 +1,14 @@
 const std = @import("std");
 const rl = @import("../raylib/raylib.zig");
 const Screen = @import("screen.zig").Screen;
-const lyra = @import("../lyra.zig");
 const Player = @import("../player.zig").Player;
 const Ground = @import("../ground.zig").Ground;
 const Sky = @import("../sky.zig").Sky;
 const Plant = @import("../plants/plant.zig").Plant;
+
 const log = @import("../log.zig");
+const lyra = @import("../lyra.zig");
+const utils = @import("../utils.zig");
 
 const sort = std.sort.sort;
 const print = std.debug.print;
@@ -65,7 +67,7 @@ fn init(allocator: std.mem.Allocator) !void {
     player.init(allocator);
     
     try plant_spawners.append(.{
-        .frequency = 2,
+        .frequency = 0.1,
         .elapsed = 0,
     });
     try spawn_tree(allocator);
@@ -77,9 +79,11 @@ fn init(allocator: std.mem.Allocator) !void {
 
 fn spawn_tree(allocator: std.mem.Allocator) !void {
     var p = Plant{};
-    var x = rl.GetRandomValue(1000, @floatToInt(i32, lyra.game_width + lyra.start_x));
-    var y = rl.GetRandomValue(@floatToInt(i32, lyra.start_y), @floatToInt(i32, lyra.game_height));
-    try p.init(allocator, @intToFloat(f32, x), @intToFloat(f32, y), false);
+    var y = utils.f32_rand(lyra.start_y, lyra.game_height);
+    var scale = y / lyra.game_height * lyra.sx;
+    var x = utils.f32_rand(600, 1000) * scale;
+
+    try p.init(allocator, x, y, false);
     try plants.append(p);
 }
 
@@ -90,7 +94,6 @@ fn plant_spawning(allocator: std.mem.Allocator) !void {
         _ = i;
         if (elapsed_time > s.elapsed + s.frequency) {
             s.elapsed = elapsed_time;
-
             try spawn_tree(allocator);
         }  
     }
@@ -134,7 +137,7 @@ fn update(allocator: std.mem.Allocator, dt: f32) !void {
     player.update();
     
     check_tile_collision();
-    // try plant_spawning(allocator);
+    try plant_spawning(allocator);
 
     // update plants
     for (plants.items) |*p, i| {
@@ -157,7 +160,7 @@ fn update(allocator: std.mem.Allocator, dt: f32) !void {
     }
     // player to sort
     var p_ze = ZEntity{
-        .z = @floatToInt(u16, player.position.y),
+        .z = @floatToInt(u16, player.position.y + player.get_radius()),
         .item = ZEntities.player
     };
     try to_order.append(p_ze);

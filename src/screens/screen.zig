@@ -6,7 +6,6 @@ pub const Screen = struct {
     updateFn: fn (std.mem.Allocator, f32) anyerror!void = update,
     drawFn: fn () void = draw,
     predrawFn: fn () void = predraw,
-
 };
 
 fn init(allocator: std.mem.Allocator) !void {

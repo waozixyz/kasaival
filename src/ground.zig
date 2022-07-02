@@ -1,15 +1,23 @@
 const std = @import("std");
 const rl = @import("raylib/raylib.zig");
 const lyra = @import("lyra.zig");
+const utils = @import("utils.zig");
 
 const print = std.debug.print;
 const math = std.math;
 const ArrayList = std.ArrayList;
 
+pub const TerrainMedium = enum { grass, desert, water };
+
+pub const Terrain = struct {
+    start_x: f32,
+    end_x: f32,
+    medium: TerrainMedium,
+};
+
 const Tile = struct {
     pos: rl.Vector2,
     size: rl.Vector2,
-
     v1: rl.Vector2,
     v2: rl.Vector2,
     v3: rl.Vector2,
@@ -20,19 +28,22 @@ const Tile = struct {
 
 fn rand_u8(min: f16, max: f16) u8 {
     var rtn: f16 = @intToFloat(f16, rl.GetRandomValue(@floatToInt(i32, min), @floatToInt(i32, max)));
-    rtn = lyra.clamp(rtn , 0, 255);
+    rtn = utils.clamp(rtn , 0, 255);
     return @floatToInt(u8, rtn);
 }
 
-fn get_color(x: f16, y: f16) rl.Color {
+fn get_color(col: f16, x: f16, y: f16) rl.Color {
     var add_b: f16 = 0;
     var sub_g: f16 = 0;
     _ = y;
-    if (x < 1000) {
-        var s: f16 = (x / 1000) * 200;
+    _ = x;
+    var max: f16 = 50;
+    if (col < max) {
+        var s: f16 = (col / max) * 200;
         add_b = 200 - s;
-        if ( x < 700 ) {
-            var a: f16 = (x / 700) * 100;
+        max = 30;
+        if ( col < max ) {
+            var a: f16 = (col / max) * 100;
             sub_g = 100 - a;
         }
     }
@@ -63,7 +74,7 @@ pub const Ground = struct {
 
         var start_y: f16 = lyra.start_y + th * scale ;
 
-        var i: usize = 0;
+        var row: usize = 0;
 
         while (start_y < lyra.game_height + th ) {
             var start_x: f16 = lyra.start_x - 200;
@@ -74,9 +85,12 @@ pub const Ground = struct {
             self.append_row(allocator) catch |err| {
                 std.log.info("Caught error: {s}", .{ err });
             };
+            var col: f16 = 0;
             while (start_x < lyra.game_width + w) {
                 if (start_x > lyra.start_x - w) {
-                    var color = get_color(start_x, start_y);
+                    col += 1;
+
+                    var color = get_color(col, start_x, start_y);
 
                     var x = start_x;
                     var y = start_y;
@@ -87,19 +101,19 @@ pub const Ground = struct {
                     var v3 = rl.Vector2{ .x = x, .y = y - h};
 
                     var t = Tile{.pos = pos, .size = size, .v1 = v1, .v2 = v2, .v3 = v3, .color = color, .org_color = color };
-                    try append_tile(self, i, t);
+                    try append_tile(self, row, t);
 
 
                     v1 = rl.Vector2{ .x = x, .y = y};
                     v2 = rl.Vector2{ .x = x + w, .y = y - h};
                     v3 = rl.Vector2{ .x = x - w , .y = y - h};
                     t = Tile{.pos = pos, .size = size, .v1 = v1, .v2 = v2, .v3 = v3, .color = color, .org_color = color };
-                    try append_tile(self, i, t);
+                    try append_tile(self, row, t);
 
                 }
                 start_x += w;
             }
-            i += 1;
+            row += 1;
             start_y += h;
 
         } 

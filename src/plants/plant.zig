@@ -5,7 +5,6 @@ const print = std.debug.print;
 const math = std.math;
 const ArrayList = std.ArrayList;
 const lyra = @import("../lyra.zig");
-
 const log = @import("../log.zig");
 
 pub const Branch = struct {
@@ -45,7 +44,7 @@ pub const Plant = struct {
     branches: ArrayList(ArrayList(Branch)) = undefined,
     leaves: ArrayList(Leaf) = undefined,
     leaf_chance: f32 = 0.5,
-    max_row: i32 = 10,
+    max_row: i32 = 5,
     current_row: usize = 0,
     split_chance: i32 = 40,
     split_angle: [2]i32 = .{20, 30},
@@ -56,8 +55,8 @@ pub const Plant = struct {
     grow_timer: i32 = 0,
     grow_time: i32 = 20,
     scale: f16 = 1,
-    w: f32 = 20,
-    h: f32 = 30,
+    w: f32 = 10,
+    h: f32 = 15,
     start_y: f32 = 0,
     fn append_row(self: *Plant, allocator: std.mem.Allocator) !void {
         var append = try self.branches.append((ArrayList(Branch).init(allocator)));

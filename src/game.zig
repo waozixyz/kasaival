@@ -3,6 +3,8 @@ const log = @import("./log.zig");
 const ZecsiAllocator = @import("allocator.zig").ZecsiAllocator;
 const rl = @import("raylib/raylib.zig");
 const lyra = @import("lyra.zig");
+const utils = @import("utils.zig");
+
 const Screen = @import("screens/screen.zig").Screen;
 const screens = @import("screens.zig");
 const ScreenNames = @import("screens.zig").ScreenNames;
@@ -80,8 +82,8 @@ pub fn loop(dt: f32) void {
     lyra.mouse_x = (@floatCast(f16, mouse.x) - (window_width - (lyra.screen_width * scale)) * 0.5) / scale;
     lyra.mouse_y = (@floatCast(f16, mouse.y) - (window_height - (lyra.screen_height * scale)) * 0.5) / scale;
         
-    lyra.mouse_x = lyra.clamp(lyra.mouse_x, 0, lyra.screen_width);
-    lyra.mouse_y = lyra.clamp(lyra.mouse_y, 0, lyra.screen_height);
+    lyra.mouse_x = utils.clamp(lyra.mouse_x, 0, lyra.screen_width);
+    lyra.mouse_y = utils.clamp(lyra.mouse_y, 0, lyra.screen_height);
     // if game screen changes, update to the new screen
     
     if (current != screens.next) {
