@@ -126,7 +126,7 @@ pub const Plant = struct {
         self.current_row += 1;
     }
     pub fn init(self: *Plant, allocator: std.mem.Allocator, x: f32, y: f32, random_row: bool) anyerror!void {
-        const scale = y / lyra.game_height * lyra.sx;
+        const scale = y / lyra.end_y * lyra.sx;
         self.start_y = y;
         self.branches = ArrayList(ArrayList(Branch)).init(allocator);
         self.leaves = ArrayList(Leaf).init(allocator);

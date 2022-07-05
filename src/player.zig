@@ -39,7 +39,7 @@ pub const Player = struct{
     position: rl.Vector2 = undefined,
     hp: f16 = 100,
     xp: f16 = 0,
-    speed: f16 = 4,
+    speed: f16 = 0.5,
     frozen: bool = false,
 
     pub fn init(self: *Player, allocator: std.mem.Allocator) void {
@@ -56,19 +56,19 @@ pub const Player = struct{
         if (! self.frozen) {
             dir = get_direction(x, y);
         }
-        var dx = dir.x * self.speed * self.flame.scale * 2;
-        var dy = dir.y * self.speed * self.flame.scale * 2;
-        var eye_bound = lyra.game_width / 5;
-        if ((x + dx < lyra.start_x + lyra.cx + eye_bound and lyra.cx > lyra.start_x )
-        or (x + dx > lyra.start_x + lyra.cx + lyra.screen_width - eye_bound and lyra.cx < lyra.game_width  + lyra.start_x - lyra.screen_width)) {
+        var dx = dir.x * self.speed * self.get_radius();
+        var dy = dir.y * self.speed * self.get_radius();
+        var eye_bound = lyra.screen_width / 5;
+        if ((x + dx < lyra.cx + eye_bound and lyra.cx > 0)
+        or (x + dx > lyra.cx + lyra.screen_width - eye_bound and lyra.cx < lyra.end_x - lyra.screen_width)) {
             lyra.cx += dx;
         }
 
-        if (x + dx < lyra.start_x + lyra.cx + self.flame.radius and dx < 0) {
-            self.position.x = lyra.start_x + lyra.cx + self.flame.radius;
+        if (x + dx < lyra.cx + self.get_radius() and dx < 0) {
+            self.position.x = lyra.cx + self.get_radius();
         }
-        else if (x + dx > lyra.start_x + lyra.cx + lyra.screen_width) {
-            self.position.x = lyra.start_x + lyra.cx + lyra.screen_width;
+        else if (x + dx > lyra.cx + lyra.screen_width - self.get_radius()) {
+            self.position.x = lyra.cx + lyra.screen_width - self.get_radius();
         }
         else {
             self.position.x += dx;
@@ -83,7 +83,7 @@ pub const Player = struct{
             self.position.y = min_y;
         }
         else {
-            self.flame.scale = self.position.y / lyra.game_height * lyra.sx ;
+            self.flame.scale = self.position.y / lyra.end_y * lyra.sx ;
             self.position.y += dy;
         }
         self.flame.update(self.position);

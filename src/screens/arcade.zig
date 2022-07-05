@@ -5,6 +5,8 @@ const Player = @import("../player.zig").Player;
 const Ground = @import("../ground.zig").Ground;
 const Sky = @import("../sky.zig").Sky;
 const Plant = @import("../plants/plant.zig").Plant;
+const Level = @import("../levels/level.zig").Level;
+const levels = @import("../levels.zig");
 
 const log = @import("../log.zig");
 const lyra = @import("../lyra.zig");
@@ -58,16 +60,18 @@ var elapsed_time: f32 = 0;
 var item_count: usize = 0;
 var playing: bool = true;
 var fade_in: u8 = 255;
+var level: Level = levels.daisyland;
+
 fn init(allocator: std.mem.Allocator) !void {
     plants = ArrayList(Plant).init(allocator);
     plant_spawners = ArrayList(PlantSpawner).init(allocator);
 
     sky.init();
-    try ground.init(allocator);
+    try ground.init(allocator, level.ground);
     player.init(allocator);
     
     try plant_spawners.append(.{
-        .frequency = 0.1,
+        .frequency = 100,
         .elapsed = 0,
     });
     try spawn_tree(allocator);
@@ -79,9 +83,9 @@ fn init(allocator: std.mem.Allocator) !void {
 
 fn spawn_tree(allocator: std.mem.Allocator) !void {
     var p = Plant{};
-    var y = utils.f32_rand(lyra.start_y, lyra.game_height);
-    var scale = y / lyra.game_height * lyra.sx;
-    var x = utils.f32_rand(600, 1000) * scale;
+    var y = utils.f32_rand(lyra.start_y, lyra.end_y);
+    var scale = y / lyra.end_y * lyra.sx;
+    var x = utils.f32_rand(4000, 4200) * scale;
 
     try p.init(allocator, x, y, false);
     try plants.append(p);
@@ -194,7 +198,7 @@ pub fn draw() void {
     }
 
     var start = rl.Vector2{.x = 0, .y = 0 };
-    var end = rl.Vector2{.x = lyra.game_width, .y = lyra.game_height};
+    var end = rl.Vector2{.x = lyra.screen_width, .y = lyra.screen_height};
         
     var color = rl.BLACK;
     color.a = fade_in;
