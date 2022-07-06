@@ -2,14 +2,18 @@ const std = @import("std");
 const rl = @import("raylib/raylib.zig");
 const lyra = @import("lyra.zig");
 const utils = @import("utils.zig");
+const Plant = @import("plant.zig").Plant;
 
 const print = std.debug.print;
 const math = std.math;
 const ArrayList = std.ArrayList;
 
 
+pub const PlantNames = enum { oak, none };
+
 pub const Terrain = struct {
     w: f16 = -1,
+    grow: PlantNames = PlantNames.none,
     cs_r: [2]u8 = [2]u8{16, 60},
     cs_g: [2]u8 = [2]u8{120, 200},
     cs_b: [2]u8 = [2]u8{10, 50},
@@ -17,6 +21,7 @@ pub const Terrain = struct {
 };
 
 const Tile = struct {
+    grow: PlantNames,
     pos: rl.Vector2,
     size: rl.Vector2,
     v1: rl.Vector2,
@@ -25,6 +30,9 @@ const Tile = struct {
     burnTimer: f32 = 0,
     color: rl.Color,
     org_color: rl.Color,
+    fertility: f32,
+    capacity: i32 = 1,
+    plants: ArrayList(Plant) = undefined,
 };
 
 fn rand_u8(cs: [2]u8) u8 {
@@ -50,7 +58,6 @@ fn get_color_between_terrains(x: f16, tw: f16, t1: Terrain, t2: Terrain) rl.Colo
         .g = get_color_difference(c1[1], c2[1], s),
         .b = get_color_difference(c1[2], c2[2], s),
         .a = get_color_difference(c1[3], c2[3], s),
-
     };
 }
 
@@ -58,7 +65,6 @@ fn get_color(x: f16, tw: f16, terrains: [5]Terrain, terrain_index: usize) rl.Col
     var t1 = terrains[terrain_index];
     var t2 = terrains[terrain_index + 1];
     return get_color_between_terrains(x, tw, t1, t2);
-
 }
 
 pub const Ground = struct {
@@ -103,7 +109,6 @@ pub const Ground = struct {
                     total_w += terrain.w;
                     terrain_index += 1;
                     terrain = terrains[terrain_index];
-
                     if (terrain.w == -1) {
                         break;
                     }
@@ -113,18 +118,24 @@ pub const Ground = struct {
 
                 var pos = rl.Vector2{.x = x, .y = y};
                 var size = rl.Vector2{.x = w, .y = h};
-
+                var fertility: f32 = 0;
+                if (terrain.grow != PlantNames.none ) {
+                    fertility = @intToFloat(f32, rl.GetRandomValue(0, 1000));
+                }
                 var v1 = rl.Vector2{ .x = x - w, .y = y};
                 var v2 = rl.Vector2{ .x = x + w, .y = y};
                 var v3 = rl.Vector2{ .x = x, .y = y - h};
-                var t = Tile{.pos = pos, .size = size, .v1 = v1, .v2 = v2, .v3 = v3, .color = color, .org_color = color };
+                var plants = ArrayList(Plant).init(allocator);
+                var t = Tile{.grow = terrain.grow, .plants = plants, .fertility = fertility, .pos = pos, .size = size, .v1 = v1, .v2 = v2, .v3 = v3, .color = color, .org_color = color };
                 try append_tile(self, row, t);
-
-
+                if (terrain.grow != PlantNames.none ) {
+                    fertility = @intToFloat(f32, rl.GetRandomValue(0, 1000));
+                }
+                plants = ArrayList(Plant).init(allocator);
                 v1 = rl.Vector2{ .x = x, .y = y};
                 v2 = rl.Vector2{ .x = x + w, .y = y - h};
                 v3 = rl.Vector2{ .x = x - w , .y = y - h};
-                t = Tile{.pos = pos, .size = size, .v1 = v1, .v2 = v2, .v3 = v3, .color = color, .org_color = color };
+                t = Tile{.grow = terrain.grow, .plants = plants, .fertility = fertility, .pos = pos, .size = size, .v1 = v1, .v2 = v2, .v3 = v3, .color = color, .org_color = color };
                 try append_tile(self, row, t);
 
                 x += w;
@@ -133,12 +144,24 @@ pub const Ground = struct {
             y += h;
         }
     }
-
-    pub fn update(self: *Ground, dt: f32) void {
+    pub fn update(self: *Ground, allocator: std.mem.Allocator, dt: f32) !void {
         for (self.tiles.items) |*row, i| {
             _ = i;
             for (row.items) |*t, j| {
                 _ = j;
+                if (t.grow != PlantNames.none) {
+                    t.fertility += dt;
+                    if (t.fertility > 1000 and t.plants.items.len < t.capacity) {
+                        t.fertility = 0;
+                        var p = Plant{};
+                        var x = utils.f32_rand(t.pos.x, t.pos.x + t.size.x);
+                        var y = utils.f32_rand(t.pos.y, t.pos.y + t.size.y);
+
+                        try p.init(allocator, x, y, false);
+                        try t.plants.append(p);
+
+                    }
+                }
 
                 if (t.burnTimer > 0) {
                     if (t.color.r < 200) {
@@ -187,7 +210,16 @@ pub const Ground = struct {
     pub fn deinit(self: *Ground) void {
         for (self.tiles.items) |*row, i| {
             _ = i;
+            for (row.items) |*t, j| {
+                _ = j;
+                for (t.plants.items) |*p, k| {
+                    _ = k;
+                    p.deinit();
+                }
+                t.plants.deinit();
+            }
             row.deinit();
+            
         }
         self.tiles.deinit();
 

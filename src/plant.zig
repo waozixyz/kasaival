@@ -1,11 +1,11 @@
 const std = @import("std");
-const rl = @import("../raylib/raylib.zig");
+const rl = @import("raylib/raylib.zig");
 
 const print = std.debug.print;
 const math = std.math;
 const ArrayList = std.ArrayList;
-const lyra = @import("../lyra.zig");
-const log = @import("../log.zig");
+const lyra = @import("lyra.zig");
+const log = @import("log.zig");
 
 pub const Branch = struct {
     deg: i32,
@@ -149,7 +149,7 @@ pub const Plant = struct {
             }
         }
     }
-    pub fn update(self: *Plant, allocator: std.mem.Allocator, _: f32) anyerror!void {
+    pub fn update(self: *Plant, allocator: std.mem.Allocator) anyerror!void {
         if (self.grow_timer > 0) {
             self.grow_timer -= 1;
         }

@@ -1,5 +1,6 @@
 const Level = @import("levels/level.zig").Level;
 const Terrain = @import("ground.zig").Terrain;
+const PlantNames = @import("ground.zig").PlantNames;
 
 
 pub const daisyland = Level{
@@ -15,6 +16,7 @@ pub const daisyland = Level{
             .cs_r = [2]u8{16, 60},
             .cs_g = [2]u8{160, 200},
             .cs_b = [2]u8{30, 50},
+            .grow = PlantNames.oak,
         },
         Terrain{
             .w = 1000,
