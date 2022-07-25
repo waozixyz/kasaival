@@ -5,8 +5,9 @@ const Player = @import("../player.zig").Player;
 const Ground = @import("../ground.zig").Ground;
 const Sky = @import("../sky.zig").Sky;
 const Plant = @import("../plant.zig").Plant;
-const Level = @import("../levels/level.zig").Level;
+const Level = @import("../level.zig").Level;
 const levels = @import("../levels.zig");
+const HUD = @import("../hud.zig").HUD;
 
 const log = @import("../log.zig");
 const lyra = @import("../lyra.zig");
@@ -46,18 +47,18 @@ fn compareLeq(_: void, left: ZEntity, right: ZEntity) bool {
 }
 
 var sky = Sky{};
+var hud = HUD{};
 var player: Player = Player{};
 var ground: Ground = Ground{};
 var to_order: ArrayList(ZEntity) = undefined;
-var elapsed_time: f32 = 0;
 var item_count: usize = 0;
 var playing: bool = true;
 var fade_in: u8 = 255;
 var level: Level = levels.daisyland;
 
 fn init(allocator: std.mem.Allocator) !void {
-    sky.init();
-    try ground.init(allocator, level.ground);
+    try sky.init(allocator);
+    try ground.init(allocator, level);
     player.init(allocator);
 }
 
@@ -93,7 +94,7 @@ fn update(allocator: std.mem.Allocator, dt: f32) !void {
         }
     }
 
-    elapsed_time += dt;
+    lyra.time += dt;
     sky.update();
     try ground.update(allocator, dt);
     player.update();
@@ -134,6 +135,7 @@ fn update(allocator: std.mem.Allocator, dt: f32) !void {
 pub fn predraw() void {
     sky.predraw();
     ground.predraw();
+    hud.predraw();
 }
 
 // draw function

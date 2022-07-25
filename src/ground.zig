@@ -3,11 +3,11 @@ const rl = @import("raylib/raylib.zig");
 const lyra = @import("lyra.zig");
 const utils = @import("utils.zig");
 const Plant = @import("plant.zig").Plant;
+const Level = @import("level.zig").Level;
 
 const print = std.debug.print;
 const math = std.math;
 const ArrayList = std.ArrayList;
-
 
 pub const PlantNames = enum { oak, none };
 
@@ -73,34 +73,29 @@ pub const Ground = struct {
         var append = try self.tiles.items[row].append(t);
         _ = append;
     }
-    fn append_row(self: *Ground, allocator: std.mem.Allocator) !void {
-        var append = try self.tiles.append((ArrayList(Tile).init(allocator)));
-        _ = append;
-    }
-    pub fn init(self: *Ground, allocator: std.mem.Allocator, terrains: [5]Terrain) !void {
+    pub fn init(self: *Ground, allocator: std.mem.Allocator, level: Level) !void {
         self.tiles = ArrayList(ArrayList(Tile)).init(allocator);
 
-        var th: f16 = 33;
-        var tw: f16 = 32;
+        var tile_w = level.ground.tile_w;
+        var tile_h = level.ground.tile_h;
+        var terrains = level.ground.terrains;
     
         var scale = lyra.start_y / lyra.end_y * lyra.sx;
-        var y: f16 = lyra.start_y + th * scale ;
+        var y = lyra.start_y + tile_h * scale ;
 
         for (terrains) |*t, i| {
             _ = i;
             if (t.w != -1) {
-                lyra.end_x += t.w - tw * lyra.sx;
+                lyra.end_x += t.w - tile_w * lyra.sx;
             }
         }
         var row: usize = 0;
-        while (y < lyra.end_y + th ) {
+        while (y < lyra.end_y + tile_h) {
             var x: f16 = 0;
             scale = y / lyra.end_y * lyra.sx;
-
-            var w: f16 = tw * scale;
-            var h: f16 = th * scale;
-            try self.append_row(allocator);
-
+            var w: f16 = tile_w * scale;
+            var h: f16 = tile_h * scale;
+            try self.tiles.append((ArrayList(Tile).init(allocator)));
             var terrain_index: usize = 0;
             var terrain = terrains[terrain_index];
             var total_w: f16 = 0;
@@ -219,11 +214,8 @@ pub const Ground = struct {
                 t.plants.deinit();
             }
             row.deinit();
-            
         }
         self.tiles.deinit();
-
     }
-
 };
 

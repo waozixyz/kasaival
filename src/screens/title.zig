@@ -60,7 +60,6 @@ fn predraw() void {
     color = rl.BLACK;
     color.a = black;
     rl.DrawRectangleV(start, end, color);
-
 }
 
 fn deinit() void {

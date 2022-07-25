@@ -1,7 +1,5 @@
 const std = @import("std");
 const rl = @import("../raylib/raylib.zig");
-
-
 const lyra = @import("../lyra.zig");
 
 const print = std.debug.print;
@@ -93,10 +91,8 @@ pub const Flame = struct{
                 p.position.x += p.vel_start.x * pp + p.vel_end.x * (1 - pp);
                 p.position.y += p.vel_start.y * pp + p.vel_end.y * (1 - pp);
                 update_colors(p, pp);
-   
 
                 p.size *= p.shrink_factor;
-
             }
             p.lifetime -= 1;
         }
@@ -110,12 +106,7 @@ pub const Flame = struct{
             var v = rl.Vector2{.x = p.position.x, .y = p.position.y};
             rl.DrawCircleV(v, p.size, u8ToColor(p.color));
             i += 1;
-
         }
-
-
-
-
     }
     
     pub fn deinit(self: *Flame) void {

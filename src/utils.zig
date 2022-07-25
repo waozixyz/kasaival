@@ -6,7 +6,14 @@ pub fn clamp(val: f16, lower: f16, higher: f16) f16 {
     else { return val; }
 }
 
-
 pub fn f32_rand(min: f32, max: f32) f32 {
     return @intToFloat(f32, rl.GetRandomValue(@floatToInt(i32, min), @floatToInt(i32, max)));
+}
+
+pub fn u8_rand(min: i32, max: i32) u8 {
+    var val = rl.GetRandomValue(min, max);
+    if (val > 255) {
+        val = 255;
+    }
+    return @intCast(u8, val);
 }
