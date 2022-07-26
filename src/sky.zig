@@ -26,14 +26,17 @@ fn get_mhn(h_off: u32) f16 {
 
 pub const Sky = struct{
     stars: ArrayList(Star) = undefined,
-
+    nebula: rl.Texture2D = undefined,
+    pos_y: f32 = -lyra.screen_height,
     pub fn init(self: *Sky, allocator: std.mem.Allocator) !void {
+        self.nebula = rl.LoadTexture("assets/nebula.png");
+
         self.stars = ArrayList(Star).init(allocator);
         var i: usize = 0;
         while (true)  {
             var star = Star{
                 .pos = rl.Vector2{
-                    .x = utils.f32_rand(-200, lyra.screen_width + 200),
+                    .x = utils.f32_rand(-20, lyra.screen_width + 20),
                     .y = utils.f32_rand(0, lyra.screen_height),
                 },
                 .radius = utils.f32_rand(1, 5),
@@ -53,6 +56,10 @@ pub const Sky = struct{
         }
     }
     pub fn update(self: *Sky, dt: f32) void {
+        self.pos_y += dt * lyra.time_speed;
+        if (self.pos_y > 0) {
+            self.pos_y -= lyra.screen_height;
+        }
         for (self.stars.items) |*s, i| {
             _ = i;
             s.pos.y += dt * lyra.time_speed;
@@ -108,18 +115,30 @@ pub const Sky = struct{
         for (self.stars.items) |*s, i| {
             _ = i;
             var x = s.pos.x - lyra.cx * 0.02;
-            
+    
             s.color.a = @floatToInt(u8, utils.clamp(255 - (t_b + t_g) * 1.2, 0, 255));
             
             rl.DrawCircleV(rl.Vector2{.x = x, .y = s.pos.y}, s.radius, s.color);    
         }
 
         rl.EndBlendMode();
+        color = rl.WHITE;
+        color.a = 200;
+        var x = - lyra.cx * 0.02;
+        var scale: f32 = 10;
+        while (x < lyra.screen_width) {
+            var y = self.pos_y;
+            while (y < lyra.screen_height) {
+                rl.DrawTextureEx(self.nebula, rl.Vector2{.x = x, .y = y}, 0, scale, color);  
+                y += @intToFloat(f32, self.nebula.height) * scale;
+            }
+            x += @intToFloat(f32, self.nebula.width) * scale;
+        } 
     }
 
     pub fn deinit(self: *Sky) void {
         self.stars.deinit();
-
+        rl.UnloadTexture(self.nebula);
     }
 };
 
