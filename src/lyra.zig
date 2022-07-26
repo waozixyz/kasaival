@@ -20,4 +20,4 @@ pub var sx : f16 = 1;
 pub var mouse_x : f16 = 0;
 pub var mouse_y : f16 = 0;
 
-pub var time: f32 = 0;
+pub var elapsed_time: f32 = 0;

@@ -12,12 +12,12 @@ const HUD = @import("../hud.zig").HUD;
 const log = @import("../log.zig");
 const lyra = @import("../lyra.zig");
 const utils = @import("../utils.zig");
+const Time = @import("../lyra.zig").Time;
 
 const sort = std.sort.sort;
 const print = std.debug.print;
 const ArrayList = std.ArrayList;
 const rand = std.crypto.random;
-
 
 pub const screen = Screen{
     .initFn = init,
@@ -84,6 +84,7 @@ fn check_tile_collision() void {
     }
 }
 
+
 // main update game loop
 fn update(allocator: std.mem.Allocator, dt: f32) !void {
     if (fade_in > 10) {
@@ -94,7 +95,8 @@ fn update(allocator: std.mem.Allocator, dt: f32) !void {
         }
     }
 
-    lyra.time += dt;
+    lyra.elapsed_time += dt;
+
     sky.update();
     try ground.update(allocator, dt);
     player.update();
