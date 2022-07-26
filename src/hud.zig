@@ -4,9 +4,7 @@ const math = std.math;
 const log = @import("./log.zig");
 const lyra = @import("./lyra.zig");
 
-var buf_slice: [:0]u8 = undefined;
 const print = std.debug.print;
-
 
 fn get_zero_or_none(val: i32) [2:0]u8 {
     if (val < 10) {
@@ -16,6 +14,9 @@ fn get_zero_or_none(val: i32) [2:0]u8 {
         return " ".*;
     }
 }
+
+const padding: i32 = 12;
+const font_size: f32 = 20;
 pub const HUD = struct{
     pub fn init(_: *HUD) void {
 
@@ -24,19 +25,14 @@ pub const HUD = struct{
     }
 
     pub fn predraw(_: *HUD) void {
-        var elapsed = @floatToInt(u32, lyra.elapsed_time);
-        var min = @mod(elapsed, 60);
-        var hour = @divFloor(@mod(elapsed, 24 * 60), 60);
-        var day = @divFloor(@mod(elapsed, 24 * 60 * 30), 60 * 24);
-        var buf: [100]u8 = undefined;
-
-        buf_slice = std.fmt.bufPrintZ(&buf, "day {d}, {d:0>2}:{d:0>2}", .{day, hour, min}) catch |err| errblk: {
+        var day = lyra.get_day();
+        var day_buf: [100]u8 = undefined;
+        var day_slice = std.fmt.bufPrintZ(&day_buf, "day {d}", .{day}) catch |err| errblk: {
             log.err("ERROR: {?}", .{err});
             break :errblk "";
         };
-
-        rl.DrawText(buf_slice, 20, 20, 40, rl.LIGHTGRAY);
-
+        var width: i32 = @intCast(i32, day_slice.len) * @floatToInt(i32, font_size * 0.5);
+        rl.DrawText(day_slice, @floatToInt(i32, lyra.screen_width) - padding * 2- width, padding, font_size, rl.MAGENTA);
       
     }
 

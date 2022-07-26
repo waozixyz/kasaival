@@ -20,4 +20,22 @@ pub var sx : f16 = 1;
 pub var mouse_x : f16 = 0;
 pub var mouse_y : f16 = 0;
 
+
+// game time
+pub var time_speed: f32 = 1;
 pub var elapsed_time: f32 = 0;
+
+pub fn get_day() u32 {
+    var elapsed = @floatToInt(u32, elapsed_time);
+    return @divFloor(elapsed, 60 * 24);
+}
+pub fn get_minute() u32 {
+    var elapsed = @floatToInt(u32, elapsed_time);
+    return @mod(elapsed, 60);
+}
+
+pub fn get_hour() u32 {
+    var elapsed = @floatToInt(u32, elapsed_time);
+    return @divFloor(@mod(elapsed, 24 * 60), 60);
+}
+        

@@ -95,9 +95,9 @@ fn update(allocator: std.mem.Allocator, dt: f32) !void {
         }
     }
 
-    lyra.elapsed_time += dt;
+    lyra.elapsed_time += dt * lyra.time_speed;
 
-    sky.update();
+    sky.update(dt);
     try ground.update(allocator, dt);
     player.update();
 
