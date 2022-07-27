@@ -15,6 +15,11 @@ const Star = struct {
     color: rl.Color,
 };
 
+const Nebula = struct {
+    pos: rl.Vector2,
+    texture: rl.Texture2D,
+};
+
 const cx_scale = 0.2;
 
 fn get_mhd(h_off: u32) f16 {
@@ -29,29 +34,29 @@ fn rand_y() f32 {
     return utils.f32_rand(0, lyra.screen_height);
 }
 fn rand_x() f32 {
-    return utils.f32_rand(-20 / cx_scale, lyra.screen_width / cx_scale);
+    return utils.f32_rand(-20, lyra.screen_width + lyra.end_x * cx_scale);
 }
 fn rand_pos() rl.Vector2 {
     return rl.Vector2{.x = rand_x(), .y = rand_y()};
 }
 pub const Sky = struct{
+    nebula: Nebula = undefined,
     stars: ArrayList(Star) = undefined,
-    nebula: rl.Texture2D = undefined,
-    nebula_y: f32 = -lyra.screen_height,
-    sun: Star = undefined,
     pub fn init(self: *Sky, allocator: std.mem.Allocator) !void {
-        self.nebula = rl.LoadTexture("assets/nebula.png");
-        self.sun = Star{
-            .pos = rand_pos(),
-            .radius = 42,
-            .color = rl.YELLOW,
+        self.nebula = Nebula {
+            .texture = rl.LoadTexture("assets/nebula.png"),
+            .pos = rl.Vector2{.x = 0, .y = -lyra.screen_height},
         };
         self.stars = ArrayList(Star).init(allocator);
         var i: usize = 0;
         while (true)  {
+            var radius = utils.f32_rand(1, 5);
+            if (i < 5) {
+                radius = utils.f32_rand(5, 20);
+            }
             var star = Star{
                 .pos = rand_pos(),
-                .radius = utils.f32_rand(1, 5),
+                .radius = radius,
                 .color = rl.Color {
                     .r = utils.u8_rand(200, 255),
                     .g = utils.u8_rand(200, 255),
@@ -69,15 +74,13 @@ pub const Sky = struct{
     }
     pub fn update(self: *Sky, dt: f32) void {
         var vy = dt * lyra.time_speed;
-        self.nebula_y += vy;
-        if (self.nebula_y > 0) {
-            self.nebula_y -= lyra.screen_height;
+        // nebula
+        self.nebula.pos.y += vy;
+        if (self.nebula.pos.y > 0) {
+            self.nebula.pos.y -= lyra.screen_height;
         }
-        self.sun.pos.y += vy;
-        if (self.sun.pos.y > lyra.screen_height) {
-            self.sun.pos.y -= lyra.screen_height + self.sun.radius;
-            self.sun.pos.x = rand_x();
-        }
+
+        // stars
         for (self.stars.items) |*s, i| {
             _ = i;
             s.pos.y += vy;
@@ -140,28 +143,25 @@ pub const Sky = struct{
             pos.x -= cx;
             rl.DrawCircleV(pos, s.radius, s.color);    
         }
-        var pos = self.sun.pos;
-        pos.x -= cx;
-        rl.DrawCircleV(pos, self.sun.radius, self.sun.color);    
-
-        rl.EndBlendMode();
         color = rl.WHITE;
         color.a = 200;
-        var x = -cx;
+        var x = self.nebula.pos.x - cx * 1.1;
         var scale: f32 = 10;
         while (x < lyra.screen_width) {
-            var y = self.nebula_y;
+            var y = self.nebula.pos.y;
             while (y < lyra.screen_height) {
-                rl.DrawTextureEx(self.nebula, rl.Vector2{.x = x, .y = y}, 0, scale, color);  
-                y += @intToFloat(f32, self.nebula.height) * scale;
+                rl.DrawTextureEx(self.nebula.texture, rl.Vector2{.x = x, .y = y}, 0, scale, color);  
+                y += @intToFloat(f32, self.nebula.texture.height) * scale;
             }
-            x += @intToFloat(f32, self.nebula.width) * scale;
+            x += @intToFloat(f32, self.nebula.texture.width) * scale;
         } 
+        rl.EndBlendMode();
+
     }
 
     pub fn deinit(self: *Sky) void {
         self.stars.deinit();
-        rl.UnloadTexture(self.nebula);
+        rl.UnloadTexture(self.nebula.texture);
     }
 };
 

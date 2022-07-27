@@ -20,9 +20,8 @@ pub var sx : f16 = 1;
 pub var mouse_x : f16 = 0;
 pub var mouse_y : f16 = 0;
 
-
 // game time
-pub var time_speed: f32 = 100;
+pub var time_speed: f32 = 2;
 pub var elapsed_time: f32 = 0;
 
 pub fn get_day() u32 {
