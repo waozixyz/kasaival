@@ -3,11 +3,11 @@ LOVE_VERSION=11.3
 NAME=Kasaival
 ITCH_ACCOUNT=waotzi
 URL="https://kasaival.rocks"
-AUTHOR="Wolfi"
+AUTHOR="Wao Tzi"
 DESCRIPTION="Survival adventure game. Out of nowhere you have come to exist. The fire is burning inside you, but you feel it diminishing. Stay alive as long as you can! Do whatever it takes to keep your flame burning!"
 
 ASSETS := $(wildcard assets/*)
-LIBS := $(wildcard lib/*)
+LIBS := $(wildcard src/*)
 LUA := $(wildcard *.lua)
 
 run: love .
@@ -18,10 +18,15 @@ LOVEFILE=releases/$(NAME)-$(VERSION).love
 
 $(LOVEFILE): $(LUA) $(LIBS) $(ASSETS)
 	mkdir -p releases/
-	find $^ -type f | LC_ALL=C sort | env TZ=UTC zip -r -q -9 -X $@ -@
+	cd src && find . -type f | LC_ALL=C sort | env TZ=UTC zip -r -q -9 -X ../$@ -@
 
 
 love: $(LOVEFILE)
+
+web: $(LOVEFILE)
+	mkdir -p releases/web
+	npx love.js $(LOVEFILE) releases/web -c -t $(NAME) -m 52428800
+	cd releases/web; ran 
 
 # platform-specific distributables
 
