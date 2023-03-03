@@ -64,9 +64,12 @@ local function init(self, prop)
     local W, H = push:getDimensions()
     self.x = prop.x or W * .5
     self.y = prop.y or H * .7
-    self.speed = prop.speed or 100
+    self.speed = prop.speed or 300
     self.flame = Flame()
-    self.sizes = {1, 1, 1, 1, 1, 1, 1, 1}
+    self.sizes = {}
+    for i = 1, 8 do
+        self.sizes[i] = 1
+    end
     self.elapsed = 0
     self.boost = false
     return copy(self)
@@ -150,12 +153,12 @@ return {
     init = init,
     h = 12, -- height
     w = 12, -- width
-    bp = .5, -- burn power
-    scale = 3,
+    bp = 0.01, -- burn power
+    scale = 1,
     update = update,
     burnRate = .2,
-    HP = 10,
+    HP = 100,
     XP = 0,
     maxXP = 100,
-    maxHP = 30
+    maxHP = 100
 }

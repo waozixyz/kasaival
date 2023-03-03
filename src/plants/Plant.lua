@@ -46,7 +46,7 @@ local template = {
     -- else do not split
     splitChance = 4,
     -- how fast this material burns
-    burnIntensity = 15,
+    burnIntensity = 1,
     -- the amount of fuel this plant provides
     fuel = 5,
     -- add fuel per branch layer

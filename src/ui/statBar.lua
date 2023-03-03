@@ -5,7 +5,7 @@ local gr = love.graphics
 
 return function(y, v, maxV, txt, color, showMax)
     local w, h = 100, 15
-    local x, y = 100, y or 170
+    local x, y = 20, y or 90
 
     gr.setColor(0, 0, 0)
     gr.rectangle("fill", x, y, w, h)

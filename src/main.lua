@@ -41,7 +41,7 @@ function love.load()
         windowHeight,
         {fullscreen = fullscreen, highdpi = true, resizable = resizable}
     )
-    set_mode("Menu")
+    set_mode("Game")
     suit.theme.color = uiTheme
     mode:init(set_mode)
     gfx.setDefaultFilter("nearest", "nearest")

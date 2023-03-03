@@ -10,7 +10,7 @@ return {
     twoBranch = true,
     startSpilt = true,
     splitAngle = {40, 60},
-    burnIntensity = 100,
+    burnIntensity = 1,
     fuel = 4,
     addFuel = 2,
 }

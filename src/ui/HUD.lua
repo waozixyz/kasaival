@@ -99,7 +99,7 @@ local function draw(self)
     end
 
     -- draw LifeBar
-    statBar(170,lyra.player.HP, lyra.player.maxHP, "HP", {.5, 0, .2}, true)
+    statBar(70, lyra.player.HP, lyra.player.maxHP, "HP", {.5, 0, .2}, true)
     -- statBar(220,lyra.player.XP, lyra.player.maxXP, "XP", {.2, 0, .5})
 end
 local function tk()
@@ -135,8 +135,8 @@ local function keypressed(key)
 end
 
 local function updateButtons()
-    local x, y = 64, 20
-    local padd = 120
+    local x, y = 20, 20
+    local padd = 50
     for _, v in pairs(btns) do
         v.x, v.y = x, y
         if v.isOn and v.isOn() then
@@ -144,7 +144,8 @@ local function updateButtons()
         elseif v.off then
             v.img = v.off
         end
-        local button = suit.ImageButton(v.img, v.x, v.y)
+
+        local button = suit.ImageButton(v.img, {scale = 0.8 }, v.x, v.y)
         if button.hit == true then
             v.fnc()
         end
