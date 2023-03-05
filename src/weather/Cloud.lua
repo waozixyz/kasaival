@@ -6,7 +6,7 @@ local Rain = require "weather.Rain"
 local Wolkeps = require "ps.Wolkeps"
 
 local ma = love.math
-local gr = love.graphics
+local gfx = love.graphics
 
 local function init(self, spawn)
     self.x = spawn.x or 400
@@ -24,8 +24,8 @@ local function draw(self)
         v:draw()
     end
     local sx, sy = 5, 5
-    gr.setColor(1, 1, 1)
-    gr.draw(self.ps, self.x, self.y, 0, sx, sy)
+    gfx.setColor(1, 1, 1)
+    gfx.draw(self.ps, self.x, self.y, 0, sx, sy)
 end
 
 local function addRain(self)

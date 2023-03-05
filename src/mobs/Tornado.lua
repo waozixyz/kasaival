@@ -1,5 +1,5 @@
 
-local gr = love.graphics
+local gfx = love.graphics
 local ma = love.math
 local Animation = require "utils.Animation"
 local copy = require "copy"
@@ -13,15 +13,15 @@ local function init(self, prop)
     self.y = prop.y or 600
     
     self.tgrow=true
-    self.anime = Animation:init(gr.newImage("assets/mobs/whirlwind.png"), 15.7, 19, 1)
+    self.anime = Animation:init(gfx.newImage("assets/mobs/whirlwind.png"), 15.7, 19, 1)
     return copy(self)
 end
 
 
 local function draw(self)
     local sx, sy = 2, 2
-    gr.setColor(1, 1, 1)
-    gr.draw(self.anime.spriteSheet, self.anime.quads[self.anime:spritenumber()],self.x+self.zeito*(math.sin(self.kreiselzeit)*100), self.y+math.cos(self.kreiselzeit)*140, 0, sx*self.zeito, sy*self.zeito)
+    gfx.setColor(1, 1, 1)
+    gfx.draw(self.anime.spriteSheet, self.anime.quads[self.anime:spritenumber()],self.x+self.zeito*(math.sin(self.kreiselzeit)*100), self.y+math.cos(self.kreiselzeit)*140, 0, sx*self.zeito, sy*self.zeito)
 end
 
 

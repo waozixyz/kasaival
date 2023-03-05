@@ -1,10 +1,10 @@
-local gr = love.graphics
+local gfx = love.graphics
 local ma = love.math
 
 local function init(self, sav)
     -- const values
-    self.bckg = gr.newImage("/assets/sky/bckg-2.jpg")
-    self.nebula = gr.newImage("/assets/sky/nebula.png")
+    self.bckg = gfx.newImage("/assets/sky/bckg-2.jpg")
+    self.nebula = gfx.newImage("/assets/sky/nebula.png")
     local h = self.bckg:getHeight()
     
     -- default values
@@ -21,9 +21,9 @@ local function init(self, sav)
 end
 
 local function draw(self)
-    gr.setColor(1, 1, 1)
-    gr.draw(self.bckg, 0, self.y)
-    gr.draw(self.nebula, 0, 0)
+    gfx.setColor(1, 1, 1)
+    gfx.draw(self.bckg, 0, self.y)
+    gfx.draw(self.nebula, 0, 0)
 end
 
 local function update(self, dt)

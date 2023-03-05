@@ -1,23 +1,23 @@
 local lyra = require "lyra"
 local font = require "ui.font"
 
-local gr = love.graphics
+local gfx = love.graphics
 
 return function(y, v, maxV, txt, color, showMax)
     local w, h = 100, 15
     local x, y = 20, y or 90
 
-    gr.setColor(0, 0, 0)
-    gr.rectangle("fill", x, y, w, h)
-    gr.setColor(color or {.5, 0, .2})
+    gfx.setColor(0, 0, 0)
+    gfx.rectangle("fill", x, y, w, h)
+    gfx.setColor(color or {.5, 0, .2})
     local nw = v / maxV * w
-    gr.rectangle("fill", x, y, nw, h)
-    gr.setColor(1, .8, .9)
-    gr.setFont(font())
+    gfx.rectangle("fill", x, y, nw, h)
+    gfx.setColor(1, .8, .9)
+    gfx.setFont(font())
     local text = math.floor(v) 
     if showMax then
         text = text .. "/" .. math.floor(maxV)
     end
     text = text .. " " .. txt
-    gr.printf(text, x, y, w, "center")
+    gfx.printf(text, x, y, w, "center")
 end

@@ -3,7 +3,7 @@ local push = require "push"
 
 local font = require "ui.font"
 
-local gr = love.graphics
+local gfx = love.graphics
 
 local function init(self, text, prop)
     local W, H = push:getDimensions()
@@ -17,14 +17,14 @@ local function init(self, text, prop)
     for k, v in pairs(tmpl) do
         self[k] = (prop and prop[k]) or v
     end
-    self.text = gr.newText(font(self.size), text)
+    self.text = gfx.newText(font(self.size), text)
     self.w = self.text:getWidth()
     return copy(self)
 end
 
 local function update(self, text)
     if text and type(text) == "string" then
-        self.text = gr.newText(font(self.size), text)
+        self.text = gfx.newText(font(self.size), text)
         self.w = self.text:getWidth()
     end
 end
@@ -40,8 +40,8 @@ local function getAlignX(align, x, w)
 end
 local function draw(self, alpha)
     self.color[4] = alpha
-    gr.setColor(self.color)
-    gr.draw(self.text, getAlignX(self.align, self.x, self.w), self.y)
+    gfx.setColor(self.color)
+    gfx.draw(self.text, getAlignX(self.align, self.x, self.w), self.y)
 end
 
 return {init = init, update = update, draw = draw}

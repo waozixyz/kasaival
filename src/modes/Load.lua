@@ -4,7 +4,7 @@ local Bckg = require("ui.Bckg")
 local Cursor = require("ui.Cursor")
 local Saves = require("sys.Saves")
 
-local gr = love.graphics
+local gfx = love.graphics
 
 local function draw(self)
     return Bckg:draw()

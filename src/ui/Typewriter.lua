@@ -1,5 +1,5 @@
 local font = require "ui.font"
-local gr = love.graphics
+local gfx = love.graphics
 
 local function init(self, txt, x, y, size, speed, delay, color, font)
 	-- position of text
@@ -44,13 +44,13 @@ end
 
 local function draw(self, alpha)
 	-- Print text so far
-	gr.setFont(self.font)
+	gfx.setFont(self.font)
 	-- if alpha given set it to color
 	if alpha then self.color[4] = alpha end
 	-- set color
-	gr.setColor(self.color)
+	gfx.setColor(self.color)
 	-- draw text
-	gr.print(self.text,self.x,self.y)
+	gfx.print(self.text,self.x,self.y)
 end
 
 return {init = init, update = update, draw = draw}

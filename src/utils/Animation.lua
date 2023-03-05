@@ -1,4 +1,4 @@
-local gr = love.graphics
+local gfx = love.graphics
 local copy = require "copy"
 
 local function spritenumber(self, add, mult)
@@ -14,7 +14,7 @@ local function init(self, image, width, height, duration)
 
     for y = 0, image:getHeight() - height, height do
         for x = 0, image:getWidth() - width, width do
-            table.insert(self.quads, gr.newQuad(x, y, width, height, image:getDimensions()))
+            table.insert(self.quads, gfx.newQuad(x, y, width, height, image:getDimensions()))
         end
     end
     self.duration = duration

@@ -1,6 +1,6 @@
 local copy = require "copy"
 
-local gr = love.graphics
+local gfx = love.graphics
 
 local function init(self)
   self.rest = 0.5
@@ -14,9 +14,9 @@ end
 
 local function draw(self)
   --windpfeil darstellung, nur die richtung
-  gr.setColor(0, 0, 0)
-  gr.line(200, 200, 200 + self.windx*self.windstark,200 )
-  gr.setColor(1, 1, 1,1 )
+  gfx.setColor(0, 0, 0)
+  gfx.line(200, 200, 200 + self.windx*self.windstark,200 )
+  gfx.setColor(1, 1, 1,1 )
 end
 
 local function update(self, dt)

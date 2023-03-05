@@ -8,7 +8,7 @@ local Typewriter = require "ui.Typewriter"
 local Batterfly = require "mobs.Batterfly"
 local Wolke = require "weather.Wolke"
 
-local gr = love.graphics
+local gfx = love.graphics
 local ke = love.keyboard
 local ev = love.event
 

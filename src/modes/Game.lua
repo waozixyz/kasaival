@@ -17,7 +17,7 @@ local Weather = require "weather.Weather"
 
 -- aliases
 local ev = love.event
-local gr = love.graphics
+local gfx = love.graphics
 
 local function add_item(v, pgw)
     local props = v.props or {}
@@ -162,7 +162,7 @@ local function draw(self)
     Background:draw()
 
     -- translate with camera x
-    gr.translate(lyra.cx, 0)
+    gfx.translate(lyra.cx, 0)
 
     -- draw Ground
     lyra.ground:draw()
@@ -171,7 +171,7 @@ local function draw(self)
     Weather:draw()
 
     -- undo translation
-    gr.translate(-lyra.cx, 0)
+    gfx.translate(-lyra.cx, 0)
 
     -- draw head up display
     HUD:draw()
@@ -202,7 +202,7 @@ local function update_quests(self, dt)
     end
 end
 
-local function update(self, dt)
+local function update(self, dt, set_mode)
     local W = push:getWidth()
     HUD:update()
     if lyra.restart then
@@ -215,7 +215,7 @@ local function update(self, dt)
         self.count = 0
     end
     if lyra.exit == 1 then
-        ev.quit()
+        set_mode("Menu")
     end
     if self.nextStage then
         load_stage(self, lyra.next)

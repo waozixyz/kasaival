@@ -4,7 +4,7 @@ local Fire = require "ps.Fire"
 local copy = require "copy"
 local lyra = require "lyra"
 
-local gr = love.graphics
+local gfx = love.graphics
 local ma = love.math
 
     
@@ -186,23 +186,23 @@ local function draw(self)
                     end
                 end
                 px, nx = x + px, x + nx
-                gr.setColor(getColor(self, v, self.cs_branch))
-                gr.setLineWidth(v.w * self.scale)
-                gr.line(px, py, nx, ny)
+                gfx.setColor(getColor(self, v, self.cs_branch))
+                gfx.setLineWidth(v.w * self.scale)
+                gfx.line(px, py, nx, ny)
                 if leaf then
                     table.insert(leaves, {x = nx + leaf.x, y = ny + leaf.y, w = leaf.w, h = leaf.h, color = leaf.color })
                 end
             end
         end
         for _, v in ipairs(leaves) do
-            gr.setColor(getColor(self, v, self.cs_leaf))
-            gr.ellipse("fill", v.x, v.y, v.w, v.h)
+            gfx.setColor(getColor(self, v, self.cs_leaf))
+            gfx.ellipse("fill", v.x, v.y, v.w, v.h)
         end
     end
 
     if self.fire then
-        gr.setColor(1, 1, 1)
-        gr.draw(self.fire)
+        gfx.setColor(1, 1, 1)
+        gfx.draw(self.fire)
     end
 end
 

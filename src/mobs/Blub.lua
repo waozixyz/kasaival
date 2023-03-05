@@ -1,6 +1,6 @@
 local Player = require("player.Player")
 
-local gr = love.graphics
+local gfx = love.graphics
 
 local function draw(self)
     Player:draw()

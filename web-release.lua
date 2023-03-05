@@ -31,4 +31,3 @@ if start_index ~= nil and end_index ~= nil then
     file:close()
 end
 
-os.execute("cd " .. release_dir .. " && ran")

@@ -3,7 +3,7 @@ local push = require "push"
 
 local Text = require "ui.Text"
 
-local gr = love.graphics
+local gfx = love.graphics
 
 -- get text for overlay
 local function init(self,title, subtitle, bckg)
@@ -17,8 +17,8 @@ end
 
 local function draw(self, hint)
     local W, H = push:getDimensions()
-    gr.setColor(self.bckg)
-    gr.rectangle("fill", 0, 0, W, H)
+    gfx.setColor(self.bckg)
+    gfx.rectangle("fill", 0, 0, W, H)
     self.title:draw()
     self.subtitle:draw()
     if hint then

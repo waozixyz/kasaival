@@ -6,7 +6,7 @@ local Controller = require "player.Controller"
 local Flame = require "ps.Flame"
 
 -- aliases
-local gr = love.graphics
+local gfx = love.graphics
 
 local function startBoost(self)
     self.dp = self.dp * 1.5
@@ -49,14 +49,14 @@ local function getHitbox(self)
 end
 
 local function draw(self)
-    gr.setColor(1,1,1,1)
+    gfx.setColor(1,1,1,1)
     if self.boost then
-        gr.setBlendMode("add")
+        gfx.setBlendMode("add")
     else
-        gr.setBlendMode("alpha")
+        gfx.setBlendMode("alpha")
     end
-    gr.draw(self.flame)
-    gr.setBlendMode("alpha")
+    gfx.draw(self.flame)
+    gfx.setBlendMode("alpha")
 end
 
 local function init(self, prop)

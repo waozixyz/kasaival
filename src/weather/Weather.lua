@@ -4,7 +4,7 @@ local Cloud = require "weather.Cloud"
 local Sandstorm = require "ps.Sandstorm"
 
 local ma = love.math
-local gr = love.graphics
+local gfx = love.graphics
 
 local function init(self, prop)
     self.prop = prop or {}
@@ -19,12 +19,12 @@ end
 
 local function draw(self)
     for _, v in ipairs(self.items) do
-        gr.setColor(1, 1, 1)
+        gfx.setColor(1, 1, 1)
         v:draw()
     end
     if self.storm then
-        gr.setColor(1, 1, 1)
-        gr.draw(self.storm)
+        gfx.setColor(1, 1, 1)
+        gfx.draw(self.storm)
     end
 end
 

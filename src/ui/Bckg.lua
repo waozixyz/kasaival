@@ -1,14 +1,14 @@
 local push = require("push")
 
-local gr = love.graphics
+local gfx = love.graphics
 
 local function draw(self)
     for _, v in ipairs(self.items) do
-        gr.draw(self.img, v.x, v.y, 0, v.sx, v.sy)
+        gfx.draw(self.img, v.x, v.y, 0, v.sx, v.sy)
     end
 end
 local function init(self, img)
-    self.img = img or gr.newImage("assets/menu.png")
+    self.img = img or gfx.newImage("assets/menu.png")
     self.items = {}
     local W, H = push:getDimensions()
     local w, h = (self.img):getDimensions()

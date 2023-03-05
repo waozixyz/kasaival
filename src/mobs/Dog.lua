@@ -5,7 +5,7 @@ local Animation = require "utils.Animation"
 local Pinkel = require "ps.Pinkel"
 local Plant = require "plants.Plant"
 
-local gr = love.graphics
+local gfx = love.graphics
 local ma = love.math
 
 local function init(self, pos)
@@ -18,7 +18,7 @@ local function init(self, pos)
     self.direction = -1
     self.fuel = 5
     self.pinkelpause = false
-    self.anime = Animation:init(gr.newImage("assets/mobs/dog_sprite.png"), self.w, self.h, 1)
+    self.anime = Animation:init(gfx.newImage("assets/mobs/dog_sprite.png"), self.w, self.h, 1)
     self.zeito = ma.random(0, 8)
     -- add color variation to dogs
     self.color = lyra.getColor({.4, 1, .4, 1, .3, 1})
@@ -51,15 +51,15 @@ local function draw(self)
     local sx, sy = self.scale, self.scale
     if self.direction > 0 then sx = sx * -1 end
     
-    gr.setColor(self.color)
+    gfx.setColor(self.color)
     local add = 1
     if self.dying then add = add + 6 end
     if self.pinkelpause then add = add + 3 end
-    gr.draw(self.anime.spriteSheet, self.anime.quads[self.anime:spritenumber(add)], self.x, self.y, 0, sx, sy, self.w * .5, self.h)
+    gfx.draw(self.anime.spriteSheet, self.anime.quads[self.anime:spritenumber(add)], self.x, self.y, 0, sx, sy, self.w * .5, self.h)
 
     if self.pinkelpause and not self.dying then
-        gr.setColor(1, 1, 1)
-        gr.draw(self.ps, self.x + 26 * self.direction * -1, self.y + 12, 0, self.direction * -1, 1, self.w * .5, self.h)
+        gfx.setColor(1, 1, 1)
+        gfx.draw(self.ps, self.x + 26 * self.direction * -1, self.y + 12, 0, self.direction * -1, 1, self.w * .5, self.h)
     end
 end
 local function use_ability(self)

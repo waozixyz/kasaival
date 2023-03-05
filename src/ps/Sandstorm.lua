@@ -1,14 +1,14 @@
 local push = require "push"
 
-local gr = love.graphics
+local gfx = love.graphics
 
 local function rtn(lifetime)
     local W, H = push:getDimensions()
     lifetime = lifetime or -1
-    local image1 = gr.newImage("assets/lightBlur.png")
+    local image1 = gfx.newImage("assets/lightBlur.png")
     image1:setFilter("linear", "linear")
 
-    local ps = gr.newParticleSystem(image1, 50000)
+    local ps = gfx.newParticleSystem(image1, 50000)
     ps:setColors(.8, .42, .15, 1, .8, .32, .15, 1, .7, .52, .15, 1, .9, .42, .25, 1)
     ps:setEmissionArea("normal", 64, H, 0, false)
     ps:setEmissionRate(2000)

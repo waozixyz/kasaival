@@ -1,6 +1,6 @@
 local copy = require "copy"
 
-local gr = love.graphics
+local gfx = love.graphics
 
 local function init(self, props)
     for k, v in pairs(props) do
@@ -70,8 +70,8 @@ local function getTile(i, v)
 end
 
 local function draw(self, i)
-    gr.setColor(self.color)
-    gr.polygon("fill", getTile(i, self))
+    gfx.setColor(self.color)
+    gfx.polygon("fill", getTile(i, self))
 end
 
 local function heal(self)

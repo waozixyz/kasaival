@@ -1,11 +1,11 @@
 
-local gr = love.graphics
+local gfx = love.graphics
 
 local function rtn()
-	local image1 = gr.newImage("assets/lightDot.png")
+	local image1 = gfx.newImage("assets/lightDot.png")
 	image1:setFilter("linear", "linear")
 
-	local ps = gr.newParticleSystem(image1, 20)
+	local ps = gfx.newParticleSystem(image1, 20)
 	ps:setColors(1, 1, 1, 1)
 	ps:setDirection(-1.5)
 	ps:setEmissionArea("none", 0, 0, 0, false)

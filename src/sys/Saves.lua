@@ -1,5 +1,5 @@
 local fi = love.filesystem
-local gr = love.graphics
+local gfx = love.graphics
 
 local function checkFiles(self, saves)
     local rtn = {}
@@ -30,7 +30,7 @@ local function getFiles(self)
         if (rtn[id] == nil) then rtn[id] = {} end
         local s = rtn[id]
         if string.find(file, ".png") then
-            s["img"] = gr.newImage("saves/" .. file)
+            s["img"] = gfx.newImage("saves/" .. file)
         else
             s["file"] = file
         end

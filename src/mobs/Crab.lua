@@ -1,4 +1,4 @@
-local gr = love.graphics
+local gfx = love.graphics
 local ma = love.math
 local Animation = require "utils.Animation"
 local copy = require "copy"
@@ -11,15 +11,15 @@ local function init(self,spawn)
     self.y = spawn.y
     self.direction = 1
     
-    self.anime = Animation:init(gr.newImage("assets/mobs/Crab.png"), 131, 129, 1)
+    self.anime = Animation:init(gfx.newImage("assets/mobs/Crab.png"), 131, 129, 1)
     return copy(self)
 end
 
 
 local function draw(self)
     local sx, sy = 1, 1
-    gr.setColor(1,1,1)
-    gr.draw(self.anime.spriteSheet, self.anime.quads[self.anime:spritenumber(1,24)],self.x+self.move*self.direction, self.y+math.sin(self.anime.currentTime-math.pi/8)^2*20, 0, self.direction*-1, 1, sx, sy)
+    gfx.setColor(1,1,1)
+    gfx.draw(self.anime.spriteSheet, self.anime.quads[self.anime:spritenumber(1,24)],self.x+self.move*self.direction, self.y+math.sin(self.anime.currentTime-math.pi/8)^2*20, 0, self.direction*-1, 1, sx, sy)
 end
 
 

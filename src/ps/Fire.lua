@@ -1,12 +1,12 @@
-local gr = love.graphics
+local gfx = love.graphics
 
 local function rtn()
 
 
-    local image1 = gr.newImage("assets/lightBlur.png")
+    local image1 = gfx.newImage("assets/lightBlur.png")
     image1:setFilter("linear", "linear")
 
-    local ps = gr.newParticleSystem(image1, 69)
+    local ps = gfx.newParticleSystem(image1, 69)
     ps:setColors(.7, 0, 0, 1, .8, 0, 0, 1, .7, 0.3, 0, 1, .8, 0.2, 0, 1)
     ps:setDirection(-1.6)
     ps:setEmissionArea("none", 0, 0, 0, false)

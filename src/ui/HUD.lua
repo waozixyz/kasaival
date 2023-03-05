@@ -9,7 +9,7 @@ local Overlay = require "ui.Overlay"
 local Music = require "sys.Music"
 local Text = require "ui.Text"
 
-local gr = love.graphics
+local gfx = love.graphics
 
 local function toggle(val) if val then return false else return true end end
 
@@ -61,7 +61,7 @@ local function init(self)
     for _, v in pairs(btns) do
         for k, img in pairs(v) do
             if (k == "on" or k == "off" or k == "img") and type(img) == "string" then
-                v[k] = gr.newImage(path .. img)
+                v[k] = gfx.newImage(path .. img)
             end
         end
     end
@@ -71,8 +71,8 @@ end
 
 local function draw(self)
     local W, H = push:getDimensions()
-    gr.setColor(.2, 0, 0, 1 - lyra.player.HP / lyra.player.maxHP * 5)
-    gr.rectangle("fill", 0, 0, W, H)
+    gfx.setColor(.2, 0, 0, 1 - lyra.player.HP / lyra.player.maxHP * 5)
+    gfx.rectangle("fill", 0, 0, W, H)
 
     -- overlays for special states
     if lyra.restart then
