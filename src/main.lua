@@ -35,7 +35,7 @@ local uiTheme = {
 
 function love.load()
     push:setupScreen(
-        gameWidth,
+        gameWidth, 
         gameHeight,
         windowWidth,
         windowHeight,

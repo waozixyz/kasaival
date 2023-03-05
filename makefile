@@ -10,7 +10,7 @@ ASSETS := $(wildcard assets/*)
 LIBS := $(wildcard src/*)
 LUA := $(wildcard *.lua)
 
-run: love .
+run: $(LOVEFILE)
 
 clean: ; rm -rf releases/* 
 
@@ -21,12 +21,11 @@ $(LOVEFILE): $(LUA) $(LIBS) $(ASSETS)
 	cd src && find . -type f | LC_ALL=C sort | env TZ=UTC zip -r -q -9 -X ../$@ -@
 
 
-love: $(LOVEFILE)
+love: $(LOVEFILE);love $(LOVEFILE)
 
 web: $(LOVEFILE)
-	mkdir -p releases/web
-	npx love.js $(LOVEFILE) releases/web -c -t $(NAME) -m 52428800
-	cd releases/web; ran 
+	lua ./web-release.lua $(LOVEFILE) "$(NAME)"
+
 
 # platform-specific distributables
 

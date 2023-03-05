@@ -1,0 +1,83 @@
+* {
+    box-sizing: border-box;
+}
+
+h1 {
+    font-family: arial;
+    color: #ff8c00;
+	font-size: 3em;
+	margin-top: 2em;
+	margin-bottom: 0;
+	text-shadow: 2px 2px #000;
+}
+
+h2 {
+	font-size: 1.8em;
+	margin-top: 0;
+	margin-bottom: 1em;
+}
+
+body {
+    background-repeat: no-repeat;
+    font-family: arial;
+    margin: 0;
+    padding: none;
+	background-color: #3a130a;
+	color: #fff;
+}
+
+header {
+	text-align: center;
+}
+
+
+footer {
+    font-family: arial;
+    font-size: 12px;
+    padding-left: 10px;
+    width: 100%;
+}
+
+/* Links */
+a {
+    text-decoration: none;
+}
+a:link {
+    color: rgb( 233, 73, 154 );
+}
+a:visited {
+    color: rgb( 110, 30, 71 );
+}
+a:hover {
+    color: rgb( 252, 207, 230 );
+}
+
+/* the canvas *must not* have any border or padding, or mouse coords will be wrong */
+#canvas {
+    padding-right: 0;
+    display: block;
+    border: 0px none;
+    visibility: hidden;
+}
+
+p {
+	font-size: 1.2em;
+	margin-top: 0;
+	margin-bottom: 2em;
+}
+
+
+.description {
+    color: #ffe4b5;
+	margin: 2em;
+}
+
+.description p {
+	font-size: 1.2em;
+	line-height: 1.5;
+}
+
+main {
+    max-width: 800px;
+    margin: auto;
+}
