@@ -1,36 +1,31 @@
 local push = require("push")
 local suit = require("suit")
-local Bckg = require("ui.Bckg")
 local Cursor = require("ui.Cursor")
 local Saves = require("sys.Saves")
 
 local gfx = love.graphics
 
-local function draw(self)
-    return Bckg:draw()
-end
 
-local function init(self, set_mode)
-    Bckg:init()
+local function init(self, set_screen)
     Cursor:init()
     self.saves = Saves:getFiles()
     if self.saves and #self.saves < 1 then
-        set_mode("Game", "saves/save1")
+        set_screen("Game", "saves/save1")
     end
 end
-local function keypressed(self, key, set_mode)
+local function keypressed(self, key, set_screen)
     if key == "escape" then
-        set_mode("Menu")
+        set_screen("Menu")
     elseif key == "1" then
-        set_mode("Game", (Saves.saveName .. "1"))
+        set_screen("Game", (Saves.saveName .. "1"))
     elseif key == "2" then
-        set_mode("Game", (Saves.saveName .. "2"))
+        set_screen("Game", (Saves.saveName .. "2"))
     elseif key == "3" then
-        set_mode("Game", (Saves.saveName .. "3"))
+        set_screen("Game", (Saves.saveName .. "3"))
     elseif key == "4" then
-        set_mode("Game", (Saves.saveName .. "4"))
+        set_screen("Game", (Saves.saveName .. "4"))
     elseif key == "return" then
-        set_mode("Game", (Saves.saveName .. "1"))
+        set_screen("Game", (Saves.saveName .. "1"))
     end
 end
 
@@ -44,7 +39,7 @@ local function getShape(id, sav)
     return x, y, w * scale, h * scale, scale
 end
 
-local function update(self, dt, set_mode)
+local function update(self, dt, set_screen)
     if self.saves then
         for id, sav in pairs(self.saves) do
             local x, y, w, h, scale = getShape(id, sav)
@@ -55,12 +50,12 @@ local function update(self, dt, set_mode)
             else
                 suit.Button(sav.file, {id = id}, x, y, w, h)
             end
-            -- if button hit, set_mode
+            -- if button hit, set_screen
             if suit.isHit(id) then
                 if sav.file then
-                    set_mode("Game", ("saves/" .. sav.file))
+                    set_screen("Game", ("saves/" .. sav.file))
                 else
-                    set_mode("Game")
+                    set_screen("Game")
                 end
             end
             suit.Button("delete", {id = id .. "del"}, x + w * .25, y + h + 50, w * .5, 50)
@@ -77,7 +72,7 @@ local function update(self, dt, set_mode)
 
         suit.Button("New Game", {id = id}, x, y, w, h)
         if suit.isHit(id) then
-            set_mode("Game")
+            set_screen("Game")
         end
         Cursor:update()
     end

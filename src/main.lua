@@ -14,10 +14,10 @@ local fullscreen = sys.getOS() == "Android" or sys.getOS() == "iOS" and true or 
 local resizable = not fullscreen
 local windowWidth, windowHeight = fullscreen and gfx.getDimensions() or 800, 600
 
-local mode
-local function set_mode(mode_name, ...)
-    mode = copy(require("modes." .. mode_name))
-    if mode.init then mode:init(set_mode, ...) end
+local screen
+local function set_screen(screen_name, ...)
+    screen = copy(require("screens." .. screen_name))
+    if screen.init then screen:init(set_screen, ...) end
 end
 
 
@@ -29,14 +29,14 @@ function love.load()
         windowHeight,
         {fullscreen = fullscreen, highdpi = true, resizable = resizable}
     )
-    set_mode("Menu")
-    mode:init(set_mode)
+    set_screen("Menu")
+    screen:init(set_screen)
     gfx.setDefaultFilter("nearest", "nearest")
 end
 
 function love.resize(w, h)
-    if mode.resize then
-        mode:resize()
+    if screen.resize then
+        screen:resize()
     end
     push:resize(w, h)
 end
@@ -44,7 +44,7 @@ end
 function love.draw()
     push:start()
     gfx.setColor(1, 1, 1)
-    mode:draw()
+    screen:draw()
     gfx.setColor(1, 1, 1)
     suit.draw()
     push:finish()
@@ -56,24 +56,24 @@ function love.update(dt)
     
     if x and y then
         suit.updateMouse(x, y)
-        if mouse.isDown(1) and mode.touch then
-            mode:touch(x, y, dt)
+        if mouse.isDown(1) and screen.touch then
+            screen:touch(x, y, dt)
         end
     end
         
-    mode:update(dt, set_mode)
+    screen:update(dt, set_screen)
 end
 
 function love.keypressed(key)
     if key == "f" or key == "f11" then
         push:switchFullscreen()
     else
-        mode:keypressed(key, set_mode)
+        screen:keypressed(key, set_screen)
     end
 end
 
 function love.focus(f)
-    if mode.focus then mode:focus(f) end
+    if screen.focus then screen:focus(f) end
 end
 
 function love.errorhandler(msg)

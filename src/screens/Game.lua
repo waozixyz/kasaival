@@ -202,7 +202,7 @@ local function update_quests(self, dt)
     end
 end
 
-local function update(self, dt, set_mode)
+local function update(self, dt, set_screen)
     local W = push:getWidth()
     HUD:update()
     if lyra.restart then
@@ -215,7 +215,7 @@ local function update(self, dt, set_mode)
         self.count = 0
     end
     if lyra.exit == 1 then
-        set_mode("Menu")
+        set_screen("Menu")
     end
     if self.nextStage then
         load_stage(self, lyra.next)

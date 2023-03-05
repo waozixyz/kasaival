@@ -9,10 +9,10 @@ local function init(self)
     Player:init()
 end
 
-local function keypressed(self, key, set_mode)
+local function keypressed(self, key, set_screen)
 end
 
-local function update(self, dt, set_mode)
+local function update(self, dt, set_screen)
     Player:update(dt)
 end
 

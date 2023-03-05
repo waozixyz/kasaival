@@ -20,11 +20,11 @@ end
 local function touch(self)
 end
 
-local function keypressed(self, key, set_mode)
+local function keypressed(self, key, set_screen)
     if key == "escape" then ev.quit() end
 end
 
-local function update(self, dt, set_mode)
+local function update(self, dt, set_screen)
     self.Batterfly:update(dt)
 
 end
