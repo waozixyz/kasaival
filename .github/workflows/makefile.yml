@@ -6,13 +6,21 @@ on:
   pull_request:
     branches: [ "main" ]
 
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
 
-    - name: Install dependencies
-      run: make
+    # Build and tests (add steps for building/testing here)
+
+    - name: Create a web release
+      run: make web
+
+    - name: Upload Release Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Release
+        path: releases/web
