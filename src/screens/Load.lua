@@ -10,20 +10,14 @@ local function init(self, set_screen)
     Cursor:init()
     self.saves = Saves:getFiles()
     if self.saves and #self.saves < 1 then
-        set_screen("Game", "saves/save1")
+        set_screen("Game", "saves/ save1")
     end
 end
 local function keypressed(self, key, set_screen)
     if key == "escape" then
         set_screen("Menu")
-    elseif key == "1" then
-        set_screen("Game", (Saves.saveName .. "1"))
-    elseif key == "2" then
-        set_screen("Game", (Saves.saveName .. "2"))
-    elseif key == "3" then
-        set_screen("Game", (Saves.saveName .. "3"))
-    elseif key == "4" then
-        set_screen("Game", (Saves.saveName .. "4"))
+    elseif key == "1" or key == "2" or key == "3" or key == "4" then
+        set_screen("Game", (Saves.saveName .. key))
     elseif key == "return" then
         set_screen("Game", (Saves.saveName .. "1"))
     end

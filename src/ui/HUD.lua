@@ -43,31 +43,48 @@ local btns = {
     },
 }
 
-local function init(self)
-    local W = push:getWidth()
-    Cursor:init()
-    -- load text
-    self.gameover = Overlay:init("GameOver", "touch anywhere or press any key to try again", {0, 0, 0, 0.5})
-    self.gamepaused = Overlay:init("Game Paused", "touch anywhere or press any key to unpause", {1, 1, 1, 0.5})
-    self.gamesaving = Overlay:init("Game Saving", "please wait patiently...", {0, 0.2, 0, 0.5})
-    self.gamerestart = Overlay:init("Game Restarting", "please wait patiently...", {0, 0.2, 0, 0.5})
-    self.questfail = Overlay:init("Quest Failed", "touch anywhere or press any key to try again", {0.1, 0, 0.1, 0.7})
-    -- load quest text
-    self.questHeading = Text:init("Current Quest", {size = 21, y = 20, x = W - 20, align = "right"})
-    getCurrentQuestsText()
+local overlays = {
+    {name = "Game Over", message = "Touch anywhere or press any key to try again", color = {0, 0, 0, 0.5}},
+    {name = "Game Paused", message = "Touch anywhere or press any key to unpause", color = {1, 1, 1, 0.5}},
+    {name = "Game Saving", message = "Please wait patiently...", color = {0, 0.2, 0, 0.5}},
+    {name = "Game Restarting", message = "Please wait patiently...", color = {0, 0.2, 0, 0.5}},
+    {name = "Quest Failed", message = "Touch anywhere or press any key to try again", color = {0.1, 0, 0.1, 0.7}}
+}
+
+local function loadText(self)
+    for i, overlay in ipairs(overlays) do
+        self[overlay.name:lower():gsub(" ", "")] = Overlay:init(overlay.name, overlay.message, overlay.color)
+    end
     
-    -- load images of button icons
+    local W = push:getWidth()
+    self.questHeading = Text:init("Current Quests", {size = 32, y = 20, x = W - 20, align = "right"})
+end
+
+local function loadImage(path, img)
+    if type(img) == "string" then
+        return gfx.newImage(path .. img)
+    end
+    return img
+end
+
+local function loadImages(self, btns)
     local path = "assets/icons/"
     for _, v in pairs(btns) do
         for k, img in pairs(v) do
-            if (k == "on" or k == "off" or k == "img") and type(img) == "string" then
-                v[k] = gfx.newImage(path .. img)
+            if k == "on" or k == "off" or k == "img" then
+                v[k] = loadImage(path, img)
             end
         end
     end
-    return self
 end
 
+local function init(self)
+    Cursor:init()
+    loadText(self)
+    getCurrentQuestsText()
+    loadImages(self, btns)
+    return self
+end
 
 local function draw(self)
     local W, H = push:getDimensions()
@@ -99,7 +116,7 @@ local function draw(self)
     end
 
     -- draw LifeBar
-    statBar(70, lyra.player.HP, lyra.player.maxHP, "HP", {.5, 0, .2}, true)
+    statBar(70, lyra.player.HP, lyra.player.maxHP, "HP", {0.5, 0, 0.2}, true)
     -- statBar(220,lyra.player.XP, lyra.player.maxXP, "XP", {.2, 0, .5})
 end
 local function tk()
