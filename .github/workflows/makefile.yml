@@ -14,7 +14,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    # Build and tests (add steps for building/testing here)
+    - name: Install Lua
+      run: sudo apt-get install lua5.4
 
     - name: Create a web release
       run: make web
