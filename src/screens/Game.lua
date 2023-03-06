@@ -215,6 +215,7 @@ local function update(self, dt, set_screen)
         self.count = 0
     end
     if lyra.exit == 1 then
+        Music:mute()
         set_screen("Menu")
     end
     if self.nextStage then

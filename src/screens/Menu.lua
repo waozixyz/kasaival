@@ -9,7 +9,7 @@ local function init(self)
     local H = push:getHeight()
     self.alpha = 1
     self.next = false
-    self.img = img or gfx.newImage("assets/menu.png")
+    self.img = gfx.newImage("assets/menu.png")
     self.title = Text:init("KASAIVAL", {size = 86 , y = 50})
     local yellow = {1, .6, .4}
     self.subtitle = Text:init("an out of control flame trying to survive", {size = 25, y = 160})
@@ -21,13 +21,10 @@ local function touch(self)
     self.next = true
 end
 
--- This function handles key presses for the current screen.
--- If the user presses the "escape" key, the game quits.
--- Otherwise, it sets the "next" variable to true.
 local function keypressed(self, key, set_screen)
     if key == "escape" then 
         ev.quit() 
-    elseif key == "space" or key == "enter" or key == "x" then
+    elseif key == "space" or key == "return" or key == "x" then
         self.next = true
     end
 end
