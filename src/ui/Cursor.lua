@@ -1,20 +1,28 @@
 local suit = require("suit")
-
-local mo = love.mouse
+local mouse = love.mouse
 
 local function init(self)
-    self.hand = mo.getSystemCursor("hand")
-    self.arrow = mo.getSystemCursor("arrow")
+    self.hand = mouse.getSystemCursor("hand")
+    self.arrow = mouse.getSystemCursor("arrow")
 end
+
 local function update(self)
     local cursor = self.arrow
+    local isHovered = suit.anyHovered() 
+    local isHit = suit.anyHit()
 
-    if suit.anyHovered() then
+    if isHovered then
         cursor = self.hand
     end
-    if suit.anyHit() then
+
+    if isHit then
         cursor = self.arrow
     end
-    mo.setCursor(cursor)
+
+    mouse.setCursor(cursor)
 end
-return {init = init, update = update}
+
+return {
+    init = init,
+    update = update
+}

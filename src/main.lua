@@ -8,7 +8,6 @@ local kbd = love.keyboard
 local mouse = love.mouse
 local sys = love.system
 
-
 local gameWidth, gameHeight = 800, 600
 local fullscreen = sys.getOS() == "Android" or sys.getOS() == "iOS" and true or false
 local resizable = not fullscreen
@@ -29,7 +28,7 @@ function love.load()
         windowHeight,
         {fullscreen = fullscreen, highdpi = true, resizable = resizable}
     )
-    set_screen("Menu")
+    set_screen("Game")
     screen:init(set_screen)
     gfx.setDefaultFilter("nearest", "nearest")
 end

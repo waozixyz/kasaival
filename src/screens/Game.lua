@@ -19,19 +19,27 @@ local Weather = require "weather.Weather"
 local ev = love.event
 local gfx = love.graphics
 
-local function add_item(v, pgw)
-    local props = v.props or {}
-    for ki, vi in pairs(spawner(v.pgw or pgw)) do
-        props[ki] = vi
+local function createAndAddItem(itemData, defaultPgw)
+    assert(type(itemData) == "table", "itemData must be a table")
+    assert(type(defaultPgw) == "number" or defaultPgw == nil, "defaultPgw must be a number or nil")
+
+    local props = itemData.props or {}
+    for key, value in pairs(spawner(itemData.pgw or defaultPgw)) do
+        props[key] = value
     end
-    local item = {}
-    if v.type == "plant" then
-        item = Plant:init(v.name, props)
-    elseif v.type == "mob" then
-        item = require("mobs." .. v.name):init(props)
+
+    local item
+    if itemData.type == "plant" then
+        item = Plant:init(itemData.name, props)
+    elseif itemData.type == "mob" then
+        item = require("mobs." .. itemData.name):init(props)
+    else
+        error("Invalid itemData.type: " .. tostring(itemData.type))
     end
+
     table.insert(lyra.items, item)
 end
+
 
 local function load_scene(self)
     if lyra.scenes[lyra.currentScene] == nil then
@@ -63,7 +71,7 @@ local function load_scene(self)
         if scene.spawn then
             for _, v in ipairs(scene.spawn) do
                 for _ = 1, v.amount do
-                    add_item(v, pgw)
+                    createAndAddItem(v, pgw)
                 end
             end
         end
@@ -131,7 +139,7 @@ local function load_stage(self, stage_name)
 end
 
 local function init(self)
-    load_stage(self, "Desert")
+    load_stage(self, "Grassland")
 end
 
 local function keypressed(self, ...)
@@ -144,15 +152,15 @@ local function scene_pause(self)
     else return false end
 end 
 
-local function paused()
-    if lyra.paused or lyra.player.HP <= 0 or lyra.questFailed then
-        return true
-    end
+
+local function isPaused()
+    return lyra.paused or lyra.player.HP <= 0 or lyra.questFailed
 end
 
 local function touch(self, ...)
     HUD.touch(...)
-    if not paused() and lyra.player and self.ready and not scene_pause(self) then
+
+    if not isPaused() and lyra.player and self.ready and not scene_pause(self) then
         lyra.player:touch(...)
     end
 end
@@ -235,7 +243,7 @@ local function update(self, dt, set_screen)
                 self.load_cx = nil
             end
         else
-            if not paused() then
+            if not isPaused() then
                 lyra:update(dt)
                 lyra.ground:update(dt)
                 lyra.ground:collide(lyra.player)
@@ -244,7 +252,7 @@ local function update(self, dt, set_screen)
                 for _, v in ipairs(self.spawn) do
                     v.time = v.time + dt
                     if v.time > v.interval then
-                        add_item(v)
+                        createAndAddItem(v)
                         v.time = 0
                     end
                 end

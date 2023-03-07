@@ -42,14 +42,12 @@ local function add(self, width, cs)
             local c = lyra.getColor(cs[cs_i])
             local fuel = c[2] - c[3]
             table.insert(row, Tile:init({color = c, h = h, orgColor = c, w = w, x = x, y = y, fuel = fuel, orgFuel = fuel}))
-            c = lyra.getColor(cs[cs_i])
-            fuel = c[3] - c[2]
-            table.insert(row,Tile:init({color = c, h = h, orgColor = c, w = w, x = x, y = y, fuel = fuel, orgFuel = fuel}))
-            i = i + 2
-            x = x + w
+ 
+            i = i + 1
+            x = x + w * 0.5
         end
         table.insert(self.grid, row)
-        y = y + h
+        y = y + h * 0.5
     end
     self.width = self.width + width
     -- save the last x position
