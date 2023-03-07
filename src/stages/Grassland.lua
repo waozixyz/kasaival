@@ -75,28 +75,9 @@ local scenes = {
     }
 }
 
-local background = {
-    name = "grassland",
-    sy = 0.5,
-    scx = 0.1
-}
 
 local music = {
-    {
-        author = "Spring",
-        title = "Maintheme",
-        ext = "mp3"
-    },
-    {
-        author = "Spring",
-        title = "Map",
-        ext = "ogg"
-    },
-    {
-        author = "Spring",
-        title = "Drama",
-        ext = "ogg"
-    }
+    "StrangerThings.ogg",
 }
 
 local sky = {y = 0}

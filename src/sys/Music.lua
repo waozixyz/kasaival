@@ -32,23 +32,14 @@ local function next(self, songs)
 end
 
 local function play(self, songs)
-    if songs then self.songs = songs end
     if self.bgm then
         if not self.bgm:isPlaying() then
             self.bgm:play()
         end
     else
-        -- always replace newSong until a different title comes up
-        local newSong = { title = self.title } -- to replace
-        while newSong.title == self.title do
-            newSong = self.songs[ma.random(1, #self.songs)] -- new song
-        end
+        local song = songs[1]
         -- add audio source
-        self.bgm = au.newSource(self.dir .. newSong.author .. "/" .. newSong.title .. "." .. newSong.ext, "stream")
-
-        -- add current song title and author to state
-        self.title = newSong.title
-        self.author = newSong.author
+        self.bgm = au.newSource("assets/music/" .. song, "stream")
 
         -- start playing song
         au.play(self.bgm)
@@ -60,4 +51,4 @@ end
 local function down(self)
     self.bgm:setVolume(self.bgm:getVolume() - .1)
 end
-return { next = next, up = up, isMuted = isMuted, down = down, toggle = toggle, song = {}, dir = "assets/music/", mute = mute, play = play }
+return { next = next, up = up, isMuted = isMuted, down = down, toggle = toggle, mute = mute, play = play }

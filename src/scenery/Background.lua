@@ -4,7 +4,7 @@ local fi = love.filesystem
 local gfx = love.graphics
 
 local function init(self, data)
-    assert(data.name, "missing background folder name")
+    if data == nil then return self end
     -- load scale for x and y
     self.sx, self.sy = data.sx or 1, data.sy or 1
     -- change lyra.cx by this scale
@@ -18,10 +18,12 @@ local function init(self, data)
         table.insert(self.images, gfx.newImage(path .. v))
     end
     self.width = self.images[1]:getWidth()
+
     return self
 end
 
 local function draw(self)
+    if self.images == nil then return end
     for i, v in ipairs(self.images) do
         gfx.draw(v, lyra.startx + lyra.cx * self.scx * i / #self.images, 0, 0, self.sx, self.sy)
     end
