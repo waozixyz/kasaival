@@ -124,7 +124,7 @@ pub fn build(b: *std.Build) !void {
             const emcc = b.addSystemCommand(&.{
                 emcc_path,
                 "-o",
-                webOutdir ++ "game.html",
+                webOutdir ++ "index.html",
 
                 emscriptenSrc ++ "entry.c",
                 bindingSrc ++ "marshal.c",

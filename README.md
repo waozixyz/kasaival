@@ -1,5 +1,4 @@
 # Kasaival
-
 Flame survival game
 
 ## supported platforms
@@ -13,7 +12,7 @@ Flame survival game
 
 ### dependencies
 - git
-- [zig (0.10.0)](https://ziglang.org/documentation/master/)
+- [zig (0.11.0)](https://ziglang.org/documentation/master/)
 - [emscripten sdk](https://emscripten.org/)
 
 ```
@@ -29,7 +28,7 @@ zig build run
 ### build for host os and architecture
 
 ```sh
-zig build -Drelease-small
+zig build
 ```
 
 The output files will be in `./zig-out/bin`
@@ -39,17 +38,17 @@ The output files will be in `./zig-out/bin`
 ```sh
 EMSDK=../emsdk #path to emscripten sdk
 
-zig build -Drelease-small -Dtarget=wasm32-wasi --sysroot "$EMSDK/upstream/emscripten"
+zig build -Dtarget=wasm32-wasi --sysroot "$EMSDK/upstream/emscripten"
 ```
 
 The output files will be in `./zig-out/web/`
 
-- game.html (entry point)
-- game.js
-- game.wasm
-- game.data
+- index.html (entry point)
+- index.js
+- index.wasm
+- index.data
 
-The game data needs to be served with a webserver. Just opening the game.html in a browser won't work
+The game data needs to be served with a webserver. Just opening the index.html in a browser won't work
 
 You can utilize python as local http server:
 ```sh

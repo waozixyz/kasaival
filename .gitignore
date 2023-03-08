@@ -1,7 +1,8 @@
-
 zig-cache/
-
 zig-out/
-
 .env
-
+*.o
+*.exe
+*.dll
+*.lib
+*.pdb
