@@ -1,14 +1,17 @@
+-- Define local variable `scenes`
 local scenes = {
+    -- First scene
     {
+        -- Ground settings
         ground = {
             add = 8000,
-            cs = {
+            color_scheme = {
                 {0, .2, .4, .5, .1, .2},
                 {.1, .4, .5, .6, .1, .3}
             }
         },
 
-
+        -- Quests
         quests = {
             {
                 type = "kill",
@@ -19,36 +22,33 @@ local scenes = {
             }
         },
 
-
-        
+        -- Mobs (enemies)
         mobs = {
             ["Frog"] = {
                 amount = 3
             }
         },
 
-
+        -- Plants
         plants = {
             ["Oak"] = {
                 amount = 100
             }
         },
-
-
-        
-        
     },
-    {
 
+    -- Second scene
+    {
+        -- Ground settings
         ground = {
             add = 8000,
-            cs = {
+            color_scheme = {
                 {.1, .4, .4, .6, .2, .4},
                 {0, .3, .4, .6, .1, .3}
             }
         },
 
-
+        -- Quests
         quests = {
             {
                 type = "reach",
@@ -59,26 +59,24 @@ local scenes = {
             }
         },
 
-
-
-
+        -- Plants
         plants = {
             ["Oak"] = {
                 amount = 100
             }
-        },
-
-
-        
-
-        
+        },        
     }
 }
 
-
-local music = {
-    "StrangerThings.ogg",
-}
-
+-- Define local variables `music` and `sky`
+local music = {"StrangerThings.ogg"}
 local sky = {y = 0}
-return {scenes = scenes, width = 16000, background = background, music = music, sky = sky}
+
+-- Return a table with all settings
+return {
+    scenes = scenes,
+    width = 16000,
+    background = nil,
+    music = music,
+    sky = sky
+}

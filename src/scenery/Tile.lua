@@ -82,10 +82,11 @@ end
 
 local function getHexagonVertices(index, tile)
     -- Calculate the x and y coordinates of the hexagon's center
-    local x = index % 2 == 0 and tile.x + tile.w / 4 or tile.x
-    local y = index % 2 == 0 and tile.y + tile.h / 4 or tile.y
-  
-    -- Calculate the x and y offsets for the hexagon's vertices
+   -- local x = index % 2 == 0 and tile.x + tile.w / 4 or tile.x
+   -- local y = index % 2 == 0 and tile.y + tile.h / 4 or tile.y
+    local x = tile.x
+    local y = tile.y
+    -- Calcula te the x and y offsets for the hexagon's vertices
     local xRadius = tile.w / 4
     local yRadius = tile.h / 4
     local xOffsets = { -xRadius, xRadius, tile.w / 2, xRadius, -xRadius, -tile.w / 2 }

@@ -13,7 +13,7 @@ local Music = require "sys.Music"
 local Plant = require "plants.Plant"
 local Player = require "player.Player"
 local Sky = require "scenery.Sky"
-local Weather = require "weather.Weather"
+-- local Weather = require "weather.Weather"
 
 -- aliases
 local ev = love.event
@@ -57,7 +57,7 @@ local function load_scene(self)
                 end
             end
             if scene.ground then
-                for _, v in ipairs(scene.ground.cs) do
+                for _, v in ipairs(scene.ground.color_scheme) do
                     table.insert(cs, v)
                 end
             end
@@ -84,11 +84,12 @@ local function load_scene(self)
                 table.insert(self.spawn, v)
             end
         end
-
+        --[[
         -- add weather conditions
         if scene.weather then
             Weather:addProp(scene.weather)
         end
+        ]]--
     end
 end
 
@@ -129,7 +130,8 @@ local function load_stage(self, stage_name)
     end
     -- init Sky
     Sky:init(stage.sky)
-    Weather:init(stage.weather)
+
+    --Weather:init(stage.weather)
 
     self.nextStage = false
     self.nextScene = false
@@ -176,7 +178,7 @@ local function draw(self)
     lyra.ground:draw()
     -- draw entities
     lyra:draw()
-    Weather:draw()
+    --Weather:draw()
 
     -- undo translation
     gfx.translate(-lyra.cx, 0)
@@ -248,7 +250,7 @@ local function update(self, dt, set_screen)
                 lyra.ground:update(dt)
                 lyra.ground:collide(lyra.player)
                 update_quests(self, dt)
-                Weather:update(dt)
+                --Weather:update(dt)
                 for _, v in ipairs(self.spawn) do
                     v.time = v.time + dt
                     if v.time > v.interval then

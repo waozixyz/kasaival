@@ -140,8 +140,8 @@ local function touch(x, y)
 end
 
 local function keypressed(key)
-    if not tk() then
-        if key == "kp+" then Music:up() end
+
+    if not tk() and isOnlyKey then
         if key == "kp-" then Music:down() end
         if key == "n" then Music:next() end
         if key == "m" then Music:toggle() end
