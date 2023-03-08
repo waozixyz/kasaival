@@ -1,12 +1,14 @@
 const std = @import("std");
 const fs = std.fs;
+const exampleList = @import("src/examples.zig").exampleList;
 
-pub const APP_NAME = "Kasaival";
+pub const APP_NAME = "raylib-zig-examples";
 
 const raylibSrc = "src/raylib/raylib/src/";
 const bindingSrc = "src/raylib/";
 
-pub fn build(b: *std.build.Builder) !void {
+pub fn build(b: *std.Build) !void {
+    try promptExample();
 
     // Standard target options allows the person running `zig build` to choose
     // what target to build for. Here we do not override the defaults, which
@@ -16,7 +18,7 @@ pub fn build(b: *std.build.Builder) !void {
 
     // Standard release options allow the person running `zig build` to select
     // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall.
-    const mode = b.standardReleaseOptions();
+    const optimize = b.standardOptimizeOption(.{});
 
     switch (target.getOsTag()) {
         .wasi, .emscripten => {
@@ -29,8 +31,13 @@ pub fn build(b: *std.build.Builder) !void {
                 std.log.err("\n\nUSAGE: Please build with 'zig build -Drelease-small -Dtarget=wasm32-wasi --sysroot \"$EMSDK/upstream/emscripten\"'\n\n", .{});
                 return error.SysRootExpected;
             }
-            const lib = b.addStaticLibrary(APP_NAME, "src/web.zig");
-            lib.addIncludeDir(raylibSrc);
+            const lib = b.addStaticLibrary(.{
+                .name = APP_NAME,
+                .root_source_file = std.build.FileSource.relative("src/web.zig"),
+                .optimize = optimize,
+                .target = target,
+            });
+            lib.addIncludePath(raylibSrc);
 
             const emcc_file = switch (b.host.target.os.tag) {
                 .windows => "emcc.bat",
@@ -66,6 +73,7 @@ pub fn build(b: *std.build.Builder) !void {
             const rmodelsO = b.addSystemCommand(&.{ emcc_path, "-Os", warnings, "-c", raylibSrc ++ "rmodels.c", "-o", webCachedir ++ "rmodels.o", "-Os", warnings, "-DPLATFORM_WEB", "-DGRAPHICS_API_OPENGL_ES2" });
             const utilsO = b.addSystemCommand(&.{ emcc_path, "-Os", warnings, "-c", raylibSrc ++ "utils.c", "-o", webCachedir ++ "utils.o", "-Os", warnings, "-DPLATFORM_WEB" });
             const raudioO = b.addSystemCommand(&.{ emcc_path, "-Os", warnings, "-c", raylibSrc ++ "raudio.c", "-o", webCachedir ++ "raudio.o", "-Os", warnings, "-DPLATFORM_WEB" });
+
             const libraylibA = b.addSystemCommand(&.{
                 emar_path,
                 "rcs",
@@ -97,21 +105,21 @@ pub fn build(b: *std.build.Builder) !void {
                 lib.step.dependOn(&emranlib.step);
             };
 
-            lib.setTarget(target);
-            lib.setBuildMode(mode);
+            // lib.setTarget(target);
+            // lib.setBuildMode(mode);
             lib.defineCMacro("__EMSCRIPTEN__", null);
             lib.defineCMacro("PLATFORM_WEB", null);
             std.log.info("emscripten include path: {s}", .{include_path});
-            lib.addIncludeDir(include_path);
-            lib.addIncludeDir(emscriptenSrc);
-            lib.addIncludeDir(bindingSrc);
-            lib.addIncludeDir(raylibSrc);
-            lib.addIncludeDir(raylibSrc ++ "extras/");
+            lib.addIncludePath(include_path);
+            lib.addIncludePath(emscriptenSrc);
+            lib.addIncludePath(bindingSrc);
+            lib.addIncludePath(raylibSrc);
+            lib.addIncludePath(raylibSrc ++ "extras/");
 
             lib.setOutputDir(webCachedir);
             lib.install();
 
-            const shell = switch (mode) {
+            const shell = switch (optimize) {
                 .Debug => emscriptenSrc ++ "shell.html",
                 else => emscriptenSrc ++ "minshell.html",
             };
@@ -137,9 +145,11 @@ pub fn build(b: *std.build.Builder) !void {
                 shell,
                 "-DPLATFORM_WEB",
                 "-sUSE_GLFW=3",
-                // "-sWASM=0",
+                "-sWASM=1",
                 "-sALLOW_MEMORY_GROWTH=1",
-                //"-sTOTAL_MEMORY=1024MB",
+                "-sWASM_MEM_MAX=512MB", //going higher than that seems not to work on iOS browsers ¯\_(ツ)_/¯
+                "-sTOTAL_MEMORY=512MB",
+                "-sABORTING_MALLOC=0",
                 "-sASYNCIFY",
                 "-sFORCE_FILESYSTEM=1",
                 "-sASSERTIONS=1",
@@ -148,6 +158,10 @@ pub fn build(b: *std.build.Builder) !void {
                 "--preload-file",
                 "assets",
                 "--source-map-base",
+                "-O1",
+                "-Os",
+                // "-sLLD_REPORT_UNDEFINED",
+                "-sERROR_ON_UNDEFINED_SYMBOLS=0",
 
                 // optimizations
                 "-O1",
@@ -167,20 +181,23 @@ pub fn build(b: *std.build.Builder) !void {
             b.getInstallStep().dependOn(&emcc.step);
             //-------------------------------------------------------------------------------------
 
-            std.log.info("\n\nOutput files will be in {s}\n---\ncd {s}\npython -m http.server\n---\n\nbuilding...", .{webOutdir, webOutdir});
+            std.log.info("\n\nOutput files will be in {s}\n---\ncd {s}\npython -m http.server\n---\n\nbuilding...", .{ webOutdir, webOutdir });
         },
         else => {
             std.log.info("building for desktop\n", .{});
-            const exe = b.addExecutable(APP_NAME, "src/desktop.zig");
-            exe.setTarget(target);
-            exe.setBuildMode(mode);
+            const exe = b.addExecutable(.{
+                .name = APP_NAME,
+                .root_source_file = std.build.FileSource.relative("src/desktop.zig"),
+                .optimize = optimize,
+                .target = target,
+            });
 
             const rayBuild = @import("src/raylib/raylib/src/build.zig");
-            const raylib = rayBuild.addRaylib(b, target);
+            const raylib = rayBuild.addRaylib(b, target, optimize);
             exe.linkLibrary(raylib);
-            exe.addIncludeDir(raylibSrc);
-            exe.addIncludeDir(raylibSrc ++ "extras/");
-            exe.addIncludeDir(bindingSrc);
+            exe.addIncludePath(raylibSrc);
+            exe.addIncludePath(raylibSrc ++ "extras/");
+            exe.addIncludePath(bindingSrc);
             exe.addCSourceFile(bindingSrc ++ "marshal.c", &.{});
 
             switch (raylib.target.getOsTag()) {
@@ -194,7 +211,7 @@ pub fn build(b: *std.build.Builder) !void {
                     exe.linkFramework("IOKit");
                 },
                 .linux => {
-                    exe.addLibPath("/usr/lib64/");
+                    exe.addLibraryPath("/usr/lib64/");
                     exe.linkSystemLibrary("GL");
                     exe.linkSystemLibrary("rt");
                     exe.linkSystemLibrary("dl");
@@ -216,5 +233,41 @@ pub fn build(b: *std.build.Builder) !void {
             const run_step = b.step("run", "Run the app");
             run_step.dependOn(&run_cmd.step);
         },
+    }
+}
+
+fn promptExample() !void {
+    prompt: while (true) {
+        var buf: [4069]u8 = undefined;
+        var fba = std.heap.FixedBufferAllocator.init(&buf);
+        defer fba.reset();
+        const output = std.io.getStdOut();
+        var writer = output.writer();
+
+        try writer.writeAll("\n\nExamples:\n--------------------------------------------------\n");
+        for (exampleList, 0..) |example, i| {
+            defer fba.reset();
+            try writer.writeAll(try std.fmt.allocPrint(fba.allocator(), "{d}:\t{s}\n", .{ i + 1, example }));
+        }
+        try writer.writeAll("--------------------------------------------------\n\nSelect which example should be built: ");
+
+        const input = std.io.getStdIn();
+        var reader = input.reader();
+
+        const option = reader.readUntilDelimiterOrEofAlloc(fba.allocator(), '\n', buf.len) catch continue;
+        const nr = std.fmt.parseInt(usize, std.mem.trim(u8, option.?, " \t\n\r"), 10) catch |err| {
+            std.log.err("{?} in input: {?s}", .{ err, option });
+            continue;
+        };
+        fba.reset();
+
+        for (exampleList, 0..) |example, i| {
+            if (nr == i) {
+                var load_example = try std.fs.cwd().createFile("src/load_example.zig", .{});
+                defer load_example.close();
+                try load_example.writeAll(try std.fmt.allocPrint(fba.allocator(), "pub const name = \"{s}\";\n", .{example}));
+                break :prompt;
+            }
+        }
     }
 }
