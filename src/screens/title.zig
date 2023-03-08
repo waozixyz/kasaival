@@ -1,6 +1,6 @@
 const std = @import("std");
 const rl = @import("../raylib/raylib.zig");
-const lyra = @import("../lyra.zig");
+const common = @import("../common.zig");
 const Screen = @import("screen.zig").Screen;
 const ScreenNames = @import("../screens.zig").ScreenNames;
 const screens = @import("../screens.zig");
@@ -41,7 +41,7 @@ fn update(_: std.mem.Allocator, _: f32) !void {
 
 fn predraw() void {
     var start = rl.Vector2{ .x = 0, .y = 0 };
-    var end = rl.Vector2{ .x = lyra.screen_width, .y = lyra.screen_height };
+    var end = rl.Vector2{ .x = common.screen_width, .y = common.screen_height };
 
     var color = rl.WHITE;
     color.a = alpha;

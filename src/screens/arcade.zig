@@ -10,9 +10,9 @@ const levels = @import("../levels.zig");
 const HUD = @import("../hud.zig").HUD;
 
 const log = @import("../log.zig");
-const lyra = @import("../lyra.zig");
+const common = @import("../common.zig");
 const utils = @import("../utils.zig");
-const Time = @import("../lyra.zig").Time;
+const Time = @import("../common.zig").Time;
 
 const sort = std.sort.sort;
 const print = std.debug.print;
@@ -64,7 +64,7 @@ fn check_tile_collision() void {
         _ = i;
         for (row.items, 0..) |*t, j| {
             _ = j;
-            if (t.pos.x + t.size.x > lyra.cx and t.pos.x - t.size.x < lyra.cx + lyra.screen_width) {
+            if (t.pos.x + t.size.x > common.cx and t.pos.x - t.size.x < common.cx + common.screen_width) {
                 // find collision with player
                 var px = player.position.x;
                 var py = player.position.y;
@@ -90,7 +90,7 @@ fn update(allocator: std.mem.Allocator, dt: f32) !void {
         }
     }
 
-    lyra.elapsed_time += dt * lyra.time_speed;
+    common.elapsed_time += dt * common.time_speed;
 
     sky.update(dt);
     try ground.update(allocator, dt);
@@ -146,7 +146,7 @@ pub fn draw() void {
     }
 
     var start = rl.Vector2{ .x = 0, .y = 0 };
-    var end = rl.Vector2{ .x = lyra.screen_width, .y = lyra.screen_height };
+    var end = rl.Vector2{ .x = common.screen_width, .y = common.screen_height };
 
     var color = rl.BLACK;
     color.a = fade_in;

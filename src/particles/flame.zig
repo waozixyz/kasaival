@@ -1,6 +1,6 @@
 const std = @import("std");
 const rl = @import("../raylib/raylib.zig");
-const lyra = @import("../lyra.zig");
+const common = @import("../common.zig");
 
 const print = std.debug.print;
 const ArrayList = std.ArrayList;

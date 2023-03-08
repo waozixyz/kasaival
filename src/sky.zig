@@ -1,7 +1,7 @@
 const std = @import("std");
 const rl = @import("raylib/raylib.zig");
 
-const lyra = @import("lyra.zig");
+const common = @import("common.zig");
 const utils = @import("utils.zig");
 
 const math = std.math;
@@ -23,18 +23,18 @@ const Nebula = struct {
 const cx_scale = 0.2;
 
 fn get_mhd(h_off: u32) f16 {
-    return @intToFloat(f16, lyra.get_minute() + (lyra.get_hour() - h_off) * 60);
+    return @intToFloat(f16, common.get_minute() + (common.get_hour() - h_off) * 60);
 }
 
 fn get_mhn(h_off: u32) f16 {
-    return @intToFloat(f16, (60 - lyra.get_minute()) + (h_off - lyra.get_hour()) * 60);
+    return @intToFloat(f16, (60 - common.get_minute()) + (h_off - common.get_hour()) * 60);
 }
 
 fn rand_y() f32 {
-    return utils.f32_rand(0, lyra.screen_height);
+    return utils.f32_rand(0, common.screen_height);
 }
 fn rand_x() f32 {
-    return utils.f32_rand(-20, lyra.screen_width + lyra.end_x * cx_scale);
+    return utils.f32_rand(-20, common.screen_width + common.end_x * cx_scale);
 }
 fn rand_pos() rl.Vector2 {
     return rl.Vector2{ .x = rand_x(), .y = rand_y() };
@@ -45,7 +45,7 @@ pub const Sky = struct {
     pub fn init(self: *Sky, allocator: std.mem.Allocator) !void {
         self.nebula = Nebula{
             .texture = rl.LoadTexture("assets/nebula.png"),
-            .pos = rl.Vector2{ .x = 0, .y = -lyra.screen_height },
+            .pos = rl.Vector2{ .x = 0, .y = -common.screen_height },
         };
         self.stars = ArrayList(Star).init(allocator);
         var i: usize = 0;
@@ -68,11 +68,11 @@ pub const Sky = struct {
         }
     }
     pub fn update(self: *Sky, dt: f32) void {
-        var vy = dt * lyra.time_speed;
+        var vy = dt * common.time_speed;
         // nebula
         self.nebula.pos.y += vy;
         if (self.nebula.pos.y > 0) {
-            self.nebula.pos.y -= lyra.screen_height;
+            self.nebula.pos.y -= common.screen_height;
         }
 
         // stars
@@ -80,16 +80,16 @@ pub const Sky = struct {
             _ = i;
             s.pos.y += vy;
 
-            if (s.pos.y > lyra.screen_height) {
-                s.pos.y -= lyra.screen_height + s.radius;
+            if (s.pos.y > common.screen_height) {
+                s.pos.y -= common.screen_height + s.radius;
                 s.pos.x = rand_x();
             }
         }
     }
     pub fn predraw(self: *Sky) void {
-        var cx = lyra.cx * cx_scale;
-        var hour = lyra.get_hour();
-        //var minute = lyra.get_minute();
+        var cx = common.cx * cx_scale;
+        var hour = common.get_hour();
+        //var minute = common.get_minute();
         // draw blue sky
         var r_f: f16 = 8;
         var g_f: f16 = 24;
@@ -126,7 +126,7 @@ pub const Sky = struct {
         var color = rl.Color{ .r = r, .g = g, .b = b, .a = 255 };
 
         var start_v = rl.Vector2{ .x = 0, .y = 0 };
-        var end_v = rl.Vector2{ .x = lyra.screen_width, .y = lyra.start_y };
+        var end_v = rl.Vector2{ .x = common.screen_width, .y = common.start_y };
 
         rl.DrawRectangleV(start_v, end_v, color);
         rl.BeginBlendMode(@enumToInt(rl.BlendMode.BLEND_ADDITIVE));
@@ -142,9 +142,9 @@ pub const Sky = struct {
         color.a = 200;
         var x = self.nebula.pos.x - cx * 1.1;
         var scale: f32 = 10;
-        while (x < lyra.screen_width) {
+        while (x < common.screen_width) {
             var y = self.nebula.pos.y;
-            while (y < lyra.screen_height) {
+            while (y < common.screen_height) {
                 rl.DrawTextureEx(self.nebula.texture, rl.Vector2{ .x = x, .y = y }, 0, scale, color);
                 y += @intToFloat(f32, self.nebula.texture.height) * scale;
             }

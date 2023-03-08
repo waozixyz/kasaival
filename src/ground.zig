@@ -1,6 +1,6 @@
 const std = @import("std");
 const rl = @import("raylib/raylib.zig");
-const lyra = @import("lyra.zig");
+const common = @import("common.zig");
 const utils = @import("utils.zig");
 const Plant = @import("plant.zig").Plant;
 const Level = @import("level.zig").Level;
@@ -80,19 +80,19 @@ pub const Ground = struct {
         var tile_h = level.ground.tile_h;
         var terrains = level.ground.terrains;
 
-        var scale = lyra.start_y / lyra.end_y * lyra.sx;
-        var y = lyra.start_y + tile_h * scale;
+        var scale = common.start_y / common.end_y * common.sx;
+        var y = common.start_y + tile_h * scale;
 
         for (terrains, 0..) |t, i| {
             _ = i;
             if (t.w != -1) {
-                lyra.end_x += t.w - tile_w * lyra.sx;
+                common.end_x += t.w - tile_w * common.sx;
             }
         }
         var row: usize = 0;
-        while (y < lyra.end_y + tile_h) {
+        while (y < common.end_y + tile_h) {
             var x: f16 = 0;
-            scale = y / lyra.end_y * lyra.sx;
+            scale = y / common.end_y * common.sx;
             var w: f16 = tile_w * scale;
             var h: f16 = tile_h * scale;
             try self.tiles.append((ArrayList(Tile).init(allocator)));
@@ -186,7 +186,7 @@ pub const Ground = struct {
     pub fn predraw(_: *Ground) void {
         var color = rl.Color{ .r = 50, .g = 100, .b = 10, .a = 220 };
 
-        rl.DrawRectangle(0, @floatToInt(u16, lyra.start_y), lyra.screen_width, lyra.screen_height, color);
+        rl.DrawRectangle(0, @floatToInt(u16, common.start_y), common.screen_width, common.screen_height, color);
     }
     pub fn draw(self: *Ground) void {
         for (self.tiles.items, 0..) |*row, i| {

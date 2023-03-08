@@ -4,7 +4,7 @@ const rl = @import("raylib/raylib.zig");
 const print = std.debug.print;
 const math = std.math;
 const ArrayList = std.ArrayList;
-const lyra = @import("lyra.zig");
+const common = @import("common.zig");
 const log = @import("log.zig");
 
 pub const Branch = struct {
@@ -106,7 +106,7 @@ pub const Plant = struct {
         self.current_row += 1;
     }
     pub fn init(self: *Plant, allocator: std.mem.Allocator, x: f32, y: f32, random_row: bool) anyerror!void {
-        const scale = y / lyra.end_y * lyra.sx;
+        const scale = y / common.end_y * common.sx;
         self.start_y = y;
         self.branches = ArrayList(ArrayList(Branch)).init(allocator);
         self.leaves = ArrayList(Leaf).init(allocator);

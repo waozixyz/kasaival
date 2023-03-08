@@ -1,7 +1,7 @@
 const std = @import("std");
 const rl = @import("raylib/raylib.zig");
 
-const lyra = @import("lyra.zig");
+const common = @import("common.zig");
 
 const Flame = @import("particles/flame.zig").Flame;
 
@@ -18,25 +18,25 @@ fn get_angle(diff: rl.Vector2) rl.Vector2 {
 
 fn get_direction(x: f32, y: f32) rl.Vector2 {
     var dir = rl.Vector2{ .x = 0.0, .y = 0.0 };
-    for (lyra.key_right, 0..) |key, i| {
+    for (common.key_right, 0..) |key, i| {
         _ = i;
         if (rl.IsKeyDown(key)) {
             dir.x = 1;
         }
     }
-    for (lyra.key_left, 0..) |key, i| {
+    for (common.key_left, 0..) |key, i| {
         _ = i;
         if (rl.IsKeyDown(key)) {
             dir.x = -1;
         }
     }
-    for (lyra.key_up, 0..) |key, i| {
+    for (common.key_up, 0..) |key, i| {
         _ = i;
         if (rl.IsKeyDown(key)) {
             dir.y = -1;
         }
     }
-    for (lyra.key_down, 0..) |key, i| {
+    for (common.key_down, 0..) |key, i| {
         _ = i;
         if (rl.IsKeyDown(key)) {
             dir.y = 1;
@@ -45,7 +45,7 @@ fn get_direction(x: f32, y: f32) rl.Vector2 {
     if (dir.y == 0 and dir.x == 0) {
         // check mouse press
         if (rl.IsMouseButtonDown(rl.MouseButton.MOUSE_BUTTON_LEFT)) {
-            var diff = rl.Vector2{ .x = lyra.mouse_x - x + lyra.cx, .y = lyra.mouse_y - y };
+            var diff = rl.Vector2{ .x = common.mouse_x - x + common.cx, .y = common.mouse_y - y };
             const offset = 5;
             if (@fabs(diff.x) > offset or @fabs(diff.y) > offset) {
                 dir = get_angle(diff);
@@ -63,7 +63,7 @@ pub const Player = struct {
     frozen: bool = false,
 
     pub fn init(self: *Player, allocator: std.mem.Allocator) void {
-        self.position = rl.Vector2{ .x = lyra.cx + lyra.screen_width * 0.5, .y = lyra.screen_height * 0.8 };
+        self.position = rl.Vector2{ .x = common.cx + common.screen_width * 0.5, .y = common.screen_height * 0.8 };
         self.flame.init(allocator);
     }
     pub fn get_radius(self: *Player) f32 {
@@ -78,27 +78,27 @@ pub const Player = struct {
         }
         var dx = dir.x * self.speed * self.get_radius();
         var dy = dir.y * self.speed * self.get_radius();
-        var eye_bound = lyra.screen_width / 5;
-        if ((x + dx < lyra.cx + eye_bound and lyra.cx > 0) or (x + dx > lyra.cx + lyra.screen_width - eye_bound and lyra.cx < lyra.end_x - lyra.screen_width)) {
-            lyra.cx += dx;
+        var eye_bound = common.screen_width / 5;
+        if ((x + dx < common.cx + eye_bound and common.cx > 0) or (x + dx > common.cx + common.screen_width - eye_bound and common.cx < common.end_x - common.screen_width)) {
+            common.cx += dx;
         }
 
-        if (x + dx < lyra.cx + self.get_radius() and dx < 0) {
-            self.position.x = lyra.cx + self.get_radius();
-        } else if (x + dx > lyra.cx + lyra.screen_width - self.get_radius()) {
-            self.position.x = lyra.cx + lyra.screen_width - self.get_radius();
+        if (x + dx < common.cx + self.get_radius() and dx < 0) {
+            self.position.x = common.cx + self.get_radius();
+        } else if (x + dx > common.cx + common.screen_width - self.get_radius()) {
+            self.position.x = common.cx + common.screen_width - self.get_radius();
         } else {
             self.position.x += dx;
         }
         // y limits
-        var min_y = lyra.start_y - self.get_radius() * 0.5;
-        var max_y = lyra.screen_height - self.get_radius();
+        var min_y = common.start_y - self.get_radius() * 0.5;
+        var max_y = common.screen_height - self.get_radius();
         if (y + dy > max_y and dy > 0) {
             self.position.y = max_y;
         } else if (y + dy < min_y and dy < 0) {
             self.position.y = min_y;
         } else {
-            self.flame.scale = self.position.y / lyra.end_y * lyra.sx;
+            self.flame.scale = self.position.y / common.end_y * common.sx;
             self.position.y += dy;
         }
         try self.flame.update(self.position);

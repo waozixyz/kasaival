@@ -2,7 +2,7 @@ const std = @import("std");
 const log = @import("./log.zig");
 const ZecsiAllocator = @import("allocator.zig").ZecsiAllocator;
 const rl = @import("raylib/raylib.zig");
-const lyra = @import("lyra.zig");
+const common = @import("common.zig");
 const utils = @import("utils.zig");
 
 const Screen = @import("screens/screen.zig").Screen;
@@ -19,11 +19,7 @@ var camera = rl.Camera2D{ .offset = rl.Vector2{ .x = 0, .y = 0 }, .target = rl.V
 var target: rl.RenderTexture2D = undefined;
 
 pub fn min(a: f16, b: f16) f16 {
-    if (a < b) {
-        return a;
-    } else {
-        return b;
-    }
+    return if (a < b) a else b;
 }
 
 pub fn start() !void {
@@ -31,9 +27,9 @@ pub fn start() !void {
     //--------------------------------------------------------------------------------------
 
     rl.SetConfigFlags(rl.ConfigFlags.FLAG_WINDOW_RESIZABLE);
-    rl.InitWindow(lyra.screen_width, lyra.screen_height, "Kasaival");
+    rl.InitWindow(common.screen_width, common.screen_height, "Kasaival");
     rl.SetTargetFPS(60);
-    target = rl.LoadRenderTexture(lyra.screen_width, lyra.screen_height);
+    target = rl.LoadRenderTexture(common.screen_width, common.screen_height);
 
     // Render texture initialization, used to hold the rendering result so we can easily resize it
     rl.SetTextureFilter(target.texture, @enumToInt(rl.TextureFilter.TEXTURE_FILTER_BILINEAR));
@@ -71,19 +67,19 @@ pub fn stop() void {
 pub fn loop(dt: f32) void {
     var window_width = @intToFloat(f16, rl.GetScreenWidth());
     var window_height = @intToFloat(f16, rl.GetScreenHeight());
-    const scale = min(window_width / lyra.screen_width, window_height / lyra.screen_height);
+    const scale = min(window_width / common.screen_width, window_height / common.screen_height);
     // fullscreen on f press
     if (rl.IsKeyPressed(rl.KeyboardKey.KEY_F)) rl.ToggleFullscreen();
     // update camera
-    camera.target = rl.Vector2{ .x = lyra.cx, .y = 0 };
-    camera.zoom = lyra.zoom;
+    camera.target = rl.Vector2{ .x = common.cx, .y = 0 };
+    camera.zoom = common.zoom;
     // update virtual mouse
     var mouse = rl.GetMousePosition();
-    lyra.mouse_x = (@floatCast(f16, mouse.x) - (window_width - (lyra.screen_width * scale)) * 0.5) / scale;
-    lyra.mouse_y = (@floatCast(f16, mouse.y) - (window_height - (lyra.screen_height * scale)) * 0.5) / scale;
+    common.mouse_x = (@floatCast(f16, mouse.x) - (window_width - (common.screen_width * scale)) * 0.5) / scale;
+    common.mouse_y = (@floatCast(f16, mouse.y) - (window_height - (common.screen_height * scale)) * 0.5) / scale;
 
-    lyra.mouse_x = utils.clamp(lyra.mouse_x, 0, lyra.screen_width);
-    lyra.mouse_y = utils.clamp(lyra.mouse_y, 0, lyra.screen_height);
+    common.mouse_x = utils.clamp(common.mouse_x, 0, common.screen_width);
+    common.mouse_y = utils.clamp(common.mouse_y, 0, common.screen_height);
     // if game screen changes, update to the new screen
 
     if (current != screens.next) {
@@ -111,7 +107,7 @@ pub fn loop(dt: f32) void {
     rl.EndTextureMode();
     // Draw RenderTexture2D to window, properly scaled
     const texture_rect = rl.Rectangle{ .x = 0, .y = 0, .width = @intToFloat(f16, target.texture.width), .height = @intToFloat(f16, -target.texture.height) };
-    const screen_rect = rl.Rectangle{ .x = (@intToFloat(f16, rl.GetScreenWidth()) - lyra.screen_width * scale) * 0.5, .y = (@intToFloat(f16, rl.GetScreenHeight()) - lyra.screen_height * scale) * 0.5, .width = lyra.screen_width * scale, .height = lyra.screen_height * scale };
+    const screen_rect = rl.Rectangle{ .x = (@intToFloat(f16, rl.GetScreenWidth()) - common.screen_width * scale) * 0.5, .y = (@intToFloat(f16, rl.GetScreenHeight()) - common.screen_height * scale) * 0.5, .width = common.screen_width * scale, .height = common.screen_height * scale };
     rl.DrawTexturePro(target.texture, texture_rect, screen_rect, rl.Vector2{ .x = 0, .y = 0 }, 0.0, rl.WHITE);
 
     rl.EndDrawing();
