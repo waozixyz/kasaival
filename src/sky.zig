@@ -37,36 +37,31 @@ fn rand_x() f32 {
     return utils.f32_rand(-20, lyra.screen_width + lyra.end_x * cx_scale);
 }
 fn rand_pos() rl.Vector2 {
-    return rl.Vector2{.x = rand_x(), .y = rand_y()};
+    return rl.Vector2{ .x = rand_x(), .y = rand_y() };
 }
-pub const Sky = struct{
+pub const Sky = struct {
     nebula: Nebula = undefined,
     stars: ArrayList(Star) = undefined,
     pub fn init(self: *Sky, allocator: std.mem.Allocator) !void {
-        self.nebula = Nebula {
+        self.nebula = Nebula{
             .texture = rl.LoadTexture("assets/nebula.png"),
-            .pos = rl.Vector2{.x = 0, .y = -lyra.screen_height},
+            .pos = rl.Vector2{ .x = 0, .y = -lyra.screen_height },
         };
         self.stars = ArrayList(Star).init(allocator);
         var i: usize = 0;
-        while (true)  {
+        while (true) {
             var radius = utils.f32_rand(1, 5);
             if (i < 5) {
                 radius = utils.f32_rand(5, 20);
             }
-            var star = Star{
-                .pos = rand_pos(),
-                .radius = radius,
-                .color = rl.Color {
-                    .r = utils.u8_rand(200, 255),
-                    .g = utils.u8_rand(200, 255),
-                    .b = utils.u8_rand(0, 200),
-                    .a = utils.u8_rand(200, 255),
-                    
-                }
-            };
-            
-            try self.stars.append(star); 
+            var star = Star{ .pos = rand_pos(), .radius = radius, .color = rl.Color{
+                .r = utils.u8_rand(200, 255),
+                .g = utils.u8_rand(200, 255),
+                .b = utils.u8_rand(0, 200),
+                .a = utils.u8_rand(200, 255),
+            } };
+
+            try self.stars.append(star);
             if (i == 100)
                 break;
             i += 1;
@@ -81,7 +76,7 @@ pub const Sky = struct{
         }
 
         // stars
-        for (self.stars.items) |*s, i| {
+        for (self.stars.items, 0..) |*s, i| {
             _ = i;
             s.pos.y += vy;
 
@@ -118,30 +113,30 @@ pub const Sky = struct{
         } else if (hour > 7 and hour < 12) {
             t_r = get_mhn(12) / r_f;
         } else if (hour >= 17 and hour <= 20) {
-            t_r = get_mhd(17)/ r_f;
-        } else if (hour > 20  and hour < 22) {
+            t_r = get_mhd(17) / r_f;
+        } else if (hour > 20 and hour < 22) {
             t_r = get_mhn(22) / r_f;
-        } 
+        }
 
         // convert colors to u8
         var r = @floatToInt(u8, t_r);
         var g = @floatToInt(u8, t_g);
         var b = @floatToInt(u8, t_b);
         // set color for sky
-        var color = rl.Color{.r = r, .g = g, .b = b, .a = 255};
+        var color = rl.Color{ .r = r, .g = g, .b = b, .a = 255 };
 
-        var start_v = rl.Vector2{.x = 0, .y = 0};
-        var end_v = rl.Vector2{.x = lyra.screen_width, .y = lyra.start_y};
-        
+        var start_v = rl.Vector2{ .x = 0, .y = 0 };
+        var end_v = rl.Vector2{ .x = lyra.screen_width, .y = lyra.start_y };
+
         rl.DrawRectangleV(start_v, end_v, color);
         rl.BeginBlendMode(@enumToInt(rl.BlendMode.BLEND_ADDITIVE));
 
-        for (self.stars.items) |*s, i| {
+        for (self.stars.items, 0..) |*s, i| {
             _ = i;
             s.color.a = @floatToInt(u8, utils.clamp(255 - (t_b + t_g) * 1.2, 0, 255));
             var pos = s.pos;
             pos.x -= cx;
-            rl.DrawCircleV(pos, s.radius, s.color);    
+            rl.DrawCircleV(pos, s.radius, s.color);
         }
         color = rl.WHITE;
         color.a = 200;
@@ -150,13 +145,12 @@ pub const Sky = struct{
         while (x < lyra.screen_width) {
             var y = self.nebula.pos.y;
             while (y < lyra.screen_height) {
-                rl.DrawTextureEx(self.nebula.texture, rl.Vector2{.x = x, .y = y}, 0, scale, color);  
+                rl.DrawTextureEx(self.nebula.texture, rl.Vector2{ .x = x, .y = y }, 0, scale, color);
                 y += @intToFloat(f32, self.nebula.texture.height) * scale;
             }
             x += @intToFloat(f32, self.nebula.texture.width) * scale;
-        } 
+        }
         rl.EndBlendMode();
-
     }
 
     pub fn deinit(self: *Sky) void {
@@ -164,4 +158,3 @@ pub const Sky = struct{
         rl.UnloadTexture(self.nebula.texture);
     }
 };
-

@@ -8,24 +8,24 @@ const printBufferSize: usize = 1024 * 16;
 pub fn info(comptime fmt: []const u8, args: anytype) void {
     var buf: [printBufferSize]u8 = undefined;
     var fba = std.heap.FixedBufferAllocator.init(&buf);
-    infoAlloc(fba.allocator(), fmt, args) catch |err| {
-        std.debug.print("Error when log.info: {?}\n(your message is probably to long, please use 'infoAlloc' instead)\n", .{err});
+    infoAlloc(fba.allocator(), fmt, args) catch |errr| {
+        std.debug.print("Error when log.info: {?}\n(your message is probably to long, please use 'infoAlloc' instead)\n", .{errr});
     };
 }
 
 pub fn warn(comptime fmt: []const u8, args: anytype) void {
     var buf: [printBufferSize]u8 = undefined;
     var fba = std.heap.FixedBufferAllocator.init(&buf);
-    warnAlloc(fba.allocator(), fmt, args) catch |err| {
-        std.debug.print("Error when log.warn: {?}\n(your message is probably to long, please use 'warnAlloc' instead)\n", .{err});
+    warnAlloc(fba.allocator(), fmt, args) catch |errr| {
+        std.debug.print("Error when log.warn: {?}\n(your message is probably to long, please use 'warnAlloc' instead)\n", .{errr});
     };
 }
 
 pub fn err(comptime fmt: []const u8, args: anytype) void {
     var buf: [printBufferSize]u8 = undefined;
     var fba = std.heap.FixedBufferAllocator.init(&buf);
-    errAlloc(fba.allocator(), fmt, args) catch |err| {
-        std.debug.print("Error when log.err: {?}\n(your message is probably to long, please use 'errAlloc' instead)\n", .{err});
+    errAlloc(fba.allocator(), fmt, args) catch |errr| {
+        std.debug.print("Error when log.err: {?}\n(your message is probably to long, please use 'errAlloc' instead)\n", .{errr});
     };
 }
 
@@ -33,8 +33,8 @@ pub fn debug(comptime fmt: []const u8, args: anytype) void {
     if (builtin.mode == .Debug) {
         var buf: [printBufferSize]u8 = undefined;
         var fba = std.heap.FixedBufferAllocator.init(&buf);
-        debugAlloc(fba.allocator(), fmt, args) catch |err| {
-            std.debug.print("Error when log.debug: {?}\n(your message is probably to long, please use 'debugAlloc' instead)\n", .{err});
+        debugAlloc(fba.allocator(), fmt, args) catch |errr| {
+            std.debug.print("Error when log.debug: {?}\n(your message is probably to long, please use 'debugAlloc' instead)\n", .{errr});
         };
     }
 }
@@ -56,12 +56,12 @@ pub fn debugAlloc(allocator: Allocator, comptime fmt: []const u8, args: anytype)
 }
 
 fn printAlloc(allocator: Allocator, comptime logLevel: LogLevel, comptime fmt: []const u8, args: anytype) !void {
-    const s = try std.fmt.allocPrintZ(allocator, fmt++"\n", args);
+    const s = try std.fmt.allocPrintZ(allocator, fmt ++ "\n", args);
     defer allocator.free(s);
     getPrintFn(logLevel)(s);
 }
 
-fn getPrintFn(comptime logLevel: LogLevel) fn ([:0]u8) void {
+fn getPrintFn(comptime logLevel: LogLevel) *const fn ([:0]u8) void {
     switch (builtin.os.tag) {
         .wasi, .emscripten, .freestanding => {
             return emscriptenPrint(logLevel);
@@ -72,7 +72,7 @@ fn getPrintFn(comptime logLevel: LogLevel) fn ([:0]u8) void {
     }
 }
 
-fn emscriptenPrint(comptime logLevel: LogLevel) fn ([:0]u8) void {
+fn emscriptenPrint(comptime logLevel: LogLevel) *const fn ([:0]u8) void {
     const emsdk = @cImport({
         @cDefine("__EMSCRIPTEN__", "1");
         @cInclude("emscripten/emscripten.h");
@@ -89,10 +89,10 @@ fn emscriptenPrint(comptime logLevel: LogLevel) fn ([:0]u8) void {
     }).print;
 }
 
-fn desktopPrint(comptime logLevel: LogLevel) fn ([:0]u8) void {
+fn desktopPrint(comptime logLevel: LogLevel) *const fn ([:0]u8) void {
     return (struct {
         pub fn print(s: [:0]u8) void {
-            const printFn: fn (comptime format: []const u8, args: anytype) void =
+            const printFn: *const fn (comptime format: []const u8, args: anytype) void =
                 switch (logLevel) {
                 .info => std.log.info,
                 .warn => std.log.warn,

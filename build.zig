@@ -1,14 +1,11 @@
 const std = @import("std");
 const fs = std.fs;
-const exampleList = @import("src/examples.zig").exampleList;
-
-pub const APP_NAME = "raylib-zig-examples";
+pub const APP_NAME = "Kasaival";
 
 const raylibSrc = "src/raylib/raylib/src/";
 const bindingSrc = "src/raylib/";
 
 pub fn build(b: *std.Build) !void {
-    try promptExample();
 
     // Standard target options allows the person running `zig build` to choose
     // what target to build for. Here we do not override the defaults, which
@@ -233,41 +230,5 @@ pub fn build(b: *std.Build) !void {
             const run_step = b.step("run", "Run the app");
             run_step.dependOn(&run_cmd.step);
         },
-    }
-}
-
-fn promptExample() !void {
-    prompt: while (true) {
-        var buf: [4069]u8 = undefined;
-        var fba = std.heap.FixedBufferAllocator.init(&buf);
-        defer fba.reset();
-        const output = std.io.getStdOut();
-        var writer = output.writer();
-
-        try writer.writeAll("\n\nExamples:\n--------------------------------------------------\n");
-        for (exampleList, 0..) |example, i| {
-            defer fba.reset();
-            try writer.writeAll(try std.fmt.allocPrint(fba.allocator(), "{d}:\t{s}\n", .{ i + 1, example }));
-        }
-        try writer.writeAll("--------------------------------------------------\n\nSelect which example should be built: ");
-
-        const input = std.io.getStdIn();
-        var reader = input.reader();
-
-        const option = reader.readUntilDelimiterOrEofAlloc(fba.allocator(), '\n', buf.len) catch continue;
-        const nr = std.fmt.parseInt(usize, std.mem.trim(u8, option.?, " \t\n\r"), 10) catch |err| {
-            std.log.err("{?} in input: {?s}", .{ err, option });
-            continue;
-        };
-        fba.reset();
-
-        for (exampleList, 0..) |example, i| {
-            if (nr == i) {
-                var load_example = try std.fs.cwd().createFile("src/load_example.zig", .{});
-                defer load_example.close();
-                try load_example.writeAll(try std.fmt.allocPrint(fba.allocator(), "pub const name = \"{s}\";\n", .{example}));
-                break :prompt;
-            }
-        }
     }
 }

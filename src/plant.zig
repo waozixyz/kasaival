@@ -15,13 +15,7 @@ pub const Branch = struct {
     h: f32,
     color: rl.Color,
 };
-pub const Leaf = struct {
-    row: usize,
-    v1: rl.Vector2,
-    v2: rl.Vector2,
-    r: f32,
-    color: rl.Color
-};
+pub const Leaf = struct { row: usize, v1: rl.Vector2, v2: rl.Vector2, r: f32, color: rl.Color };
 
 const deg_to_rad: f32 = math.pi / 180.0;
 
@@ -29,9 +23,8 @@ fn get_color(cs: [6]u8) rl.Color {
     const r = @intCast(u8, rl.GetRandomValue(cs[0], cs[1]));
     const g = @intCast(u8, rl.GetRandomValue(cs[2], cs[3]));
     const b = @intCast(u8, rl.GetRandomValue(cs[4], cs[5]));
-    return rl.Color{ .r = r, .g = g, .b = b, .a = 255};
+    return rl.Color{ .r = r, .g = g, .b = b, .a = 255 };
 }
-
 
 fn get_rot_x(deg: i32) f32 {
     return math.cos(@intToFloat(f32, deg) * deg_to_rad);
@@ -47,9 +40,9 @@ pub const Plant = struct {
     max_row: i32 = 5,
     current_row: usize = 0,
     split_chance: i32 = 40,
-    split_angle: [2]i32 = .{20, 30},
-    cs_branch: [6]u8 =  .{125, 178, 122, 160, 76, 90},
-    cs_leaf: [6]u8 = .{150, 204, 190, 230, 159, 178},
+    split_angle: [2]i32 = .{ 20, 30 },
+    cs_branch: [6]u8 = .{ 125, 178, 122, 160, 76, 90 },
+    cs_leaf: [6]u8 = .{ 150, 204, 190, 230, 159, 178 },
     left_x: f32 = 9999999,
     right_x: f32 = -9999999,
     grow_timer: i32 = 0,
@@ -73,47 +66,34 @@ pub const Plant = struct {
         const nx = px + get_rot_x(deg) * bh;
         const ny = py + get_rot_y(deg) * bh;
         const c = get_color(self.cs_branch);
-        
 
-        self.branches.items[self.current_row + 1].append(Branch{
-            .deg = deg,
-            .v1 = rl.Vector2{.x = px, .y = py},
-            .v2 = rl.Vector2{.x = nx, .y = ny},
-            .w = bw,
-            .h = bh,
-            .color = c}) catch |err| log.err("ERROR: {?}", .{err});
+        self.branches.items[self.current_row + 1].append(Branch{ .deg = deg, .v1 = rl.Vector2{ .x = px, .y = py }, .v2 = rl.Vector2{ .x = nx, .y = ny }, .w = bw, .h = bh, .color = c }) catch |err| log.err("ERROR: {?}", .{err});
 
         var chance = (@intToFloat(f32, rl.GetRandomValue(0, 100)) / 100) * @intToFloat(f32, self.current_row) / @intToFloat(f32, self.max_row);
         if (chance > self.leaf_chance) {
             var div_x = get_rot_x(deg * 2) * bw;
             var div_y = get_rot_y(deg * 2) * bw;
 
-            self.leaves.append(Leaf{
-                .row = self.current_row,
-                .r = bw,
-                .v1 = rl.Vector2{.x = nx + div_x, .y = ny + div_y},
-                .v2 = rl.Vector2{.x = nx - div_x, .y = ny - div_y},
-                .color = get_color(self.cs_leaf)
-            }) catch |err| log.err("ERROR: {?}", .{err});
+            self.leaves.append(Leaf{ .row = self.current_row, .r = bw, .v1 = rl.Vector2{ .x = nx + div_x, .y = ny + div_y }, .v2 = rl.Vector2{ .x = nx - div_x, .y = ny - div_y }, .color = get_color(self.cs_leaf) }) catch |err| log.err("ERROR: {?}", .{err});
         }
 
         if (nx < self.left_x) {
             self.left_x = nx;
         } else if (nx > self.right_x) {
             self.right_x = nx + bw;
-        }   
+        }
     }
     pub fn get_z(self: *Plant) f32 {
         return self.branches.items[0].items[0].v1.y;
     }
     fn get_next_pos(self: *Plant, a: f32, b: f32) f32 {
-        return b + (a - b) * @intToFloat(f32, self.grow_timer) / @intToFloat(f32, self.grow_time); 
+        return b + (a - b) * @intToFloat(f32, self.grow_timer) / @intToFloat(f32, self.grow_time);
     }
     fn grow(self: *Plant, allocator: std.mem.Allocator) void {
         self.append_row(allocator) catch |err| log.err("ERROR: {?}", .{err});
         var prev_row = self.branches.items[self.current_row].items;
-        
-        for (prev_row) |*b, i| {
+
+        for (prev_row, 0..) |*b, i| {
             _ = i;
             var split = rl.GetRandomValue(0, 100);
             if (self.split_chance > split) {
@@ -135,8 +115,8 @@ pub const Plant = struct {
         try self.append_row(allocator);
         try self.branches.items[0].append(Branch{
             .deg = angle,
-            .v1 = rl.Vector2{ .x = x, .y = y},
-            .v2 = rl.Vector2{ .x = x, .y = y - self.h},
+            .v1 = rl.Vector2{ .x = x, .y = y },
+            .v2 = rl.Vector2{ .x = x, .y = y - self.h },
             .w = self.w * scale,
             .h = self.h * scale,
             .color = get_color(self.cs_branch),
@@ -156,25 +136,22 @@ pub const Plant = struct {
         if (self.grow_timer == 0 and self.current_row < self.max_row) {
             self.grow(allocator);
             self.grow_timer = self.grow_time;
-        } 
+        }
     }
     pub fn draw(self: *Plant) void {
-        for (self.branches.items) |*row, i| {
-            for (row.items) |*b, j| {
+        for (self.branches.items, 0..) |*row, i| {
+            for (row.items, 0..) |*b, j| {
                 _ = j;
-                    
+
                 var v2 = b.v2;
 
                 if (i == self.current_row and self.grow_timer > 0) {
-                    v2 = rl.Vector2{
-                        .x = self.get_next_pos(b.v1.x, v2.x),
-                        .y = self.get_next_pos(b.v1.y, v2.y)
-                    };
+                    v2 = rl.Vector2{ .x = self.get_next_pos(b.v1.x, v2.x), .y = self.get_next_pos(b.v1.y, v2.y) };
                 }
-            
+
                 rl.DrawLineEx(b.v1, v2, b.w, b.color);
             }
-            for (self.leaves.items) |*l, j| {
+            for (self.leaves.items, 0..) |*l, j| {
                 _ = j;
                 if (l.row < i and !(i == self.current_row and self.grow_timer > 0)) {
                     rl.DrawCircleV(l.v1, l.r, l.color);
@@ -184,7 +161,7 @@ pub const Plant = struct {
         }
     }
     pub fn deinit(self: *Plant) void {
-        for (self.branches.items) |*row, i| {
+        for (self.branches.items, 0..) |*row, i| {
             _ = i;
             row.deinit();
         }
@@ -192,5 +169,3 @@ pub const Plant = struct {
         self.leaves.deinit();
     }
 };
-
-

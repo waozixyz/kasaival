@@ -9,20 +9,16 @@ const print = std.debug.print;
 fn get_zero_or_none(val: i32) [2:0]u8 {
     if (val < 10) {
         return " 0".*;
-    }
-    else {
+    } else {
         return " ".*;
     }
 }
 
 const padding: i32 = 12;
 const font_size: f32 = 20;
-pub const HUD = struct{
-    pub fn init(_: *HUD) void {
-
-    }
-    pub fn update(_: *HUD) void {
-    }
+pub const HUD = struct {
+    pub fn init(_: *HUD) void {}
+    pub fn update(_: *HUD) void {}
 
     pub fn predraw(_: *HUD) void {
         var day = lyra.get_day();
@@ -32,11 +28,8 @@ pub const HUD = struct{
             break :errblk "";
         };
         var width: i32 = @intCast(i32, day_slice.len) * @floatToInt(i32, font_size * 0.5);
-        rl.DrawText(day_slice, @floatToInt(i32, lyra.screen_width) - padding * 2- width, padding, font_size, rl.MAGENTA);
-      
+        rl.DrawText(day_slice, @floatToInt(i32, lyra.screen_width) - padding * 2 - width, padding, font_size, rl.MAGENTA);
     }
 
-    pub fn deinit(_: *HUD) void {
-    }
+    pub fn deinit(_: *HUD) void {}
 };
-

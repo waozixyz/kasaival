@@ -19,7 +19,6 @@ pub const screen = Screen{
     .deinitFn = deinit,
 };
 
-
 fn init(_: std.mem.Allocator) !void {
     texture = rl.LoadTexture("assets/menu.png");
 }
@@ -41,13 +40,13 @@ fn update(_: std.mem.Allocator, _: f32) !void {
 }
 
 fn predraw() void {
-    var start = rl.Vector2{.x = 0, .y = 0 };
-    var end = rl.Vector2{.x = lyra.screen_width, .y = lyra.screen_height};
-    
+    var start = rl.Vector2{ .x = 0, .y = 0 };
+    var end = rl.Vector2{ .x = lyra.screen_width, .y = lyra.screen_height };
+
     var color = rl.WHITE;
     color.a = alpha;
-    rl.DrawTextureEx(texture, start, 0, 1, color);    
-    
+    rl.DrawTextureEx(texture, start, 0, 1, color);
+
     color = rl.MAROON;
     color.a = alpha;
     rl.DrawText("KASAIVAL", 200, 90, 80, color);
@@ -56,7 +55,7 @@ fn predraw() void {
     color = rl.BEIGE;
     color.a = alpha;
     rl.DrawText("touch anywhere to start burning", 140, 555, 30, color);
-    
+
     color = rl.BLACK;
     color.a = black;
     rl.DrawRectangleV(start, end, color);
@@ -65,4 +64,3 @@ fn predraw() void {
 fn deinit() void {
     rl.UnloadTexture(texture);
 }
-

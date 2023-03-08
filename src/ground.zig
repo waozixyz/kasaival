@@ -14,10 +14,10 @@ pub const PlantNames = enum { oak, none };
 pub const Terrain = struct {
     w: f16 = -1,
     grow: PlantNames = PlantNames.none,
-    cs_r: [2]u8 = [2]u8{16, 60},
-    cs_g: [2]u8 = [2]u8{120, 200},
-    cs_b: [2]u8 = [2]u8{10, 50},
-    cs_a: [2]u8 = [2]u8{130, 200},
+    cs_r: [2]u8 = [2]u8{ 16, 60 },
+    cs_g: [2]u8 = [2]u8{ 120, 200 },
+    cs_b: [2]u8 = [2]u8{ 10, 50 },
+    cs_a: [2]u8 = [2]u8{ 130, 200 },
 };
 
 const Tile = struct {
@@ -40,7 +40,7 @@ fn rand_u8(cs: [2]u8) u8 {
 }
 
 fn get_terrain_color_u8(t1: Terrain) [4]u8 {
-    return [4]u8{rand_u8(t1.cs_r), rand_u8(t1.cs_g), rand_u8(t1.cs_b), rand_u8(t1.cs_a)};
+    return [4]u8{ rand_u8(t1.cs_r), rand_u8(t1.cs_g), rand_u8(t1.cs_b), rand_u8(t1.cs_a) };
 }
 
 fn get_color_difference(c1: u8, c2: u8, s: f16) u8 {
@@ -68,8 +68,8 @@ fn get_color(x: f16, tw: f16, terrains: [5]Terrain, terrain_index: usize) rl.Col
 }
 
 pub const Ground = struct {
-    tiles : ArrayList(ArrayList(Tile)) = undefined,
-    fn append_tile(self: *Ground, row: usize,  t: Tile) !void {
+    tiles: ArrayList(ArrayList(Tile)) = undefined,
+    fn append_tile(self: *Ground, row: usize, t: Tile) !void {
         var append = try self.tiles.items[row].append(t);
         _ = append;
     }
@@ -79,11 +79,11 @@ pub const Ground = struct {
         var tile_w = level.ground.tile_w;
         var tile_h = level.ground.tile_h;
         var terrains = level.ground.terrains;
-    
-        var scale = lyra.start_y / lyra.end_y * lyra.sx;
-        var y = lyra.start_y + tile_h * scale ;
 
-        for (terrains) |*t, i| {
+        var scale = lyra.start_y / lyra.end_y * lyra.sx;
+        var y = lyra.start_y + tile_h * scale;
+
+        for (terrains, 0..) |t, i| {
             _ = i;
             if (t.w != -1) {
                 lyra.end_x += t.w - tile_w * lyra.sx;
@@ -109,28 +109,28 @@ pub const Ground = struct {
                     }
                 }
 
-                var color = get_color(x, total_w,  terrains, terrain_index);
+                var color = get_color(x, total_w, terrains, terrain_index);
 
-                var pos = rl.Vector2{.x = x, .y = y};
-                var size = rl.Vector2{.x = w, .y = h};
+                var pos = rl.Vector2{ .x = x, .y = y };
+                var size = rl.Vector2{ .x = w, .y = h };
                 var fertility: f32 = 0;
-                if (terrain.grow != PlantNames.none ) {
+                if (terrain.grow != PlantNames.none) {
                     fertility = @intToFloat(f32, rl.GetRandomValue(0, 1000));
                 }
-                var v1 = rl.Vector2{ .x = x - w, .y = y};
-                var v2 = rl.Vector2{ .x = x + w, .y = y};
-                var v3 = rl.Vector2{ .x = x, .y = y - h};
+                var v1 = rl.Vector2{ .x = x - w, .y = y };
+                var v2 = rl.Vector2{ .x = x + w, .y = y };
+                var v3 = rl.Vector2{ .x = x, .y = y - h };
                 var plants = ArrayList(Plant).init(allocator);
-                var t = Tile{.grow = terrain.grow, .plants = plants, .fertility = fertility, .pos = pos, .size = size, .v1 = v1, .v2 = v2, .v3 = v3, .color = color, .org_color = color };
+                var t = Tile{ .grow = terrain.grow, .plants = plants, .fertility = fertility, .pos = pos, .size = size, .v1 = v1, .v2 = v2, .v3 = v3, .color = color, .org_color = color };
                 try append_tile(self, row, t);
-                if (terrain.grow != PlantNames.none ) {
+                if (terrain.grow != PlantNames.none) {
                     fertility = @intToFloat(f32, rl.GetRandomValue(0, 1000));
                 }
                 plants = ArrayList(Plant).init(allocator);
-                v1 = rl.Vector2{ .x = x, .y = y};
-                v2 = rl.Vector2{ .x = x + w, .y = y - h};
-                v3 = rl.Vector2{ .x = x - w , .y = y - h};
-                t = Tile{.grow = terrain.grow, .plants = plants, .fertility = fertility, .pos = pos, .size = size, .v1 = v1, .v2 = v2, .v3 = v3, .color = color, .org_color = color };
+                v1 = rl.Vector2{ .x = x, .y = y };
+                v2 = rl.Vector2{ .x = x + w, .y = y - h };
+                v3 = rl.Vector2{ .x = x - w, .y = y - h };
+                t = Tile{ .grow = terrain.grow, .plants = plants, .fertility = fertility, .pos = pos, .size = size, .v1 = v1, .v2 = v2, .v3 = v3, .color = color, .org_color = color };
                 try append_tile(self, row, t);
 
                 x += w;
@@ -140,9 +140,9 @@ pub const Ground = struct {
         }
     }
     pub fn update(self: *Ground, allocator: std.mem.Allocator, dt: f32) !void {
-        for (self.tiles.items) |*row, i| {
+        for (self.tiles.items, 0..) |*row, i| {
             _ = i;
-            for (row.items) |*t, j| {
+            for (row.items, 0..) |*t, j| {
                 _ = j;
                 if (t.grow != PlantNames.none) {
                     t.fertility += dt;
@@ -154,7 +154,6 @@ pub const Ground = struct {
 
                         try p.init(allocator, x, y, false);
                         try t.plants.append(p);
-
                     }
                 }
 
@@ -169,8 +168,7 @@ pub const Ground = struct {
                         t.color.b -= 4;
                     }
                     t.burnTimer -= 20 * dt;
-                }
-                else {
+                } else {
                     var heal = rl.GetRandomValue(0, 10);
                     if (heal > 7) {
                         if (t.color.r > t.org_color.r) {
@@ -183,19 +181,17 @@ pub const Ground = struct {
                     }
                 }
             }
-
         }
-
     }
     pub fn predraw(_: *Ground) void {
-        var color = rl.Color{.r = 50, .g = 100, .b = 10, .a = 220};
+        var color = rl.Color{ .r = 50, .g = 100, .b = 10, .a = 220 };
 
         rl.DrawRectangle(0, @floatToInt(u16, lyra.start_y), lyra.screen_width, lyra.screen_height, color);
     }
     pub fn draw(self: *Ground) void {
-        for (self.tiles.items) |*row, i| {
+        for (self.tiles.items, 0..) |*row, i| {
             _ = i;
-            for (row.items) |*t, j| {
+            for (row.items, 0..) |*t, j| {
                 _ = j;
 
                 rl.DrawTriangle(t.v1, t.v2, t.v3, t.color);
@@ -203,11 +199,11 @@ pub const Ground = struct {
         }
     }
     pub fn deinit(self: *Ground) void {
-        for (self.tiles.items) |*row, i| {
+        for (self.tiles.items, 0..) |*row, i| {
             _ = i;
-            for (row.items) |*t, j| {
+            for (row.items, 0..) |*t, j| {
                 _ = j;
-                for (t.plants.items) |*p, k| {
+                for (t.plants.items, 0..) |*p, k| {
                     _ = k;
                     p.deinit();
                 }
@@ -218,4 +214,3 @@ pub const Ground = struct {
         self.tiles.deinit();
     }
 };
-

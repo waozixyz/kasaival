@@ -27,14 +27,10 @@ pub const screen = Screen{
     .deinitFn = deinit,
 };
 
-const ZEntities = enum {
-    player,
-    plant,
-    none
-};
+const ZEntities = enum { player, plant, none };
 const ZEntity = struct {
     item: ZEntities = ZEntities.none,
-    index : [3]usize = [3]usize{0, 0, 0},
+    index: [3]usize = [3]usize{ 0, 0, 0 },
     z: u16 = 0,
 };
 
@@ -64,18 +60,18 @@ fn init(allocator: std.mem.Allocator) !void {
 
 fn check_tile_collision() void {
     // check tile collision with player
-    for (ground.tiles.items) |*row, i| {
+    for (ground.tiles.items, 0..) |*row, i| {
         _ = i;
-        for (row.items) |*t, j| {
+        for (row.items, 0..) |*t, j| {
             _ = j;
-            if ( t.pos.x + t.size.x > lyra.cx and t.pos.x - t.size.x < lyra.cx + lyra.screen_width) {
+            if (t.pos.x + t.size.x > lyra.cx and t.pos.x - t.size.x < lyra.cx + lyra.screen_width) {
                 // find collision with player
                 var px = player.position.x;
                 var py = player.position.y;
                 var pr = player.get_radius();
 
-                if ( t.pos.y - t.size.y < py + pr and t.pos.y > py - pr) {
-                    if (t.pos.x - t.size.x < px + pr and t.pos.x + t.size.x> px - pr) {
+                if (t.pos.y - t.size.y < py + pr and t.pos.y > py - pr) {
+                    if (t.pos.x - t.size.x < px + pr and t.pos.x + t.size.x > px - pr) {
                         t.burnTimer = 2;
                     }
                 }
@@ -83,7 +79,6 @@ fn check_tile_collision() void {
         }
     }
 }
-
 
 // main update game loop
 fn update(allocator: std.mem.Allocator, dt: f32) !void {
@@ -99,7 +94,7 @@ fn update(allocator: std.mem.Allocator, dt: f32) !void {
 
     sky.update(dt);
     try ground.update(allocator, dt);
-    player.update();
+    try player.update();
 
     check_tile_collision();
 
@@ -108,26 +103,18 @@ fn update(allocator: std.mem.Allocator, dt: f32) !void {
     to_order = ArrayList(ZEntity).init(allocator);
 
     // plants to_order
-    for (ground.tiles.items) |*row, i| {
-        for (row.items) |*t, j| {
-            for (t.plants.items) |*p, k| {
+    for (ground.tiles.items, 0..) |*row, i| {
+        for (row.items, 0..) |*t, j| {
+            for (t.plants.items, 0..) |*p, k| {
                 try p.update(allocator);
-                var ze = ZEntity{
-                    .index = [3]usize{i, j, k},
-                    .z = @floatToInt(u16, p.start_y),
-                    .item = ZEntities.plant
-                };
+                var ze = ZEntity{ .index = [3]usize{ i, j, k }, .z = @floatToInt(u16, p.start_y), .item = ZEntities.plant };
                 try to_order.append(ze);
-
             }
-        }    
+        }
     }
 
     // player to sort
-    var p_ze = ZEntity{
-        .z = @floatToInt(u16, player.position.y + player.get_radius()),
-        .item = ZEntities.player
-    };
+    var p_ze = ZEntity{ .z = @floatToInt(u16, player.position.y + player.get_radius()), .item = ZEntities.player };
     try to_order.append(p_ze);
 
     sort(ZEntity, to_order.items, {}, compareLeq);
@@ -144,7 +131,7 @@ pub fn predraw() void {
 pub fn draw() void {
     ground.draw();
 
-    for (to_order.items) |*ze, i| {
+    for (to_order.items, 0..) |*ze, i| {
         _ = i;
         switch (ze.item) {
             ZEntities.player => {
@@ -154,13 +141,12 @@ pub fn draw() void {
                 var p = ground.tiles.items[ze.index[0]].items[ze.index[1]].plants.items[ze.index[2]];
                 p.draw();
             },
-            ZEntities.none => {}
-
+            ZEntities.none => {},
         }
     }
 
-    var start = rl.Vector2{.x = 0, .y = 0 };
-    var end = rl.Vector2{.x = lyra.screen_width, .y = lyra.screen_height};
+    var start = rl.Vector2{ .x = 0, .y = 0 };
+    var end = rl.Vector2{ .x = lyra.screen_width, .y = lyra.screen_height };
 
     var color = rl.BLACK;
     color.a = fade_in;
