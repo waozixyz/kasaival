@@ -12,7 +12,7 @@ const ArrayList = std.ArrayList;
 pub const PlantNames = enum { oak, none };
 
 pub const Terrain = struct {
-    w: f32 = -1,
+    tiles: usize = 0,
     grow: PlantNames = PlantNames.none,
     cs_r: [2]u8 = [2]u8{ 16, 60 },
     cs_g: [2]u8 = [2]u8{ 120, 200 },
@@ -47,11 +47,11 @@ fn get_color_difference(c1: u8, c2: u8, s: f32) u8 {
     return @floatToInt(u8, utils.clamp(@intToFloat(f32, c2) * s + @intToFloat(f32, c1) * (1 - s), 0, 255));
 }
 
-fn get_color_between_terrains(x: f32, tw: f32, t1: Terrain, t2: Terrain) rl.Color {
+fn get_color(i: usize, t1: Terrain, t2: Terrain) rl.Color {
     var c1 = get_terrain_color_u8(t1);
     var c2 = get_terrain_color_u8(t2);
 
-    var s: f32 = (x - tw) / t1.w;
+    var s: f32 = @intToFloat(f32, i) / @intToFloat(f32, t1.tiles);
     s = utils.clamp(s, 0, 1);
     return rl.Color{
         .r = get_color_difference(c1[0], c2[0], s),
@@ -61,11 +61,6 @@ fn get_color_between_terrains(x: f32, tw: f32, t1: Terrain, t2: Terrain) rl.Colo
     };
 }
 
-fn get_color(x: f32, tw: f32, terrains: [5]Terrain, terrain_index: usize) rl.Color {
-    var t1 = terrains[terrain_index];
-    var t2 = terrains[terrain_index + 1];
-    return get_color_between_terrains(x, tw, t1, t2);
-}
 
 pub const Ground = struct {
     tiles: ArrayList(ArrayList(Tile)) = undefined,
@@ -76,64 +71,53 @@ pub const Ground = struct {
     pub fn init(self: *Ground, allocator: std.mem.Allocator, level: Level) !void {
         self.tiles = ArrayList(ArrayList(Tile)).init(allocator);
 
-        var tile_w = level.ground.tile_w;
-        var tile_h = level.ground.tile_h;
+        var w = level.ground.tile_w;
+        var h = level.ground.tile_h;
         var terrains = level.ground.terrains;
 
-        var scale = config.start_y / config.end_y * config.sx;
-        var y = config.start_y + tile_h * scale;
+        var y = config.start_y + h;
 
         for (terrains) |*t, i| {
             _ = i;
-            if (t.w != -1) {
-                config.end_x += t.w - tile_w * config.sx;
+            if (t.tiles != -1) {
+                config.end_x += @intToFloat(f32, t.tiles) * w - w;
             }
         }
         var row: usize = 0;
-        while (y < config.end_y + tile_h) {
-            var x: f32 = 0;
-            scale = y / config.end_y * config.sx;
-            var w: f32 = tile_w * scale;
-            var h: f32 = tile_h * scale;
+        while (y < config.end_y + h) {
             try self.tiles.append((ArrayList(Tile).init(allocator)));
+            var x: f32 = 0;
             var terrain_index: usize = 0;
-            var terrain = terrains[terrain_index];
-            var total_w: f32 = 0;
-            while (x < total_w + terrain.w) {
-                if (x + w > total_w + terrain.w and terrain_index < terrains.len - 1) {
-                    total_w += terrain.w;
-                    terrain_index += 1;
-                    terrain = terrains[terrain_index];
-                    if (terrain.w == -1) {
-                        break;
+            while (terrain_index < terrains.len ) {
+                var terrain = terrains[terrain_index];
+                var i: usize = 0;
+                while (i < terrain.tiles) {
+                    var color = get_color(i, terrain, terrains[terrain_index + 1]);
+                    var pos = rl.Vector2{ .x = x, .y = y };
+                    var size = rl.Vector2{ .x = w, .y = h };
+                    var fertility: f32 = 0;
+                    if (terrain.grow != PlantNames.none) {
+                        fertility = @intToFloat(f32, rl.GetRandomValue(0, 1000));
                     }
+                    var v1 = rl.Vector2{ .x = x - w, .y = y };
+                    var v2 = rl.Vector2{ .x = x + w, .y = y };
+                    var v3 = rl.Vector2{ .x = x, .y = y - h };
+                    var plants = ArrayList(Plant).init(allocator);
+                    var t = Tile{ .grow = terrain.grow, .plants = plants, .fertility = fertility, .pos = pos, .size = size, .v1 = v1, .v2 = v2, .v3 = v3, .color = color, .org_color = color };
+                    try append_tile(self, row, t);
+                    if (terrain.grow != PlantNames.none) {
+                        fertility = @intToFloat(f32, rl.GetRandomValue(0, 1000));
+                    }
+                    plants = ArrayList(Plant).init(allocator);
+                    v1 = rl.Vector2{ .x = x, .y = y };
+                    v2 = rl.Vector2{ .x = x + w, .y = y - h };
+                    v3 = rl.Vector2{ .x = x - w, .y = y - h };
+                    t = Tile{ .grow = terrain.grow, .plants = plants, .fertility = fertility, .pos = pos, .size = size, .v1 = v1, .v2 = v2, .v3 = v3, .color = color, .org_color = color };
+                    try append_tile(self, row, t);
+                    i += 1;
+                    x += w;
                 }
-
-                var color = get_color(x, total_w, terrains, terrain_index);
-
-                var pos = rl.Vector2{ .x = x, .y = y };
-                var size = rl.Vector2{ .x = w, .y = h };
-                var fertility: f32 = 0;
-                if (terrain.grow != PlantNames.none) {
-                    fertility = @intToFloat(f32, rl.GetRandomValue(0, 1000));
-                }
-                var v1 = rl.Vector2{ .x = x - w, .y = y };
-                var v2 = rl.Vector2{ .x = x + w, .y = y };
-                var v3 = rl.Vector2{ .x = x, .y = y - h };
-                var plants = ArrayList(Plant).init(allocator);
-                var t = Tile{ .grow = terrain.grow, .plants = plants, .fertility = fertility, .pos = pos, .size = size, .v1 = v1, .v2 = v2, .v3 = v3, .color = color, .org_color = color };
-                try append_tile(self, row, t);
-                if (terrain.grow != PlantNames.none) {
-                    fertility = @intToFloat(f32, rl.GetRandomValue(0, 1000));
-                }
-                plants = ArrayList(Plant).init(allocator);
-                v1 = rl.Vector2{ .x = x, .y = y };
-                v2 = rl.Vector2{ .x = x + w, .y = y - h };
-                v3 = rl.Vector2{ .x = x - w, .y = y - h };
-                t = Tile{ .grow = terrain.grow, .plants = plants, .fertility = fertility, .pos = pos, .size = size, .v1 = v1, .v2 = v2, .v3 = v3, .color = color, .org_color = color };
-                try append_tile(self, row, t);
-
-                x += w;
+                terrain_index += 1;
             }
             row += 1;
             y += h;

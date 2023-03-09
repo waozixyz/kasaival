@@ -98,7 +98,6 @@ pub const Player = struct {
         } else if (y + dy < min_y and dy < 0) {
             self.position.y = min_y;
         } else {
-            self.flame.scale = self.position.y / config.end_y * config.sx;
             self.position.y += dy;
         }
         try self.flame.update(self.position);
