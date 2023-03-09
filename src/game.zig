@@ -103,10 +103,10 @@ pub fn mainLoop() !void {
     //----------------------------------------------------------------------------------
 
     rl.BeginDrawing();
+    rl.ClearBackground(rl.BLACK);
 
     // Begin drawing to a render texture
     rl.BeginTextureMode(target);
-    rl.ClearBackground(rl.BLACK);
 
     // Draw the static elements of the current screen
     current_screen.staticDrawFn();

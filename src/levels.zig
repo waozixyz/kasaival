@@ -5,6 +5,7 @@ const Ground = @import("level.zig").Ground;
 const rl = @import("raylib/raylib.zig");
 
 pub const daisyland = Level{
+    .music = "assets/music/StrangerThings.ogg",
     .ground = Ground{
         .tile_w = 18,
         .tile_h = 18,

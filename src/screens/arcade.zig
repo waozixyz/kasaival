@@ -8,6 +8,7 @@ const Plant = @import("../plant.zig").Plant;
 const Level = @import("../level.zig").Level;
 const levels = @import("../levels.zig");
 const HUD = @import("../hud.zig").HUD;
+const tokenize = std.mem.tokenize;
 
 const log = @import("../log.zig");
 const config = @import("../config.zig");
@@ -51,11 +52,16 @@ var item_count: usize = 0;
 var playing: bool = true;
 var fade_in: u8 = 255;
 var level: Level = levels.daisyland;
-
+var music: rl.Music = undefined;
 fn init(allocator: std.mem.Allocator) !void {
+    music = rl.LoadMusicStream(level.music);
+    
+    rl.PlayMusicStream(music);
+
     try sky.init(allocator);
     try ground.init(allocator, level);
     player.init(allocator);
+
 }
 
 fn check_tile_collision() void {
@@ -82,6 +88,8 @@ fn check_tile_collision() void {
 
 // main update game loop
 fn update(allocator: std.mem.Allocator, dt: f32) !void {
+    rl.UpdateMusicStream(music);   // Update music buffer with new stream data
+
     if (fade_in > 10) {
         fade_in -= 10;
         player.frozen = true;
@@ -153,6 +161,7 @@ pub fn draw() void {
     rl.DrawRectangleV(start, end, color);
 }
 pub fn deinit() void {
+    rl.UnloadMusicStream(music);   // Unload music stream buffers from RAM
     sky.deinit();
     ground.deinit();
     player.deinit();

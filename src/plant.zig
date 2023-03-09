@@ -106,7 +106,6 @@ pub const Plant = struct {
         self.current_row += 1;
     }
     pub fn init(self: *Plant, allocator: std.mem.Allocator, x: f32, y: f32, random_row: bool) anyerror!void {
-        const scale = y / config.end_y * config.sx;
         self.start_y = y;
         self.branches = ArrayList(ArrayList(Branch)).init(allocator);
         self.leaves = ArrayList(Leaf).init(allocator);
@@ -117,8 +116,8 @@ pub const Plant = struct {
             .deg = angle,
             .v1 = rl.Vector2{ .x = x, .y = y },
             .v2 = rl.Vector2{ .x = x, .y = y - self.h },
-            .w = self.w * scale,
-            .h = self.h * scale,
+            .w = self.w,
+            .h = self.h,
             .color = get_color(self.cs_branch),
         });
         self.grow_timer = rl.GetRandomValue(0, self.grow_time);
