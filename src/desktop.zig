@@ -4,12 +4,31 @@ const fmt = std.fmt;
 const log = @import("log.zig");
 const game = @import("game.zig");
 const raylib = @import("raylib/raylib.zig");
+const ZecsiAllocator = @import("allocator.zig").ZecsiAllocator;
+
+var zalloc = ZecsiAllocator{};
 
 pub fn main() anyerror!void {
-    try game.start();
-    defer game.stop();
+    const allocator = zalloc.allocator();
+    defer {
+        log.info("free memory...", .{});
+        if (zalloc.deinit()) {
+            log.err("memory leaks detected!", .{});
+        }
+    }
 
+    const exePath = try std.fs.selfExePathAlloc(allocator);
+    defer allocator.free(exePath);
+    
+    log.info("starting game...", .{});
+    try game.start(allocator);
+
+    defer {
+        log.info("stopping game...", .{});
+        game.stop();
+    }
+    
     while (!raylib.WindowShouldClose()) {
-        game.loop(raylib.GetFrameTime());
+        try game.mainLoop();
     }
 }

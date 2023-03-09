@@ -1,6 +1,6 @@
 const rl = @import("raylib/raylib.zig");
 
-pub fn clamp(val: f16, lower: f16, higher: f16) f16 {
+pub fn clamp(val: f32, lower: f32, higher: f32) f32 {
     if (val < lower) {
         return lower;
     } else if (val > higher) {

@@ -1,6 +1,6 @@
 const std = @import("std");
 const rl = @import("raylib/raylib.zig");
-const common = @import("common.zig");
+const config = @import("config.zig");
 const utils = @import("utils.zig");
 const Plant = @import("plant.zig").Plant;
 const Level = @import("level.zig").Level;
@@ -12,7 +12,7 @@ const ArrayList = std.ArrayList;
 pub const PlantNames = enum { oak, none };
 
 pub const Terrain = struct {
-    w: f16 = -1,
+    w: f32 = -1,
     grow: PlantNames = PlantNames.none,
     cs_r: [2]u8 = [2]u8{ 16, 60 },
     cs_g: [2]u8 = [2]u8{ 120, 200 },
@@ -43,15 +43,15 @@ fn get_terrain_color_u8(t1: Terrain) [4]u8 {
     return [4]u8{ rand_u8(t1.cs_r), rand_u8(t1.cs_g), rand_u8(t1.cs_b), rand_u8(t1.cs_a) };
 }
 
-fn get_color_difference(c1: u8, c2: u8, s: f16) u8 {
-    return @floatToInt(u8, utils.clamp(@intToFloat(f16, c2) * s + @intToFloat(f16, c1) * (1 - s), 0, 255));
+fn get_color_difference(c1: u8, c2: u8, s: f32) u8 {
+    return @floatToInt(u8, utils.clamp(@intToFloat(f32, c2) * s + @intToFloat(f32, c1) * (1 - s), 0, 255));
 }
 
-fn get_color_between_terrains(x: f16, tw: f16, t1: Terrain, t2: Terrain) rl.Color {
+fn get_color_between_terrains(x: f32, tw: f32, t1: Terrain, t2: Terrain) rl.Color {
     var c1 = get_terrain_color_u8(t1);
     var c2 = get_terrain_color_u8(t2);
 
-    var s: f16 = (x - tw) / t1.w;
+    var s: f32 = (x - tw) / t1.w;
     s = utils.clamp(s, 0, 1);
     return rl.Color{
         .r = get_color_difference(c1[0], c2[0], s),
@@ -61,7 +61,7 @@ fn get_color_between_terrains(x: f16, tw: f16, t1: Terrain, t2: Terrain) rl.Colo
     };
 }
 
-fn get_color(x: f16, tw: f16, terrains: [5]Terrain, terrain_index: usize) rl.Color {
+fn get_color(x: f32, tw: f32, terrains: [5]Terrain, terrain_index: usize) rl.Color {
     var t1 = terrains[terrain_index];
     var t2 = terrains[terrain_index + 1];
     return get_color_between_terrains(x, tw, t1, t2);
@@ -80,25 +80,25 @@ pub const Ground = struct {
         var tile_h = level.ground.tile_h;
         var terrains = level.ground.terrains;
 
-        var scale = common.start_y / common.end_y * common.sx;
-        var y = common.start_y + tile_h * scale;
+        var scale = config.start_y / config.end_y * config.sx;
+        var y = config.start_y + tile_h * scale;
 
-        for (terrains, 0..) |t, i| {
+        for (terrains) |*t, i| {
             _ = i;
             if (t.w != -1) {
-                common.end_x += t.w - tile_w * common.sx;
+                config.end_x += t.w - tile_w * config.sx;
             }
         }
         var row: usize = 0;
-        while (y < common.end_y + tile_h) {
-            var x: f16 = 0;
-            scale = y / common.end_y * common.sx;
-            var w: f16 = tile_w * scale;
-            var h: f16 = tile_h * scale;
+        while (y < config.end_y + tile_h) {
+            var x: f32 = 0;
+            scale = y / config.end_y * config.sx;
+            var w: f32 = tile_w * scale;
+            var h: f32 = tile_h * scale;
             try self.tiles.append((ArrayList(Tile).init(allocator)));
             var terrain_index: usize = 0;
             var terrain = terrains[terrain_index];
-            var total_w: f16 = 0;
+            var total_w: f32 = 0;
             while (x < total_w + terrain.w) {
                 if (x + w > total_w + terrain.w and terrain_index < terrains.len - 1) {
                     total_w += terrain.w;
@@ -140,9 +140,9 @@ pub const Ground = struct {
         }
     }
     pub fn update(self: *Ground, allocator: std.mem.Allocator, dt: f32) !void {
-        for (self.tiles.items, 0..) |*row, i| {
+        for (self.tiles.items) |*row, i| {
             _ = i;
-            for (row.items, 0..) |*t, j| {
+            for (row.items) |*t, j| {
                 _ = j;
                 if (t.grow != PlantNames.none) {
                     t.fertility += dt;
@@ -186,12 +186,12 @@ pub const Ground = struct {
     pub fn predraw(_: *Ground) void {
         var color = rl.Color{ .r = 50, .g = 100, .b = 10, .a = 220 };
 
-        rl.DrawRectangle(0, @floatToInt(u16, common.start_y), common.screen_width, common.screen_height, color);
+        rl.DrawRectangle(0, @floatToInt(u16, config.start_y), config.screen_width, config.screen_height, color);
     }
     pub fn draw(self: *Ground) void {
-        for (self.tiles.items, 0..) |*row, i| {
+        for (self.tiles.items) |*row, i| {
             _ = i;
-            for (row.items, 0..) |*t, j| {
+            for (row.items) |*t, j| {
                 _ = j;
 
                 rl.DrawTriangle(t.v1, t.v2, t.v3, t.color);
@@ -199,11 +199,11 @@ pub const Ground = struct {
         }
     }
     pub fn deinit(self: *Ground) void {
-        for (self.tiles.items, 0..) |*row, i| {
+        for (self.tiles.items) |*row, i| {
             _ = i;
-            for (row.items, 0..) |*t, j| {
+            for (row.items) |*t, j| {
                 _ = j;
-                for (t.plants.items, 0..) |*p, k| {
+                for (t.plants.items) |*p, k| {
                     _ = k;
                     p.deinit();
                 }

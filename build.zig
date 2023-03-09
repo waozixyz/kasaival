@@ -1,11 +1,12 @@
 const std = @import("std");
 const fs = std.fs;
+
 pub const APP_NAME = "Kasaival";
 
 const raylibSrc = "src/raylib/raylib/src/";
 const bindingSrc = "src/raylib/";
 
-pub fn build(b: *std.Build) !void {
+pub fn build(b: *std.build.Builder) !void {
 
     // Standard target options allows the person running `zig build` to choose
     // what target to build for. Here we do not override the defaults, which
@@ -15,25 +16,20 @@ pub fn build(b: *std.Build) !void {
 
     // Standard release options allow the person running `zig build` to select
     // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall.
-    const optimize = b.standardOptimizeOption(.{});
+    const mode = b.standardReleaseOptions();
 
     switch (target.getOsTag()) {
         .wasi, .emscripten => {
-            const emscriptenSrc = "src/raylib/emscripten/";
+            const emscriptenSrc = "emscripten/";
             const webCachedir = "zig-cache/web/";
             const webOutdir = "zig-out/web/";
-
+            
             std.log.info("building for emscripten\n", .{});
             if (b.sysroot == null) {
                 std.log.err("\n\nUSAGE: Please build with 'zig build -Drelease-small -Dtarget=wasm32-wasi --sysroot \"$EMSDK/upstream/emscripten\"'\n\n", .{});
                 return error.SysRootExpected;
             }
-            const lib = b.addStaticLibrary(.{
-                .name = APP_NAME,
-                .root_source_file = std.build.FileSource.relative("src/web.zig"),
-                .optimize = optimize,
-                .target = target,
-            });
+            const lib = b.addStaticLibrary(APP_NAME, "src/web.zig");
             lib.addIncludePath(raylibSrc);
 
             const emcc_file = switch (b.host.target.os.tag) {
@@ -70,7 +66,6 @@ pub fn build(b: *std.Build) !void {
             const rmodelsO = b.addSystemCommand(&.{ emcc_path, "-Os", warnings, "-c", raylibSrc ++ "rmodels.c", "-o", webCachedir ++ "rmodels.o", "-Os", warnings, "-DPLATFORM_WEB", "-DGRAPHICS_API_OPENGL_ES2" });
             const utilsO = b.addSystemCommand(&.{ emcc_path, "-Os", warnings, "-c", raylibSrc ++ "utils.c", "-o", webCachedir ++ "utils.o", "-Os", warnings, "-DPLATFORM_WEB" });
             const raudioO = b.addSystemCommand(&.{ emcc_path, "-Os", warnings, "-c", raylibSrc ++ "raudio.c", "-o", webCachedir ++ "raudio.o", "-Os", warnings, "-DPLATFORM_WEB" });
-
             const libraylibA = b.addSystemCommand(&.{
                 emar_path,
                 "rcs",
@@ -101,22 +96,21 @@ pub fn build(b: *std.Build) !void {
             _ = fs.cwd().statFile(webCachedir ++ "libraylib.a") catch {
                 lib.step.dependOn(&emranlib.step);
             };
-
-            // lib.setTarget(target);
-            // lib.setBuildMode(mode);
+            //--- from:  https://github.com/floooh/pacman.zig/blob/main/build.zig -----------------
+            // var wasm32 = target;
+            // wasm32.os_tag = .emscripten;
+            lib.setTarget(target);
+            lib.setBuildMode(mode);
             lib.defineCMacro("__EMSCRIPTEN__", null);
-            lib.defineCMacro("PLATFORM_WEB", null);
             std.log.info("emscripten include path: {s}", .{include_path});
             lib.addIncludePath(include_path);
-            lib.addIncludePath(emscriptenSrc);
             lib.addIncludePath(bindingSrc);
             lib.addIncludePath(raylibSrc);
-            lib.addIncludePath(raylibSrc ++ "extras/");
 
             lib.setOutputDir(webCachedir);
             lib.install();
 
-            const shell = switch (optimize) {
+            const shell = switch (mode) {
                 .Debug => emscriptenSrc ++ "shell.html",
                 else => emscriptenSrc ++ "minshell.html",
             };
@@ -125,14 +119,12 @@ pub fn build(b: *std.Build) !void {
                 emcc_path,
                 "-o",
                 webOutdir ++ "index.html",
-
                 emscriptenSrc ++ "entry.c",
                 bindingSrc ++ "marshal.c",
 
                 webCachedir ++ "lib" ++ APP_NAME ++ ".a",
                 "-I.",
                 "-I" ++ raylibSrc,
-                "-I" ++ emscriptenSrc,
                 "-I" ++ bindingSrc,
                 "-L.",
                 "-L" ++ webCachedir,
@@ -140,6 +132,8 @@ pub fn build(b: *std.Build) !void {
                 "-l" ++ APP_NAME,
                 "--shell-file",
                 shell,
+                "--js-library",
+                "emscripten/lib.js",
                 "-DPLATFORM_WEB",
                 "-sUSE_GLFW=3",
                 "-sWASM=1",
@@ -157,20 +151,13 @@ pub fn build(b: *std.Build) !void {
                 "--source-map-base",
                 "-O1",
                 "-Os",
-                // "-sLLD_REPORT_UNDEFINED",
-                "-sERROR_ON_UNDEFINED_SYMBOLS=0",
-
-                // optimizations
-                "-O1",
-                "-Os",
-
                 // "-sUSE_PTHREADS=1",
                 // "--profiling",
                 // "-sTOTAL_STACK=128MB",
                 // "-sMALLOC='emmalloc'",
                 // "--no-entry",
                 "-sEXPORTED_FUNCTIONS=['_malloc','_free','_main', '_emsc_main','_emsc_set_window_size']",
-                "-sEXPORTED_RUNTIME_METHODS=ccall,cwrap",
+                "-sEXPORTED_RUNTIME_METHODS=ccall,cwrap,UTF8ToString,allocateUTF8,free",
             });
 
             emcc.step.dependOn(&lib.step);
@@ -178,19 +165,15 @@ pub fn build(b: *std.Build) !void {
             b.getInstallStep().dependOn(&emcc.step);
             //-------------------------------------------------------------------------------------
 
-            std.log.info("\n\nOutput files will be in {s}\n---\ncd {s}\npython -m http.server\n---\n\nbuilding...", .{ webOutdir, webOutdir });
         },
         else => {
             std.log.info("building for desktop\n", .{});
-            const exe = b.addExecutable(.{
-                .name = APP_NAME,
-                .root_source_file = std.build.FileSource.relative("src/desktop.zig"),
-                .optimize = optimize,
-                .target = target,
-            });
+            const exe = b.addExecutable(APP_NAME, "src/desktop.zig");
+            exe.setTarget(target);
+            exe.setBuildMode(mode);
 
             const rayBuild = @import("src/raylib/raylib/src/build.zig");
-            const raylib = rayBuild.addRaylib(b, target, optimize);
+            const raylib = rayBuild.addRaylib(b, target);
             exe.linkLibrary(raylib);
             exe.addIncludePath(raylibSrc);
             exe.addIncludePath(raylibSrc ++ "extras/");

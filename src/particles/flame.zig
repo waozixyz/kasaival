@@ -1,6 +1,6 @@
 const std = @import("std");
 const rl = @import("../raylib/raylib.zig");
-const common = @import("../common.zig");
+const config = @import("../config.zig");
 
 const print = std.debug.print;
 const ArrayList = std.ArrayList;
@@ -8,10 +8,10 @@ const ArrayList = std.ArrayList;
 const Particle = struct {
     start_y: u16,
     position: rl.Vector2,
-    lifetime: f16,
+    lifetime: f32,
     vel_start: rl.Vector2,
     vel_end: rl.Vector2,
-    shrink_factor: f16,
+    shrink_factor: f32,
     size: f32,
     color: [4]u8,
     color_start: [4]u8,
@@ -21,9 +21,9 @@ const Particle = struct {
 pub const Flame = struct {
     amount: u8 = 70,
 
-    lifetime: f16 = 40,
+    lifetime: f32 = 40,
     scale: f32 = 1,
-    radius: f16 = 14,
+    radius: f32 = 14,
     color_start: [4]u8 = [4]u8{ 200, 50, 80, 200 },
     color_end: [4]u8 = [4]u8{ 120, 30, 60, 20 },
     particles: ArrayList(Particle) = undefined,
@@ -43,9 +43,9 @@ pub const Flame = struct {
         self.particles = ArrayList(Particle).init(allocator);
     }
     fn get_particle(self: *Flame, position: rl.Vector2) Particle {
-        const vel_x: f32 = @intToFloat(f16, rl.GetRandomValue(-3, 3)) * self.scale;
-        const vel_x_end = (@intToFloat(f16, rl.GetRandomValue(-2, 2)) - vel_x) * self.scale;
-        const shrink_factor = @intToFloat(f16, rl.GetRandomValue(95, 90)) * 0.01;
+        const vel_x: f32 = @intToFloat(f32, rl.GetRandomValue(-3, 3)) * self.scale;
+        const vel_x_end = (@intToFloat(f32, rl.GetRandomValue(-2, 2)) - vel_x) * self.scale;
+        const shrink_factor = @intToFloat(f32, rl.GetRandomValue(95, 90)) * 0.01;
         const particle_size = self.radius;
         const size = particle_size * self.scale;
         const vel_y = -4 * self.scale;
@@ -70,9 +70,9 @@ pub const Flame = struct {
         return self.radius * self.scale;
     }
 
-    fn update_colors(p: *Particle, pp: f16) void {
-        for (p.color, 0..) |_, i| {
-            p.color[i] = @floatToInt(u8, @intToFloat(f16, p.color_start[i]) * pp + @intToFloat(f16, p.color_end[i]) * (1 - pp));
+    fn update_colors(p: *Particle, pp: f32) void {
+        for (p.color) |_, i| {
+            p.color[i] = @floatToInt(u8, @intToFloat(f32, p.color_start[i]) * pp + @intToFloat(f32, p.color_end[i]) * (1 - pp));
         }
     }
 
@@ -81,7 +81,7 @@ pub const Flame = struct {
             var p = self.get_particle(position);
             try self.particles.append(p);
         }
-        for (self.particles.items, 0..) |*p, i| {
+        for (self.particles.items) |*p, i| {
             if (p.lifetime <= 0) {
                 self.particles.items[i] = self.get_particle(position);
             }

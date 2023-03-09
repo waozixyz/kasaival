@@ -1,6 +1,6 @@
 const std = @import("std");
 const rl = @import("../raylib/raylib.zig");
-const common = @import("../common.zig");
+const config = @import("../config.zig");
 const Screen = @import("screen.zig").Screen;
 const ScreenNames = @import("../screens.zig").ScreenNames;
 const screens = @import("../screens.zig");
@@ -15,15 +15,15 @@ var texture: rl.Texture2D = undefined;
 pub const screen = Screen{
     .initFn = init,
     .updateFn = update,
-    .predrawFn = predraw,
+    .staticDrawFn = staticDraw,
     .deinitFn = deinit,
 };
 
-fn init(_: std.mem.Allocator) !void {
+pub fn init(_: std.mem.Allocator) !void {
     texture = rl.LoadTexture("assets/menu.png");
 }
 
-fn update(_: std.mem.Allocator, _: f32) !void {
+pub fn update(_: std.mem.Allocator, _: f32) !void {
     if (rl.IsMouseButtonPressed(rl.MouseButton.MOUSE_BUTTON_LEFT) or rl.GetKeyPressed() > 0) {
         fade_out = true;
     }
@@ -39,9 +39,9 @@ fn update(_: std.mem.Allocator, _: f32) !void {
     }
 }
 
-fn predraw() void {
+pub fn staticDraw() void {
     var start = rl.Vector2{ .x = 0, .y = 0 };
-    var end = rl.Vector2{ .x = common.screen_width, .y = common.screen_height };
+    var end = rl.Vector2{ .x = config.screen_width, .y = config.screen_height };
 
     var color = rl.WHITE;
     color.a = alpha;
@@ -61,6 +61,6 @@ fn predraw() void {
     rl.DrawRectangleV(start, end, color);
 }
 
-fn deinit() void {
+pub fn deinit() void {
     rl.UnloadTexture(texture);
 }

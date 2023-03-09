@@ -79,12 +79,11 @@ const EmscriptenAllocator = struct {
         return @intToPtr(*[*]u8, @ptrToInt(ptr) - @sizeOf(usize));
     }
 
-    fn alignedAlloc(len: usize, log2_align: u8) ?[*]u8 {
-        const alignment = @as(usize, 1) << @intCast(Allocator.Log2Align, log2_align);
+    fn alignedAlloc(len: usize, alignment: usize) ?[*]u8 {
         if (supports_posix_memalign) {
             // The posix_memalign only accepts alignment values that are a
             // multiple of the pointer size
-            const eff_alignment = @max(alignment, @sizeOf(usize));
+            const eff_alignment = std.math.max(alignment, @sizeOf(usize));
 
             var aligned_ptr: ?*anyopaque = undefined;
             if (c.posix_memalign(&aligned_ptr, eff_alignment, len) != 0)
@@ -127,42 +126,58 @@ const EmscriptenAllocator = struct {
     fn alloc(
         _: *anyopaque,
         len: usize,
-        log2_align: u8,
+        alignment: u29,
+        len_align: u29,
         return_address: usize,
-    ) ?[*]u8 {
+    ) error{OutOfMemory}![]u8 {
         _ = return_address;
         assert(len > 0);
-        return alignedAlloc(len, log2_align);
+        assert(std.math.isPowerOfTwo(alignment));
+
+        var ptr = alignedAlloc(len, alignment) orelse return error.OutOfMemory;
+        if (len_align == 0) {
+            return ptr[0..len];
+        }
+        const full_len = init: {
+            if (EmscriptenAllocator.supports_malloc_size) {
+                const s = alignedAllocSize(ptr);
+                assert(s >= len);
+                break :init s;
+            }
+            break :init len;
+        };
+        return ptr[0..mem.alignBackwardAnyAlign(full_len, len_align)];
     }
 
     fn resize(
         _: *anyopaque,
         buf: []u8,
-        log2_buf_align: u8,
+        buf_align: u29,
         new_len: usize,
+        len_align: u29,
         return_address: usize,
-    ) bool {
-        _ = log2_buf_align;
+    ) ?usize {
+        _ = buf_align;
         _ = return_address;
         if (new_len <= buf.len) {
-            return true;
+            return mem.alignAllocLen(buf.len, new_len, len_align);
         }
-        if (@hasDecl(c, "malloc_size")) {
+        if (EmscriptenAllocator.supports_malloc_size) {
             const full_len = alignedAllocSize(buf.ptr);
             if (new_len <= full_len) {
-                return true;
+                return mem.alignAllocLen(full_len, new_len, len_align);
             }
         }
-        return false;
+        return null;
     }
 
     fn free(
         _: *anyopaque,
         buf: []u8,
-        log2_buf_align: u8,
+        buf_align: u29,
         return_address: usize,
     ) void {
-        _ = log2_buf_align;
+        _ = buf_align;
         _ = return_address;
         alignedFree(buf.ptr);
     }

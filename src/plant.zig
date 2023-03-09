@@ -4,7 +4,7 @@ const rl = @import("raylib/raylib.zig");
 const print = std.debug.print;
 const math = std.math;
 const ArrayList = std.ArrayList;
-const common = @import("common.zig");
+const config = @import("config.zig");
 const log = @import("log.zig");
 
 pub const Branch = struct {
@@ -47,7 +47,7 @@ pub const Plant = struct {
     right_x: f32 = -9999999,
     grow_timer: i32 = 0,
     grow_time: i32 = 20,
-    scale: f16 = 1,
+    scale: f32 = 1,
     w: f32 = 10,
     h: f32 = 15,
     start_y: f32 = 0,
@@ -93,7 +93,7 @@ pub const Plant = struct {
         self.append_row(allocator) catch |err| log.err("ERROR: {?}", .{err});
         var prev_row = self.branches.items[self.current_row].items;
 
-        for (prev_row, 0..) |*b, i| {
+        for (prev_row) |*b, i| {
             _ = i;
             var split = rl.GetRandomValue(0, 100);
             if (self.split_chance > split) {
@@ -106,7 +106,7 @@ pub const Plant = struct {
         self.current_row += 1;
     }
     pub fn init(self: *Plant, allocator: std.mem.Allocator, x: f32, y: f32, random_row: bool) anyerror!void {
-        const scale = y / common.end_y * common.sx;
+        const scale = y / config.end_y * config.sx;
         self.start_y = y;
         self.branches = ArrayList(ArrayList(Branch)).init(allocator);
         self.leaves = ArrayList(Leaf).init(allocator);
@@ -139,8 +139,8 @@ pub const Plant = struct {
         }
     }
     pub fn draw(self: *Plant) void {
-        for (self.branches.items, 0..) |*row, i| {
-            for (row.items, 0..) |*b, j| {
+        for (self.branches.items) |*row, i| {
+            for (row.items) |*b, j| {
                 _ = j;
 
                 var v2 = b.v2;
@@ -151,7 +151,7 @@ pub const Plant = struct {
 
                 rl.DrawLineEx(b.v1, v2, b.w, b.color);
             }
-            for (self.leaves.items, 0..) |*l, j| {
+            for (self.leaves.items) |*l, j| {
                 _ = j;
                 if (l.row < i and !(i == self.current_row and self.grow_timer > 0)) {
                     rl.DrawCircleV(l.v1, l.r, l.color);
@@ -161,7 +161,7 @@ pub const Plant = struct {
         }
     }
     pub fn deinit(self: *Plant) void {
-        for (self.branches.items, 0..) |*row, i| {
+        for (self.branches.items) |*row, i| {
             _ = i;
             row.deinit();
         }

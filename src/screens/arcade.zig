@@ -10,9 +10,9 @@ const levels = @import("../levels.zig");
 const HUD = @import("../hud.zig").HUD;
 
 const log = @import("../log.zig");
-const common = @import("../common.zig");
+const config = @import("../config.zig");
 const utils = @import("../utils.zig");
-const Time = @import("../common.zig").Time;
+const Time = @import("../config.zig").Time;
 
 const sort = std.sort.sort;
 const print = std.debug.print;
@@ -23,7 +23,7 @@ pub const screen = Screen{
     .initFn = init,
     .updateFn = update,
     .drawFn = draw,
-    .predrawFn = predraw,
+    .staticDrawFn = staticDraw,
     .deinitFn = deinit,
 };
 
@@ -60,11 +60,11 @@ fn init(allocator: std.mem.Allocator) !void {
 
 fn check_tile_collision() void {
     // check tile collision with player
-    for (ground.tiles.items, 0..) |*row, i| {
+    for (ground.tiles.items) |*row, i| {
         _ = i;
-        for (row.items, 0..) |*t, j| {
+        for (row.items) |*t, j| {
             _ = j;
-            if (t.pos.x + t.size.x > common.cx and t.pos.x - t.size.x < common.cx + common.screen_width) {
+            if (t.pos.x + t.size.x > config.cx and t.pos.x - t.size.x < config.cx + config.screen_width) {
                 // find collision with player
                 var px = player.position.x;
                 var py = player.position.y;
@@ -90,7 +90,7 @@ fn update(allocator: std.mem.Allocator, dt: f32) !void {
         }
     }
 
-    common.elapsed_time += dt * common.time_speed;
+    config.elapsed_time += dt * config.time_speed;
 
     sky.update(dt);
     try ground.update(allocator, dt);
@@ -103,9 +103,9 @@ fn update(allocator: std.mem.Allocator, dt: f32) !void {
     to_order = ArrayList(ZEntity).init(allocator);
 
     // plants to_order
-    for (ground.tiles.items, 0..) |*row, i| {
-        for (row.items, 0..) |*t, j| {
-            for (t.plants.items, 0..) |*p, k| {
+    for (ground.tiles.items) |*row, i| {
+        for (row.items) |*t, j| {
+            for (t.plants.items) |*p, k| {
                 try p.update(allocator);
                 var ze = ZEntity{ .index = [3]usize{ i, j, k }, .z = @floatToInt(u16, p.start_y), .item = ZEntities.plant };
                 try to_order.append(ze);
@@ -121,7 +121,7 @@ fn update(allocator: std.mem.Allocator, dt: f32) !void {
 }
 
 // unaffected by camera movement
-pub fn predraw() void {
+pub fn staticDraw() void {
     sky.predraw();
     ground.predraw();
     hud.predraw();
@@ -131,7 +131,7 @@ pub fn predraw() void {
 pub fn draw() void {
     ground.draw();
 
-    for (to_order.items, 0..) |*ze, i| {
+    for (to_order.items) |*ze, i| {
         _ = i;
         switch (ze.item) {
             ZEntities.player => {
@@ -146,7 +146,7 @@ pub fn draw() void {
     }
 
     var start = rl.Vector2{ .x = 0, .y = 0 };
-    var end = rl.Vector2{ .x = common.screen_width, .y = common.screen_height };
+    var end = rl.Vector2{ .x = config.screen_width, .y = config.screen_height };
 
     var color = rl.BLACK;
     color.a = fade_in;
