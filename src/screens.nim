@@ -17,5 +17,5 @@ var
   zoom* = 1.0
   cx* = 0.0
   mouse* = Vector2()
-  currentScreen*: GameScreen = Title
+  currentScreen*: GameScreen = Gameplay
   

@@ -2,7 +2,6 @@ import
   raylib, screens, screens/gameplay, screens/title
 
 var
-  camera = Camera2D()
   target = RenderTexture2d()
   current = currentScreen
 
@@ -62,10 +61,6 @@ proc updateDrawFrame {.cdecl.} =
   # Toggle fullscreen mode when F key is pressed
   if (isKeyPressed(KeyboardKey(F))):
     toggleFullscreen()
-  
-  # Update the camera target and zoom
-  camera.target.x = cx
-  camera.zoom = zoom
 
   # Update the virtual mouse position
   let mo = getMousePosition();
@@ -81,7 +76,7 @@ proc updateDrawFrame {.cdecl.} =
 
   
   beginDrawing()
-  clearBackground(RayWhite)
+  clearBackground(Black)
   # draw current screen
   drawScreen()
 
