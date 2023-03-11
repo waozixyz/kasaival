@@ -1,4 +1,4 @@
-import raylib, ../screens, ../player, ../gaia/ground, ../levels
+import raylib, ../screens, ../player, ../gaia/ground, ../levels, ../utils
 
 type
   Gameplay* = ref object of Screen
@@ -16,28 +16,6 @@ method init*(self: Gameplay) =
   self.player.init()
 
 
-proc doLineSegmentsIntersect(x1, y1, x2, y2, x3, y3, x4, y4: float): bool =
-  # calculate the direction of the lines
-  let dir1x = x2 - x1
-  let dir1y = y2 - y1
-  let dir2x = x4 - x3
-  let dir2y = y4 - y3
-  
-  # calculate denominator and numerator for t 
-  let denom = dir1x * dir2y - dir1y * dir2x
-  let numT = (x1 - x3) * dir2y - (y1 - y3) * dir2x
-  let numU = (x1 - x3) * dir1y - (y1 - y3) * dir1x
-  # check if the line segments intersect
-  if denom.abs() > 0.00001:
-    let t = numT / denom
-    let u = -numU / denom
-
-    if abs(t) < 0.5 and abs(u) < 0.5:
-      return true
-
-  return false
-
-
 
 proc checkTileCollision(self: Gameplay) =
   # check tile collision with player
@@ -45,6 +23,8 @@ proc checkTileCollision(self: Gameplay) =
   var pw = self.player.getRadius() * 0.5
   var ph = self.player.getRadius() * 0.2
   for i, tile in self.ground.tiles:
+    if not isTileVisible(tile):
+      continue
     var collided = false
     let vertices = tile.vertices
     for j in 0 ..< vertices.len:

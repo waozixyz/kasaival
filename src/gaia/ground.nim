@@ -1,4 +1,4 @@
-import raylib, ../screens, ../levels, std/random
+import raylib, ../screens, ../levels, std/random, ../utils
 
 type
   Tile* = object
@@ -129,20 +129,16 @@ method update*(self: Ground, dt: float) {.base.} =
         a: 255
       )    
 
-proc getMinMaxX(vertices: array[0..2,Vector2]): (float, float) =
-  var minX = vertices[0].x
-  var maxX = vertices[0].x
-  for v in vertices:
-    if v.x < minX:
-      minX = v.x
-    elif v.x > maxX:
-      maxX = v.x
-  return (float(minX), float(maxX))
+proc isTileVisible*(tile: Tile): bool =
+  let (minX, maxX) = getMinMaxX(tile.vertices)
+  if maxX > cx and minX < cx + screenWidth:
+    return true
+  else:
+    return false
 
 method draw*(self: Ground) {.base.} =
   for tile in self.tiles:
-    let (minX, maxX) = getMinMaxX(tile.vertices)
-    if maxX > cx and minX < cx + screenWidth:
+    if isTileVisible(tile):
       let v = tile.vertices
       drawTriangle(v[0], v[1], v[2], tile.color)
   
