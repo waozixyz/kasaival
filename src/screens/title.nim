@@ -9,7 +9,7 @@ method init*(self: Title) =
   self.id = TitleScreen
   self.texture = loadTexture("resources/images/menu.png");
   
-method update*(self: Title) =
+method update*(self: Title, dt: float) =
   if isKeyPressed(Enter) or isGestureDetected(Tap):
     currentScreen = GameplayScreen
   discard

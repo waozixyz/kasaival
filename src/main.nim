@@ -15,7 +15,7 @@ proc getCurrentScreen() =
   else:
     discard
 
-proc updateDrawFrame {.cdecl.} =
+proc updateDrawFrame() {.cdecl.} =
   # Get the current window size
   let windowWidth = getScreenWidth()
   let windowHeight = getScreenHeight()
@@ -41,7 +41,7 @@ proc updateDrawFrame {.cdecl.} =
     current.init()
 
   # update current screen
-  current.update()
+  current.update(getFrameTime())
 
   beginDrawing()
   clearBackground(Black)

@@ -2,7 +2,7 @@ import raylib, screens, particles/fire, std/math
 
 type
   Player* = ref object of RootObj
-    position = Vector2()
+    position* = Vector2()
     sprite = Fire()
     hp: float = 100.0
     xp: float = 0.0
@@ -51,8 +51,11 @@ method init*(self: Player) {.base.} =
   self.position = Vector2(x: cx + screenWidth * 0.5, y: screenHeight * 0.8)
   self.sprite.init()
 
+method getRadius*(self: Player):float {.base.} =
+  return self.sprite.getRadius()
+
 method update*(self: Player) {.base.} =
-  let radius = self.sprite.getRadius()
+  let radius = self.getRadius()
   let x = self.position.x
   let y = self.position.y
   var dir = Vector2()

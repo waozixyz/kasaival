@@ -15,7 +15,24 @@ method init*(self: Gameplay) =
   # Init entities  
   self.player.init()
 
-method update*(self: Gameplay) =
+
+
+proc checkTileCollision(self: Gameplay) =
+  # check tile collision with player
+  for i, tile in self.ground.tiles:
+    if (tile.pos.x + tile.size.x > cx and tile.pos.x - tile.size.x < cx + screenWidth):
+      # find collision with player
+      var px = self.player.position.x
+      var py = self.player.position.y
+      var pr = self.player.getRadius()
+      var prx = pr * 0.2
+      var pry = pr * 0.6
+      if (tile.pos.y - tile.size.y < py + pry and tile.pos.y > py - pry):
+        if (tile.pos.x - tile.size.x < px + prx and tile.pos.x + tile.size.x > px - prx):
+          self.ground.tiles[i].burnTimer = 2
+
+
+method update*(self: Gameplay, dt: float) =
   if isKeyPressed(Escape):
     currentScreen = TitleScreen
 
@@ -24,7 +41,8 @@ method update*(self: Gameplay) =
   self.camera.zoom = zoom  
 
   # Update gaia
-  self.ground.update()
+  self.ground.update(dt)
+  self.checkTileCollision()
 
   # Update entities
   self.player.update()

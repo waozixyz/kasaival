@@ -16,7 +16,7 @@ type
 
 proc initDaisy*(): Level =
   result.music = "StrangerThings.ogg"
-  result.tile = Vector2(x: 18, y: 18)
+  result.tile = Vector2(x: 42, y: 42)
   result.terrains = @[
     Terrain(
       tiles: 100,

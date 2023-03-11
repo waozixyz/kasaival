@@ -15,8 +15,8 @@ const
 
 var
   zoom* = 1.0
-  cx* = 0.0
-  startY* = 200.0
+  cx* = 1500.0
+  startY* = 150.0
   endX* = 0.0
   endY* = screenHeight
   mouse* = Vector2()
@@ -30,7 +30,7 @@ type
 method init*(self: Screen) {.base.}  =
   discard
 
-method update*(self: Screen) {.base.} =
+method update*(self: Screen, dt: float) {.base.} =
   discard
   
 method draw*(self: Screen) {.base.}  =
