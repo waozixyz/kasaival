@@ -1,4 +1,4 @@
-import raylib, std/random, std/lists
+import raylib, std/random
 
 type
   Particle* = object
@@ -62,7 +62,7 @@ method updateColors(self: Fire, p: var Particle, pp: float) {.base.} =
   p.color[3] = uint8(float(self.color_start[3]) * pp + float(self.color_end[3]) * (1 - pp));
 
         
-method update*(self: Fire, position: Vector2) =
+method update*(self: Fire, position: Vector2) {.base.} =
   if (self.currentAmount < self.amount):
     var p = self.getParticle(position)
     self.particles.add(p)
@@ -86,10 +86,10 @@ method update*(self: Fire, position: Vector2) =
 proc u8ToColor(color: array[0..3, uint8]): Color =
   return Color(r: color[0], g: color[1], b: color[2], a: color[3])
 
-method draw*(self: Fire)  =
+method draw*(self: Fire) {.base.} =
   for p in self.particles:
     drawCircle(p.position, p.size, u8ToColor(p.color))
  
 
-method unload*(self: Fire)  =
+method unload*(self: Fire) {.base.} =
   discard

@@ -1,26 +1,30 @@
 import raylib, ../screens, ../player
 
-var
-  camera = Camera2D()
+type
+  Gameplay* = ref object of Screen
+    camera: Camera2D = Camera2D()
+    player: Player = Player()
 
+method init*(self: Gameplay) =
+  self.id = GameplayScreen
+  self.player.init()
 
-proc initGameplayScreen* =
-  initPlayer()
-
-proc updateGameplayScreen* =
-  if isKeyPressed(Escape):
-    currentScreen = Title
+method update*(self: Gameplay) =
+  #if isKeyPressed(Escape):
+  #  currentScreen = Title
 
   # Update the camera target and zoom
-  camera.target.x = cx
-  camera.zoom = zoom
+  self.camera.target.x = cx
+  self.camera.zoom = zoom  
 
-  updatePlayer()
+  # Update entities
+  self.player.update()
 
-proc drawGameplayScreen* =
-  beginMode2D(camera);
-  drawPlayer()
+method draw*(self: Gameplay) =
+  beginMode2D(self.camera);
+  self.player.draw()
   endMode2D();
 
-proc unloadGameplayScreen* =
-  unloadPlayer()
+method unload*(self: Gameplay) =
+  self.player.unload()
+

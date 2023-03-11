@@ -3,7 +3,7 @@ import
 
 var
   target = RenderTexture2d()
-  current = currentScreen
+  current: Screen
 
 proc findMin(x: float, y: float): float =  
   if x < y:
@@ -11,42 +11,14 @@ proc findMin(x: float, y: float): float =
   else:
     return y
 
-
-proc initScreen =
-    case current
-    of Title:
-      initTitleScreen()
-    of Gameplay:
-      initGameplayScreen()
-    else:
-      discard
-
-proc updateScreen =
-  case current
-    of Title:
-      updateTitleScreen()
-    of Gameplay:
-      updateGameplayScreen()
-    else:
-      discard
-
-proc drawScreen =
-  case current
-    of Title:
-      drawTitleScreen()
-    of Gameplay:
-      drawGameplayScreen()
-    else:
-      discard
-
-proc unloadScreen =
-    case current
-    of Title:
-      unloadTitleScreen()
-    of Gameplay:
-      unloadGameplayScreen()
-    else:
-      discard
+proc getCurrentScreen() =
+  case currentScreen
+  of TitleScreen:
+    current = Title()
+  of GameplayScreen:
+    current = Gameplay()
+  else:
+    discard
 
 proc updateDrawFrame {.cdecl.} =
   # Get the current window size
@@ -68,17 +40,18 @@ proc updateDrawFrame {.cdecl.} =
   mouse.y = (float(mo.y) - (float(window_height) - height) * 0.5) / scale
 
   # update current screen
-  if (current != currentScreen):
-    unloadScreen()
-    current = currentScreen
-    initScreen()
-  updateScreen()
+  if (current.id != currentScreen):
+    current.unload()
+    getCurrentScreen()
+    current.init()
 
+  current.update()
+  echo current.id
   
   beginDrawing()
   clearBackground(Black)
   # draw current screen
-  drawScreen()
+  current.draw()
 
   endDrawing()
 
@@ -93,8 +66,9 @@ proc main =
 
   try:    
     # init current screen
-    initScreen()
-    
+    getCurrentScreen()
+    current.init()
+
     # run game loop
     when defined(emscripten):
       emscriptenSetMainLoop(updateDrawFrame, 60, 1)
@@ -104,7 +78,7 @@ proc main =
         updateDrawFrame()
       
     # deinit current screen
-    unloadScreen()
+    current.unload()
   
   # close current window
   finally:

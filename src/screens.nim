@@ -3,7 +3,7 @@ import
 
 type
   GameScreen* = enum
-    Unknown = -1, Logo = 0, Title, Gameplay
+    UnknownScreen = -1, LogoScreen = 0, TitleScreen, GameplayScreen
 
 # ----------------------------------------------------------------------------------
 # Global Variables Definition (shared by several modules)
@@ -17,5 +17,21 @@ var
   zoom* = 1.0
   cx* = 0.0
   mouse* = Vector2()
-  currentScreen*: GameScreen = Gameplay
+  currentScreen*: GameScreen = TitleScreen
   
+type
+  Screen* = ref object of RootObj
+    id*: GameScreen 
+
+
+method init*(self: Screen) {.base.}  =
+  discard
+
+method update*(self: Screen) {.base.} =
+  discard
+  
+method draw*(self: Screen) {.base.}  =
+  discard
+
+method unload*(self: Screen) {.base.} =
+  discard
