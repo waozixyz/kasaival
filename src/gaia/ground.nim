@@ -36,6 +36,13 @@ proc getColor(s: float, t1: Terrain, t2: Terrain): Color =
     b: getColorDifference(c1[2], c2[2], s),
     a: 255,
   )
+proc getColorFromColor(c: Color, f: int): Color =
+  return Color(
+    r: uint8(int(c.r) + rand(-f..f)),
+    g: uint8(int(c.g) + rand(-f..f)),
+    b: uint8(int(c.b) + rand(-f..f)),
+    a: 255,
+  )
     
 method init*(self: Ground, level: Level) {.base.} =
   randomize()
@@ -63,7 +70,7 @@ method init*(self: Ground, level: Level) {.base.} =
         tile.size = Vector2(x: w, y: h)
         tile.orgColor = tile.color 
         self.tiles.add(tile)
-        tile.color = getColor(clamp(i, 0, 1), terrain, level.terrains[ti + 1])
+        tile.color = getColorFromColor(tile.color, 5)
 
         tile.vertices = [
           Vector2(x: x, y: y),
@@ -73,9 +80,10 @@ method init*(self: Ground, level: Level) {.base.} =
         self.tiles.add(tile)
         x += w      
       y -= h
-      h *= 0.94
-      w *= 0.94
+      h *= yScaling
+      w *= yScaling
     endX += terrainWidth
+    startY = y
  
 
     

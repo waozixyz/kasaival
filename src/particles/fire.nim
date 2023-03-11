@@ -17,7 +17,7 @@ type
     currentAmount: int = 0
     amount: int = 70
     lifetime: float = 40
-    scale: float = 1
+    scale*: float = 1
     radius: float = 14
     colorStart: array[0..3, uint8] = [200, 60, 50, 200]
     colorEnd: array[0..3, uint8] = [120, 0, 100, 20]

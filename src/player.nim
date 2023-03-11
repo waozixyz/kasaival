@@ -8,6 +8,7 @@ type
     xp: float = 0.0
     speed: float = 0.5
     frozen = false
+    scale*: float = 1
 
 const
   key_right: array[0..1, KeyboardKey] = [Right, KeyboardKey(D)]
@@ -67,8 +68,9 @@ method update*(self: Player) {.base.} =
   var dy = dir.y * self.speed * radius
   
   # x limit, move screen at edges
-  var eyeBound = screenWidth / 5;
-  if ((x + dx < cx + eyeBound and cx > 0) or (x + dx > cx + screenWidth - eyeBound and cx < float(endX) - screenWidth)):
+  var eyeBound = screenWidth / (5 * (self.scale * 1.8))
+
+  if (x + dx < cx + eyeBound and cx > 0 and dx < 0) or (x + dx > cx + screenWidth - eyeBound and cx < float(endX) - screenWidth and dx > 0):
     cx += dx;
 
   if (x + dx < cx + radius and dx < 0):
@@ -86,7 +88,11 @@ method update*(self: Player) {.base.} =
     self.position.y = minY
   else:
     self.position.y += dy
-
+  
+  # change player scale depending on y postion
+  self.scale = (self.position.y / screenHeight) * yScaling
+  self.sprite.scale = self.scale
+  # update flame
   self.sprite.update(self.position)
 
 method draw*(self: Player) {.base.}  =
