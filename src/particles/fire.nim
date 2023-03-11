@@ -34,6 +34,9 @@ proc getColorEnd(self: Fire): array[0..3, uint8] =
   rtn[2] -= uint8(rand(0..20))
   rtn[3] -= uint8(rand(0..20))
   return rtn;
+  
+method getRadius*(self: Fire): float {.base.} =
+  return self.radius * self.scale;
 
 method getParticle(self: Fire, position: Vector2): Particle {.base.} =
   let vel_x = rand(-3.0..3.0) * self.scale

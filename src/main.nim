@@ -39,15 +39,15 @@ proc updateDrawFrame {.cdecl.} =
   mouse.x = (float(mo.x) - (float(window_width) - width) * 0.5) / scale
   mouse.y = (float(mo.y) - (float(window_height) - height) * 0.5) / scale
 
-  # update current screen
+  # change screen if new current screen
   if (current.id != currentScreen):
     current.unload()
     getCurrentScreen()
     current.init()
 
+  # update current screen
   current.update()
-  echo current.id
-  
+
   beginDrawing()
   clearBackground(Black)
   # draw current screen

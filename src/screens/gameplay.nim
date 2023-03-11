@@ -10,8 +10,8 @@ method init*(self: Gameplay) =
   self.player.init()
 
 method update*(self: Gameplay) =
-  #if isKeyPressed(Escape):
-  #  currentScreen = Title
+  if isKeyPressed(Escape):
+    currentScreen = TitleScreen
 
   # Update the camera target and zoom
   self.camera.target.x = cx

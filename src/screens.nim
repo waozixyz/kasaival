@@ -16,8 +16,10 @@ const
 var
   zoom* = 1.0
   cx* = 0.0
+  startY* = 200
+  endX* = screenWidth
   mouse* = Vector2()
-  currentScreen*: GameScreen = TitleScreen
+  currentScreen*: GameScreen = GameplayScreen
   
 type
   Screen* = ref object of RootObj
