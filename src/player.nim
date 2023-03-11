@@ -6,16 +6,16 @@ type
     sprite = Fire()
     hp: float = 100.0
     xp: float = 0.0
-    speed: float = 0.5
+    speed: float = 0.4
     frozen = false
     scale*: float = 1
+    initScale: float = 2
 
 const
   key_right: array[0..1, KeyboardKey] = [Right, KeyboardKey(D)]
   key_left: array[0..1, KeyboardKey] = [Left, KeyboardKey(A)]
   key_up: array[0..1, KeyboardKey] = [Up, KeyboardKey(W)]
   key_down: array[0..1, KeyboardKey] = [Down, KeyboardKey(S)]
-
 
 proc getAngle(diff: Vector2): Vector2 =
   var angle = arctan2(diff.x, diff.y)
@@ -40,11 +40,9 @@ proc getDirection(x: float, y: float): Vector2 =
   
   if (dir.y == 0 and dir.x == 0):
     # check mouse press
-    if (isGestureDetected(Tap)):
+    if (isMouseButtonDown(Left)):
       var diff = Vector2(x: mouse.x - x + cx, y: mouse.y - y)
-      const offset = 5
-      if (diff.x > offset or diff.y > offset):
-        dir = getAngle(diff)
+      dir = getAngle(diff)
 
   return dir
 
@@ -90,7 +88,7 @@ method update*(self: Player) {.base.} =
     self.position.y += dy
   
   # change player scale depending on y postion
-  self.scale = (self.position.y / screenHeight) * yScaling
+  self.scale = (self.position.y / screenHeight) * yScaling * self.initScale
   self.sprite.scale = self.scale
   # update flame
   self.sprite.update(self.position)

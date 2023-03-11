@@ -1,10 +1,10 @@
 import raylib, ../screens, ../levels, std/random
 
 type
-  Tile = object
+  Tile* = object
     pos*: Vector2
     size*: Vector2
-    vertices: array[0..2, Vector2]
+    vertices*: array[0..2, Vector2]
     burnTimer*: float = 0.0
     color: Color
     orgColor: Color
@@ -66,8 +66,6 @@ method init*(self: Ground, level: Level) {.base.} =
           Vector2(x: x, y: y - h)
         ]
         tile.plants = terrain.plants
-        tile.pos = Vector2(x: x, y: y)
-        tile.size = Vector2(x: w, y: h)
         tile.orgColor = tile.color 
         self.tiles.add(tile)
         tile.color = getColorFromColor(tile.color, 5)
@@ -131,10 +129,22 @@ method update*(self: Ground, dt: float) {.base.} =
         a: 255
       )    
 
+proc getMinMaxX(vertices: array[0..2,Vector2]): (float, float) =
+  var minX = vertices[0].x
+  var maxX = vertices[0].x
+  for v in vertices:
+    if v.x < minX:
+      minX = v.x
+    elif v.x > maxX:
+      maxX = v.x
+  return (float(minX), float(maxX))
+
 method draw*(self: Ground) {.base.} =
   for tile in self.tiles:
-    let v = tile.vertices
-    drawTriangle(v[0], v[1], v[2], tile.color)
-    
+    let (minX, maxX) = getMinMaxX(tile.vertices)
+    if maxX > cx and minX < cx + screenWidth:
+      let v = tile.vertices
+      drawTriangle(v[0], v[1], v[2], tile.color)
+  
 method unload*(self: Ground) {.base.}=
   discard
