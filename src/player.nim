@@ -83,7 +83,6 @@ method update*(self: Player) {.base.} =
     self.position.y = minY
   else:
     self.position.y += dy
-  
 
   self.sprite.update(self.position)
 

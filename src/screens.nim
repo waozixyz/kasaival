@@ -16,8 +16,9 @@ const
 var
   zoom* = 1.0
   cx* = 0.0
-  startY* = 200
-  endX* = screenWidth
+  startY* = 200.0
+  endX* = 0.0
+  endY* = screenHeight
   mouse* = Vector2()
   currentScreen*: GameScreen = GameplayScreen
   

@@ -5,11 +5,6 @@ var
   target = RenderTexture2d()
   current: Screen
 
-proc findMin(x: float, y: float): float =  
-  if x < y:
-    return x  
-  else:
-    return y
 
 proc getCurrentScreen() =
   case currentScreen
@@ -25,13 +20,13 @@ proc updateDrawFrame {.cdecl.} =
   let windowWidth = getScreenWidth()
   let windowHeight = getScreenHeight()
   # Calculate the scaling factor
-  let scale = findMin(windowWidth / screenWidth, windowHeight / screenHeight)
+  let scale = min(windowWidth / screenWidth, windowHeight / screenHeight)
   # Calculate the scaled screen size
   let width = float(screenWidth) * scale;
   let height = float(screenHeight) * scale;
 
   # Toggle fullscreen mode when F key is pressed
-  if (isKeyPressed(KeyboardKey(F))):
+  if (isKeyPressed(F)):
     toggleFullscreen()
 
   # Update the virtual mouse position
