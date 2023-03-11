@@ -28,7 +28,7 @@ proc checkTileCollision(self: Gameplay) =
     
     let (minX, maxX) = getMinMax(vertices, 0)
     let (minY, maxY) = getMinMax(vertices, 1)
-    if pos.x - pr < maxX and pos.x + pr * 0.5 > minX and pos.y  < maxY and pos.y + pr * 2 > minY:
+    if pos.x - pr < maxX and pos.x + pr * 0.5 > minX and pos.y  < maxY and pos.y + pr + 10 > minY:
       self.ground.tiles[i].burnTimer = 2
 
     

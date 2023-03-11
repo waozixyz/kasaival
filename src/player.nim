@@ -1,4 +1,4 @@
-import raylib, screens, particles/fire, std/math, utils
+import raylib, screens, particles/fire, std/math
 
 type
   Player* = ref object of RootObj
@@ -80,12 +80,10 @@ method update*(self: Player) {.base.} =
   # y limits
   var minY = float(startY) - radius * 0.5;
   var maxY = screenHeight - radius;
-  if (y + dy > maxY and dy > 0):
-    self.position.y = maxY
-  elif (y + dy < minY and dy < 0):
-    self.position.y = minY
-  else:
-    self.position.y += dy
+  if y + dy > maxY and dy > 0: self.position.y = maxY
+  elif y + dy < minY and dy < 0: self.position.y = minY
+  else: self.position.y += dy
+
   
   # change player scale depending on y postion
   self.scale = (self.position.y / screenHeight) * yScaling * self.initScale
