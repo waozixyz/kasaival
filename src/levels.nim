@@ -20,7 +20,7 @@ proc initDaisy*(): Level =
   result.terrains = @[
     Terrain(
       tiles: 100,
-      cs: [16, 60, 60, 120, 200, 250],
+      cs: [16, 60, 60, 80, 200, 250],
       plants: @[],
     ),
     Terrain(
