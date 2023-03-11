@@ -20,24 +20,17 @@ method init*(self: Gameplay) =
 proc checkTileCollision(self: Gameplay) =
   # check tile collision with player
   var pos = self.player.position
-  var pw = self.player.getRadius() * 0.5
-  var ph = self.player.getRadius() * 0.2
+  var pr = self.player.getRadius() * 2
   for i, tile in self.ground.tiles:
     if not isTileVisible(tile):
       continue
-    var collided = false
-    let vertices = tile.vertices
-    for j in 0 ..< vertices.len:
-      let vertex = vertices[j]
-      let nextVertex = vertices[(j + 1) mod vertices.len]
-      if doLineSegmentsIntersect(
-          vertex.x, vertex.y, nextVertex.x, nextVertex.y,
-          pos.x - pw, pos.y - ph, pos.x + pw, pos.y + ph):
-        collided = true
-        break
-    if collided:
+    
+    let (minX, maxX) = getMinMax(vertices, 0)
+    let (minY, maxY) = getMinMax(vertices, 1)
+    if pos.x - pr < maxX and pos.x + pr * 0.5 > minX and pos.y  < maxY and pos.y + pr * 2 > minY:
       self.ground.tiles[i].burnTimer = 2
 
+    
 method update*(self: Gameplay, dt: float) =
   if isKeyPressed(Escape):
     currentScreen = TitleScreen

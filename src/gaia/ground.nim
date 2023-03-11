@@ -84,57 +84,33 @@ method init*(self: Ground, level: Level) {.base.} =
     startY = y
  
 
-    
-method update*(self: Ground, dt: float) {.base.} =
-
-   for i, tile in self.tiles:
-    if tile.plants.len > 0:
-      # tile.fertility += dt;
-      # if (t.fertility > 1000 and tile.plants.items.len < tile.capacity):
-      #   tile.fertility = 0
-      #   var p = Plant()
-      #   var x = rand(t.pos.x..t.pos.x + t.size.x)
-      #   var y = rand(t.pos.y..t.pos.y + t.size.y)
-      #   tile.plants.add(p)
-      discard
-    var r = int(tile.color.r)
-    var g = int(tile.color.g)
-    var b = int(tile.color.b)
-    var colorChange = false
-
-    if tile.burnTimer > 0:
-        if r < 200:
-          r += 20
-        if g > 100:
-          g -= 10
-        if b > 4:
-          b -= 4 
-        colorChange = true
-        self.tiles[i].burnTimer -= (20.0 * dt)
+method update*(self: Ground, dt: float) {.base.}=
+  for i, tile in self.tiles:
+    # plant logic
+    discard
+      
+    # tile color logic
+    var t = tile.color
+    var burnTimer = tile.burnTimer
+    if burnTimer > 0:
+      t.r = uint8(min(220, int(t.r) + 10))
+      t.g = uint8(max(0, int(t.g) - 5))
+      t.b = uint8(max(0, int(t.b) - 2))
+      burnTimer -= 5.0 * dt
     else:
-      var heal = rand(0..10)
-      if heal > 7:
-        if r > int(tile.orgColor.r):
-          r -= 2
-        elif g < int(tile.orgColor.g):
-          g += 1
-        elif b < int(tile.orgColor.b):
-          b += 1
-        colorChange = true
-    if colorChange:
-      self.tiles[i].color = Color(
-        r: uint8(r),
-        g: uint8(g),
-        b: uint8(b),
-        a: 255
-      )    
+      if t.r > tile.orgColor.r:
+        t.r = uint8(max(int(tile.orgColor.r), int(t.r) - 2))
+      elif t.g < tile.orgColor.g:
+        t.g += 1
+      elif t.b < tile.orgColor.b:
+        t.b += 1
+        
+    self.tiles[i].color = t
+    self.tiles[i].burnTimer = burnTimer
 
 proc isTileVisible*(tile: Tile): bool =
-  let (minX, maxX) = getMinMaxX(tile.vertices)
-  if maxX > cx and minX < cx + screenWidth:
-    return true
-  else:
-    return false
+  let (minX, maxX) = getMinMax(tile.vertices, 0)
+  return maxX >= cx - 100 and minX <= cx + screenWidth + 100
 
 method draw*(self: Ground) {.base.} =
   for tile in self.tiles:
