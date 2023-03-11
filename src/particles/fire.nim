@@ -60,33 +60,41 @@ method getParticle(self: Fire, position: Vector2): Particle {.base.} =
   return p
 
 proc updateColors(p: Particle, pp: float): Color =
-  return Color(
-    r: uint8(float(p.colorStart[0]) * pp + float(p.colorEnd[0]) * (1 - pp)),
-    g: uint8(float(p.colorStart[1]) * pp + float(p.colorEnd[1]) * (1 - pp)),
-    b: uint8(float(p.colorStart[2]) * pp + float(p.colorEnd[2]) * (1 - pp)),
-    a: uint8(float(p.colorStart[3]) * pp + float(p.colorEnd[3]) * (1 - pp))
-  )
+  var colors: array[0..3, uint8]
+  for i in 0 ..< p.colorStart.len:
+    colors[i] = uint8(float(p.colorStart[i]) * pp + float(p.colorEnd[i]) * (1 - pp))
+  
+  return Color(r: colors[0], g: colors[1], b: colors[2], a: colors[3])
 
-        
+# Updates the state of the `Fire` emitter given a new position
 method update*(self: Fire, position: Vector2) {.base.} =
-  if (self.currentAmount < self.amount):
+  # Create new particle if the maximum capacity has not been reached yet
+  if self.currentAmount < self.amount:
     var p = self.getParticle(position)
     self.particles.add(p)
     self.currentAmount += 1
 
-  for i in 0..self.currentAmount:
+  # Update each particle
+  for i in 0..(self.currentAmount - 1):   # Updated the loop limits since the index starts from 0
     var p = self.particles[i]
-    if (p.lifetime <= 0):
-      p = self.getParticle(position)
     
-    var pp = p.lifetime / self.lifetime
-    if (pp > 0):
-      p.position.x += p.vel_start.x * pp + p.vel_end.x * (1 - pp)
-      p.position.y += p.vel_start.y * pp + p.vel_end.y * (1 - pp)
+    # Regenerate particle if its lifetime has ended
+    if p.lifetime <= 0:
+      p = self.getParticle(position)
+
+    var pp = p.lifetime.float / self.lifetime.float   # Convert to float before dividing for proper division 
+    if pp > 0:
+      # Update particle attributes based on its remaining lifetime
+      p.position = Vector2(
+        x: p.position.x + (p.vel_start.x * pp) + (p.vel_end.x * (1.0 - pp)),
+        y: p.position.y + (p.vel_start.y * pp) + (p.vel_end.y * (1.0 - pp))
+      )
       p.color = updateColors(p, pp)
       p.size *= p.shrink_factor
+     
     p.lifetime -= 1
-    self.particles[i] = p
+    self.particles[i] = p  # Assign back the updated particle
+
   
 method draw*(self: Fire) {.base.} =
   for p in self.particles:

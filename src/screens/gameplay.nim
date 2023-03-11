@@ -24,6 +24,7 @@ proc checkTileCollision(self: Gameplay) =
   for i, tile in self.ground.tiles:
     if not isTileVisible(tile):
       continue
+    let vertices = tile.vertices
     
     let (minX, maxX) = getMinMax(vertices, 0)
     let (minY, maxY) = getMinMax(vertices, 1)

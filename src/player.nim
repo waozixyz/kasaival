@@ -1,4 +1,4 @@
-import raylib, screens, particles/fire, std/math
+import raylib, screens, particles/fire, std/math, utils
 
 type
   Player* = ref object of RootObj
