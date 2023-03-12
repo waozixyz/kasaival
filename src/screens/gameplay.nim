@@ -51,7 +51,11 @@ proc sortEntities(x, y: Entity): int =
   cmp(x.z, y.z)
 
 method update*(self: Gameplay, dt: float) =
-  updateMusicStream(self.music)
+  if (isKeyPressed(M)):
+    isMute = not isMute
+
+  if not isMute:
+    updateMusicStream(self.music)
 
   # change screen on escape button
   if isKeyPressed(Escape):
