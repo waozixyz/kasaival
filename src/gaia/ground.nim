@@ -93,7 +93,7 @@ method update*(self: Ground, dt: float) {.base.}=
       burnTimer -= 5.0 * dt
     else:
       if t.r > to.r:
-        t.r = uint8(max(int(to.r), int(t.r) - 2))
+        t.r = max(to.r, t.r - 2)
       elif t.g < to.g:
         t.g += 1
       elif t.b < to.b:

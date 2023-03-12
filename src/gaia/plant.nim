@@ -1,4 +1,4 @@
-import raylib, std/random, ../utils, std/math
+import raylib, std/random, ../utils, std/math, ../screens
 
 type
   Branch = object
@@ -91,7 +91,9 @@ method grow*(self: var Plant) {.base.} =
 
 method init*(self: var Plant, x: float, y: float, randomRow: bool) {.base.} =
   self.startY = y
-
+  var scale = y / screenHeight
+  self.w = 20 * scale
+  self.h = 32 * scale
   var angle = -90
 
   # add the first branch at angle 90

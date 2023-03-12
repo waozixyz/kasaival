@@ -41,6 +41,7 @@ proc updateDrawFrame() {.cdecl.} =
     current.init()
 
   # update current screen
+  mouseCursor = 0
   current.update(getFrameTime())
 
   beginDrawing()
@@ -49,6 +50,7 @@ proc updateDrawFrame() {.cdecl.} =
   clearBackground(Black)
   # draw current screen
   current.draw()
+  setMouseCursor(MouseCursor(mouseCursor))
 
   endTextureMode()
 
@@ -57,6 +59,7 @@ proc updateDrawFrame() {.cdecl.} =
   drawTexture(target.texture, textureRect, screenRect, Vector2( x: 0, y: 0 ), 0.0, WHITE)
 
   endDrawing()
+  
 
 proc main =
   # init raylib window

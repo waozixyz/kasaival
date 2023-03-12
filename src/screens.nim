@@ -22,6 +22,7 @@ var
   mouse* = Vector2()
   currentScreen*: GameScreen = GameplayScreen
   yScaling* =  0.94
+  mouseCursor* = 0
   
 type
   Screen* = ref object of RootObj

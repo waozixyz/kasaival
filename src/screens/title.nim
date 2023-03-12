@@ -10,11 +10,13 @@ method init*(self: Title) =
   self.texture = loadTexture("resources/images/menu.png");
   
 method update*(self: Title, dt: float) =
+  mouseCursor = 4
   if isKeyPressed(Enter) or isGestureDetected(Tap):
     currentScreen = GameplayScreen
   discard
 
 method draw*(self: Title)  =
+
   drawTexture(self.texture, Vector2(), 0, 1, White);
 
   drawText("KASAIVAL", 200, 90, 80, Maroon);

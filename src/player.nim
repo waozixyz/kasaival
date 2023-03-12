@@ -53,9 +53,9 @@ method init*(self: Player) {.base.} =
 method getRadius*(self: Player):float {.base.} =
   return self.sprite.getRadius()
 
-      
 proc getZ*(self: Player): float = 
   return self.position.y + self.getRadius()
+
 method update*(self: Player) {.base.} =
   let radius = self.getRadius()
   let x = self.position.x
@@ -86,7 +86,6 @@ method update*(self: Player) {.base.} =
   if y + dy > maxY and dy > 0: self.position.y = maxY
   elif y + dy < minY and dy < 0: self.position.y = minY
   else: self.position.y += dy
-
   
   # change player scale depending on y postion
   self.scale = (self.position.y / screenHeight) * yScaling * self.initScale
