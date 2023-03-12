@@ -21,14 +21,18 @@ proc checkTileCollision(self: Gameplay) =
   # check tile collision with player
   var pos = self.player.position
   var pr = self.player.getRadius() * 2
+
+  # Iterate through visible tiles and check for collision with the player
   for i, tile in self.ground.tiles:
-    if not isTileVisible(tile):
-      continue
+    if not isTileVisible(tile): continue
+
     let vertices = tile.vertices
     
     let (minX, maxX) = getMinMax(vertices, 0)
     let (minY, maxY) = getMinMax(vertices, 1)
-    if pos.x - pr < maxX and pos.x + pr * 0.5 > minX and pos.y  < maxY and pos.y + pr + 10 > minY:
+
+    if pos.x - pr * 1.5 < maxX and pos.x + pr * 0.5 > minX and pos.y  < maxY and pos.y + pr + 10> minY:
+      # Set burn timer for tile if player collides with it
       self.ground.tiles[i].burnTimer = 2
 
     
