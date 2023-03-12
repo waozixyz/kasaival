@@ -31,8 +31,8 @@ proc updateDrawFrame() {.cdecl.} =
 
   # Update the virtual mouse position
   let mo = getMousePosition();
-  mouse.x = (float(mo.x) - (float(window_width) - width) * 0.5) / scale
-  mouse.y = (float(mo.y) - (float(window_height) - height) * 0.5) / scale
+  mouse.x = (float(mo.x) - (float(windowWidth) - width) * 0.5) / scale
+  mouse.y = (float(mo.y) - (float(windowHeight) - height) * 0.5) / scale
 
   # change screen if new current screen
   if (current.id != currentScreen):
@@ -45,8 +45,16 @@ proc updateDrawFrame() {.cdecl.} =
 
   beginDrawing()
   clearBackground(Black)
+  beginTextureMode(target)
+  clearBackground(Black)
   # draw current screen
   current.draw()
+
+  endTextureMode()
+
+  let textureRect = Rectangle( x: 0, y: 0, width: float(target.texture.width), height: float(-target.texture.height))
+  let screenRect = Rectangle( x: (float(windowWidth) - width) * 0.5, y: (float(windowHeight) - height) * 0.5, width: width, height: height)
+  drawTexture(target.texture, textureRect, screenRect, Vector2( x: 0, y: 0 ), 0.0, WHITE)
 
   endDrawing()
 
