@@ -15,7 +15,7 @@ const
 
 var
   zoom* = 1.0
-  cx* = 1500.0
+  cx* = 4500.0
   startY* = 150.0
   endX* = 0.0
   endY* = screenHeight

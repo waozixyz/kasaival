@@ -1,7 +1,4 @@
-import raylib
-
-const 
-	deg_to_rad = math.pi / 180.0 
+import raylib, std/random, ../utils, std/math
 
 type
   Branch = object
@@ -10,12 +7,12 @@ type
     w, h: float
     color: Color
   Leaf = object
-    row: usize
+    row: int
     v1, v2: Vector2
     r: float
     color: Color
-  Plant = object 
-    branches: seq[Branch]
+  Plant* = object 
+    branches: seq[seq[Branch]]
     leaves: seq[Leaf]
     leafChance: float = 0.5
     maxRow: int = 5
@@ -24,71 +21,110 @@ type
     splitAngle: array[2,int] = [20,30]
     csBranch: array[6,uint8]= [ 125, 178, 122, 160, 76, 90 ]
     csLeaf: array[6,uint8] = [ 150, 204, 190, 230, 159, 178 ]
-    leftX: float = 9999999
-    rightX: float = -9999999
-    growTimer: int = 0
-    growTime: int = 20
+    leftBound*: float = 9999999
+    rightBound*: float = -9999999
+    growTimer: float = 0
+    growTime: float = 20
     scale: float = 1
     w: float = 10
     h: float = 15
     startY: float = 0
 
 proc getColor(cs: array[0..5, uint8]): Color =
-	var r = cast[uint8](rand(cs[0]..cs[1]))
-	var b = cast[uint8](rand(cs[2]..cs[3]))
-	var g = cast[uint8](rand(cs[4]..cs[5]))
-	return(Color(r, g, b, 255))
+  var c = getCustomColorSchema(cs)
+
+  return Color(r: c[0], g: c[1], b: c[2], a: 255)
 
 proc getRotX(deg: int): float = 
-	return math.cos(deg.toFloat() * deg_to_rad)
+  return cos(deg2rad(float(deg)))
 
 proc getRotY(deg: int): float = 
-	return math.sin(deg.toFloat() * deg_to_rad)
+  return sin(deg2rad(float(deg)))
 
-method getAngle(self: Plant): int =
-  return random( self.splitAngle[0]..self.splitAngle[1] )
+method getAngle(self: Plant): int {.base.} =
+  return rand( self.splitAngle[0]..self.splitAngle[1] )
       
-method addBranch(self: var Plant, deg: int, b: var Branch) =
+method addBranch(self: var Plant, deg: int, b: Branch) {.base.} =
   let bw = b.w * 0.9
   let bh = b.h * 0.95
   let px = b.v2.x
   let py = b.v2.y
   let nx = px + getRotX(deg) * bh;
   let ny = py + getRotY(deg) * bh;
-  var c = getColor(self.csBranch)
-
-  self.branches.add(Branch(deg,n1,n2,bw,bh,c))
-  var chance = clamp(((rand(100) as float) / 100.0) * (self.currentRow as float) / (self.maxRow as float), 0.0, self.leafChance)
+  let c = getColor(self.csBranch)
+  let v1 = Vector2(x: px, y: py)
+  let v2 = Vector2(x: nx, y: ny)
+  self.branches[self.currentRow + 1].add(Branch(deg: deg, v1: v1, v2: v2, w: bw, h: bh, color: c))
+  var chance = clamp((rand(0.0..100.0) / 100.0) * float(self.currentRow) / float(self.maxRow), 0.0, self.leafChance)
                       
   if chance > self.leaf_chance:
     let divX = getRotX(deg * 2) * bw;
     let divY = getRotY(deg * 2) * bw;
-    self.leaves.add(Leaf(row: self.currentRow, r: bw, v1: Vector2(nx+divX, ny+divY), v2: Vector2(nx-divX, ny-divY),color:getColor(self.cs_leaf)))
+    self.leaves.add(Leaf(row: self.currentRow, r: bw, v1: Vector2(x: nx+divX, y: ny+divY), v2: Vector2( x: nx-divX, y: ny-divY), color: getColor(self.cs_leaf)))
 
-  if nx < self.left_x:
-    self.left_x = nx
-  elif nx > self.right_x:
-    self.right_x = nx + bw
+  if nx < self.leftBound:
+    self.leftBound = nx
+  elif nx > self.rightBound:
+    self.rightBound = nx + bw
       
-proc getZ(p: Plant): float32 = 
-    p.branches[0][0].v1.y
+proc getZ*(self: Plant): float = 
+  return float(self.branches[0][0].v1.y)
   
-proc getNextPos(p: Plant, a: float32, b: float32): float32 = 
-    b + (a - b) * float32(p.grow_timer) / float32(p.grow_time)
+proc getNextPos(self: Plant, a: float, b: float): float = 
+  return b + (a - b) * float(self.growTimer) / float(self.growTime)
     
-proc grow(p: Plant, allocator: Allocator) =
-  doAssert p.currentRow < p.max_row, "Plants cannot grow anymore"
+method grow*(self: var Plant) {.base.} =
+  doAssert self.currentRow < self.max_row, "Plants cannot grow anymore"
     
-  let prewRow = p.branches[p.currentRow]
-  for prewRow, i in 0 ..< len(prevRow):
-    let mut branch = prewRow[i]
-    let split = rl.GetRandomValue(0, 100)
-    if p.split_chance > split:
-      p.addBranch(branch.deg - p.getAngle(), branch)
-      p.addBranch(branch.deg + p.getAngle(), branch)
+  let prevRow = self.branches[self.currentRow]
+  for i in 0..prevRow.len - 1:
+    self.branches.add(@[])
+    var branch = prevRow[i]
+    let split = rand(0..100)
+    if self.splitChance > split:
+      self.addBranch(branch.deg - self.getAngle(), branch)
+      self.addBranch(branch.deg + self.getAngle(), branch)
     else:
-      p.addBranch(branch.deg, branch)
+      self.addBranch(branch.deg, branch)
   
-  inc(p.currentRow)
+  inc(self.currentRow)
 
-  
+method init*(self: var Plant, x: float, y: float, randomRow: bool) {.base.} =
+  self.startY = y
+
+  var angle = -90
+
+  # add the first branch at angle 90
+  let vertices = (Vector2(x: x, y: y), Vector2(x: x, y: y - self.h))
+  let branch = Branch(deg: angle, v1: vertices[0], v2: vertices[1], w: self.w, h: self.h, color: getColor(self.csBranch))
+  self.leftBound = x
+  self.rightBound = x + self.w
+  self.branches.add(@[branch])
+  # set up grow time
+  self.growTimer = rand(0.0..self.growTime)
+
+  # grow tree to random row if necessary
+  if randomRow:
+      var growToRow = rand(0..self.maxRow)
+      while self.currentRow < growToRow:
+          self.grow()
+
+method update*(self: var Plant, dt: float) {.base.} =
+  if self.growTimer > 0.0:
+    self.growTimer -= 100.0 * dt
+  elif self.currentRow < self.maxRow:
+    self.grow()
+    self.growTimer = self.growTime
+
+method draw*(self: Plant) {.base.} =
+  for i, row in self.branches:
+    for b in row:
+      var v2 = b.v2
+      if i == self.currentRow and self.growTimer > 0.0:
+        v2 = Vector2(x: self.getNextPos(b.v1.x, v2.x), y: self.getNextPos(b.v1.y, v2.y))
+      drawLine(b.v1, v2, b.w, b.color)
+
+    for l in self.leaves:
+      if l.row < i and not (i == self.currentRow and self.growTimer > 0.0):
+        drawCircle(l.v1, l.r, l.color)
+        drawCircle(l.v2, l.r, l.color)

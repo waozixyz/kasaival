@@ -6,7 +6,7 @@ type
 
   Terrain* = object
     tiles*: int = 0
-    plants*: seq[PlantNames]
+    grow*: seq[PlantNames]
     cs*: array[0..5, uint8]
  
   Level* = object
@@ -21,22 +21,22 @@ proc initDaisy*(): Level =
     Terrain(
       tiles: 100,
       cs: [16, 60, 60, 80, 200, 250],
-      plants: @[],
+      grow: @[],
     ),
     Terrain(
       tiles: 100,
       cs: [16, 60, 160, 200, 30, 50],
-      plants: @[Oak],
+      grow: @[Oak],
     ),
     Terrain(
       tiles: 100,
       cs: [50, 60, 130, 200, 80, 120],
-      plants: @[],
+      grow: @[],
     ),
     Terrain(
       tiles: 0,
       cs: [16, 60, 60, 90, 130, 200],
-      plants: @[],
+      grow: @[],
     )
   ]
     

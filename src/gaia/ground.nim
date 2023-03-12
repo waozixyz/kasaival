@@ -1,4 +1,4 @@
-import raylib, ../screens, ../levels, std/random, ../utils
+import raylib, ../screens, ../levels, std/random, ../utils, plant
 
 type
   Tile* = object
@@ -9,29 +9,22 @@ type
     color: Color
     orgColor: Color
     fertility: float
-    capacity: float = 1
-    plants*: seq[PlantNames]
+    capacity: int = 1
+    grow*: seq[PlantNames]
+    plantIndices: seq[int]
 
   Ground* = ref object of RootObj
     tiles* = @[Tile()]
+    plants*: seq[Plant]
 
-
-
-proc getTerrainColor(cs: array[0..5, uint8]): array[0..2, uint8] =
-  for i in 0..2:
-    var
-      a = min(float(cs[i * 2]), float(cs[i * 2 + 1]))
-      b = max(float(cs[i * 2]), float(cs[i * 2 + 1]))
-    result[i] = uint8(rand(a..b))
-  return result
 
 proc getColorDifference(c1: uint8, c2: uint8, s: float): uint8 =
   return uint8(float(c2) * s + float(c1) * (1 - s))
 
 proc getColor(s: float, t1: Terrain, t2: Terrain): Color =
   var
-    c1 = getTerrainColor(t1.cs)
-    c2 = getTerrainColor(t2.cs)
+    c1 = getCustomColorSchema(t1.cs)
+    c2 = getCustomColorSchema(t2.cs)
   return Color(
     r: getColorDifference(c1[0], c2[0], s),
     g: getColorDifference(c1[1], c2[1], s),
@@ -61,14 +54,14 @@ method init*(self: Ground, level: Level) {.base.} =
           i = clamp((x - endX) / terrainWidth, 0, 1)
           tile = Tile()
         tile.color = getColor(i, terrain, level.terrains[ti + 1])
-        if (terrain.plants.len > 0):
-          tile.fertility = float(rand(0..1000))
+        if (terrain.grow.len > 0):
+          tile.fertility = rand(0.0..1.0)
         tile.vertices = [
           Vector2(x: x - w, y: y),
           Vector2(x: x, y: y),
           Vector2(x: x, y: y - h)
         ]
-        tile.plants = terrain.plants
+        tile.grow = terrain.grow
         tile.orgColor = tile.color 
         self.tiles.add(tile)
         tile.color = getColorFromColor(tile.color, 15)
@@ -86,10 +79,9 @@ method init*(self: Ground, level: Level) {.base.} =
     endX += terrainWidth
     startY = y
   endX -= level.tile.x
+
 method update*(self: Ground, dt: float) {.base.}=
-  for i, tile in self.tiles:
-    # plant logic
-      
+  for i, tile in self.tiles:      
     # tile color logic
     var t = tile.color
     var to = tile.orgColor
@@ -106,9 +98,30 @@ method update*(self: Ground, dt: float) {.base.}=
         t.g += 1
       elif t.b < to.b:
         t.b += 1
-        
+    
     self.tiles[i].color = t
     self.tiles[i].burnTimer = burnTimer
+
+    for i in tile.plantIndices:
+      self.plants[i].update(dt)
+    # tile grow plant logic
+    if (tile.grow.len == 0): continue
+    self.tiles[i].fertility += dt * 0.001
+
+    
+    if tile.fertility < 1.0 or tile.plantIndices.len >= tile.capacity: continue
+    self.tiles[i].fertility = 0.0
+
+    var plant = Plant()
+    let (minX, maxX) = getMinMax(tile.vertices, 0)
+    let (minY, maxY) = getMinMax(tile.vertices, 1)
+    var x = rand(minX..maxX)
+    var y = rand(minY..maxY)
+
+    plant.init(x, y, false)
+    self.plants.add(plant)
+    self.tiles[i].plantIndices.add(self.plants.len - 1)
+
 
 proc isTileVisible*(tile: Tile): bool =
   let (minX, maxX) = getMinMax(tile.vertices, 0)
@@ -120,5 +133,3 @@ method draw*(self: Ground) {.base.} =
       let v = tile.vertices
       drawTriangle(v[0], v[1], v[2], tile.color)
   
-method unload*(self: Ground) {.base.}=
-  discard
