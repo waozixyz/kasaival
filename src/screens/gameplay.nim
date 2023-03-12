@@ -6,12 +6,16 @@ type
     player: Player = Player()
     ground: Ground = Ground()
     level: Level = initDaisy()
+    music: Music
 
 method init*(self: Gameplay) =
   self.id = GameplayScreen
+  # init music
+  self.music = loadMusicStream("resources/music/" & self.level.music)
+  playMusicStream(self.music);
+
   # Init gaia
   self.ground.init(self.level)
-
   # Init entities  
   self.player.init()
 
@@ -37,6 +41,9 @@ proc checkTileCollision(self: Gameplay) =
 
     
 method update*(self: Gameplay, dt: float) =
+  updateMusicStream(self.music)
+
+  # change screen on escape button
   if isKeyPressed(Escape):
     currentScreen = TitleScreen
 
