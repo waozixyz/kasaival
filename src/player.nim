@@ -93,6 +93,3 @@ method update*(self: Player) {.base.} =
 
 method draw*(self: Player) {.base.}  =
   self.sprite.draw()
-
-method unload*(self: Player) {.base.} =
-  self.sprite.unload()

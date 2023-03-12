@@ -101,5 +101,3 @@ method draw*(self: Fire) {.base.} =
     drawCircle(p.position, p.size, p.color)
  
 
-method unload*(self: Fire) {.base.} =
-  discard

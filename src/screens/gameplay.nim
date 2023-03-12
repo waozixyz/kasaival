@@ -1,4 +1,4 @@
-import raylib, ../screens, ../player, ../gaia/ground, ../levels, ../utils
+import raylib, ../screens, ../player, ../gaia/ground, ../levels, ../utils, ../gaia/sky
 
 type
   Gameplay* = ref object of Screen
@@ -6,6 +6,7 @@ type
     player: Player = Player()
     ground: Ground = Ground()
     level: Level = initDaisy()
+    sky: Sky = Sky()
     music: Music
 
 method init*(self: Gameplay) =
@@ -15,6 +16,7 @@ method init*(self: Gameplay) =
   playMusicStream(self.music);
 
   # Init gaia
+  self.sky.init()
   self.ground.init(self.level)
   # Init entities  
   self.player.init()
@@ -52,6 +54,7 @@ method update*(self: Gameplay, dt: float) =
   self.camera.zoom = zoom  
 
   # Update gaia
+  self.sky.update(dt)
   self.ground.update(dt)
   self.checkTileCollision()
 
@@ -59,16 +62,16 @@ method update*(self: Gameplay, dt: float) =
   self.player.update()
 
 method draw*(self: Gameplay) =
+  # draw background
+  self.sky.draw()
+
   beginMode2D(self.camera);
   # draw gaia
   self.ground.draw()
+
   # draw entities
   self.player.draw()
   endMode2D();
 
 method unload*(self: Gameplay) =
-  # unload gaia
-  self.ground.unload()
-  # unload entities
-  self.player.unload()
-
+  discard
