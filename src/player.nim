@@ -6,7 +6,7 @@ type
     sprite* = Fire()
     hp: float = 100.0
     xp: float = 0.0
-    speed: float = 0.4
+    speed: float = 0.6
     frozen = false
     scale*: float = 1
     initScale: float = 2

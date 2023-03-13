@@ -20,10 +20,10 @@ var
   endX* = 0.0
   endY* = screenHeight
   mouse* = Vector2()
-  currentScreen*: GameScreen = GameplayScreen
+  currentScreen*: GameScreen = TitleScreen
   yScaling* =  0.94
   mouseCursor* = 0
-  isMute* = true
+  isMute* = false
   
 type
   Screen* = ref object of RootObj

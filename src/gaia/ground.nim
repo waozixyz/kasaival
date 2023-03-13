@@ -11,11 +11,10 @@ type
     fertility: float
     capacity: int = 1
     grow*: seq[PlantNames]
-    plantIndices*: seq[int]
+    plants*: seq[Plant]
 
   Ground* = ref object of RootObj
     tiles* = @[Tile()]
-    plants*: seq[Plant]
 
 
 proc getColorDifference(c1: uint8, c2: uint8, s: float): uint8 =
@@ -48,8 +47,7 @@ method addPlant(self: Ground, i: int, randRow: bool) {.base.} =
   var y = rand(minY..maxY)
 
   plant.init(x, y, randRow)
-  self.plants.add(plant)
-  self.tiles[i].plantIndices.add(self.plants.len - 1)
+  self.tiles[i].plants.add(plant)
  
 method init*(self: Ground, level: Level) {.base.} =
   randomize()
@@ -119,14 +117,19 @@ method update*(self: Ground, dt: float) {.base.} =
     self.tiles[i].color = t
     self.tiles[i].burnTimer = burnTimer
 
-    for i in tile.plantIndices:
-      self.plants[i].update(dt)
+    for j, p in tile.plants:
+      self.tiles[i].plants[j].update(dt)
+      if p.dead:
+        self.tiles[i].plants.delete(j)
+      #if self.plants[i].dead:
+      #  self.plants.delete(i)
+
     # tile grow plant logic
     if (tile.grow.len == 0): continue
     self.tiles[i].fertility += dt * 0.001
 
     
-    if tile.fertility < 1.0 or tile.plantIndices.len >= tile.capacity: continue
+    if tile.fertility < 1.0 or tile.plants.len >= tile.capacity: continue
     self.tiles[i].fertility = 0.0
     self.addPlant(i, false)
    

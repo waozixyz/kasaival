@@ -31,6 +31,7 @@ type
     startY*: float = 0
     growing: bool = true
     burnTimer*: float = 0.0
+    dead*: bool = false
 
 
 proc getColor(cs: array[0..5, uint8]): Color =
@@ -83,7 +84,7 @@ method addBranch(self: var Plant, deg: int, b: Branch) {.base.} =
     self.rightBound = nx + bw
       
 proc getZ*(self: Plant): float = 
-  return float(self.branches[0][0].v1.y)
+  return self.startY
   
 proc getNextPos(self: Plant, a: float, b: float): float = 
   return b + (a - b) * float(self.growTimer) / float(self.growTime)
@@ -111,7 +112,6 @@ method init*(self: var Plant, x: float, y: float, randomRow: bool) {.base.} =
   self.h = 32 * scale
   var angle = -90
 
-
   # add the first branch at angle 90
   let vertices = (Vector2(x: x, y: y), Vector2(x: x, y: y - self.h))
   let c = Color(r: uint8(rand(125..178)),g: uint8(rand(122..160)),b: uint8(rand(76..90)))
@@ -128,33 +128,47 @@ method init*(self: var Plant, x: float, y: float, randomRow: bool) {.base.} =
     while self.currentRow < growToRow:
       self.grow()
 
+method shrink*(self: var Plant) {.base.} =
+  if self.currentRow == 0:
+    self.dead = true
+    
+  for i, b in self.branches[self.currentRow]:
+    self.branches[self.currentRow].delete(i)
+
+  dec(self.currentRow)
+
+
+proc changeColor(branchColor: Color, burnTimer: float, orgR: uint8): Color =
+  var c = branchColor
+  if burnTimer > 0:
+    c.r = uint8(min(220, int(c.r) + 10))
+    c.g = uint8(max(0, int(c.g) - 5))
+    c.b = uint8(max(0, int(c.b) - 2))
+  elif c.r > orgR:
+    c.r = max(orgR, c.r - 2)
+  return c
+
 method update*(self: var Plant, dt: float) {.base.} =
+  if self.dead: return
+
+  if self.burnTimer > 0:
+    self.growing = false
+    self.burnTimer -= 5.0 * dt
+    self.shrink()
+
   for i, row in self.branches:
     for j, branch in row:
-      var (r, g, b) = (branch.color.r, branch.color.g, branch.color.b)
+      let (r, g, b) = (branch.color.r, branch.color.g, branch.color.b)
+      self.branches[i][j].color = changeColor(branch.color, self.burnTimer, branch.orgColor.r)
+      
       for k, leaf in branch.leaves:
-        var (r, g, b) = (leaf.color.r, leaf.color.g, leaf.color.b)
-        if self.burnTimer > 0:
-          r = uint8(min(220, int(r) + 5))
-          g = uint8(max(0, int(g) - 5))
-          b = uint8(max(0, int(b) - 2))
-        else:
-          if r > leaf.orgColor.r:
-            r = max(leaf.orgColor.r, r - 2)
-        self.branches[i][j].leaves[k].color = Color(r: r, g: g, b: b, a:255)
-
-      if self.burnTimer > 0:
-        self.growing = false
-        r = uint8(min(220, int(r) + 5))
-        g = uint8(max(0, int(g) - 5))
-        b = uint8(max(0, int(b) - 2))
-        self.burnTimer -= 5.0 * dt
-      else:
-        if r < 50:
+        self.branches[i][j].leaves[k].color = changeColor(leaf.color, self.burnTimer, leaf.orgColor.r)
+        
+        if self.burnTimer <= 0 and r < 50:
           self.growing = true
-        if r > branch.orgColor.r:
-          r = max(branch.orgColor.r, r - 2)
-      self.branches[i][j].color = Color(r: r, g: g, b: b, a:255)
+        
+      self.branches[i][j].color.a = 255
+
 
   if self.growing:
     if self.growTimer > 0.0:
@@ -163,6 +177,7 @@ method update*(self: var Plant, dt: float) {.base.} =
       self.grow()
       self.growTimer = self.growTime
 method draw*(self: Plant) {.base.} =
+  if self.dead: return
   for i, row in self.branches:
     for b in row:
       var v2 = b.v2

@@ -2,9 +2,9 @@ import raylib, ../screens, ../player, ../gaia/ground, ../levels, ../utils, ../ga
 
 type
   Entity = object
-    item: string = ""
-    index: int = -1
-    z: float = 0
+    item: string
+    index: array[0..1, int]
+    z: float
   Gameplay* = ref object of Screen
     camera: Camera2D = Camera2D()
     player: Player = Player()
@@ -43,9 +43,9 @@ proc checkTileCollision(self: Gameplay) =
     if pos.x - pr * 1.5 < maxX and pos.x + pr * 0.5 > minX and pos.y - pr < maxY and pos.y + pr > minY:
       # Set burn timer for tile if player collides with it
       self.ground.tiles[i].burnTimer = 2
-      if tile.plantIndices.len == 0: continue
-      for i in tile.plantIndices:
-        self.ground.plants[i].burnTimer = 2
+      if tile.plants.len == 0: continue
+      for j, p in tile.plants:
+        self.ground.tiles[i].plants[j].burnTimer = 2
 
 proc sortEntities(x, y: Entity): int =
   cmp(x.z, y.z)
@@ -75,11 +75,14 @@ method update*(self: Gameplay, dt: float) =
 
   # add entities to sort
   self.entities = @[]
-  for i, p in self.ground.plants:
-    if p.rightBound < cx or p.leftBound > cx + screenWidth: continue
-    self.entities.add(Entity(index: i, z: p.getZ(), item: "plant"))
+  for i, t in self.ground.tiles:
+    for j, p in t.plants:
+      if p.dead: break
+      if p.rightBound < cx or p.leftBound > cx + screenWidth: continue
+      self.entities.add(Entity(index: [i, j], z: p.getZ(), item: "plant"))
+
   for i, p in self.player.sprite.particles:
-    self.entities.add(Entity(index: i, z: p.startY + self.player.getRadius() * 0.5, item: "player"))
+    self.entities.add(Entity(index: [i, -1], z: p.startY + self.player.getRadius() * 0.5, item: "player"))
   self.entities.sort(sortEntities)
 
 
@@ -96,9 +99,9 @@ method draw*(self: Gameplay) =
     var i = entity.index
     case entity.item:
       of "plant":
-        self.ground.plants[i].draw()
+        self.ground.tiles[i[0]].plants[i[1]].draw()
       of "player":
-        self.player.draw(i)
+        self.player.draw(i[0])
   endMode2D();
 
 method unload*(self: Gameplay) =
