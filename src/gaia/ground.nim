@@ -9,11 +9,12 @@ type
     color: Color
     orgColor: Color
     fertility: float
+    growProbability: float
     capacity: int = 1
-    grow*: seq[PlantNames]
     plants*: seq[Plant]
 
   Ground* = ref object of RootObj
+    grow*: seq[PlantNames]
     tiles* = @[Tile()]
 
 
@@ -68,16 +69,18 @@ method init*(self: Ground, level: Level) {.base.} =
           i = clamp((x - endX) / terrainWidth, 0, 1)
           tile = Tile()
         tile.color = getColor(i, terrain, level.terrains[ti + 1])
-        if (terrain.grow.len > 0):
+          
+        tile.growProbability = (float(tile.color.g) - (float(tile.color.r) + float(tile.color.b) * 0.5 )) / 200.0
+
+        if tile.growProbability > 0.5:
           tile.fertility = rand(0.0..1.1)
-  
 
         tile.vertices = [
           Vector2(x: x - w, y: y),
           Vector2(x: x, y: y),
           Vector2(x: x, y: y - h)
         ]
-        tile.grow = terrain.grow
+        self.grow = level.grow
         tile.orgColor = tile.color 
         self.tiles.add(tile)
         tile.color = getColorFromColor(tile.color, 15)
@@ -88,7 +91,7 @@ method init*(self: Ground, level: Level) {.base.} =
           Vector2(x: x, y: y - h)
         ]     
         self.tiles.add(tile)
-        if (tile.fertility > 1):
+        if (tile.fertility > 1 ):
           self.addPlant(self.tiles.len - 1, true)
         x += w      
       y -= h
@@ -134,7 +137,7 @@ method update*(self: Ground, dt: float) {.base.} =
 
     # tile grow plant logic
     # check if we should add a new plant
-    if (tile.grow.len == 0): continue
+    if (self.grow.len == 0 and tile.growProbability < 0.5): continue
     self.tiles[i].fertility += dt * 0.001
 
     

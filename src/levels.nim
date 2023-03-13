@@ -6,37 +6,35 @@ type
 
   Terrain* = object
     tiles*: int = 0
-    grow*: seq[PlantNames]
     cs*: array[0..5, uint8]
  
   Level* = object
     music*: string
     terrains*: seq[Terrain]
     tile*: Vector2 = Vector2()
+    grow*: seq[PlantNames]
 
 proc initDaisy*(): Level =
   result.music = "StrangerThings.ogg"
   result.tile = Vector2(x: 42, y: 42)
+  result.grow = @[Oak]
+
   result.terrains = @[
     Terrain(
       tiles: 100,
       cs: [16, 60, 60, 80, 200, 250],
-      grow: @[],
     ),
     Terrain(
       tiles: 100,
       cs: [16, 60, 160, 200, 30, 50],
-      grow: @[Oak],
     ),
     Terrain(
       tiles: 100,
       cs: [50, 60, 130, 200, 80, 120],
-      grow: @[],
     ),
     Terrain(
       tiles: 0,
       cs: [16, 60, 60, 90, 130, 200],
-      grow: @[],
     )
   ]
     
