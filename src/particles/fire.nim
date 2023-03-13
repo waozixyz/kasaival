@@ -2,12 +2,12 @@ import raylib, std/random
 
 type
   Particle* = object
-    start_y: int
+    startY*: float
     position: Vector2
     lifetime: float
-    vel_start: Vector2
-    vel_end: Vector2
-    shrink_factor: float
+    velStart: Vector2
+    velEnd: Vector2
+    shrinkFactor: float
     size: float
     color: Color
     colorStart: array[0..3, uint8]
@@ -21,7 +21,7 @@ type
     radius: float = 14
     colorStart: array[0..3, uint8] = [200, 60, 50, 200]
     colorEnd: array[0..3, uint8] = [120, 0, 100, 20]
-    particles = @[Particle()]
+    particles* = @[Particle()]
 
 
 method init*(self: Fire) {.base.} =
@@ -36,26 +36,26 @@ proc getColorEnd(self: Fire): array[0..3, uint8] =
   return rtn;
   
 method getRadius*(self: Fire): float {.base.} =
-  return self.radius * self.scale;
+  return self.radius * self.scale
 
 method getParticle(self: Fire, position: Vector2): Particle {.base.} =
-  let vel_x = rand(-3.0..3.0) * self.scale
-  let vel_x_end = vel_x * -1 + rand(-3.0..3.0) * self.scale
-  let shrink_factor = rand(92.0..95.0) * 0.01
+  let velX = rand(-3.0..3.0) * self.scale
+  let velXEnd = velX * -1 + rand(-3.0..3.0) * self.scale
+  let shrinkFactor = rand(92.0..95.0) * 0.01
   let size = self.radius * self.scale;
-  let vel_y = -4 * self.scale;
-  let vel_y_end = vel_y + (rand(3.0..5.0) * self.scale)
+  let velY = -4 * self.scale;
+  let velYEnd = velY + (rand(3.0..5.0) * self.scale)
   var p = Particle(
     size: size,
     lifetime: self.lifetime,
-    start_y: int(position.y),
+    startY: position.y,
     position: position,
-    vel_start: Vector2( x: vel_x, y: vel_y),
-    vel_end: Vector2( x: vel_x_end, y: vel_y_end),
+    velStart: Vector2( x: velX, y: velY),
+    velEnd: Vector2( x: velXEnd, y: velYEnd),
     color: Color(),
     colorStart: self.colorStart,
     colorEnd: getColorEnd(self),
-    shrink_factor: shrink_factor,
+    shrinkFactor: shrinkFactor,
   )
   return p
 
@@ -86,18 +86,18 @@ method update*(self: Fire, position: Vector2) {.base.} =
     if pp > 0:
       # Update particle attributes based on its remaining lifetime
       p.position = Vector2(
-        x: p.position.x + (p.vel_start.x * pp) + (p.vel_end.x * (1.0 - pp)),
-        y: p.position.y + (p.vel_start.y * pp) + (p.vel_end.y * (1.0 - pp))
+        x: p.position.x + (p.velStart.x * pp) + (p.velEnd.x * (1.0 - pp)),
+        y: p.position.y + (p.velStart.y * pp) + (p.velEnd.y * (1.0 - pp))
       )
       p.color = updateColors(p, pp)
-      p.size *= p.shrink_factor
+      p.size *= p.shrinkFactor
      
     p.lifetime -= 1
     self.particles[i] = p  # Assign back the updated particle
 
   
-method draw*(self: Fire) {.base.} =
-  for p in self.particles:
-    drawCircle(p.position, p.size, p.color)
+method draw*(self: Fire, i: int) {.base.} =
+  let p = self.particles[i]
+  drawCircle(p.position, p.size, p.color)
  
 

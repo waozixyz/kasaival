@@ -1,8 +1,6 @@
 import raylib, ../screens, ../player, ../gaia/ground, ../levels, ../utils, ../gaia/sky, ../gaia/plant, std/algorithm
 
 type
-
-
   Entity = object
     item: string = ""
     index: int = -1
@@ -42,16 +40,18 @@ proc checkTileCollision(self: Gameplay) =
     let (minX, maxX) = getMinMax(vertices, 0)
     let (minY, maxY) = getMinMax(vertices, 1)
 
-    if pos.x - pr * 1.5 < maxX and pos.x + pr * 0.5 > minX and pos.y + pr < maxY and pos.y + pr > minY:
+    if pos.x - pr * 1.5 < maxX and pos.x + pr * 0.5 > minX and pos.y - pr < maxY and pos.y + pr > minY:
       # Set burn timer for tile if player collides with it
       self.ground.tiles[i].burnTimer = 2
-
+      if tile.plantIndices.len == 0: continue
+      for i in tile.plantIndices:
+        self.ground.plants[i].burnTimer = 2
 
 proc sortEntities(x, y: Entity): int =
   cmp(x.z, y.z)
 
 method update*(self: Gameplay, dt: float) =
-  if (isKeyPressed(M)):
+  if isKeyPressed(M):
     isMute = not isMute
 
   if not isMute:
@@ -78,8 +78,8 @@ method update*(self: Gameplay, dt: float) =
   for i, p in self.ground.plants:
     if p.rightBound < cx or p.leftBound > cx + screenWidth: continue
     self.entities.add(Entity(index: i, z: p.getZ(), item: "plant"))
-    
-  self.entities.add(Entity(z: self.player.getZ(), item: "player"))
+  for i, p in self.player.sprite.particles:
+    self.entities.add(Entity(index: i, z: p.startY + self.player.getRadius() * 0.5, item: "player"))
   self.entities.sort(sortEntities)
 
 
@@ -98,7 +98,7 @@ method draw*(self: Gameplay) =
       of "plant":
         self.ground.plants[i].draw()
       of "player":
-        self.player.draw()
+        self.player.draw(i)
   endMode2D();
 
 method unload*(self: Gameplay) =

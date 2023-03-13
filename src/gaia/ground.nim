@@ -11,7 +11,7 @@ type
     fertility: float
     capacity: int = 1
     grow*: seq[PlantNames]
-    plantIndices: seq[int]
+    plantIndices*: seq[int]
 
   Ground* = ref object of RootObj
     tiles* = @[Tile()]
@@ -86,6 +86,7 @@ method update*(self: Ground, dt: float) {.base.}=
     var t = tile.color
     var to = tile.orgColor
     var burnTimer = tile.burnTimer
+
     if burnTimer > 0:
       t.r = uint8(min(int(220.0 - float(to.r) * 0.8), int(t.r) + 10))
       t.g = uint8(max(int(0.0 + float(to.g) * 0.8), int(t.g) - 5))

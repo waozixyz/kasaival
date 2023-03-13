@@ -3,7 +3,7 @@ import raylib, screens, particles/fire, std/math
 type
   Player* = ref object of RootObj
     position* = Vector2()
-    sprite = Fire()
+    sprite* = Fire()
     hp: float = 100.0
     xp: float = 0.0
     speed: float = 0.4
@@ -93,5 +93,5 @@ method update*(self: Player) {.base.} =
   # update flame
   self.sprite.update(self.position)
 
-method draw*(self: Player) {.base.}  =
-  self.sprite.draw()
+method draw*(self: Player, i: int) {.base.}  =
+  self.sprite.draw(i)

@@ -23,7 +23,7 @@ var
   currentScreen*: GameScreen = GameplayScreen
   yScaling* =  0.94
   mouseCursor* = 0
-  isMute* = false
+  isMute* = true
   
 type
   Screen* = ref object of RootObj
