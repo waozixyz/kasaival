@@ -1,5 +1,5 @@
 import
-  raylib, screens, screens/gameplay, screens/title
+  raylib, screens, screens/arcade, screens/title
 
 var
   target = RenderTexture2d()
@@ -10,8 +10,8 @@ proc getCurrentScreen() =
   case currentScreen
   of TitleScreen:
     current = Title()
-  of GameplayScreen:
-    current = Gameplay()
+  of ArcadeScreen:
+    current = Arcade()
   else:
     discard
 

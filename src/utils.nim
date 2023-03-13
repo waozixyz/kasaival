@@ -23,3 +23,12 @@ proc getCustomColorSchema*(cs: array[0..5, uint8]): array[0..2, uint8] =
       b = max(float(cs[i * 2]), float(cs[i * 2 + 1]))
     result[i] = uint8(rand(a..b))
   return result
+
+
+
+proc uint8ToColor*(color: array[0..2, float], alpha: float): Color =
+  result =  Color(
+    r: uint8(color[0]),
+    g: uint8(color[1]),
+    b: uint8(color[2]),
+    a: uint8(alpha))

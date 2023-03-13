@@ -3,7 +3,7 @@ import
 
 type
   GameScreen* = enum
-    UnknownScreen = -1, LogoScreen = 0, TitleScreen, GameplayScreen
+    UnknownScreen = -1, LogoScreen = 0, TitleScreen, ArcadeScreen
 
 # ----------------------------------------------------------------------------------
 # Global Variables Definition (shared by several modules)
@@ -20,8 +20,8 @@ var
   endX* = 0.0
   endY* = screenHeight
   mouse* = Vector2()
-  currentScreen*: GameScreen = TitleScreen
-  yScaling* =  0.94
+  currentScreen*: GameScreen = ArcadeScreen
+  yScaling* =  0.98
   mouseCursor* = 0
   isMute* = false
   

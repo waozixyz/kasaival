@@ -12,10 +12,10 @@ type
     initScale: float = 2
 
 const
-  key_right: array[0..1, KeyboardKey] = [Right, KeyboardKey(D)]
-  key_left: array[0..1, KeyboardKey] = [Left, KeyboardKey(A)]
-  key_up: array[0..1, KeyboardKey] = [Up, KeyboardKey(W)]
-  key_down: array[0..1, KeyboardKey] = [Down, KeyboardKey(S)]
+  keyRight: array[0..1, KeyboardKey] = [Right, KeyboardKey(D)]
+  keyLeft: array[0..1, KeyboardKey] = [Left, KeyboardKey(A)]
+  keyUp: array[0..1, KeyboardKey] = [Up, KeyboardKey(W)]
+  keyDown: array[0..1, KeyboardKey] = [Down, KeyboardKey(S)]
 
 proc getAngle(diff: Vector2): Vector2 =
   var angle = arctan2(diff.x, diff.y)
@@ -25,16 +25,16 @@ proc getAngle(diff: Vector2): Vector2 =
 
 proc getDirection(x: float, y: float): Vector2 =
   var dir = Vector2()
-  for key in key_right:
+  for key in keyRight:
     if (isKeyDown(key)):
       dir.x = 1;
-  for key in key_left:
+  for key in keyLeft:
     if (isKeyDown(key)):
       dir.x = -1;
-  for key in key_up:
+  for key in keyUp:
     if (isKeyDown(key)):
       dir.y = -1;
-  for key in key_down:
+  for key in keyDown:
     if (isKeyDown(key)):
       dir.y = 1;
   

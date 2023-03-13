@@ -39,12 +39,16 @@ proc getColorFromColor(c: Color, f: int): Color =
   )
 
 method addPlant(self: Ground, i: int, randRow: bool) {.base.} =
-  var tile = self.tiles[i]
   var plant = Plant()
+  let tile = self.tiles[i]
   let (minX, maxX) = getMinMax(tile.vertices, 0)
   let (minY, maxY) = getMinMax(tile.vertices, 1)
-  var x = rand(minX..maxX)
-  var y = rand(minY..maxY)
+  let scale = minY / screenHeight
+
+  let padding = 15.0  * scale
+
+  let x = minX
+  let y = rand((minY + padding)..(maxY-padding))
 
   plant.init(x, y, randRow)
   self.tiles[i].plants.add(plant)
@@ -93,43 +97,49 @@ method init*(self: Ground, level: Level) {.base.} =
     endX += terrainWidth
     startY = y
   endX -= level.tile.x
-
 method update*(self: Ground, dt: float) {.base.} =
+  # loop through tiles
   for i, tile in self.tiles:      
     # tile color logic
-    var t = tile.color
-    var to = tile.orgColor
+    var currentColor = tile.color
+    var originalColor = tile.orgColor
     var burnTimer = tile.burnTimer
 
     if burnTimer > 0:
-      t.r = uint8(min(int(220.0 - float(to.r) * 0.8), int(t.r) + 10))
-      t.g = uint8(max(int(0.0 + float(to.g) * 0.8), int(t.g) - 5))
-      t.b = uint8(max(int(0.0 + float(to.b) * 0.8), int(t.b) - 2))
+      # darken the colors while burning
+      currentColor.r = uint8(min(int(220.0 - float(originalColor.r) * 0.8), int(currentColor.r) + 10))
+      currentColor.g = uint8(max(int(0.0 + float(originalColor.g) * 0.8), int(currentColor.g) - 5))
+      currentColor.b = uint8(max(int(0.0 + float(originalColor.b) * 0.8), int(currentColor.b) - 2))
+      # decrement timer
       burnTimer -= 5.0 * dt
     else:
-      if t.r > to.r:
-        t.r = max(to.r, t.r - 2)
-      elif t.g < to.g:
-        t.g += 1
-      elif t.b < to.b:
-        t.b += 1
+      # bring the color back to original if not burning anymore
+      if currentColor.r > originalColor.r:
+        currentColor.r = max(originalColor.r, currentColor.r - 2)
+      elif currentColor.g < originalColor.g:
+        currentColor.g += 1
+      elif currentColor.b < originalColor.b:
+        currentColor.b += 1
     
-    self.tiles[i].color = t
+    # update tile color and timer
+    self.tiles[i].color = currentColor
     self.tiles[i].burnTimer = burnTimer
 
-    for j, p in tile.plants:
+    # loop through plants
+    for j, plant in tile.plants:
       self.tiles[i].plants[j].update(dt)
-      if p.dead:
+      if plant.dead:
+        # remove dead plant from list
         self.tiles[i].plants.delete(j)
-      #if self.plants[i].dead:
-      #  self.plants.delete(i)
 
     # tile grow plant logic
+    # check if we should add a new plant
     if (tile.grow.len == 0): continue
     self.tiles[i].fertility += dt * 0.001
 
     
     if tile.fertility < 1.0 or tile.plants.len >= tile.capacity: continue
+    # reset fertility and add new plant
     self.tiles[i].fertility = 0.0
     self.addPlant(i, false)
    

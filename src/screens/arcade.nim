@@ -5,7 +5,7 @@ type
     item: string
     index: array[0..1, int]
     z: float
-  Gameplay* = ref object of Screen
+  Arcade* = ref object of Screen
     camera: Camera2D = Camera2D()
     player: Player = Player()
     ground: Ground = Ground()
@@ -14,8 +14,8 @@ type
     music: Music
     entities: seq[Entity]
 
-method init*(self: Gameplay) =
-  self.id = GameplayScreen
+method init*(self: Arcade) =
+  self.id = ArcadeScreen
   # init music
   self.music = loadMusicStream("resources/music/" & self.level.music)
   playMusicStream(self.music);
@@ -26,7 +26,7 @@ method init*(self: Gameplay) =
   # Init entities  
   self.player.init()
 
-proc checkTileCollision(self: Gameplay) =
+proc checkTileCollision(self: Arcade) =
   # check tile collision with player
   var pos = self.player.position
   var pr = self.player.getRadius() 
@@ -50,7 +50,7 @@ proc checkTileCollision(self: Gameplay) =
 proc sortEntities(x, y: Entity): int =
   cmp(x.z, y.z)
 
-method update*(self: Gameplay, dt: float) =
+method update*(self: Arcade, dt: float) =
   if isKeyPressed(M):
     isMute = not isMute
 
@@ -86,7 +86,7 @@ method update*(self: Gameplay, dt: float) =
   self.entities.sort(sortEntities)
 
 
-method draw*(self: Gameplay) =
+method draw*(self: Arcade) =
   # draw background
   self.sky.draw()
 
@@ -104,5 +104,5 @@ method draw*(self: Gameplay) =
         self.player.draw(i[0])
   endMode2D();
 
-method unload*(self: Gameplay) =
+method unload*(self: Arcade) =
   discard

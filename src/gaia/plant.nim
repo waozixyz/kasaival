@@ -5,14 +5,14 @@ type
     deg: int
     v1, v2: Vector2
     w, h: float
-    color: Color
-    orgColor: Color
+    color: array[0..2, float]
+    orgColor: array[0..2, float]
     leaves: seq[Leaf]
   Leaf = object
     v1, v2: Vector2
     r: float
-    color: Color
-    orgColor: Color
+    color: array[0..2, float]
+    orgColor: array[0..2, float]
   Plant* = object 
     branches: seq[seq[Branch]]
     leafChance: float = 0.5
@@ -24,7 +24,8 @@ type
     leftBound*: float = 9999999
     rightBound*: float = -9999999
     growTimer: float = 0
-    growTime: float = 20
+    growSpeed: float = 2
+    burnSpeed: float = 4
     scale: float = 1
     w: float = 10
     h: float = 15
@@ -32,12 +33,10 @@ type
     growing: bool = true
     burnTimer*: float = 0.0
     dead*: bool = false
+    reviving: bool = false
+    decayTimer: float = 0.0
+    alpha: float = 255.0
 
-
-proc getColor(cs: array[0..5, uint8]): Color =
-  var c = getCustomColorSchema(cs)
-
-  return Color(r: c[0], g: c[1], b: c[2], a: 255)
 
 proc getRotX(deg: int): float = 
   return cos(deg2rad(float(deg)))
@@ -48,9 +47,9 @@ proc getRotY(deg: int): float =
 method getAngle(self: Plant): int {.base.} =
   return rand( self.splitAngle[0]..self.splitAngle[1] )
 
-proc getRandomUint8(baseUint8: uint8, randRange: int): uint8 =
+proc getRandomColor(color: float, randRange: float): float =
   ## Returns a random uint8 within range of `randRange` added to base `uint8`
-  result = uint8(min(255, max(0, int(baseUint8) + rand(-randRange..randRange))))
+  result = min(255.0, max(0.0, color + rand(-randRange..randRange)))
   
 method addBranch(self: var Plant, deg: int, b: Branch) {.base.} =
   let bw = b.w * 0.9
@@ -60,12 +59,10 @@ method addBranch(self: var Plant, deg: int, b: Branch) {.base.} =
   let nx = px + getRotX(deg) * bh;
   let ny = py + getRotY(deg) * bh;
   
-  var c = Color(
-    r: getRandomUint8(b.color.r, rand(0..15)),
-    g: getRandomUint8(b.color.g, rand(0..20)),
-    b: getRandomUint8(b.color.b, rand(0..15)),
-    a: 255
-  )
+  var c = [
+    getRandomColor(b.color[0], rand(0.0..15.0)),
+    getRandomColor(b.color[1], rand(0.0..20.0)),
+    getRandomColor(b.color[2], rand(0.0..15.0))]
 
   let v1 = Vector2(x: px, y: py)
   let v2 = Vector2(x: nx, y: ny)
@@ -74,7 +71,12 @@ method addBranch(self: var Plant, deg: int, b: Branch) {.base.} =
   if chance == self.leafChance:
     let divX = getRotX(deg * 2) * bw;
     let divY = getRotY(deg * 2) * bw;
-    c = getColor(self.csLeaf)
+    let leafColor = getCustomColorSchema(self.csLeaf)
+    c = [
+      float(leafColor[0]),
+      float(leafColor[1]),
+      float(leafColor[2]),
+    ]
     var currentBranch = self.branches[self.currentRow + 1].len - 1
     self.branches[self.currentRow + 1][currentBranch].leaves.add(Leaf( r: bw * 0.8, v1: Vector2(x: nx+divX, y: ny+divY), v2: Vector2( x: nx-divX, y: ny-divY), color: c, orgColor: c))
 
@@ -87,8 +89,11 @@ proc getZ*(self: Plant): float =
   return self.startY
   
 proc getNextPos(self: Plant, a: float, b: float): float = 
-  return b + (a - b) * float(self.growTimer) / float(self.growTime)
-    
+  return b + (a - b) * float(self.growTimer) / 1.0
+
+proc increaseColor(channel: float, amount: float): float =
+    result = min(255.0, max(0.0, channel + amount))
+
 method grow*(self: var Plant) {.base.} =
   doAssert self.currentRow < self.max_row, "Plants cannot grow anymore"
     
@@ -105,6 +110,14 @@ method grow*(self: var Plant) {.base.} =
   
   inc(self.currentRow)
 
+
+  for i, row in self.branches:
+    for j, b in row:
+      self.branches[i][j].color[1] = increaseColor(b.orgColor[1], +2.0)
+      self.branches[i][j].orgColor[1] = increaseColor(b.orgColor[1], -8.0)
+      self.branches[i][j].orgColor[0] = increaseColor(b.orgColor[0], +5.0)
+      self.branches[i][j].color[0] = increaseColor(b.color[0], +5.0)
+
 method init*(self: var Plant, x: float, y: float, randomRow: bool) {.base.} =
   self.startY = y
   var scale = y / screenHeight
@@ -114,13 +127,11 @@ method init*(self: var Plant, x: float, y: float, randomRow: bool) {.base.} =
 
   # add the first branch at angle 90
   let vertices = (Vector2(x: x, y: y), Vector2(x: x, y: y - self.h))
-  let c = Color(r: uint8(rand(125..178)),g: uint8(rand(122..160)),b: uint8(rand(76..90)))
+  let c = [rand(125.0..178.0), rand(162.0..230.0), rand(76.0..90.0)]
   let branch = Branch(deg: angle, v1: vertices[0], v2: vertices[1], w: self.w, h: self.h, color: c, orgColor: c)
   self.leftBound = x
   self.rightBound = x + self.w
   self.branches.add(@[branch])
-  # set up grow time
-  self.growTimer = rand(0.0..self.growTime)
 
   # grow tree to random row if necessary
   if randomRow:
@@ -138,44 +149,91 @@ method shrink*(self: var Plant) {.base.} =
   dec(self.currentRow)
 
 
-proc changeColor(branchColor: Color, burnTimer: float, orgR: uint8): Color =
+proc burnColor(self: var Plant, dt: float, branchColor: array[0..2, float], org: array[0..2, float]): array[0..2, float] =
   var c = branchColor
-  if burnTimer > 0:
-    c.r = uint8(min(220, int(c.r) + 10))
-    c.g = uint8(max(0, int(c.g) - 5))
-    c.b = uint8(max(0, int(c.b) - 2))
-  elif c.r > orgR:
-    c.r = max(orgR, c.r - 2)
+  if self.burnTimer > 0.0:
+    c[0] = min(220.0, c[0] + 600.0 * dt)
+    c[1] = max(0.0, c[1] - 40.0 * dt)
+    c[2] = max(0.0, c[2] - 180.0 * dt)
+  elif not self.growing:
+    if c[0] > org[0] - 30: 
+      c[0] = max(0, c[0] - 30.0 * dt)
+    if c[1] < org[1] - 150:
+      c[1] = min(2.0, c[1] - 120 * dt)
+  if self.reviving:
+    if c[1] < org[1]:
+      c[1] += 120 * dt
+
   return c
 
-method update*(self: var Plant, dt: float) {.base.} =
-  if self.dead: return
+method update*(self: var Plant, dt: float)  {.base.}  =  
+  if self.dead: 
+    return
+    
+  if self.alpha < 1:
+    self.dead = true
+    return
 
+  # If the plant is burning, reduce its size and stop growth
   if self.burnTimer > 0:
     self.growing = false
     self.burnTimer -= 5.0 * dt
-    self.shrink()
 
+    if self.growTimer > 1:
+      self.shrink()
+      self.growTimer = 0
+    else:
+      self.growTimer += self.burnSpeed * dt
+
+  if not self.growing and not self.reviving:
+    self.decayTimer += dt
+
+  # Loop through all branches and leaves, updating their colors based on burn timer
   for i, row in self.branches:
     for j, branch in row:
-      let (r, g, b) = (branch.color.r, branch.color.g, branch.color.b)
-      self.branches[i][j].color = changeColor(branch.color, self.burnTimer, branch.orgColor.r)
+      let color = branch.color
+      let orgColor = branch.orgColor
       
+      # Update branch color
+      if self.decayTimer > 50:
+        var c = color
+        c[0] = max(0, c[0] - 20 * dt)
+        c[1] = max(0, c[1] - 20 * dt)
+        c[2] = max(0, c[2] - 20 * dt)
+        if self.alpha > 200:
+          self.alpha = max(0, self.alpha - 2 * dt)
+        else:
+          self.alpha = max(0, self.alpha - 20 * dt)
+
+        self.branches[i][j].color = c
+        echo c
+        continue
+      else:
+        self.branches[i][j].color = self.burnColor(dt, color, orgColor)
+      
+      # Loop through all leafs to update leaf color
       for k, leaf in branch.leaves:
-        self.branches[i][j].leaves[k].color = changeColor(leaf.color, self.burnTimer, leaf.orgColor.r)
+        let leafColor = leaf.color
+        let leafOrgCol = leaf.orgColor
+        self.branches[i][j].leaves[k].color = self.burnColor(dt, leafColor, leafOrgCol)
         
-        if self.burnTimer <= 0 and r < 50:
+      # Check if the plant should start growing again if it was previously burnt
+      if self.burnTimer <= 0 and color[0] < 100 and color[1] > 100:
+        self.reviving = true
+        self.decayTimer = 0
+        if color[2] > 200:
           self.growing = true
-        
-      self.branches[i][j].color.a = 255
+          self.reviving = false
+          
 
-
+  # If the plant is able to grow, increase its size and update the timer
   if self.growing:
     if self.growTimer > 0.0:
-      self.growTimer -= 100.0 * dt
+      self.growTimer -= self.growSpeed * dt
     elif self.currentRow < self.maxRow:
       self.grow()
-      self.growTimer = self.growTime
+      self.growTimer = 1
+
 method draw*(self: Plant) {.base.} =
   if self.dead: return
   for i, row in self.branches:
@@ -183,11 +241,11 @@ method draw*(self: Plant) {.base.} =
       var v2 = b.v2
       if i == self.currentRow and self.growTimer > 0.0:
         v2 = Vector2(x: self.getNextPos(b.v1.x, v2.x), y: self.getNextPos(b.v1.y, v2.y))
-      drawLine(b.v1, v2, b.w, b.color)
+      drawLine(b.v1, v2, b.w, uint8ToColor(b.color, self.alpha))
 
       for l in b.leaves:
         var radius = l.r
         if i == self.currentRow and self.growTimer > 0.0:
           radius = self.getNextPos(0.0, l.r)
-        drawCircle(l.v1, radius, l.color)
+        drawCircle(l.v1, radius, uint8ToColor(l.color, self.alpha))
   

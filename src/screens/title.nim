@@ -12,7 +12,7 @@ method init*(self: Title) =
 method update*(self: Title, dt: float) =
   mouseCursor = 4
   if isKeyPressed(Enter) or isGestureDetected(Tap):
-    currentScreen = GameplayScreen
+    currentScreen = ArcadeScreen
   discard
 
 method draw*(self: Title)  =
