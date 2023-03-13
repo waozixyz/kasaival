@@ -38,7 +38,19 @@ proc getColorFromColor(c: Color, f: int): Color =
     b: uint8(int(c.b) + rand(-f..f)),
     a: 255,
   )
-    
+
+method addPlant(self: Ground, i: int, randRow: bool) {.base.} =
+  var tile = self.tiles[i]
+  var plant = Plant()
+  let (minX, maxX) = getMinMax(tile.vertices, 0)
+  let (minY, maxY) = getMinMax(tile.vertices, 1)
+  var x = rand(minX..maxX)
+  var y = rand(minY..maxY)
+
+  plant.init(x, y, randRow)
+  self.plants.add(plant)
+  self.tiles[i].plantIndices.add(self.plants.len - 1)
+ 
 method init*(self: Ground, level: Level) {.base.} =
   randomize()
   endX = -level.tile.x
@@ -55,7 +67,9 @@ method init*(self: Ground, level: Level) {.base.} =
           tile = Tile()
         tile.color = getColor(i, terrain, level.terrains[ti + 1])
         if (terrain.grow.len > 0):
-          tile.fertility = rand(0.0..1.0)
+          tile.fertility = rand(0.0..1.1)
+  
+
         tile.vertices = [
           Vector2(x: x - w, y: y),
           Vector2(x: x, y: y),
@@ -72,6 +86,8 @@ method init*(self: Ground, level: Level) {.base.} =
           Vector2(x: x, y: y - h)
         ]     
         self.tiles.add(tile)
+        if (tile.fertility > 1):
+          self.addPlant(self.tiles.len - 1, true)
         x += w      
       y -= h
       h *= yScaling
@@ -80,7 +96,7 @@ method init*(self: Ground, level: Level) {.base.} =
     startY = y
   endX -= level.tile.x
 
-method update*(self: Ground, dt: float) {.base.}=
+method update*(self: Ground, dt: float) {.base.} =
   for i, tile in self.tiles:      
     # tile color logic
     var t = tile.color
@@ -112,17 +128,8 @@ method update*(self: Ground, dt: float) {.base.}=
     
     if tile.fertility < 1.0 or tile.plantIndices.len >= tile.capacity: continue
     self.tiles[i].fertility = 0.0
-
-    var plant = Plant()
-    let (minX, maxX) = getMinMax(tile.vertices, 0)
-    let (minY, maxY) = getMinMax(tile.vertices, 1)
-    var x = rand(minX..maxX)
-    var y = rand(minY..maxY)
-
-    plant.init(x, y, false)
-    self.plants.add(plant)
-    self.tiles[i].plantIndices.add(self.plants.len - 1)
-
+    self.addPlant(i, false)
+   
 
 proc isTileVisible*(tile: Tile): bool =
   let (minX, maxX) = getMinMax(tile.vertices, 0)

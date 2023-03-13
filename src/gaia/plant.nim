@@ -20,8 +20,7 @@ type
     maxRow: int = 5
     currentRow: int = 0
     splitChance: int = 40
-    splitAngle: array[2,int] = [20,30]
-    csBranch: array[6,uint8]= [ 125, 178, 122, 160, 76, 90 ]
+    splitAngle: array[0..1, int] = [20,30]
     csLeaf: array[6,uint8] = [ 150, 204, 190, 230, 159, 178 ]
     leftBound*: float = 9999999
     rightBound*: float = -9999999
@@ -47,7 +46,11 @@ proc getRotY(deg: int): float =
 
 method getAngle(self: Plant): int {.base.} =
   return rand( self.splitAngle[0]..self.splitAngle[1] )
-      
+
+proc getRandomUint8(baseUint8: uint8, randRange: int): uint8 =
+  ## Returns a random uint8 within range of `randRange` added to base `uint8`
+  result = uint8(min(255, max(0, int(baseUint8) + rand(-randRange..randRange))))
+  
 method addBranch(self: var Plant, deg: int, b: Branch) {.base.} =
   let bw = b.w * 0.9
   let bh = b.h * 0.95
@@ -55,7 +58,16 @@ method addBranch(self: var Plant, deg: int, b: Branch) {.base.} =
   let py = b.v2.y
   let nx = px + getRotX(deg) * bh;
   let ny = py + getRotY(deg) * bh;
-  var c = getColor(self.csBranch)
+  let randR = rand(0..15)
+  let randG = rand(0..15)
+  let randB = rand(0..15)
+  var c = Color(
+    r: getRandomUint8(b.color.r, randR),
+    g: getRandomUint8(b.color.g, randG),
+    b: getRandomUint8(b.color.b, randB)
+  )
+
+
   let v1 = Vector2(x: px, y: py)
   let v2 = Vector2(x: nx, y: ny)
   self.branches[self.currentRow + 1].add(Branch(deg: deg, v1: v1, v2: v2, w: bw, h: bh, color: c, orgColor: c))
@@ -101,9 +113,10 @@ method init*(self: var Plant, x: float, y: float, randomRow: bool) {.base.} =
   self.h = 32 * scale
   var angle = -90
 
+
   # add the first branch at angle 90
   let vertices = (Vector2(x: x, y: y), Vector2(x: x, y: y - self.h))
-  let c = getColor(self.csBranch)
+  let c = Color(r: uint8(rand(125..178)),g: uint8(rand(122..160)),b: uint8(rand(76..90)))
   let branch = Branch(deg: angle, v1: vertices[0], v2: vertices[1], w: self.w, h: self.h, color: c, orgColor: c)
   self.leftBound = x
   self.rightBound = x + self.w
@@ -113,9 +126,9 @@ method init*(self: var Plant, x: float, y: float, randomRow: bool) {.base.} =
 
   # grow tree to random row if necessary
   if randomRow:
-      var growToRow = rand(0..self.maxRow)
-      while self.currentRow < growToRow:
-          self.grow()
+    var growToRow = rand(0..self.maxRow)
+    while self.currentRow < growToRow:
+      self.grow()
 
 method update*(self: var Plant, dt: float) {.base.} =
   if self.growTimer > 0.0:
