@@ -1,8 +1,8 @@
 # Package
 version       = "1.0.0"
-author        = "Author"
-description   = "Raylib game template"
-license       = "License"
+author        = "Waotzi"
+description   = "an out of control flame trying to survive"
+license       = "GPL3"
 srcDir        = "src"
 
 # Dependencies
