@@ -15,7 +15,7 @@ type
 
   Ground* = ref object of RootObj
     grow*: seq[PlantNames]
-    tiles* = @[Tile()]
+    tiles*: seq[Tile]
 
 
 proc getColorDifference(c1: uint8, c2: uint8, s: float): uint8 =
