@@ -65,8 +65,7 @@ proc main =
   # init raylib window
   setconfigFlags(flags(WindowResizable));
   initWindow(screenWidth, screenHeight, "Kasaival")
-  setTargetFPS(60)
-  initAudioDevice()
+  
   
   target = loadRenderTexture(screenWidth, screenHeight)
 
@@ -74,11 +73,12 @@ proc main =
     # init current screen
     getCurrentScreen()
     current.init()
-
+    
     # run game loop
     when defined(emscripten):
-      emscriptenSetMainLoop(updateDrawFrame, 60, 1)
+      emscriptenSetMainLoop(updateDrawFrame, 0, 1)
     else:
+      initAudioDevice()
       setTargetFPS(60)
       while not windowShouldClose():
         updateDrawFrame()

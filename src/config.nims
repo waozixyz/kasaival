@@ -1,4 +1,7 @@
+--define:emscripten # Specify target
+
 import os
+
 const AndroidApiVersion {.intdefine.} = 29
 const AndroidNdk {.strdefine.} = "/opt/android-ndk"
 when defined(windows):
@@ -65,6 +68,5 @@ elif defined(emscripten):
   --threads:off
   --panics:on
   --define:noSignalHandler
-  --passL:"-o raylib_game.html"
-  # Use raylib/src/shell.html or raylib/src/minshell.html
-  # --passL:"--shell-file minshell.html"
+  --passL:"-o ../public/index.html"
+  --passL:"--shell-file shell.html"
