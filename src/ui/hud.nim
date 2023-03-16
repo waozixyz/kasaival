@@ -11,6 +11,6 @@ method update*(self: Hud, dt: float) {.base.} =
   discard
   
 method draw*(self: Hud, player: Player) {.base.} =
-  drawText("Fuel: " & $int(player.fuel), 20, 20, 30, Maroon);
+  drawText("Fuel: " & $round(playerFuel, -1), 20, 20, 30, Maroon);
   drawText("Day", screenWidth - 100, 20, 30, BEIGE);
 

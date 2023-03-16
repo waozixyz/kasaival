@@ -24,6 +24,8 @@ var
   yScaling* =  0.98
   mouseCursor* = 0
   isMute* = false
+  playerFuel*: float = 300
+
   
 type
   Screen* = ref object of RootObj

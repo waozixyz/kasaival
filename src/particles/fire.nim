@@ -19,8 +19,8 @@ type
     lifetime: float = 40
     scale*: float = 1
     radius: float = 14
-    colorStart: array[0..3, uint8] = [200, 60, 50, 200]
-    colorEnd: array[0..3, uint8] = [120, 0, 100, 20]
+    colorStart*: array[0..3, uint8] = [200, 60, 50, 200]
+    colorEnd*: array[0..3, uint8] = [120, 0, 100, 20]
     particles* = @[Particle()]
 
 
@@ -96,13 +96,13 @@ method update*(self: Fire, position: Vector2) {.base.} =
     self.particles[i] = p  # Assign back the updated particle
 
   
-method draw*(self: Fire, i: int, fuel: float = 255) {.base.} =
+method draw*(self: Fire, i: int, alpha: float = 255) {.base.} =
   let p = self.particles[i]
   var c = p.color
-  var f = fuel
-  if f > 255: f = 255
-  if f < 0: f = 0
-  c.a = uint8(float(c.a) * 255 / f)
+  var a = alpha
+  if a > 255: a = 255
+  if a < 0: a = 0
+  c.a = uint8(float(c.a) * 255 / a)
   drawCircle(p.position, p.size, c)
  
 

@@ -47,13 +47,18 @@ proc checkTileCollision(self: Arcade, dt: float) =
       self.ground.tiles[i].burnTimer = 2
       let c = self.ground.tiles[i].color
       let oc = self.ground.tiles[i].orgColor
-      let fuel = (c[1]  - c[2] - oc[2]) / 100 * dt
-      self.player.addFuel(fuel)
+      var bf = 5.0
+      if oc[2] > 100:
+        bf *= 2
+      if oc[2] > 200:
+        bf *= 10
+      let fuel = (c[1]  - c[2] - oc[2] * bf) / 100 * dt
+      playerFuel += fuel
+
       if tile.plants.len == 0: continue
       
       for j, p in tile.plants:
         self.ground.tiles[i].plants[j].burnTimer = 2
-
 
 proc sortEntities(x, y: Entity): int =
   cmp(x.z, y.z)

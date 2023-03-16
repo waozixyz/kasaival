@@ -26,7 +26,8 @@ type
     growTimer: float = 0
     growSpeed: float = 2
     burnSpeed: float = 4
-    scale: float = 1
+    scale: float = 1.0
+    branchFuel: float = 2
     w: float = 10
     h: float = 15
     startY*: float = 0
@@ -58,7 +59,6 @@ method addBranch(self: var Plant, deg: int, b: Branch) {.base.} =
   let py = b.v2.y
   let nx = px + getRotX(deg) * bh;
   let ny = py + getRotY(deg) * bh;
-  
   var c = [
     getRandomColor(b.color[0], rand(0.0..15.0)),
     getRandomColor(b.color[1], rand(0.0..20.0)),
@@ -67,7 +67,7 @@ method addBranch(self: var Plant, deg: int, b: Branch) {.base.} =
   let v1 = Vector2(x: px, y: py)
   let v2 = Vector2(x: nx, y: ny)
   self.branches[self.currentRow + 1].add(Branch(deg: deg, v1: v1, v2: v2, w: bw, h: bh, color: c, orgColor: c))
-  var chance = clamp(rand(0.0..1.0) * float(self.currentRow) / float(self.maxRow), 0.0, self.leafChance)
+  let chance = clamp(rand(0.0..1.0) * float(self.currentRow) / float(self.maxRow), 0.0, self.leafChance)
   if chance == self.leafChance:
     let divX = getRotX(deg * 2) * bw;
     let divY = getRotY(deg * 2) * bw;
@@ -77,7 +77,7 @@ method addBranch(self: var Plant, deg: int, b: Branch) {.base.} =
       float(leafColor[1]),
       float(leafColor[2]),
     ]
-    var currentBranch = self.branches[self.currentRow + 1].len - 1
+    let currentBranch = self.branches[self.currentRow + 1].len - 1
     self.branches[self.currentRow + 1][currentBranch].leaves.add(Leaf( r: bw * 0.8, v1: Vector2(x: nx+divX, y: ny+divY), v2: Vector2( x: nx-divX, y: ny-divY), color: c, orgColor: c))
 
   if nx < self.leftBound:
@@ -87,7 +87,7 @@ method addBranch(self: var Plant, deg: int, b: Branch) {.base.} =
       
 proc getZ*(self: Plant): float = 
   return self.startY
-  
+
 proc getNextPos(self: Plant, a: float, b: float): float = 
   return b + (a - b) * float(self.growTimer) / 1.0
 
@@ -142,9 +142,9 @@ method init*(self: var Plant, x: float, y: float, randomRow: bool) {.base.} =
 method shrink*(self: var Plant) {.base.} =
   if self.currentRow == 0:
     self.dead = true
-    
   for i, b in self.branches[self.currentRow]:
     self.branches[self.currentRow].delete(i)
+    playerFuel += self.branchFuel
 
   dec(self.currentRow)
 
@@ -167,7 +167,6 @@ proc burnColor(self: var Plant, dt: float, branchColor: array[0..2, float], org:
   return c
 
 method update*(self: var Plant, dt: float)  {.base.}  =  
-  echo self.alpha
   if self.alpha < 1:
     self.dead = true
 

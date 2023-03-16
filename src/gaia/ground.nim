@@ -67,7 +67,6 @@ method init*(self: Ground, level: Level) {.base.} =
         tile.color = getColor(i, terrain, level.terrains[ti + 1])
           
         tile.growProbability = (tile.color[1] - (tile.color[0] + tile.color[1] * 0.5 )) / 100.0
-        echo tile.growProbability
         if tile.growProbability > 0.5:
           tile.fertility = rand(0.0..1.1)
 
