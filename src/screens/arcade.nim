@@ -50,8 +50,9 @@ proc checkTileCollision(self: Arcade, dt: float) =
       var bf = 5.0
       if oc[2] > 100:
         bf *= 2
-      if oc[2] > 200:
+      if oc[2] > 150:
         bf *= 10
+    
       let fuel = (c[1]  - c[2] - oc[2] * bf) / 100 * dt
       playerFuel += fuel
 
