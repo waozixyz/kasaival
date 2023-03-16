@@ -1,4 +1,4 @@
-import raylib, ../screens, ../player, ../gaia/ground, ../levels, ../utils, ../gaia/sky, ../gaia/plant, std/algorithm
+import raylib, ../screens, ../player, ../gaia/ground, ../levels, ../utils, ../gaia/sky, ../gaia/plant, std/algorithm, ../ui/hud
 
 type
   Entity = object
@@ -12,15 +12,16 @@ type
     level: Level = initDaisy()
     sky: Sky = Sky()
     music: Music
+    hud: Hud = Hud()
     entities: seq[Entity]
 
 method init*(self: Arcade) =
   self.id = ArcadeScreen
   # init music
-  if not defined(emscripten):
-    self.music = loadMusicStream("resources/music/" & self.level.music)
-    playMusicStream(self.music);
-
+  self.music = loadMusicStream("resources/music/" & self.level.music)
+  playMusicStream(self.music);
+  # init ui
+  self.hud.init()
   # Init gaia
   self.sky.init()
   self.ground.init(self.level)
@@ -64,7 +65,10 @@ method update*(self: Arcade, dt: float) =
 
   # Update the camera target and zoom
   self.camera.target.x = cx
-  self.camera.zoom = zoom  
+  self.camera.zoom = zoom
+
+  # update ui
+  self.hud.update(dt)
 
   # Update gaia
   self.sky.update(dt)
@@ -104,6 +108,9 @@ method draw*(self: Arcade) =
       of "player":
         self.player.draw(i[0])
   endMode2D();
+  
+  # draw ui
+  self.hud.draw()
 
 method unload*(self: Arcade) =
   discard

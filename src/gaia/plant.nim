@@ -167,13 +167,12 @@ proc burnColor(self: var Plant, dt: float, branchColor: array[0..2, float], org:
   return c
 
 method update*(self: var Plant, dt: float)  {.base.}  =  
+  if self.alpha < 1:
+    self.dead = true
+  
   if self.dead: 
     return
     
-  if self.alpha < 1:
-    self.dead = true
-    return
-
   # If the plant is burning, reduce its size and stop growth
   if self.burnTimer > 0:
     self.growing = false
@@ -206,7 +205,6 @@ method update*(self: var Plant, dt: float)  {.base.}  =
           self.alpha = max(0, self.alpha - 20 * dt)
 
         self.branches[i][j].color = c
-        echo c
         continue
       else:
         self.branches[i][j].color = self.burnColor(dt, color, orgColor)

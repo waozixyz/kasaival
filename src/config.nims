@@ -1,5 +1,3 @@
---define:emscripten # Specify target
-
 import os
 
 const AndroidApiVersion {.intdefine.} = 29

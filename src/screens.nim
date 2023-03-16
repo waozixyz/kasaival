@@ -20,7 +20,7 @@ var
   endX* = 0.0
   endY* = screenHeight
   mouse* = Vector2()
-  currentScreen*: GameScreen = TitleScreen
+  currentScreen*: GameScreen = ArcadeScreen
   yScaling* =  0.98
   mouseCursor* = 0
   isMute* = false

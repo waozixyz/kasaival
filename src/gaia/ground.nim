@@ -42,7 +42,7 @@ proc getColorFromColor(c: Color, f: int): Color =
 method addPlant(self: Ground, i: int, randRow: bool) {.base.} =
   var plant = Plant()
   let tile = self.tiles[i]
-  let (minX, maxX) = getMinMax(tile.vertices, 0)
+  let (minX, _) = getMinMax(tile.vertices, 0)
   let (minY, maxY) = getMinMax(tile.vertices, 1)
   let scale = minY / screenHeight
 

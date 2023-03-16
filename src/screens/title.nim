@@ -1,4 +1,4 @@
-import raylib, ../screens, std/lenientops
+import raylib, ../screens
 
 type
   Title* = ref object of Screen
@@ -21,7 +21,6 @@ method draw*(self: Title)  =
 
   drawText("KASAIVAL", 200, 90, 80, Maroon);
   drawText("an out of control flame trying to survive", 100, 255, 30, Maroon);
-
   drawText("touch anywhere to start burning", 140, 555, 30, BEIGE);
 
 method unload*(self: Title) =
