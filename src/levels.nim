@@ -6,7 +6,7 @@ type
 
   Terrain* = object
     tiles*: int = 0
-    cs*: array[0..5, uint8]
+    cs*: array[0..5, float]
  
   Level* = object
     music*: string

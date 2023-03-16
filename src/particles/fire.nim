@@ -96,8 +96,13 @@ method update*(self: Fire, position: Vector2) {.base.} =
     self.particles[i] = p  # Assign back the updated particle
 
   
-method draw*(self: Fire, i: int) {.base.} =
+method draw*(self: Fire, i: int, fuel: float = 255) {.base.} =
   let p = self.particles[i]
-  drawCircle(p.position, p.size, p.color)
+  var c = p.color
+  var f = fuel
+  if f > 255: f = 255
+  if f < 0: f = 0
+  c.a = uint8(float(c.a) * 255 / f)
+  drawCircle(p.position, p.size, c)
  
 

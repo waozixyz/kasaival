@@ -4,12 +4,13 @@ type
   Player* = ref object of RootObj
     position* = Vector2()
     sprite* = Fire()
-    hp: float = 100.0
-    xp: float = 0.0
+    fuel*: float = 300
+    xp*: float = 0.0
     speed: float = 0.6
     frozen = false
     scale*: float = 1
     initScale: float = 2
+    alpha: float = 255
 
 const
   keyRight: array[0..1, KeyboardKey] = [Right, KeyboardKey(D)]
@@ -56,18 +57,22 @@ method getRadius*(self: Player):float {.base.} =
 proc getZ*(self: Player): float = 
   return self.position.y + self.getRadius()
 
-method update*(self: Player) {.base.} =
+method addFuel*(self: Player, fuel: float) {.base.} =
+  self.fuel += fuel
+
+method update*(self: Player, dt: float) {.base.} =
+  var burn = 8.0
   let radius = self.getRadius()
   let x = self.position.x
   let y = self.position.y
   var dir = Vector2()
-  if (not self.frozen):
+  if not self.frozen:
     dir = getDirection(x, y)
-  
+    burn += burn * (abs(dir.x) + abs(dir.y)) * self.speed
   # get velocity of player
   var dx = dir.x * self.speed * radius
   var dy = dir.y * self.speed * radius
-  
+
   # x limit, move screen at edges
   var eyeBound = screenWidth / (5 * (self.scale * 1.8))
 
@@ -93,5 +98,8 @@ method update*(self: Player) {.base.} =
   # update flame
   self.sprite.update(self.position)
 
+  # update hp
+  self.fuel -= burn * dt
+
 method draw*(self: Player, i: int) {.base.}  =
-  self.sprite.draw(i)
+  self.sprite.draw(i, self.fuel)

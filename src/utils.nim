@@ -16,12 +16,12 @@ proc deg2rad*(degrees: float): float =
   result = degrees * PI / 180.0
 
 
-proc getCustomColorSchema*(cs: array[0..5, uint8]): array[0..2, uint8] =
+proc getCustomColorSchema*(cs: array[0..5, float]): array[0..2, float] =
   for i in 0..2:
     var
-      a = min(float(cs[i * 2]), float(cs[i * 2 + 1]))
-      b = max(float(cs[i * 2]), float(cs[i * 2 + 1]))
-    result[i] = uint8(rand(a..b))
+      a = min(cs[i * 2], cs[i * 2 + 1])
+      b = max(cs[i * 2], cs[i * 2 + 1])
+    result[i] = rand(a..b)
   return result
 
 

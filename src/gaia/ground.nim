@@ -6,8 +6,8 @@ type
     size*: Vector2
     vertices*: array[0..2, Vector2]
     burnTimer*: float = 0.0
-    color: Color
-    orgColor: Color
+    color*: array[0..2, float]
+    orgColor*: array[0..2, float]
     fertility: float
     growProbability: float
     capacity: int = 1
@@ -18,26 +18,22 @@ type
     tiles*: seq[Tile]
 
 
-proc getColorDifference(c1: uint8, c2: uint8, s: float): uint8 =
-  return uint8(float(c2) * s + float(c1) * (1 - s))
+proc getColorDifference(c1: float, c2: float, s: float): float =
+  return c2 * s + c1 * (1 - s)
 
-proc getColor(s: float, t1: Terrain, t2: Terrain): Color =
+proc getColor(s: float, t1: Terrain, t2: Terrain): array[0..2, float] =
   var
     c1 = getCustomColorSchema(t1.cs)
     c2 = getCustomColorSchema(t2.cs)
-  return Color(
-    r: getColorDifference(c1[0], c2[0], s),
-    g: getColorDifference(c1[1], c2[1], s),
-    b: getColorDifference(c1[2], c2[2], s),
-    a: 255,
-  )
-proc getColorFromColor(c: Color, f: int): Color =
-  return Color(
-    r: uint8(int(c.r) + rand(-f..f)),
-    g: uint8(int(c.g) + rand(-f..f)),
-    b: uint8(int(c.b) + rand(-f..f)),
-    a: 255,
-  )
+  return [getColorDifference(c1[0], c2[0], s),
+    getColorDifference(c1[1], c2[1], s),
+    getColorDifference(c1[2], c2[2], s),
+  ]
+proc getColorFromColor(c: array[0..2, float], f: float): array[0..2, float] =
+  return [c[0] + rand(-f..f),
+    c[1] + rand(-f..f),
+    c[2] + rand(-f..f)
+  ]
 
 method addPlant(self: Ground, i: int, randRow: bool) {.base.} =
   var plant = Plant()
@@ -70,8 +66,8 @@ method init*(self: Ground, level: Level) {.base.} =
           tile = Tile()
         tile.color = getColor(i, terrain, level.terrains[ti + 1])
           
-        tile.growProbability = (float(tile.color.g) - (float(tile.color.r) + float(tile.color.b) * 0.5 )) / 200.0
-
+        tile.growProbability = (tile.color[1] - (tile.color[0] + tile.color[1] * 0.5 )) / 100.0
+        echo tile.growProbability
         if tile.growProbability > 0.5:
           tile.fertility = rand(0.0..1.1)
 
@@ -110,19 +106,19 @@ method update*(self: Ground, dt: float) {.base.} =
 
     if burnTimer > 0:
       # darken the colors while burning
-      currentColor.r = uint8(min(int(220.0 - float(originalColor.r) * 0.8), int(currentColor.r) + 10))
-      currentColor.g = uint8(max(int(0.0 + float(originalColor.g) * 0.8), int(currentColor.g) - 5))
-      currentColor.b = uint8(max(int(0.0 + float(originalColor.b) * 0.8), int(currentColor.b) - 2))
+      currentColor[0] = min(220.0 - originalColor[0] * 0.8, currentColor[0] + 600 * dt)
+      currentColor[1] = max(0.0 + originalColor[1] * 0.8, currentColor[1] - 300 * dt)
+      currentColor[2] = max(0.0 + originalColor[2] * 0.8, currentColor[2] - 120 * dt)
       # decrement timer
       burnTimer -= 5.0 * dt
     else:
       # bring the color back to original if not burning anymore
-      if currentColor.r > originalColor.r:
-        currentColor.r = max(originalColor.r, currentColor.r - 2)
-      elif currentColor.g < originalColor.g:
-        currentColor.g += 1
-      elif currentColor.b < originalColor.b:
-        currentColor.b += 1
+      if currentColor[0] > originalColor[0]:
+        currentColor[0] = max(originalColor[0], currentColor[0] - 120 * dt)
+      elif currentColor[1] < originalColor[1]:
+        currentColor[1] += 60 * dt
+      elif currentColor[2] < originalColor[2]:
+        currentColor[2] += 60 * dt
     
     # update tile color and timer
     self.tiles[i].color = currentColor
@@ -155,5 +151,5 @@ method draw*(self: Ground) {.base.} =
   for tile in self.tiles:
     if isTileVisible(tile):
       let v = tile.vertices
-      drawTriangle(v[0], v[1], v[2], tile.color)
+      drawTriangle(v[0], v[1], v[2], uint8ToColor(tile.color, 255))
   

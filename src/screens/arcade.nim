@@ -8,7 +8,7 @@ type
   Arcade* = ref object of Screen
     camera: Camera2D = Camera2D()
     player: Player = Player()
-    ground: Ground = Ground()
+    ground*: Ground = Ground()
     level: Level = initDaisy()
     sky: Sky = Sky()
     music: Music
@@ -28,7 +28,7 @@ method init*(self: Arcade) =
   # Init entities  
   self.player.init()
 
-proc checkTileCollision(self: Arcade) =
+proc checkTileCollision(self: Arcade, dt: float) =
   # check tile collision with player
   var pos = self.player.position
   var pr = self.player.getRadius() 
@@ -45,9 +45,15 @@ proc checkTileCollision(self: Arcade) =
     if pos.x - pr * 1.5 < maxX and pos.x + pr * 0.5 > minX and pos.y - pr < maxY and pos.y + pr > minY:
       # Set burn timer for tile if player collides with it
       self.ground.tiles[i].burnTimer = 2
+      let c = self.ground.tiles[i].color
+      let oc = self.ground.tiles[i].orgColor
+      let fuel = (c[1]  - c[2] - oc[2]) / 100 * dt
+      self.player.addFuel(fuel)
       if tile.plants.len == 0: continue
+      
       for j, p in tile.plants:
         self.ground.tiles[i].plants[j].burnTimer = 2
+
 
 proc sortEntities(x, y: Entity): int =
   cmp(x.z, y.z)
@@ -73,10 +79,10 @@ method update*(self: Arcade, dt: float) =
   # Update gaia
   self.sky.update(dt)
   self.ground.update(dt)
-  self.checkTileCollision()
+  self.checkTileCollision(dt)
 
   # Update entities
-  self.player.update()
+  self.player.update(dt)
 
   # add entities to sort
   self.entities = @[]
@@ -110,7 +116,7 @@ method draw*(self: Arcade) =
   endMode2D();
   
   # draw ui
-  self.hud.draw()
+  self.hud.draw(self.player)
 
 method unload*(self: Arcade) =
   discard

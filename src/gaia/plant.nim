@@ -20,7 +20,7 @@ type
     currentRow: int = 0
     splitChance: int = 40
     splitAngle: array[0..1, int] = [20,30]
-    csLeaf: array[6,uint8] = [ 150, 244, 150, 250, 99, 128 ]
+    csLeaf: array[0..5, float] = [ 150, 244, 150, 250, 99, 128 ]
     leftBound*: float = 9999999
     rightBound*: float = -9999999
     growTimer: float = 0
@@ -167,12 +167,15 @@ proc burnColor(self: var Plant, dt: float, branchColor: array[0..2, float], org:
   return c
 
 method update*(self: var Plant, dt: float)  {.base.}  =  
+  echo self.alpha
   if self.alpha < 1:
     self.dead = true
-  
+
   if self.dead: 
     return
     
+
+
   # If the plant is burning, reduce its size and stop growth
   if self.burnTimer > 0:
     self.growing = false
