@@ -8,7 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
     # Restore cache if it exists.
     - name: Restore Cache
@@ -17,12 +16,18 @@ jobs:
         path: |
           emsdk
           raylib
-          Nim
         key: ${{ runner.os }}-nim-raylib-build-${{ hashFiles('**/lockfiles') }}
 
     # Checkout the codebase.
     - name: Checkout
       uses: actions/checkout@v2
+
+        
+    - name: Setup Nim environment
+      uses: jiro4989/setup-nim-action@v1.1.4
+      with:
+        nim-version: '1.9.x' # default is 'stable'
+    - run: nimble install -y naylib
 
     # Install dependencies
     - name: Install dependencies
@@ -48,15 +53,6 @@ jobs:
         make PLATFORM=PLATFORM_WEB &&
         sudo make install RAYLIB_LIBTYPE=SHARED
   
-    # Install nim
-    - name: Install nim 
-      run: |
-        curl -L https://github.com/nim-lang/nightlies/releases/latest/download/linux_x64.tar.xz --output nim.tar.xz &&
-        tar -xvf nim.tar.xz &&
-        cd nim-1.9.1 &&
-        sudo ./install.sh /usr/local/bin
-        sudo ./bin/nimble install -y naylib
-
     # Build the desktop version.
     - name: Build desktop version &&
       run: |
