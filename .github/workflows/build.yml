@@ -1,0 +1,98 @@
+name: nim raylib build
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Restore cache if it exists.
+    - name: Restore Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          emsdk
+          raylib
+          Nim
+        key: ${{ runner.os }}-nim-raylib-build-${{ hashFiles('**/lockfiles') }}
+
+    # Checkout the codebase.
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Install dependencies
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y git libasound2-dev mesa-common-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev
+    
+    # Install emsdk.
+    - name: Install emsdk
+      run: |
+        git clone https://github.com/emscripten-core/emsdk &&
+        cd emsdk/ &&
+        ./emsdk install latest &&
+        ./emsdk activate latest
+
+        
+    # Install raylib and make raylib.
+    - name: Install Raylib and make raylib
+      run: |
+        source emsdk/emsdk_env.sh &&
+        git clone https://github.com/raysan5/raylib.git raylib &&
+        cd raylib/src &&
+        make PLATFORM=PLATFORM_DESKTOP RAYLIB_LIBTYPE=SHARED &&
+        make PLATFORM=PLATFORM_WEB &&
+        sudo make install RAYLIB_LIBTYPE=SHARED
+  
+    # Install nim
+    - name: Install nim 
+      run: |
+        curl -L https://github.com/nim-lang/nightlies/releases/latest/download/linux_x64.tar.xz --output nim.tar.xz &&
+        tar -xvf nim.tar.xz &&
+        cd nim-1.9.1 &&
+        sudo ./install.sh /usr/local/bin
+        sudo ./bin/nimble install -y naylib
+
+    # Build the desktop version.
+    - name: Build desktop version &&
+      run: |
+        nim c -d:release src/main.nim
+
+    # Create a releases folder and move desktop output there.
+    - name: Create desktop output directory and move binaries
+      run: |
+        mkdir -p releases/desktop
+        mv main releases/desktop/
+
+    # Create a web output in the "public" folder and move it to "releases" folder.
+    - name: Create web output directory
+      run: |
+        mkdir -p ../public/
+
+    # Create a web release folder and move zip content.
+    - name: Create desktop output directory and move binaries
+      run: |
+        mkdir -p releases/web
+        cd releases/web
+        zip ./release.zip ../../../public/*
+
+    # Build the web version using emscripten.
+    - name: Build web version
+      run: Nim/bin/nim c -d:release -d:emscripten src/main.nim
+
+     # Upload desktop and web artifacts to Github.
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: Desktop Output
+        path: releases/desktop/
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: Web Output
+        path: releases/web/release.zip

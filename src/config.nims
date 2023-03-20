@@ -66,5 +66,5 @@ elif defined(emscripten):
   --threads:off
   --panics:on
   --define:noSignalHandler
-  --passL:"-o ../public/index.html"
+  --passL:"-o public/index.html"
   --passL:"--shell-file shell.html"
