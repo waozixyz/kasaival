@@ -62,7 +62,7 @@ jobs:
     - name: Create desktop output directory and move binaries
       run: |
         mkdir -p releases/desktop
-        mv main releases/desktop/
+        mv src/main releases/desktop/
 
     # Create a web output in the "public" folder and move it to "releases" folder.
     - name: Create web output directory
