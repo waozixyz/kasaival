@@ -69,16 +69,16 @@ jobs:
       run: |
         mkdir -p ../public/
 
-    # Create a web release folder and move zip content.
-    - name: Create desktop output directory and move binaries
-      run: |
-        mkdir -p releases/web
-        cd releases/web
-        zip ./release.zip ../../../public/*
-
     # Build the web version using emscripten.
     - name: Build web version
       run: Nim/bin/nim c -d:release -d:emscripten src/main.nim
+   
+    # Create a web release folder and move zip content.
+    - name: Create a web release folder and move zip content.
+      run: |
+        zip ./release.zip ../public/*
+        mkdir -p releases/web
+        mv release.zip releases/web
 
      # Upload desktop and web artifacts to Github.
     - name: Upload Artifacts
