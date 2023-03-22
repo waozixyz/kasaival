@@ -61,7 +61,7 @@ jobs:
     - name: Create desktop output directory and move binaries
       run: |
         mkdir -p releases/desktop
-        mv src/main releases/desktop/
+        cp src/main releases/desktop/
 
     # Build the web version using emscripten.
     - name: Build web version
@@ -73,10 +73,9 @@ jobs:
     # Create a web release folder and move zip content.
     - name: Create a web release folder and move zip content.
       run: |
-        zip ./release.zip public/*
         mkdir -p releases/web
-        mv release.zip releases/web
-
+        cp -R public/* releases/web
+      
      # Upload desktop and web artifacts to Github.
     - name: Upload Releases
       uses: actions/upload-artifact@v2
