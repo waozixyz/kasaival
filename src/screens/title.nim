@@ -7,7 +7,7 @@ type
 
 method init*(self: Title) =
   self.id = TitleScreen
-  self.texture = loadTexture("resources/images/menu.png");
+  self.texture = loadTexture(ASSET_FOLDER & "/images/menu.png");
   
 method update*(self: Title, dt: float) =
   mouseCursor = 4

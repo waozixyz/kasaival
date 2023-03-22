@@ -9,6 +9,8 @@ type
 # Global Variables Definition (shared by several modules)
 # ----------------------------------------------------------------------------------
 
+const ASSET_FOLDER* = "resources"
+
 const
   screenWidth* = 800
   screenHeight* = 600

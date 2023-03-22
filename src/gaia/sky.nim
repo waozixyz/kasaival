@@ -6,8 +6,8 @@ type
     planets: Texture2D
     
 method init*(self: var Sky) {.base.} =
-  self.nebula = loadTexture("resources/images/nebula.png")
-  self.planets = loadTexture("resources/images/planets.png")
+  self.nebula = loadTexture(ASSET_FOLDER & "/images/nebula.png")
+  self.planets = loadTexture(ASSET_FOLDER & "/images/planets.png")
 
 method update*(self: var Sky, dt: float) {.base.} =
   discard

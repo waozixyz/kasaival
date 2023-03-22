@@ -18,8 +18,9 @@ type
 method init*(self: Arcade) =
   self.id = ArcadeScreen
   # init music
-  self.music = loadMusicStream("resources/music/" & self.level.music)
-  playMusicStream(self.music);
+  when not defined(emscripten):
+    self.music = loadMusicStream(ASSET_FOLDER & "/music/" & self.level.music)
+    playMusicStream(self.music);
   # init ui
   self.hud.init()
   # Init gaia

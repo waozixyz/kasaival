@@ -65,11 +65,13 @@ proc main =
   # init raylib window
   setconfigFlags(flags(WindowResizable));
   initWindow(screenWidth, screenHeight, "Kasaival")
-  initAudioDevice()
   
   target = loadRenderTexture(screenWidth, screenHeight)
 
   try:    
+    when not defined(emscripten):
+      initAudioDevice()
+
     # init current screen
     getCurrentScreen()
     current.init()
