@@ -78,14 +78,8 @@ jobs:
         mv release.zip releases/web
 
      # Upload desktop and web artifacts to Github.
-    - name: Upload Artifacts
+    - name: Upload Releases
       uses: actions/upload-artifact@v2
       with:
-        name: Desktop Output
-        path: releases/desktop/
-
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: Web Output
-        path: releases/web/release.zip
+        name: Releases
+        path: releases/
