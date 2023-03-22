@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: Production
     steps:
     # Restore cache if it exists.
     - name: Restore Cache
@@ -82,3 +83,20 @@ jobs:
       with:
         name: Releases
         path: releases/
+
+    - name: Wait for 1 minute
+      run: sleep 60
+    
+    - name: Send webhook
+      env:
+        REPO_NAME: ${{ github.event.repository.name }}
+        WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
+        REF: "refs/heads/main"
+      run: |
+        payload="{\"repository\": {\"name\": \"$REPO_NAME\"}, \"ref\": \"$REF\"}"
+        signature=$(printf "%s" "$payload" | openssl dgst -sha1 -hmac "${WEBHOOK_SECRET}" | sed 's/^.*= //')
+        curl -X POST https://webhooks.alphion.xyz/hooks/ansible-playbook \
+          -H 'Content-Type: application/json' \
+          -H "X-Hub-Signature: sha1=${signature}" \
+          -d "$payload"
+        
