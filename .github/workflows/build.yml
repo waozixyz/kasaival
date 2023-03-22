@@ -81,7 +81,7 @@ jobs:
     - name: Upload Releases
       uses: actions/upload-artifact@v2
       with:
-        name: Releases
+        name: kasaival
         path: releases/
 
     - name: Wait for 1 minute
