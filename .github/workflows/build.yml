@@ -70,7 +70,9 @@ jobs:
 
     # Build the web version using emscripten.
     - name: Build web version
-      run: nim c -d:release -d:emscripten src/main.nim
+      run: | 
+        source emsdk/emsdk_env.sh &&
+        nim c -d:release -d:emscripten src/main.nim
    
     # Create a web release folder and move zip content.
     - name: Create a web release folder and move zip content.
