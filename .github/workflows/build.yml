@@ -54,9 +54,8 @@ jobs:
         sudo make install RAYLIB_LIBTYPE=SHARED
   
     # Build the desktop version.
-    - name: Build desktop version &&
-      run: |
-        nim c -d:release src/main.nim
+    - name: Build desktop version
+      run: nim c -d:release src/main.nim
 
     # Create a releases folder and move desktop output there.
     - name: Create desktop output directory and move binaries
@@ -71,7 +70,7 @@ jobs:
 
     # Build the web version using emscripten.
     - name: Build web version
-      run: Nim/bin/nim c -d:release -d:emscripten src/main.nim
+      run: nim c -d:release -d:emscripten src/main.nim
    
     # Create a web release folder and move zip content.
     - name: Create a web release folder and move zip content.
