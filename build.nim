@@ -18,6 +18,14 @@ proc buildProject(buildType: string) =
     echo "Building for web..."
     let webBuildCmd = "nim c -d:release -d:emscripten src/main.nim"
     discard execCmd(webBuildCmd)
+    let publicZip = "public.zip"
+    echo "Zipping public folder..."
+    let zipCmd = "zip -r " & publicZip & " public"
+    discard execCmd(zipCmd)
+    let uploadCmd = "butler push " & publicZip & " waotzi/kasaival:html5"
+    echo "Uploading to itch.io..."
+    discard execCmd(uploadCmd)
+    os.removeFile(publicZip)
   of "desktop":
     echo "Building for desktop..."
     let desktopBuildCmd = "nim c -r -d:release src/main.nim"
@@ -35,7 +43,9 @@ proc parseArgs() =
         buildType = val
     else: discard
 
-  copyStaticToPublic()
+  if buildType == "web":
+    copyStaticToPublic()
+
   buildProject(buildType)
 
 parseArgs()
