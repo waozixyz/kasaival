@@ -70,9 +70,15 @@ proc parseArgs() =
         upload = true
     else: discard
 
+  if upload:
+    copyStaticToPublic()
+    buildProject("web", false, true)
+    buildProject("desktop", false, true)
+    return
+  
   if buildType == "web":
     copyStaticToPublic()
 
-  buildProject(buildType, runProgram, upload)
+  buildProject(buildType, runProgram, false)
 
 parseArgs()
