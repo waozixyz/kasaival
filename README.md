@@ -2,59 +2,52 @@
 
 _DISCLAIMER:_
 
-Welcome to **raylib game template**!
-
-This template provides a base structure to start developing a small raylib game in plain C. The repo is also pre-configured with a default `LICENSE` (zlib/libpng) and a `README.md` (this one) to be properly filled by users. Feel free to change the LICENSE as required.
-
-All the sections defined by `$(Data to Fill)` are expected to be edited and filled properly. It's recommended to delete this disclaimer message after editing this `README.md` file.
-
-This template has been created to be used with raylib (www.raylib.com) and it's licensed under an unmodified zlib/libpng license.
-
-_Copyright (c) 2014-2022 Ramon Santamaria ([@raysan5](https://twitter.com/raysan5))_
+Welcome to **Kasaival**!
 
 -----------------------------------
 
-## $(Game Title)
+## Kasaival
 
-![$(Game Title)](screenshots/screenshot000.png "$(Game Title)")
+![Kasaival](screenshots/screenshot000.png "Kasaival")
 
-### Description
 
-$(Your Game Description)
+## Description
 
-### Features
+Kasaival is a survival game where you play as a fiery flame in a new world of scorching heat and harsh conditions. Devour plants to survive and protect yourself from water mobs, all while trying to level up to gain new abilities and survive as long as possible in the pits of hell.
 
- - $(Game Feature 01)
- - $(Game Feature 02)
- - $(Game Feature 03)
+## Features
 
-### Controls
+- Survival gameplay
+- Devour plants to stay alive
+- Protect yourself from water mobs
+- Level up to gain new abilities
 
-Keyboard:
- - $(Game Control 01)
- - $(Game Control 02)
- - $(Game Control 03)
+## Controls
 
-### Screenshots
+## Controls
 
-_TODO: Show your game to the world, animated GIFs recommended!._
+- Move: Mouse or arrow keys/WASD
+- Attack: Right mouse button
 
-### Developers
+## Developers
 
- - $(Developer 01) - $(Role/Tasks Developed)
- - $(Developer 02) - $(Role/Tasks Developed)
- - $(Developer 03) - $(Role/Tasks Developed)
+- Waotzi - Lead Developer and Designer
 
-### Links
+## Links
 
- - YouTube Gameplay: $(YouTube Link)
- - itch.io Release: $(itch.io Game Page)
- - Steam Release: $(Steam Game Page)
+- [itch.io Release](https://waotzi.itch.io/kasaival)
 
-### License
+## Build Instructions
 
-This game sources are licensed under an unmodified zlib/libpng license, which is an OSI-certified, BSD-like license that allows static linking with closed source software. Check [LICENSE](LICENSE) for further details.
+To build the game for desktop platforms, run the following command:
 
-$(Additional Licenses)
+    nim c -d:release src/main.nim
 
-*Copyright (c) $(Year) $(User Name) ($(User Twitter/GitHub Name))*
+To build the game for the web using Emscripten, run the following command:
+
+    nim c -d:release -d:emscripten src/main.nim
+
+
+## License
+
+This game is licensed under the GPL v3 license. See [LICENSE](LICENSE) for details.
