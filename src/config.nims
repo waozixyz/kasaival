@@ -68,3 +68,4 @@ elif defined(emscripten):
   --define:noSignalHandler
   --passL:"-o public/index.html"
   --passL:"--shell-file shell.html"
+

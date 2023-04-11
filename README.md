@@ -41,12 +41,11 @@ Kasaival is a survival game where you play as a fiery flame in a new world of sc
 
 To build the game for desktop platforms, run the following command:
 
-    nim c -d:release src/main.nim
+    nim r build.nim
 
 To build the game for the web using Emscripten, run the following command:
 
-    nim c -d:release -d:emscripten src/main.nim
-
+    nim r build.nim -b:web
 
 ## License
 

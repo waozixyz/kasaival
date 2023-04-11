@@ -1,0 +1,11 @@
+{
+    "name": "Kasaival",
+    "short_name": "Kasaival",
+    "description": "An out of control flame, trying to survive",
+    "start_url": "/",
+    "display": "standalone",
+    "orientation": "landscape",
+    "background_color": "#800000",
+    "theme_color": "#FFA07A"
+  }
+  
