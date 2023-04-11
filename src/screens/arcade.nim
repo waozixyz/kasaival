@@ -14,6 +14,7 @@ type
     music: Music
     hud: Hud = Hud()
     entities: seq[Entity]
+    gameOver*: bool = false
 
 method init*(self: Arcade) =
   self.id = ArcadeScreen
@@ -82,26 +83,29 @@ method update*(self: Arcade, dt: float) =
 
   # update ui
   self.hud.update(dt)
+  if playerFuel <= 0:
+    self.gameOver = true
 
-  # Update gaia
-  self.sky.update(dt)
-  self.ground.update(dt)
-  self.checkTileCollision(dt)
+  if not self.gameOver:
+    # Update gaia
+    self.sky.update(dt)
+    self.ground.update(dt)
+    self.checkTileCollision(dt)
 
-  # Update entities
-  self.player.update(dt)
+    # Update entities
+    self.player.update(dt)
 
-  # add entities to sort
-  self.entities = @[]
-  for i, t in self.ground.tiles:
-    for j, p in t.plants:
-      if p.dead: break
-      if p.rightBound < cx or p.leftBound > cx + screenWidth: continue
-      self.entities.add(Entity(index: [i, j], z: p.getZ(), item: "plant"))
+    # add entities to sort
+    self.entities = @[]
+    for i, t in self.ground.tiles:
+      for j, p in t.plants:
+        if p.dead: break
+        if p.rightBound < cx or p.leftBound > cx + screenWidth: continue
+        self.entities.add(Entity(index: [i, j], z: p.getZ(), item: "plant"))
 
-  for i, p in self.player.sprite.particles:
-    self.entities.add(Entity(index: [i, -1], z: p.startY + self.player.getRadius() * 0.5, item: "player"))
-  self.entities.sort(sortEntities)
+    for i, p in self.player.sprite.particles:
+      self.entities.add(Entity(index: [i, -1], z: p.startY + self.player.getRadius() * 0.5, item: "player"))
+    self.entities.sort(sortEntities)
 
 
 method draw*(self: Arcade) =
@@ -124,6 +128,13 @@ method draw*(self: Arcade) =
   
   # draw ui
   self.hud.draw(self.player)
+
+  if self.gameOver:
+    # draw semi-transparent overlay
+    drawRectangle(0, 0, screenWidth, screenHeight, Color(r: 0, g: 0, b: 0, a:  200))
+    # draw Game Over text
+    drawText("Game Over", int32(float(screenWidth)/2.0 - float(measureText("Game Over", 48))/2.0), int32(float(screenHeight)/2 - 24), 48, WHITE)
+
 
 method unload*(self: Arcade) =
   discard
