@@ -36,7 +36,7 @@ proc buildProject(buildType: string, runProgram: bool, upload: bool) =
       "nim c -r -d:release src/main.nim"
     else:
       "nim c -d:release src/main.nim"
-      
+
     let exeFile = "src/main"  
     if upload:
       let exeZip = "main.zip"
@@ -66,7 +66,7 @@ proc parseArgs() =
         buildType = val
       of "r", "run":
         runProgram = true
-      of "u":
+      of "u", "upload":
         upload = true
     else: discard
 
