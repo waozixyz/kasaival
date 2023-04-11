@@ -24,8 +24,6 @@ Kasaival is a survival game where you play as a fiery flame in a new world of sc
 
 ## Controls
 
-## Controls
-
 - Move: Mouse or arrow keys/WASD
 - Attack: Right mouse button
 

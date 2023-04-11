@@ -1,4 +1,4 @@
-import os, osproc, strutils, parseopt
+import os, osproc, parseopt
 
 proc copyStaticToPublic() =
   let staticDir = "static"
