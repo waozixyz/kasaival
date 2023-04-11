@@ -14,8 +14,10 @@ const ASSET_FOLDER* = "resources"
 const
   screenWidth* = 800
   screenHeight* = 600
+  startFuel* = 300
 
 var
+  gameOver* = false
   zoom* = 1.0
   cx* = 4500.0
   startY* = 150.0
@@ -26,7 +28,7 @@ var
   yScaling* =  0.98
   mouseCursor* = 0
   isMute* = false
-  playerFuel*: float = 300
+  playerFuel*: float = startFuel
 
   
 type

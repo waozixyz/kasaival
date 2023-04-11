@@ -36,7 +36,7 @@ proc buildProject(buildType: string, runProgram: bool, upload: bool) =
       "nim c -r -d:release src/main.nim"
     else:
       "nim c -d:release src/main.nim"
-
+    discard execCmd(desktopBuildCmd)
     let exeFile = "src/main"  
     if upload:
       let exeZip = "main.zip"
