@@ -120,7 +120,7 @@ method grow*(self: var Plant) {.base.} =
 
 method init*(self: var Plant, x: float, y: float, randomRow: bool) {.base.} =
   self.startY = y
-  var scale = y / screenHeight
+  var scale = getYScale(y)
   self.w = 20 * scale
   self.h = 32 * scale
   var angle = -90

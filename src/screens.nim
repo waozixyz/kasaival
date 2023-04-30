@@ -25,12 +25,16 @@ var
   endY* = screenHeight
   mouse* = Vector2()
   currentScreen*: GameScreen = ArcadeScreen
-  yScaling* =  0.98
   mouseCursor* = 0
   isMute* = false
   playerFuel*: float = startFuel
 
-  
+
+proc getYScale*(y: float): float =
+  result = (y - 100.0) / 150.0 * 0.4 + 0.6
+
+
+
 type
   Screen* = ref object of RootObj
     id*: GameScreen 

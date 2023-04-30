@@ -15,16 +15,10 @@ proc getMinMax*(vertices: array[0..2, Vector2]; dir: int): (float, float) =
 proc deg2rad*(degrees: float): float =
   result = degrees * PI / 180.0
 
-
 proc getCustomColorSchema*(cs: array[0..5, float]): array[0..2, float] =
-  for i in 0..2:
-    var
-      a = min(cs[i * 2], cs[i * 2 + 1])
-      b = max(cs[i * 2], cs[i * 2 + 1])
-    result[i] = rand(a..b)
-  return result
-
-
+  result = [rand(min(cs[0], cs[1])..max(cs[0], cs[1])),
+            rand(min(cs[2], cs[3])..max(cs[2], cs[3])),
+            rand(min(cs[4], cs[5])..max(cs[4], cs[5]))]
 
 proc uint8ToColor*(color: array[0..2, float], alpha: float): Color =
   result =  Color(

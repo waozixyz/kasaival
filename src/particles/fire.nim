@@ -19,6 +19,8 @@ type
     lifetime: float = 40
     scale*: float = 1
     radius: float = 14
+    velocity*: Vector2
+    position*: Vector2
     colorStart*: array[0..3, uint8] = [200, 60, 50, 200]
     colorEnd*: array[0..3, uint8] = [120, 0, 100, 20]
     particles* = @[Particle()]
@@ -28,28 +30,28 @@ method init*(self: Fire) {.base.} =
   randomize()
 
 proc getColorEnd(self: Fire): array[0..3, uint8] =
-  var rtn = self.colorEnd;
-  rtn[0] -= uint8(rand(0..40))
-  rtn[1] -= uint8(rand(0..20))
-  rtn[2] -= uint8(rand(0..20))
-  rtn[3] -= uint8(rand(0..20))
-  return rtn;
+  var rtn = self.colorEnd
+  for i in 0..3:
+    rtn[i] -= uint8(rand(0..20))
+  rtn[0] -= uint8(rand(0..20))
+  return rtn
+
   
 method getRadius*(self: Fire): float {.base.} =
   return self.radius * self.scale
 
-method getParticle(self: Fire, position: Vector2): Particle {.base.} =
+method getParticle(self: Fire): Particle {.base.} =
   let velX = rand(-3.0..3.0) * self.scale
   let velXEnd = velX * -1 + rand(-3.0..3.0) * self.scale
-  let shrinkFactor = rand(92.0..95.0) * 0.01
+  let shrinkFactor = rand(92.0..95.0) * 0.0105
   let size = self.radius * self.scale;
-  let velY = -4 * self.scale;
-  let velYEnd = velY + (rand(3.0..5.0) * self.scale)
+  let velY = (-4 * self.scale) + abs(self.velocity.x) * 0.7
+  let velYEnd = -(rand(3.0..5.0) * self.scale)
   var p = Particle(
     size: size,
     lifetime: self.lifetime,
-    startY: position.y,
-    position: position,
+    startY: self.position.y,
+    position: self.position,
     velStart: Vector2( x: velX, y: velY),
     velEnd: Vector2( x: velXEnd, y: velYEnd),
     color: Color(),
@@ -67,10 +69,10 @@ proc updateColors(p: Particle, pp: float): Color =
   return Color(r: colors[0], g: colors[1], b: colors[2], a: colors[3])
 
 # Updates the state of the `Fire` emitter given a new position
-method update*(self: Fire, position: Vector2) {.base.} =
+method update*(self: Fire) {.base.} =
   # Create new particle if the maximum capacity has not been reached yet
   if self.currentAmount < self.amount:
-    var p = self.getParticle(position)
+    var p = self.getParticle()
     self.particles.add(p)
     self.currentAmount += 1
 
@@ -80,7 +82,7 @@ method update*(self: Fire, position: Vector2) {.base.} =
     
     # Regenerate particle if its lifetime has ended
     if p.lifetime <= 0:
-      p = self.getParticle(position)
+      p = self.getParticle()
 
     var pp = p.lifetime.float / self.lifetime.float   # Convert to float before dividing for proper division 
     if pp > 0:
@@ -96,13 +98,8 @@ method update*(self: Fire, position: Vector2) {.base.} =
     self.particles[i] = p  # Assign back the updated particle
 
   
-method draw*(self: Fire, i: int, alpha: float = 255) {.base.} =
+method draw*(self: Fire, i: int) {.base.} =
   let p = self.particles[i]
-  var c = p.color
-  var a = alpha
-  if a > 255: a = 255
-  if a < 0: a = 0
-  c.a = uint8(float(c.a) * 255 / a)
-  drawCircle(p.position, p.size, c)
+  drawCircle(p.position, p.size, p.color)
  
 

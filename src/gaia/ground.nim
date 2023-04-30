@@ -19,16 +19,15 @@ type
 
 
 proc getColorDifference(c1: float, c2: float, s: float): float =
-  return c2 * s + c1 * (1 - s)
+  return c1 * (1 - s) + c2 * s
 
 proc getColor(s: float, t1: Terrain, t2: Terrain): array[0..2, float] =
-  var
-    c1 = getCustomColorSchema(t1.cs)
-    c2 = getCustomColorSchema(t2.cs)
-  return [getColorDifference(c1[0], c2[0], s),
-    getColorDifference(c1[1], c2[1], s),
-    getColorDifference(c1[2], c2[2], s),
-  ]
+  var c1 = getCustomColorSchema(t1.cs)
+  var c2 = getCustomColorSchema(t2.cs)
+  result = [getColorDifference(c1[0], c2[0], s),
+            getColorDifference(c1[1], c2[1], s),
+            getColorDifference(c1[2], c2[2], s)]
+
 proc getColorFromColor(c: array[0..2, float], f: float): array[0..2, float] =
   return [c[0] + rand(-f..f),
     c[1] + rand(-f..f),
@@ -49,16 +48,19 @@ method addPlant(self: Ground, i: int, randRow: bool) {.base.} =
 
   plant.init(x, y, randRow)
   self.tiles[i].plants.add(plant)
- 
+
 method init*(self: Ground, level: Level) {.base.} =
   randomize()
   endX = -level.tile.x
+  var tileSize = 46.0
   for ti, terrain in level.terrains:
     var
       terrainWidth = float(terrain.tiles) * level.tile.x
       (w, h) = (level.tile.x, level.tile.y)
       y = float(endY)
     while y > startY:
+      h = tileSize * getYScale(y)
+      w = tileSize * getYScale(y)
       var x = endX
       while x < endX + terrainWidth:
         var
@@ -90,11 +92,12 @@ method init*(self: Ground, level: Level) {.base.} =
           self.addPlant(self.tiles.len - 1, true)
         x += w      
       y -= h
-      h *= yScaling
-      w *= yScaling
+
     endX += terrainWidth
     startY = y
   endX -= level.tile.x
+
+
 method update*(self: Ground, dt: float) {.base.} =
   # loop through tiles
   for i, tile in self.tiles:      

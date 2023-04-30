@@ -5,11 +5,10 @@ type
     position* = Vector2()
     sprite* = Fire()
     xp*: float = 0.0
-    speed: float = 0.6
+    speed: float = 0.4
     frozen = false
     scale*: float = 1
-    initScale: float = 2
-    alpha: float = 255
+    initScale: float = 1.2
 
 const
   keyRight: array[0..1, KeyboardKey] = [Right, KeyboardKey(D)]
@@ -88,23 +87,25 @@ method update*(self: Player, dt: float) {.base.} =
   elif y + dy < minY and dy < 0: self.position.y = minY
   else: self.position.y += dy
   
-  if playerFuel <= 500:
-    self.sprite.colorStart = [200, 60, 50, 200]
-    self.sprite.colorEnd = [120, 0, 100, 20]
-  elif playerFuel<= 2000:
-    self.sprite.colorStart = [200, 60, 100, 200]
-    self.sprite.colorEnd = [120, 0, 200, 20]
-  else:
-    self.sprite.colorStart = [240, 150, 50, 200]
-    self.sprite.colorEnd = [90, 40, 100, 20]
+  self.sprite.velocity = Vector2(x: dx, y: dy)
+  self.sprite.position = self.position
+
+  var red = min(1.0, playerFuel / 1000.0)  # increase red from 0 to 1 as playerFuel goes up to 1000
+  var blue = max(0.0, (playerFuel - 1000.0) / 1000.0)  # increase blue from 0 to 1 as playerFuel goes from 1000 to 2000
+  var green = max(0.0, (playerFuel - 500.0) / 1500.0)  # increase green from 0 to 1 as playerFuel goes from 500 to 2000
+
+  self.sprite.colorStart = [uint8(29 + 240 * red), uint8(20 + 90 * green), uint8(20 + 20 * blue), 250]
+  self.sprite.colorEnd = [120, 0, 100, 20]
+
+
   # change player scale depending on y postion
-  self.scale = (self.position.y / screenHeight) * yScaling * self.initScale * min(1.5, max(1, playerFuel / 1000))
+  self.scale = getYScale(self.position.y) * self.initScale * min(1.5, max(1, playerFuel / 1000))
   self.sprite.scale = self.scale
   # update flame
-  self.sprite.update(self.position)
+  self.sprite.update()
 
   # update hp
   playerFuel -= burn * dt
 
 method draw*(self: Player, i: int) {.base.}  =
-  self.sprite.draw(i, playerFuel)
+  self.sprite.draw(i)
