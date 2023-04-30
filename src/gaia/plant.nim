@@ -25,8 +25,8 @@ type
     rightBound*: float = -9999999
     growTimer: float = 0
     growSpeed: float = 2
-    burnSpeed: float = 4
-    scale: float = 1.0
+    burnSpeed: float = 20
+    scale: float = 0.8
     branchFuel: float = 2
     w: float = 10
     h: float = 15
@@ -127,7 +127,7 @@ method init*(self: var Plant, x: float, y: float, randomRow: bool) {.base.} =
 
   # add the first branch at angle 90
   let vertices = (Vector2(x: x, y: y), Vector2(x: x, y: y - self.h))
-  let c = [rand(125.0..178.0), rand(162.0..230.0), rand(76.0..90.0)]
+  let c = [rand(125.0..178.0), rand(142.0..230.0), rand(76.0..120.0)]
   let branch = Branch(deg: angle, v1: vertices[0], v2: vertices[1], w: self.w, h: self.h, color: c, orgColor: c)
   self.leftBound = x
   self.rightBound = x + self.w
@@ -173,8 +173,6 @@ method update*(self: var Plant, dt: float)  {.base.}  =
   if self.dead: 
     return
     
-
-
   # If the plant is burning, reduce its size and stop growth
   if self.burnTimer > 0:
     self.growing = false

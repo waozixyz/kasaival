@@ -5,10 +5,10 @@ type
     position* = Vector2()
     sprite* = Fire()
     xp*: float = 0.0
-    speed: float = 0.4
+    speed: float = 0.5
     frozen = false
     scale*: float = 1
-    initScale: float = 1.2
+    initScale: float = 2
 
 const
   keyRight: array[0..1, KeyboardKey] = [Right, KeyboardKey(D)]
@@ -85,7 +85,8 @@ method update*(self: Player, dt: float) {.base.} =
   var maxY = screenHeight - radius;
   if y + dy > maxY and dy > 0: self.position.y = maxY
   elif y + dy < minY and dy < 0: self.position.y = minY
-  else: self.position.y += dy
+  else:
+    self.position.y += dy
   
   self.sprite.velocity = Vector2(x: dx, y: dy)
   self.sprite.position = self.position
@@ -93,9 +94,8 @@ method update*(self: Player, dt: float) {.base.} =
   var red = min(1.0, playerFuel / 1000.0)  # increase red from 0 to 1 as playerFuel goes up to 1000
   var blue = max(0.0, (playerFuel - 1000.0) / 1000.0)  # increase blue from 0 to 1 as playerFuel goes from 1000 to 2000
   var green = max(0.0, (playerFuel - 500.0) / 1500.0)  # increase green from 0 to 1 as playerFuel goes from 500 to 2000
-
-  self.sprite.colorStart = [uint8(29 + 240 * red), uint8(20 + 90 * green), uint8(20 + 20 * blue), 250]
-  self.sprite.colorEnd = [120, 0, 100, 20]
+  self.sprite.colorStart = [uint8(50 + 200 * red), uint8(20 + 90 * green), uint8(20 * blue), 250]
+  self.sprite.colorEnd = [50, 0, 150, 20]
 
 
   # change player scale depending on y postion

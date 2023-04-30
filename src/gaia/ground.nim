@@ -52,7 +52,7 @@ method addPlant(self: Ground, i: int, randRow: bool) {.base.} =
 method init*(self: Ground, level: Level) {.base.} =
   randomize()
   endX = -level.tile.x
-  var tileSize = 46.0
+  var tileSize = 28.0
   for ti, terrain in level.terrains:
     var
       terrainWidth = float(terrain.tiles) * level.tile.x
@@ -108,9 +108,9 @@ method update*(self: Ground, dt: float) {.base.} =
 
     if burnTimer > 0:
       # darken the colors while burning
-      currentColor[0] = min(220.0 - originalColor[0] * 0.8, currentColor[0] + 600 * dt)
-      currentColor[1] = max(0.0 + originalColor[1] * 0.8, currentColor[1] - 300 * dt)
-      currentColor[2] = max(0.0 + originalColor[2] * 0.8, currentColor[2] - 120 * dt)
+      currentColor[0] = min(220, currentColor[0] + 800 * dt)
+      currentColor[1] = max(originalColor[1] * 0.4, currentColor[1] - 400 * dt)
+      currentColor[2] = max(originalColor[2] * 0.4, currentColor[2] - 200 * dt)
       # decrement timer
       burnTimer -= 5.0 * dt
     else:

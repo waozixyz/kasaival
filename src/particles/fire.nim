@@ -15,10 +15,10 @@ type
 
   Fire* = ref object of RootObj
     currentAmount: int = 0
-    amount: int = 70
+    amount: int = 240
     lifetime: float = 40
     scale*: float = 1
-    radius: float = 14
+    radius: float = 7
     velocity*: Vector2
     position*: Vector2
     colorStart*: array[0..3, uint8] = [200, 60, 50, 200]
@@ -33,7 +33,6 @@ proc getColorEnd(self: Fire): array[0..3, uint8] =
   var rtn = self.colorEnd
   for i in 0..3:
     rtn[i] -= uint8(rand(0..20))
-  rtn[0] -= uint8(rand(0..20))
   return rtn
 
   
@@ -41,12 +40,11 @@ method getRadius*(self: Fire): float {.base.} =
   return self.radius * self.scale
 
 method getParticle(self: Fire): Particle {.base.} =
-  let velX = rand(-3.0..3.0) * self.scale
-  let velXEnd = velX * -1 + rand(-3.0..3.0) * self.scale
-  let shrinkFactor = rand(92.0..95.0) * 0.0105
+  let velX = rand(-2.0..2.0) * self.scale - (self.velocity.x * 0.5)
+  let velXEnd = velX * -1 + rand(-2.0..2.0) * self.scale
   let size = self.radius * self.scale;
-  let velY = (-4 * self.scale) + abs(self.velocity.x) * 0.7
-  let velYEnd = -(rand(3.0..5.0) * self.scale)
+  let velY = (-2 * self.scale) - (self.velocity.y * 0.5)
+  let velYEnd = -(rand(2.0..3.0) * self.scale)
   var p = Particle(
     size: size,
     lifetime: self.lifetime,
@@ -56,8 +54,7 @@ method getParticle(self: Fire): Particle {.base.} =
     velEnd: Vector2( x: velXEnd, y: velYEnd),
     color: Color(),
     colorStart: self.colorStart,
-    colorEnd: getColorEnd(self),
-    shrinkFactor: shrinkFactor,
+    colorEnd: self.getColorEnd(),
   )
   return p
 
@@ -75,7 +72,11 @@ method update*(self: Fire) {.base.} =
     var p = self.getParticle()
     self.particles.add(p)
     self.currentAmount += 1
-
+  if self.currentAmount < self.amount:
+    var p = self.getParticle()
+    self.particles.add(p)
+    self.currentAmount += 1
+    
   # Update each particle
   for i in 0..(self.currentAmount - 1):   # Updated the loop limits since the index starts from 0
     var p = self.particles[i]
@@ -92,7 +93,7 @@ method update*(self: Fire) {.base.} =
         y: p.position.y + (p.velStart.y * pp) + (p.velEnd.y * (1.0 - pp))
       )
       p.color = updateColors(p, pp)
-      p.size *= p.shrinkFactor
+      p.size *= 0.98
      
     p.lifetime -= 1
     self.particles[i] = p  # Assign back the updated particle
