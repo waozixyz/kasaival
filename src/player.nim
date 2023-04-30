@@ -1,14 +1,20 @@
-import raylib, screens, particles/fire, std/math
+import raylib, screens, std/math
 
 type
+  Particle* = object
+    position*: Vector2 = Vector2(x: 0, y: 0)
+    lifetime: float
+    velocity: Vector2
+    size: float
+    color: Color
   Player* = ref object of RootObj
     position* = Vector2()
-    sprite* = Fire()
     xp*: float = 0.0
     speed: float = 0.5
     frozen = false
     scale*: float = 1
     initScale: float = 2
+    particles*: seq[Particle]
 
 const
   keyRight: array[0..1, KeyboardKey] = [Right, KeyboardKey(D)]
@@ -47,13 +53,23 @@ proc getDirection(x: float, y: float): Vector2 =
 
 method init*(self: Player) {.base.} =
   self.position = Vector2(x: cx + screenWidth * 0.5, y: screenHeight * 0.8)
-  self.sprite.init()
 
 method getRadius*(self: Player):float {.base.} =
-  return self.sprite.getRadius()
+  return 32
 
 proc getZ*(self: Player): float = 
   return self.position.y + self.getRadius()
+
+method addParticle*(self: Player, velocity: Vector2, color: Color) {.base.} =
+  var p = Particle(
+    size: 32,
+    lifetime: 30,
+    position: self.position,
+    velocity: velocity,
+    color: color,
+  )
+  self.particles.add(p)
+
 
 method update*(self: Player, dt: float) {.base.} =
   var burn = 8.0
@@ -88,24 +104,22 @@ method update*(self: Player, dt: float) {.base.} =
   else:
     self.position.y += dy
   
-  self.sprite.velocity = Vector2(x: dx, y: dy)
-  self.sprite.position = self.position
 
-  var red = min(1.0, playerFuel / 1000.0)  # increase red from 0 to 1 as playerFuel goes up to 1000
-  var blue = max(0.0, (playerFuel - 1000.0) / 1000.0)  # increase blue from 0 to 1 as playerFuel goes from 1000 to 2000
-  var green = max(0.0, (playerFuel - 500.0) / 1500.0)  # increase green from 0 to 1 as playerFuel goes from 500 to 2000
-  self.sprite.colorStart = [uint8(50 + 200 * red), uint8(20 + 90 * green), uint8(20 * blue), 250]
-  self.sprite.colorEnd = [50, 0, 150, 20]
+  var red = uint8(min(1.0, playerFuel / 1000.0))  # increase red from 0 to 1 as playerFuel goes up to 1000
+  var blue = uint8(max(0.0, (playerFuel - 1000.0) / 1000.0))  # increase blue from 0 to 1 as playerFuel goes from 1000 to 2000
+  var green = uint8(max(0.0, (playerFuel - 500.0) / 1500.0))  # increase green from 0 to 1 as playerFuel goes from 500 to 2000
 
+  if self.particles.len < 50:
+    self.addParticle(Vector2(x: dx, y: dy), Color(r: red, g: green, b: blue))
 
   # change player scale depending on y postion
   self.scale = getYScale(self.position.y) * self.initScale * min(1.5, max(1, playerFuel / 1000))
-  self.sprite.scale = self.scale
   # update flame
-  self.sprite.update()
 
   # update hp
   playerFuel -= burn * dt
 
 method draw*(self: Player, i: int) {.base.}  =
-  self.sprite.draw(i)
+  #self.sprite.draw(i)
+  for p in self.particles:
+    drawCircle(p.position, p.size, p.color)

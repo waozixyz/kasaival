@@ -26,7 +26,7 @@ type
     growTimer: float = 0
     growSpeed: float = 2
     burnSpeed: float = 20
-    scale: float = 0.8
+    initScale: float = 0.8
     branchFuel: float = 2
     w: float = 10
     h: float = 15
@@ -120,7 +120,7 @@ method grow*(self: var Plant) {.base.} =
 
 method init*(self: var Plant, x: float, y: float, randomRow: bool) {.base.} =
   self.startY = y
-  var scale = getYScale(y)
+  var scale = getYScale(y) * self.initScale
   self.w = 20 * scale
   self.h = 32 * scale
   var angle = -90

@@ -113,8 +113,8 @@ method update*(self: Arcade, dt: float) =
       if p.rightBound < cx or p.leftBound > cx + screenWidth: continue
       self.entities.add(Entity(index: [i, j], z: p.getZ(), item: "plant"))
 
-  for i, p in self.player.sprite.particles:
-    self.entities.add(Entity(index: [i, -1], z: p.startY + self.player.getRadius() * 0.5, item: "player"))
+  for i, p in self.player.particles:
+    self.entities.add(Entity(index: [i, -1], z: p.position.y, item: "player"))
   self.entities.sort(sortEntities)
 
 
