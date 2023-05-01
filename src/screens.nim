@@ -14,7 +14,7 @@ const ASSET_FOLDER* = "resources"
 const
   screenWidth* = 800
   screenHeight* = 600
-  startFuel* = 300
+  startFuel* = 300000000
 
 var
   gameOver* = false
@@ -22,11 +22,11 @@ var
   cx* = 4500.0
   startY* = 150.0
   endX* = 0.0
-  endY* = screenHeight
   mouse* = Vector2()
   currentScreen*: GameScreen = ArcadeScreen
   mouseCursor* = 0
-  isMute* = false
+  isMute* = true
+  windPower* = 0.0
   playerFuel*: float = startFuel
 
 

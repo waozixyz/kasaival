@@ -1,5 +1,3 @@
-import raylib
-
 type
   PlantNames* = enum
     UnknownPlant = -1, Oak = 0, Sakura
@@ -11,12 +9,12 @@ type
   Level* = object
     music*: string
     terrains*: seq[Terrain]
-    tile*: Vector2 = Vector2()
+    tileSize*: float = 0.0
     grow*: seq[PlantNames]
 
 proc initDaisy*(): Level =
   result.music = "StrangerThings.ogg"
-  result.tile = Vector2(x: 42, y: 42)
+  result.tileSize = 28.0
   result.grow = @[Oak]
 
   result.terrains = @[
@@ -26,7 +24,7 @@ proc initDaisy*(): Level =
     ),
     Terrain(
       tiles: 100,
-      cs: [16, 60, 160, 200, 30, 50],
+      cs: [16, 80, 160, 200, 30, 50],
     ),
     Terrain(
       tiles: 100,

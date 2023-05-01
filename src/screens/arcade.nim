@@ -38,10 +38,11 @@ proc checkTileCollision(self: Arcade, dt: float) =
   for i, tile in self.ground.tiles:
     if not isTileVisible(tile): continue
 
-    let vertices = tile.vertices
-    
-    let (minX, maxX) = getMinMax(vertices, 0)
-    let (minY, maxY) = getMinMax(vertices, 1)
+    let
+      minX = tile.center.x - tile.radius
+      maxX = tile.center.x + tile.radius
+      minY = tile.center.y - tile.radius
+      maxY = tile.center.y + tile.radius
 
     if pos.x - pr * 1.5 < maxX and pos.x + pr * 0.5 > minX and pos.y - pr < maxY and pos.y + pr > minY:
       # Set burn timer for tile if player collides with it
@@ -75,6 +76,7 @@ method restartGame(self: Arcade): void {.base} =
   gameOver = false
 
 method update*(self: Arcade, dt: float) =
+  windPower += dt
   if isKeyPressed(M):
     isMute = not isMute
 

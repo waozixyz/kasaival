@@ -3,8 +3,8 @@ import raylib, ../screens, ../levels, std/random, ../utils, plant
 type
   Tile* = object
     pos*: Vector2
-    size*: Vector2
-    vertices*: array[0..2, Vector2]
+    radius*: float32
+    center*: Vector2
     burnTimer*: float = 0.0
     color*: array[0..2, float]
     orgColor*: array[0..2, float]
@@ -12,6 +12,7 @@ type
     growProbability: float
     capacity: int = 1
     plants*: seq[Plant]
+    rotation: float = 0.0
 
   Ground* = ref object of RootObj
     grow*: seq[PlantNames]
@@ -27,40 +28,31 @@ proc getColor(s: float, t1: Terrain, t2: Terrain): array[0..2, float] =
   result = [getColorDifference(c1[0], c2[0], s),
             getColorDifference(c1[1], c2[1], s),
             getColorDifference(c1[2], c2[2], s)]
-
+            
 proc getColorFromColor(c: array[0..2, float], f: float): array[0..2, float] =
   return [c[0] + rand(-f..f),
     c[1] + rand(-f..f),
     c[2] + rand(-f..f)
   ]
-
 method addPlant(self: Ground, i: int, randRow: bool) {.base.} =
   var plant = Plant()
   let tile = self.tiles[i]
-  let (minX, _) = getMinMax(tile.vertices, 0)
-  let (minY, maxY) = getMinMax(tile.vertices, 1)
-  let scale = minY / screenHeight
-
-  let padding = 15.0  * scale
-
-  let x = minX
-  let y = rand((minY + padding)..(maxY-padding))
+  let x = tile.center.x - tile.radius
+  let y = rand(tile.center.y - tile.radius..tile.center.y + tile.radius)
 
   plant.init(x, y, randRow)
   self.tiles[i].plants.add(plant)
 
 method init*(self: Ground, level: Level) {.base.} =
   randomize()
-  endX = -level.tile.x
-  var tileSize = 28.0
+  endX = -level.tileSize
   for ti, terrain in level.terrains:
     var
-      terrainWidth = float(terrain.tiles) * level.tile.x
-      (w, h) = (level.tile.x, level.tile.y)
-      y = float(endY)
-    while y > startY:
-      h = tileSize * getYScale(y)
-      w = tileSize * getYScale(y)
+      terrainWidth = float(terrain.tiles) * level.tileSize
+      y = startY
+    while y < screenHeight + level.tileSize * 2:
+      
+      let radius = level.tileSize * getYScale(y)
       var x = endX
       while x < endX + terrainWidth:
         var
@@ -72,35 +64,27 @@ method init*(self: Ground, level: Level) {.base.} =
         if tile.growProbability > 0.5:
           tile.fertility = rand(0.0..1.1)
 
-        tile.vertices = [
-          Vector2(x: x - w, y: y),
-          Vector2(x: x, y: y),
-          Vector2(x: x, y: y - h)
-        ]
+        tile.center = Vector2(x: x, y: y)
+        tile.radius = radius
+        tile.rotation = 0.0
         self.grow = level.grow
         tile.orgColor = tile.color 
         self.tiles.add(tile)
-        tile.color = getColorFromColor(tile.color, 15)
-
-        tile.vertices = [
-          Vector2(x: x, y: y),
-          Vector2(x: x + w, y: y - h),
-          Vector2(x: x, y: y - h)
-        ]     
+        tile.center = Vector2(x: x + rand(-radius * 0.5..radius * 0.5), y: y + rand(-radius * 0.5..radius * 0.5))
+        tile.color = getColorFromColor(tile.color, 20.0)
         self.tiles.add(tile)
-        if (tile.fertility > 1 ):
-          self.addPlant(self.tiles.len - 1, true)
-        x += w      
-      y -= h
+
+        x += radius * 1.5
+      y += radius
 
     endX += terrainWidth
-    startY = y
-  endX -= level.tile.x
 
 
 method update*(self: Ground, dt: float) {.base.} =
   # loop through tiles
   for i, tile in self.tiles:      
+    # update rotation based on wind
+    self.tiles[i].rotation = rand(0.0.. windPower)
     # tile color logic
     var currentColor = tile.color
     var originalColor = tile.orgColor
@@ -110,7 +94,7 @@ method update*(self: Ground, dt: float) {.base.} =
       # darken the colors while burning
       currentColor[0] = min(220, currentColor[0] + 800 * dt)
       currentColor[1] = max(originalColor[1] * 0.4, currentColor[1] - 400 * dt)
-      currentColor[2] = max(originalColor[2] * 0.4, currentColor[2] - 200 * dt)
+      currentColor[2] = max(originalColor[2] * 0.6, currentColor[2] - 200 * dt)
       # decrement timer
       burnTimer -= 5.0 * dt
     else:
@@ -120,7 +104,7 @@ method update*(self: Ground, dt: float) {.base.} =
       elif currentColor[1] < originalColor[1]:
         currentColor[1] += 60 * dt
       elif currentColor[2] < originalColor[2]:
-        currentColor[2] += 60 * dt
+        currentColor[2] += 40 * dt
     
     # update tile color and timer
     self.tiles[i].color = currentColor
@@ -146,12 +130,10 @@ method update*(self: Ground, dt: float) {.base.} =
    
 
 proc isTileVisible*(tile: Tile): bool =
-  let (minX, maxX) = getMinMax(tile.vertices, 0)
-  return maxX >= cx - 100 and minX <= cx + screenWidth + 100
+  return tile.center.x + tile.radius >= cx - 100 and tile.center.x - tile.radius <= cx + screenWidth + 100
 
 method draw*(self: Ground) {.base.} =
   for tile in self.tiles:
     if isTileVisible(tile):
-      let v = tile.vertices
-      drawTriangle(v[0], v[1], v[2], uint8ToColor(tile.color, 255))
-  
+      
+      drawPoly(tile.center, 12, tile.radius, tile.rotation, uint8ToColor(tile.color, 250))
