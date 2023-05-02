@@ -3,7 +3,8 @@ import raylib, ../screens, ../levels, std/random, ../utils, plant
 type
   Tile* = object
     pos*: Vector2
-    radius*: float32
+    orgRadius: float64
+    radius*: float64
     center*: Vector2
     burnTimer*: float = 0.0
     color*: array[0..2, float]
@@ -17,7 +18,6 @@ type
   Ground* = ref object of RootObj
     grow*: seq[PlantNames]
     tiles*: seq[Tile]
-
 
 proc getColorDifference(c1: float, c2: float, s: float): float =
   return c1 * (1 - s) + c2 * s
@@ -66,7 +66,8 @@ method init*(self: Ground, level: Level) {.base.} =
 
         tile.center = Vector2(x: x, y: y)
         tile.radius = radius
-        tile.rotation = 0.0
+        tile.orgRadius = radius
+        tile.rotation = rand(0.0..360.0)
         self.grow = level.grow
         tile.orgColor = tile.color 
         self.tiles.add(tile)
@@ -92,12 +93,15 @@ method update*(self: Ground, dt: float) {.base.} =
 
     if burnTimer > 0:
       # darken the colors while burning
-      currentColor[0] = min(220, currentColor[0] + 800 * dt)
-      currentColor[1] = max(originalColor[1] * 0.4, currentColor[1] - 400 * dt)
+      currentColor[0] = min(255 - originalColor[0], currentColor[0] + 320 * dt)
+      currentColor[1] = max(originalColor[1] * 0.8, currentColor[1] - 120 * dt)
       currentColor[2] = max(originalColor[2] * 0.6, currentColor[2] - 200 * dt)
       # decrement timer
       burnTimer -= 5.0 * dt
+      self.tiles[i].radius *= 0.9
     else:
+      if tile.radius < tile.orgRadius:
+        self.tiles[i].radius += 0.1
       # bring the color back to original if not burning anymore
       if currentColor[0] > originalColor[0]:
         currentColor[0] = max(originalColor[0], currentColor[0] - 120 * dt)
@@ -132,8 +136,6 @@ method update*(self: Ground, dt: float) {.base.} =
 proc isTileVisible*(tile: Tile): bool =
   return tile.center.x + tile.radius >= cx - 100 and tile.center.x - tile.radius <= cx + screenWidth + 100
 
-method draw*(self: Ground) {.base.} =
-  for tile in self.tiles:
-    if isTileVisible(tile):
-      
-      drawPoly(tile.center, 12, tile.radius, tile.rotation, uint8ToColor(tile.color, 250))
+method draw*(self: Ground, i: int) {.base.} =
+  let tile = self.tiles[i]
+  drawPoly(tile.center, 9, tile.radius, tile.rotation, uint8ToColor(tile.color, 255))

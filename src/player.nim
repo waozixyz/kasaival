@@ -82,7 +82,8 @@ method update*(self: Player, dt: float) {.base.} =
   var dir = Vector2()
   if not self.frozen:
     dir = getDirection(x, y)
-    #playerFuel -= (abs(dir.x) + abs(dir.y)) * self.speed * dt / 1000
+    playerFuel -= (abs(dir.x) + abs(dir.y)) * self.speed * dt / 1000
+
   # get velocity of player
   var dx = (dir.x * self.speed * radius) * dt
   var dy = (dir.y * self.speed * radius) * dt
@@ -100,7 +101,7 @@ method update*(self: Player, dt: float) {.base.} =
   else:
     self.position.x += dx
   # y limits
-  var minY = float(startY) - radius * 0.5;
+  var minY = float(startY) - radius;
   var maxY = screenHeight - radius;
   if y + dy > maxY and dy > 0: self.position.y = maxY
   elif y + dy < minY and dy < 0: self.position.y = minY
@@ -124,7 +125,7 @@ method update*(self: Player, dt: float) {.base.} =
     red = uint8(10 + 110 * ((playerFuel - 2000) / 1000.0))
     green = 20
     blue = uint8(100 + 110 * ((playerFuel - 2000) / 1000.0))
-  var color = Color(r: red, g: green, b: blue, a: 200)
+  var color = Color(r: red, g: green, b: blue, a: 255)
 
   var vel = Vector2(x: dx, y: dy)
   if self.particles.len < 50:
@@ -156,7 +157,7 @@ method update*(self: Player, dt: float) {.base.} =
 
 proc draw(self: Particle, pos: Vector2, color: Color) =
   # draw rectangle
-  drawPoly(pos, 5, self.radius, self.rotation, color)
+  drawPoly(pos, 6, self.radius, self.rotation, color)
 
 proc jitterColor(color: Color, jitter: float): Color =
   result.r = float2uint8(float32(color.r) + rand(-jitter..jitter))

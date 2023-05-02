@@ -31,20 +31,24 @@ method init*(self: Arcade) =
 
 proc checkTileCollision(self: Arcade, dt: float) =
   # check tile collision with player
-  var pos = self.player.position
-  var pr = self.player.getRadius() 
+  var playerPosition = self.player.position
+  var playerRadius = self.player.getRadius() 
 
   # Iterate through visible tiles and check for collision with the player
   for i, tile in self.ground.tiles:
     if not isTileVisible(tile): continue
 
     let
-      minX = tile.center.x - tile.radius
-      maxX = tile.center.x + tile.radius
-      minY = tile.center.y - tile.radius
-      maxY = tile.center.y + tile.radius
+      tileMinX = tile.center.x - tile.radius
+      tileMaxX = tile.center.x + tile.radius
+      tileMinY = tile.center.y - tile.radius
+      tileMaxY = tile.center.y - tile.radius
+      playerMinX = playerPosition.x - playerRadius
+      playerMaxX = playerPosition.x + playerRadius
+      playerMinY = playerPosition.y - playerRadius
+      playerMaxY = playerPosition.y + playerRadius
 
-    if pos.x - pr * 1.5 < maxX and pos.x + pr * 0.5 > minX and pos.y - pr < maxY and pos.y + pr > minY:
+    if playerMinX < tileMaxX and playerMaxX > tileMinX and playerMinY < tileMaxY and playerMaxY > tileMinY:
       # Set burn timer for tile if player collides with it
       self.ground.tiles[i].burnTimer = 2
       let c = self.ground.tiles[i].color
@@ -112,7 +116,9 @@ method update*(self: Arcade, dt: float) =
       if p.dead: break
       if p.rightBound < cx or p.leftBound > cx + screenWidth: continue
       self.entities.add(Entity(index: [i, j], z: p.getZ(), item: "plant"))
-
+    if t.isTileVisible():
+      self.entities.add(Entity(index: [i, 0], z: t.center.y - t.radius, item: "ground"))
+  
   for i, p in self.player.particles:
     self.entities.add(Entity(index: [i, -1], z: p.position.y, item: "player"))
   self.entities.sort(sortEntities)
@@ -121,10 +127,8 @@ method update*(self: Arcade, dt: float) =
 method draw*(self: Arcade) =
   # draw background
   self.sky.draw()
-
+  drawRectangle(0, int32(startY - 10), screenWidth, screenHeight, Color(r: 255, g: 255, b: 255, a: 120))
   beginMode2D(self.camera);
-  # draw gaia
-  self.ground.draw()
 
   # draw entities
   for entity in self.entities:
@@ -134,6 +138,8 @@ method draw*(self: Arcade) =
         self.ground.tiles[i[0]].plants[i[1]].draw()
       of "player":
         self.player.draw(i[0])
+      of "ground":
+        self.ground.draw(i[0])
   endMode2D();
   
   # draw ui

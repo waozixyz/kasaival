@@ -38,7 +38,6 @@ type
     decayTimer: float = 0.0
     alpha: float = 255.0
 
-
 proc getRotX(deg: int): float = 
   return cos(deg2rad(float(deg)))
 
@@ -95,7 +94,7 @@ proc increaseColor(channel: float, amount: float): float =
     result = min(255.0, max(0.0, channel + amount))
 
 method grow*(self: var Plant) {.base.} =
-  doAssert self.currentRow < self.max_row, "Plants cannot grow anymore"
+  doAssert self.currentRow < self.max_row, "Plant cannot grow anymore"
     
   let prevRow = self.branches[self.currentRow]
   for i in 0..prevRow.len - 1:
