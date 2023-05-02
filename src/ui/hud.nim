@@ -11,7 +11,7 @@ method update*(self: Hud, dt: float) {.base.} =
   discard
   
 method draw*(self: Hud, player: Player) {.base.} =
-  drawText("Fuel: " & $round(playerFuel, -1), 20, 20, 30, Maroon);
+  drawText("Fuel: " & $int32(playerFuel), 20, 20, 30, Maroon);
   drawText("Day", screenWidth - 100, 20, 30, BEIGE);
   if gameOver:
       # draw semi-transparent overlay

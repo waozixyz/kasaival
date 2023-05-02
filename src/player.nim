@@ -1,20 +1,24 @@
-import raylib, screens, std/math
+import raylib, screens, std/math, std/random, utils
 
 type
   Particle* = object
     position*: Vector2 = Vector2(x: 0, y: 0)
-    lifetime: float
-    velocity: Vector2
-    size: float
+    lifetime: float = 20
+    velocity: Vector2 = Vector2(x: 0, y: 0)
+    radius: float
     color: Color
+    rotation: float
   Player* = ref object of RootObj
+    rotation: float = 0.0
     position* = Vector2()
     xp*: float = 0.0
-    speed: float = 0.5
+    speed: float = 30
     frozen = false
+    radius*: float = 22.0
     scale*: float = 1
-    initScale: float = 2
+    lifetime: float = 30
     particles*: seq[Particle]
+    lastDirection: float = 1.0
 
 const
   keyRight: array[0..1, KeyboardKey] = [Right, KeyboardKey(D)]
@@ -52,37 +56,36 @@ proc getDirection(x: float, y: float): Vector2 =
   return dir
 
 method init*(self: Player) {.base.} =
+  randomize()
   self.position = Vector2(x: cx + screenWidth * 0.5, y: screenHeight * 0.8)
 
-method getRadius*(self: Player):float {.base.} =
-  return 32
+proc getRadius*(self: Player):float =
+  return self.radius * self.scale
 
 proc getZ*(self: Player): float = 
   return self.position.y + self.getRadius()
 
-method addParticle*(self: Player, velocity: Vector2, color: Color) {.base.} =
-  var p = Particle(
-    size: 32,
-    lifetime: 30,
+proc getParticle*(self: Player, velocity: Vector2, color: Color): Particle =
+  return Particle(
+    radius: self.radius * self.scale,
+    lifetime: self.lifetime,
     position: self.position,
     velocity: velocity,
+    rotation: self.rotation,
     color: color,
   )
-  self.particles.add(p)
-
 
 method update*(self: Player, dt: float) {.base.} =
-  var burn = 8.0
   let radius = self.getRadius()
   let x = self.position.x
   let y = self.position.y
   var dir = Vector2()
   if not self.frozen:
     dir = getDirection(x, y)
-    burn += burn * (abs(dir.x) + abs(dir.y)) * self.speed
+    #playerFuel -= (abs(dir.x) + abs(dir.y)) * self.speed * dt / 1000
   # get velocity of player
-  var dx = dir.x * self.speed * radius
-  var dy = dir.y * self.speed * radius
+  var dx = (dir.x * self.speed * radius) * dt
+  var dy = (dir.y * self.speed * radius) * dt
 
   # x limit, move screen at edges
   var eyeBound = 200 + screenWidth / (radius * self.scale * 2)
@@ -103,23 +106,64 @@ method update*(self: Player, dt: float) {.base.} =
   elif y + dy < minY and dy < 0: self.position.y = minY
   else:
     self.position.y += dy
-  
 
-  var red = uint8(min(1.0, playerFuel / 1000.0))  # increase red from 0 to 1 as playerFuel goes up to 1000
-  var blue = uint8(max(0.0, (playerFuel - 1000.0) / 1000.0))  # increase blue from 0 to 1 as playerFuel goes from 1000 to 2000
-  var green = uint8(max(0.0, (playerFuel - 500.0) / 1500.0))  # increase green from 0 to 1 as playerFuel goes from 500 to 2000
+  var 
+    red: uint8
+    green: uint8
+    blue: uint8
 
+  if playerFuel < 1000:
+    red = uint8(150 + 100 * (playerFuel / 1000.0))
+    green = uint8(40 + 50 * (playerFuel / 1000.0))
+    blue = 5
+  elif playerFuel < 2000:
+    red = uint8(240 - 100 * ((playerFuel - 1000) / 1000.0))
+    green = uint8(90 - 70 * ((playerFuel - 1000) / 1000.0))
+    blue = uint8(20 + 80 * ((playerFuel - 1000) / 1000.0))
+  else:
+    red = uint8(10 + 110 * ((playerFuel - 2000) / 1000.0))
+    green = 20
+    blue = uint8(100 + 110 * ((playerFuel - 2000) / 1000.0))
+  var color = Color(r: red, g: green, b: blue, a: 200)
+
+  var vel = Vector2(x: dx, y: dy)
   if self.particles.len < 50:
-    self.addParticle(Vector2(x: dx, y: dy), Color(r: red, g: green, b: blue))
+    var p = self.getParticle(vel, color)
+    self.particles.add(p)
 
+  for i, p in self.particles:
+    var p = self.particles[i]
+
+    p.position.x += rand(-4.0..4.0)
+    p.position.y += -5 * (1 - abs(dir.x))
+
+    p.radius *= 0.94
+    p.color.a = uint8(float32(p.color.a) * 0.9)
+    p.lifetime -= dt * 50
+    p.rotation += 20
+    if p.lifetime <= 0:
+      p = self.getParticle(vel, color)
+    self.particles[i] = p
+  if dir.x != 0:
+    self.lastDirection = dir.x
+  var rotX = dx / self.scale
+  if rotX == 0:
+    rotX = 5 * self.lastDirection
+  self.rotation -= rotx
   # change player scale depending on y postion
-  self.scale = getYScale(self.position.y) * self.initScale * min(1.5, max(1, playerFuel / 1000))
+  self.scale = getYScale(self.position.y) * min(1.5, max(1, playerFuel / 1000))
   # update flame
 
-  # update hp
-  playerFuel -= burn * dt
+proc draw(self: Particle, pos: Vector2, color: Color) =
+  # draw rectangle
+  drawPoly(pos, 5, self.radius, self.rotation, color)
 
-method draw*(self: Player, i: int) {.base.}  =
-  #self.sprite.draw(i)
-  for p in self.particles:
-    drawCircle(p.position, p.size, p.color)
+proc jitterColor(color: Color, jitter: float): Color =
+  result.r = float2uint8(float32(color.r) + rand(-jitter..jitter))
+  result.g = float2uint8(float32(color.g) + rand(-jitter..jitter))
+  result.b = float2uint8(float32(color.b) + rand(-jitter..jitter))
+  result.a = color.a
+
+method draw*(self: Player, i: int) {.base.} =
+  var p = self.particles[i]
+  p.draw(p.position, jitterColor(p.color, 5.0))

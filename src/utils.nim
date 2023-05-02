@@ -14,3 +14,6 @@ proc uint8ToColor*(color: array[0..2, float], alpha: float): Color =
     g: uint8(color[1]),
     b: uint8(color[2]),
     a: uint8(alpha))
+
+proc float2uint8*(num: float32): uint8 =
+  result = min(max(uint8(num), 0), 255)

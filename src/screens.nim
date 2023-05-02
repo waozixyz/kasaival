@@ -14,7 +14,7 @@ const ASSET_FOLDER* = "resources"
 const
   screenWidth* = 800
   screenHeight* = 600
-  startFuel* = 300000000
+  startFuel* = 200
 
 var
   gameOver* = false

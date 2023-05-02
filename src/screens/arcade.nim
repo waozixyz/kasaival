@@ -49,14 +49,12 @@ proc checkTileCollision(self: Arcade, dt: float) =
       self.ground.tiles[i].burnTimer = 2
       let c = self.ground.tiles[i].color
       let oc = self.ground.tiles[i].orgColor
-      var bf = 5.0
+      var bf = 4.0
       if oc[2] > 100:
         bf *= 2
       if oc[2] > 150:
         bf *= 10
-    
-      let fuel = (c[1]  - c[2] - oc[2] * bf) / 100 * dt
-      playerFuel += fuel
+      playerFuel += (c[1]  - (c[2] + oc[2]) * bf) / 1000 * dt
 
       if tile.plants.len == 0: continue
       
