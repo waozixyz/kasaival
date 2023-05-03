@@ -2,10 +2,8 @@ import raylib, ../screens, ../levels, std/random, ../utils, plant
 
 type
   Tile* = object
-    pos*: Vector2
-    orgRadius: float64
     radius*: float64
-    center*: Vector2
+    center*: Vector3
     burnTimer*: float = 0.0
     color*: array[0..2, float]
     orgColor*: array[0..2, float]
@@ -20,7 +18,7 @@ type
     tiles*: seq[Tile]
 
 proc getColorDifference(c1: float, c2: float, s: float): float =
-  return c1 * (1 - s) + c2 * s
+  result = c1 * (1 - s) + c2 * s
 
 proc getColor(s: float, t1: Terrain, t2: Terrain): array[0..2, float] =
   var c1 = getCustomColorSchema(t1.cs)
@@ -28,31 +26,28 @@ proc getColor(s: float, t1: Terrain, t2: Terrain): array[0..2, float] =
   result = [getColorDifference(c1[0], c2[0], s),
             getColorDifference(c1[1], c2[1], s),
             getColorDifference(c1[2], c2[2], s)]
-            
-proc getColorFromColor(c: array[0..2, float], f: float): array[0..2, float] =
-  return [c[0] + rand(-f..f),
-    c[1] + rand(-f..f),
-    c[2] + rand(-f..f)
-  ]
+
 method addPlant(self: Ground, i: int, randRow: bool) {.base.} =
   var plant = Plant()
   let tile = self.tiles[i]
   let x = tile.center.x - tile.radius
-  let y = rand(tile.center.y - tile.radius..tile.center.y + tile.radius)
+  let z = rand(tile.center.z - tile.radius..tile.center.z + tile.radius)
 
-  plant.init(x, y, randRow)
+  plant.init(x, z, randRow)
   self.tiles[i].plants.add(plant)
 
 method init*(self: Ground, level: Level) {.base.} =
   randomize()
+
+
   endX = -level.tileSize
   for ti, terrain in level.terrains:
     var
       terrainWidth = float(terrain.tiles) * level.tileSize
-      y = startY
-    while y < screenHeight + level.tileSize * 2:
+      z = 0.0
+    while z < screenHeight:
       
-      let radius = level.tileSize * getYScale(y)
+      let radius = level.tileSize
       var x = endX
       while x < endX + terrainWidth:
         var
@@ -64,19 +59,15 @@ method init*(self: Ground, level: Level) {.base.} =
         if tile.growProbability > 0.5:
           tile.fertility = rand(0.0..1.1)
 
-        tile.center = Vector2(x: x, y: y)
+        tile.center = Vector3(x: x, y: 0, z: z)
         tile.radius = radius
-        tile.orgRadius = radius
         tile.rotation = rand(0.0..360.0)
         self.grow = level.grow
         tile.orgColor = tile.color 
         self.tiles.add(tile)
-        tile.center = Vector2(x: x + rand(-radius * 0.5..radius * 0.5), y: y + rand(-radius * 0.5..radius * 0.5))
-        tile.color = getColorFromColor(tile.color, 20.0)
-        self.tiles.add(tile)
 
-        x += radius * 1.5
-      y += radius
+        x += radius * 2
+      z += radius * 2
 
     endX += terrainWidth
 
@@ -100,8 +91,6 @@ method update*(self: Ground, dt: float) {.base.} =
       burnTimer -= 5.0 * dt
       self.tiles[i].radius *= 0.9
     else:
-      if tile.radius < tile.orgRadius:
-        self.tiles[i].radius += 0.1
       # bring the color back to original if not burning anymore
       if currentColor[0] > originalColor[0]:
         currentColor[0] = max(originalColor[0], currentColor[0] - 120 * dt)
@@ -134,8 +123,10 @@ method update*(self: Ground, dt: float) {.base.} =
    
 
 proc isTileVisible*(tile: Tile): bool =
-  return tile.center.x + tile.radius >= cx - 100 and tile.center.x - tile.radius <= cx + screenWidth + 100
+  return tile.center.x + tile.radius >= cameraX - 100 and tile.center.x - tile.radius <= cameraX + screenWidth + 100
 
-method draw*(self: Ground, i: int) {.base.} =
-  let tile = self.tiles[i]
-  drawPoly(tile.center, 9, tile.radius, tile.rotation, uint8ToColor(tile.color, 255))
+method draw*(self: Ground) {.base.} =
+  for tile in self.tiles:
+    drawCylinder(tile.center, tile.radius, tile.radius, tile.radius, 9, uint8ToColor(tile.color, 255))
+    for plant in tile.plants:
+      plant.draw()

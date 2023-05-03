@@ -18,9 +18,8 @@ const
 
 var
   gameOver* = false
-  zoom* = 1.0
-  cx* = 4500.0
-  startY* = 150.0
+  cameraX* = 4500.0
+  cameraY* = 0.0
   endX* = 0.0
   mouse* = Vector2()
   currentScreen*: GameScreen = ArcadeScreen
@@ -29,16 +28,9 @@ var
   windPower* = 0.0
   playerFuel*: float = startFuel
 
-
-proc getYScale*(y: float): float =
-  result = (y - 100.0) / 150.0 * 0.4 + 0.6
-
-
-
 type
   Screen* = ref object of RootObj
     id*: GameScreen 
-
 
 method init*(self: Screen) {.base.}  =
   discard

@@ -26,7 +26,6 @@ type
     growTimer: float = 0
     growSpeed: float = 2
     burnSpeed: float = 20
-    initScale: float = 0.8
     branchFuel: float = 2
     w: float = 10
     h: float = 15
@@ -119,9 +118,8 @@ method grow*(self: var Plant) {.base.} =
 
 method init*(self: var Plant, x: float, y: float, randomRow: bool) {.base.} =
   self.startY = y
-  var scale = getYScale(y) * self.initScale
-  self.w = 20 * scale
-  self.h = 32 * scale
+  self.w = 20
+  self.h = 32
   var angle = -90
 
   # add the first branch at angle 90
@@ -238,8 +236,7 @@ method draw*(self: Plant) {.base.} =
       var v2 = b.v2
       if i == self.currentRow and self.growTimer > 0.0:
         v2 = Vector2(x: self.getNextPos(b.v1.x, v2.x), y: self.getNextPos(b.v1.y, v2.y))
-      drawLine(b.v1, v2, b.w, uint8ToColor(b.color, self.alpha))
-
+      drawCube(Vector3(x: b.v1.x, y: b.v1.y, z: 1), Vector3(x: b.v2.x - b.v1.x, y: b.v2.y - b.v1.y, z: 1), uint8ToColor(b.color, self.alpha))
       for l in b.leaves:
         var radius = l.r
         if i == self.currentRow and self.growTimer > 0.0:

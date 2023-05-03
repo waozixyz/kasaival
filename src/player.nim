@@ -2,15 +2,14 @@ import raylib, screens, std/math, std/random, utils
 
 type
   Particle* = object
-    position*: Vector2 = Vector2(x: 0, y: 0)
+    position*: Vector3
     lifetime: float = 20
-    velocity: Vector2 = Vector2(x: 0, y: 0)
-    radius: float
+    radius*: float
     color: Color
     rotation: float
   Player* = ref object of RootObj
     rotation: float = 0.0
-    position* = Vector2()
+    position*: Vector3
     xp*: float = 0.0
     speed: float = 30
     frozen = false
@@ -26,14 +25,14 @@ const
   keyUp: array[0..1, KeyboardKey] = [Up, KeyboardKey(W)]
   keyDown: array[0..1, KeyboardKey] = [Down, KeyboardKey(S)]
 
-proc getAngle(diff: Vector2): Vector2 =
-  var angle = arctan2(diff.x, diff.y)
+proc getAngle(diff: Vector3): Vector3 =
+  var angle = arctan2(diff.x, diff.z)
   if (angle < 0):
     angle += PI * 2.0
-  return Vector2(x: sin(angle), y: cos(angle))
+  return Vector3(x: sin(angle), y: 0, z: cos(angle))
 
-proc getDirection(x: float, y: float): Vector2 =
-  var dir = Vector2()
+proc getDirection(x: float, y: float, z: float): Vector3 =
+  var dir = Vector3()
   for key in keyRight:
     if (isKeyDown(key)):
       dir.x = 1;
@@ -42,35 +41,31 @@ proc getDirection(x: float, y: float): Vector2 =
       dir.x = -1;
   for key in keyUp:
     if (isKeyDown(key)):
-      dir.y = -1;
+      dir.z = -1;
   for key in keyDown:
     if (isKeyDown(key)):
-      dir.y = 1;
+      dir.z = 1;
   
-  if (dir.y == 0 and dir.x == 0):
+  if (dir.z == 0 and dir.x == 0):
     # check mouse press
     if (isMouseButtonDown(Left)):
-      var diff = Vector2(x: mouse.x - x + cx, y: mouse.y - y)
+      var diff = Vector3(x: mouse.x - x + cameraX, y: 0, z: mouse.y - z)
       dir = getAngle(diff)
 
   return dir
 
 method init*(self: Player) {.base.} =
   randomize()
-  self.position = Vector2(x: cx + screenWidth * 0.5, y: screenHeight * 0.8)
+  self.position = Vector3(x: cameraX, y: 2, z: screenHeight * 0.5)
 
 proc getRadius*(self: Player):float =
   return self.radius * self.scale
 
-proc getZ*(self: Player): float = 
-  return self.position.y + self.getRadius()
-
-proc getParticle*(self: Player, velocity: Vector2, color: Color): Particle =
+proc getParticle*(self: Player, color: Color): Particle =
   return Particle(
     radius: self.radius * self.scale,
     lifetime: self.lifetime,
     position: self.position,
-    velocity: velocity,
     rotation: self.rotation,
     color: color,
   )
@@ -79,34 +74,37 @@ method update*(self: Player, dt: float) {.base.} =
   let radius = self.getRadius()
   let x = self.position.x
   let y = self.position.y
-  var dir = Vector2()
+  let z = self.position.z
+  var dir = Vector3()
   if not self.frozen:
-    dir = getDirection(x, y)
-    playerFuel -= (abs(dir.x) + abs(dir.y)) * self.speed * dt / 1000
+    dir = getDirection(x, 0, z)
+    playerFuel -= (abs(dir.x) + abs(dir.z)) * self.speed * dt / 1000
 
   # get velocity of player
   var dx = (dir.x * self.speed * radius) * dt
-  var dy = (dir.y * self.speed * radius) * dt
+  var dz = (dir.z * self.speed * radius) * dt
 
   # x limit, move screen at edges
-  var eyeBound = 200 + screenWidth / (radius * self.scale * 2)
+  #var eyeBound = 200 + screenWidth / (radius * self.scale * 2)
+  var eyeBound = (screenWidth * 0.3) * (1.0 - z / 1200.0)
 
-  if (x + dx < cx + eyeBound and cx > 0 and dx < 0) or (x + dx > cx + screenWidth - eyeBound and cx < float(endX) - screenWidth and dx > 0):
-    cx += dx;
 
-  if (x + dx < cx + radius and dx < 0):
-    self.position.x = cx + radius
-  elif (x + dx > cx + screenWidth - radius):
-    self.position.x = cx + screenWidth - radius
+  if (x + dx < cameraX - eyeBound and cameraX > 0 and dx < 0) or (x + dx > cameraX + eyeBound and cameraX < float(endX) - eyeBound and dx > 0):
+    cameraX += dx;
+
+  if (x + dx < cameraX + radius - screenWidth and dx < 0):
+    self.position.x = cameraX + radius
+  elif (x + dx > cameraX + screenWidth - radius):
+    self.position.x = cameraX + screenWidth - radius
   else:
     self.position.x += dx
-  # y limits
-  var minY = float(startY) - radius;
-  var maxY = screenHeight - radius;
-  if y + dy > maxY and dy > 0: self.position.y = maxY
-  elif y + dy < minY and dy < 0: self.position.y = minY
+  # z limits
+  var minZ = -radius;
+  var maxZ = screenHeight - radius;
+  if z + dz > maxZ and dz > 0: self.position.z = maxZ
+  elif z + dz < minZ and dz < 0: self.position.z = minZ
   else:
-    self.position.y += dy
+    self.position.z += dz
 
   var 
     red: uint8
@@ -127,23 +125,23 @@ method update*(self: Player, dt: float) {.base.} =
     blue = uint8(100 + 110 * ((playerFuel - 2000) / 1000.0))
   var color = Color(r: red, g: green, b: blue, a: 255)
 
-  var vel = Vector2(x: dx, y: dy)
   if self.particles.len < 50:
-    var p = self.getParticle(vel, color)
+    var p = self.getParticle(color)
     self.particles.add(p)
 
   for i, p in self.particles:
     var p = self.particles[i]
 
     p.position.x += rand(-4.0..4.0)
-    p.position.y += -5 * (1 - abs(dir.x))
+    p.position.y += 10
+    p.position.z += rand(-4.0..4.0)
 
     p.radius *= 0.94
     p.color.a = uint8(float32(p.color.a) * 0.9)
     p.lifetime -= dt * 50
     p.rotation += 20
     if p.lifetime <= 0:
-      p = self.getParticle(vel, color)
+      p = self.getParticle(color)
     self.particles[i] = p
   if dir.x != 0:
     self.lastDirection = dir.x
@@ -152,12 +150,12 @@ method update*(self: Player, dt: float) {.base.} =
     rotX = 5 * self.lastDirection
   self.rotation -= rotx
   # change player scale depending on y postion
-  self.scale = getYScale(self.position.y) * min(1.5, max(1, playerFuel / 1000))
+  self.scale = min(1.5, max(1, playerFuel / 1000))
   # update flame
 
-proc draw(self: Particle, pos: Vector2, color: Color) =
+proc draw(self: Particle, pos: Vector3, color: Color) =
   # draw rectangle
-  drawPoly(pos, 6, self.radius, self.rotation, color)
+  drawCylinder(pos, self.radius, self.radius, self.radius,  6, color)
 
 proc jitterColor(color: Color, jitter: float): Color =
   result.r = float2uint8(float32(color.r) + rand(-jitter..jitter))
@@ -165,6 +163,6 @@ proc jitterColor(color: Color, jitter: float): Color =
   result.b = float2uint8(float32(color.b) + rand(-jitter..jitter))
   result.a = color.a
 
-method draw*(self: Player, i: int) {.base.} =
-  var p = self.particles[i]
-  p.draw(p.position, jitterColor(p.color, 5.0))
+method draw*(self: Player) {.base.} =
+  for p in self.particles:
+    p.draw(p.position, jitterColor(p.color, 5.0))
