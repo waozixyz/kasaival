@@ -1,6 +1,9 @@
 import raylib, screens, std/math, std/random, utils
 
+
 type
+  PlayerState = enum
+    Grounded = 0, Jumping, Falling, Frozen
   Particle* = object
     position*: Vector3
     lifetime: float = 20
@@ -10,14 +13,16 @@ type
   Player* = ref object of RootObj
     rotation: float = 0.0
     position*: Vector3
+    velocity: Vector3
     xp*: float = 0.0
     speed: float = 30
-    frozen = false
     radius*: float = 22.0
     scale*: float = 1
     lifetime: float = 30
     particles*: seq[Particle]
     lastDirection: float = 1.0
+    jumpForce: float = 20.0
+    state: PlayerState = Grounded
 
 const
   keyRight: array[0..1, KeyboardKey] = [Right, KeyboardKey(D)]
@@ -31,7 +36,7 @@ proc getAngle(diff: Vector3): Vector3 =
     angle += PI * 2.0
   return Vector3(x: sin(angle), y: 0, z: cos(angle))
 
-proc getDirection(x: float, y: float, z: float): Vector3 =
+proc getDirection(x: float, z: float): Vector3 =
   var dir = Vector3()
   for key in keyRight:
     if (isKeyDown(key)):
@@ -46,6 +51,7 @@ proc getDirection(x: float, y: float, z: float): Vector3 =
     if (isKeyDown(key)):
       dir.z = 1;
   
+
   if (dir.z == 0 and dir.x == 0):
     # check mouse press
     if (isMouseButtonDown(Left)):
@@ -73,13 +79,32 @@ proc getParticle*(self: Player, color: Color): Particle =
 method update*(self: Player, dt: float) {.base.} =
   let radius = self.getRadius()
   let x = self.position.x
-  let y = self.position.y
   let z = self.position.z
+
+
   var dir = Vector3()
-  if not self.frozen:
-    dir = getDirection(x, 0, z)
+  const jumpHeight = 200.5
+
+  if self.state != Frozen:
+    if self.state == Grounded and isKeyDown(Space):
+      self.state = Jumping
+      self.velocity.y = jumpHeight
+
+    if self.velocity.y < 0:
+      self.state = Falling
+
+    if self.state == Falling or self.state == Jumping:
+      self.velocity.y -= gravity 
+
+    if self.position.y <= radius and self.state == Falling:
+      self.velocity.y = 0
+      self.position.y = radius
+      self.state = Grounded
+    self.position.y += self.velocity.y * dt
+    dir = getDirection(x, z)
     playerFuel -= (abs(dir.x) + abs(dir.z)) * self.speed * dt / 1000
 
+  echo self.state
   # get velocity of player
   var dx = (dir.x * self.speed * radius) * dt
   var dz = (dir.z * self.speed * radius) * dt
@@ -134,6 +159,8 @@ method update*(self: Player, dt: float) {.base.} =
 
     p.position.x += rand(-4.0..4.0)
     p.position.y += 10
+    p.position.y += self.velocity.y * dt
+
     p.position.z += rand(-4.0..4.0)
 
     p.radius *= 0.94

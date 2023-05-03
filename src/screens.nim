@@ -15,6 +15,7 @@ const
   screenWidth* = 800
   screenHeight* = 600
   startFuel* = 200
+  gravity* = 9.81
 
 var
   gameOver* = false
