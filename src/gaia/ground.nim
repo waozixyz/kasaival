@@ -31,9 +31,10 @@ method addPlant(self: Ground, i: int, randRow: bool) {.base.} =
   var plant = Plant()
   let tile = self.tiles[i]
   let x = tile.center.x - tile.radius
+  let y = 0.0
   let z = rand(tile.center.z - tile.radius..tile.center.z + tile.radius)
 
-  plant.init(x, z, randRow)
+  plant.init(Vector3(x: x, y: y, z: z), randRow)
   self.tiles[i].plants.add(plant)
 
 method init*(self: Ground, level: Level) {.base.} =
@@ -106,7 +107,7 @@ method update*(self: Ground, dt: float) {.base.} =
     # loop through plants
     for j, plant in tile.plants:
       self.tiles[i].plants[j].update(dt)
-      if plant.dead:
+      if plant.state == PlantStates.Dead:
         # remove dead plant from list
         self.tiles[i].plants.delete(j)
 

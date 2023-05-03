@@ -18,3 +18,6 @@ proc uint8ToColor*(color: array[0..2, float], alpha: float): Color =
     b: uint8(float2uint8(color[2])),
     a: uint8(float2uint8(alpha)))
 
+
+func addVectors*(a: Vector3, b: Vector3): Vector3 =
+  result = Vector3(x: a.x + b.x, y: a.y + b.y, z: a.z + b.z)

@@ -104,7 +104,6 @@ method update*(self: Player, dt: float) {.base.} =
     dir = getDirection(x, z)
     playerFuel -= (abs(dir.x) + abs(dir.z)) * self.speed * dt / 1000
 
-  echo self.state
   # get velocity of player
   var dx = (dir.x * self.speed * radius) * dt
   var dz = (dir.z * self.speed * radius) * dt
@@ -158,8 +157,7 @@ method update*(self: Player, dt: float) {.base.} =
     var p = self.particles[i]
 
     p.position.x += rand(-4.0..4.0)
-    p.position.y += 10
-    p.position.y += self.velocity.y * dt
+    p.position.y += 10 + self.velocity.y * dt
 
     p.position.z += rand(-4.0..4.0)
 
