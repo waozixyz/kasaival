@@ -2,7 +2,9 @@ import raylib, ../screens, ../levels, std/random, ../utils, plant
 
 type
   Tile* = object
-    size*: Vector3
+    hp*: float = 100
+    size*: float
+    orgSize*: float
     position*: Vector3
     burnTimer*: float = 0.0
     color*: array[0..2, float]
@@ -30,9 +32,9 @@ proc getColor(s: float, t1: Terrain, t2: Terrain): array[0..2, float] =
 method addPlant(self: Ground, i: int, randRow: bool) {.base.} =
   var plant = Plant()
   let tile = self.tiles[i]
-  let x = tile.position.x - tile.size.x
+  let x = tile.position.x - tile.size
   let y = 0.0
-  let z = rand(tile.position.z - tile.size.z..tile.position.z + tile.size.z)
+  let z = rand(tile.position.z - tile.size..tile.position.z + tile.size)
 
   plant.init(Vector3(x: x, y: y, z: z), randRow)
   self.tiles[i].plants.add(plant)
@@ -47,7 +49,7 @@ method init*(self: Ground, level: Level) {.base.} =
       terrainWidth = float(terrain.tiles) * level.tileSize
       z = 0.0
     while z < groundLength:
-      let size = Vector3(x: level.tileSize, y: level.tileSize, z: level.tileSize)
+      let size = level.tileSize
       var y = 0.0
       while y > -groundHeight:
         var x = endX
@@ -63,14 +65,15 @@ method init*(self: Ground, level: Level) {.base.} =
 
           tile.position = Vector3(x: x, y: y, z: z)
           tile.size = size
+          tile.orgSize = size
           tile.rotation = rand(0.0..360.0)
           self.grow = level.grow
           tile.orgColor = tile.color 
           self.tiles.add(tile)
 
-          x += size.x
-        y -= size.y
-      z += size.z
+          x += size
+        y -= size
+      z += size
 
     endX += terrainWidth
 
@@ -86,15 +89,13 @@ method update*(self: Ground, dt: float) {.base.} =
     var burnTimer = tile.burnTimer
 
     if burnTimer > 0:
+      self.tiles[i].hp -= dt * 60
       # darken the colors while burning
       currentColor[0] = min(255 - originalColor[0], currentColor[0] + 320 * dt)
       currentColor[1] = max(originalColor[1] * 0.8, currentColor[1] - 120 * dt)
       currentColor[2] = max(originalColor[2] * 0.6, currentColor[2] - 200 * dt)
       # decrement timer
       burnTimer -= 5.0 * dt
-      self.tiles[i].size.x *= 0.9
-      self.tiles[i].size.y *= 0.9
-      self.tiles[i].size.z *= 0.9
     else:
       # bring the color back to original if not burning anymore
       if currentColor[0] > originalColor[0]:
@@ -107,7 +108,10 @@ method update*(self: Ground, dt: float) {.base.} =
     # update tile color and timer
     self.tiles[i].color = currentColor
     self.tiles[i].burnTimer = burnTimer
+    if tile.hp != 100:
+      echo tile.hp, " ", self.tiles[i].size 
 
+    self.tiles[i].size = tile.orgSize * (tile.hp / 100)
     # loop through plants
     #for j, plant in tile.plants:
     #  self.tiles[i].plants[j].update(dt)
@@ -128,15 +132,12 @@ method update*(self: Ground, dt: float) {.base.} =
    
 
 proc isTileVisible*(tile: Tile): bool =
-  return tile.position.x + tile.size.x >= cameraX - 100 and tile.position.x - tile.size.x <= cameraX + screenWidth + 100
+  result = tile.position.x < cameraX + screenWidth * 0.6 and tile.position.x > cameraX - screenWidth * 0.6 and tile.position.y < cameraY + screenHeight * 0.5 and tile.position.y > cameraY - screenHeight * 0.2
 
 method draw*(self: Ground) {.base.} =
   for tile in self.tiles:
-    if tile.position.x > cameraX + screenWidth * 0.4: continue
-    if tile.position.x < cameraX - screenWidth * 0.4: continue
-    if tile.position.y > cameraY + screenHeight * 0.5: continue
-    if tile.position.y < cameraY - screenHeight * 0.2: continue
-    #drawCylinder(tile.position, tile.radius, tile.radius, tile.radius, 9, uint8ToColor(tile.color, 255))
-    drawCube(tile.position, tile.size, uint8ToColor(tile.color, 255))
+    if tile.isTileVisible:
+      #drawCylinder(tile.position, tile.radius, tile.radius, tile.radius, 9, uint8ToColor(tile.color, 255))
+      drawCube(tile.position, Vector3(x: tile.size, y: tile.size, z: tile.size), uint8ToColor(tile.color, 255))
     #for plant in tile.plants:
     #  plant.draw()

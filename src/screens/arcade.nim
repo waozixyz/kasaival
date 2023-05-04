@@ -38,23 +38,28 @@ method init*(self: Arcade) =
   self.camera.target = Vector3(x: cameraX, y: cameraY, z: 100)
   self.camera.up = Vector3(x: 0.0, y: 1.0, z: 0.0)
 
+proc playerIsColliding(playerPos: Vector3, playerSize: float, objPos: Vector3, objSize: float): bool =
+  let
+    objRadius = objSize / 2.0
+    playerRadius = playerSize / 2.0
+
+  result = (
+    playerPos.x - playerRadius < objPos.x + objRadius and 
+    playerPos.x + playerRadius > objPos.x - objRadius and 
+    playerPos.z - playerRadius < objPos.z + objRadius and 
+    playerPos.z + playerRadius > objPos.z - objRadius and
+    playerPos.y - playerRadius < objPos.y + objRadius and 
+    playerPos.y + playerRadius > objPos.y 
+  )
+
+
 proc checkTileCollision(self: Arcade, dt: float) =
   # check tile collision with player
   var player = self.player
 
   # Iterate through visible tiles and check for collision with the player
   for i, tile in self.ground.tiles:
-    let
-      tileMinX = tile.position.x - tile.size.x
-      tileMaxX = tile.position.x + tile.size.x
-      tileMinZ = tile.position.z - tile.size.z
-      tileMaxZ = tile.position.z - tile.size.z
-      playerMinX = player.position.x - player.radius
-      playerMaxX = player.position.x + player.radius
-      playerMinZ = player.position.z - player.radius
-      playerMaxZ = player.position.z + player.radius
-      
-    if playerMinX < tileMaxX and playerMaxX > tileMinX and playerMinZ < tileMaxZ and playerMaxZ > tileMinZ:
+    if playerIsColliding(player.position, player.radius, tile.position, tile.size):
       # Set burn timer for tile if player collides with it
       self.ground.tiles[i].burnTimer = 2
       let c = self.ground.tiles[i].color
@@ -64,7 +69,7 @@ proc checkTileCollision(self: Arcade, dt: float) =
         bf *= 2
       if oc[2] > 150:
         bf *= 10
-      playerFuel += (c[1]  - (c[2] + oc[2]) * bf) / 1000 * dt
+      #playerFuel += (c[1]  - (c[2] + oc[2]) * bf) / 1000 * dt
 
       if tile.plants.len == 0: continue
       
@@ -107,7 +112,7 @@ method update*(self: Arcade, dt: float) =
   # Update gaia
   self.sky.update(dt)
   self.ground.update(dt)
-  #self.checkTileCollision(dt)
+  self.checkTileCollision(dt)
 
   # Update entities
   self.player.update(dt)

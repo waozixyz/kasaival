@@ -22,7 +22,7 @@ const
 
 var
   gameOver* = false
-  cameraX* = 1000.0
+  cameraX* = 2000.0
   cameraY* = 0.0
   endX* = 0.0
   mouse* = Vector2()
