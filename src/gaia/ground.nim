@@ -46,8 +46,7 @@ method init*(self: Ground, level: Level) {.base.} =
     var
       terrainWidth = float(terrain.tiles) * level.tileSize
       z = 0.0
-    while z < screenHeight:
-      
+    while z < groundLength:
       let radius = level.tileSize
       var x = endX
       while x < endX + terrainWidth:

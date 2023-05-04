@@ -31,13 +31,12 @@ method init*(self: Arcade) =
   self.player = Player()
   self.player.init()
   # The width and height of the ground plane
-
   self.camera = Camera3D()
-  self.camera.target = Vector3(x: cameraX, y: 0, z: 300)
-  self.camera.position = Vector3(x: cameraX, y: screenHeight - 200, z: 900)
-  self.camera.up = Vector3(x: 0.0, y: 1.0, z: 1.0)
-  self.camera.fovy = 45.0
+  self.camera.fovy = 35
   self.camera.projection = CameraProjection.Perspective
+  self.camera.position = Vector3(x: cameraX, y: screenHeight * 0.5, z: groundLength * 2)
+  self.camera.target = Vector3(x: cameraX, y: 0, z: 0)
+  self.camera.up = Vector3(x: 0.0, y: 1.0, z: 0.0)
 
 proc checkTileCollision(self: Arcade, dt: float) =
   # check tile collision with player
@@ -77,7 +76,7 @@ proc checkTileCollision(self: Arcade, dt: float) =
 method restartGame(self: Arcade): void {.base} =
   # reset game state
   playerFuel = startFuel
-  cameraX = 4500.0
+  cameraX = startCameraX
   self.init()
   gameOver = false
 
@@ -120,8 +119,6 @@ method draw*(self: Arcade) =
   # draw entities
   self.ground.draw()
   self.player.draw()
-
-  drawGrid(200, 100.0)
   endMode3D();
   
   # draw ui

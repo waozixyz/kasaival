@@ -13,7 +13,7 @@ type
   Plant* = object 
     state* = Growing
     position: Vector3
-    size: Vector3 = Vector3(x: 20, y: 32, z: 20)
+    size: Vector3 = Vector3(x: 10, y: 16, z: 10)
     branches: seq[seq[Branch]]
     maxRow: int = 5
     currentRow: int = 0
@@ -44,7 +44,8 @@ proc getRandomColor(color: float, randRange: float): float =
   
 method addBranch(self: var Plant, deg: int, b: Branch) {.base.} =
   let size = Vector3(x: b.size.x * 0.9, y: b.size.y * 0.95, z: b.size.z * 0.9)
-  let pos = addVectors(b.position, b.size)
+  var pos = b.position
+  pos.y += b.size.y
   var new_pos = pos
   new_pos.x += getRotX(deg) * size.y;
   new_pos.y += getRotY(deg) * size.y;

@@ -14,12 +14,14 @@ const ASSET_FOLDER* = "resources"
 const
   screenWidth* = 800
   screenHeight* = 600
+  groundLength* = 400
   startFuel* = 200
   gravity* = 9.81
+  startCameraX* = 1000
 
 var
   gameOver* = false
-  cameraX* = 4500.0
+  cameraX* = 1000.0
   cameraY* = 0.0
   endX* = 0.0
   mouse* = Vector2()

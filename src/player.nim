@@ -16,8 +16,7 @@ type
     velocity: Vector3
     xp*: float = 0.0
     speed: float = 30
-    radius*: float = 22.0
-    scale*: float = 1
+    radius*: float = 9.0
     lifetime: float = 30
     particles*: seq[Particle]
     lastDirection: float = 1.0
@@ -62,14 +61,14 @@ proc getDirection(x: float, z: float): Vector3 =
 
 method init*(self: Player) {.base.} =
   randomize()
-  self.position = Vector3(x: cameraX, y: 2, z: screenHeight * 0.5)
+  self.position = Vector3(x: cameraX, y: 2, z: groundLength * 0.5)
 
 proc getRadius*(self: Player):float =
-  return self.radius * self.scale
+  return self.radius
 
 proc getParticle*(self: Player, color: Color): Particle =
   return Particle(
-    radius: self.radius * self.scale,
+    radius: self.radius,
     lifetime: self.lifetime,
     position: self.position,
     rotation: self.rotation,
@@ -81,9 +80,8 @@ method update*(self: Player, dt: float) {.base.} =
   let x = self.position.x
   let z = self.position.z
 
-
   var dir = Vector3()
-  const jumpHeight = 200.5
+  const jumpHeight = 200.0
 
   if self.state != Frozen:
     if self.state == Grounded and isKeyDown(Space):
@@ -113,7 +111,7 @@ method update*(self: Player, dt: float) {.base.} =
   var eyeBound = (screenWidth * 0.3) * (1.0 - z / 1200.0)
 
 
-  if (x + dx < cameraX - eyeBound and cameraX > 0 and dx < 0) or (x + dx > cameraX + eyeBound and cameraX < float(endX) - eyeBound and dx > 0):
+  if (x + dx < cameraX - eyeBound and cameraX > 0 and dx <= 0) or (x + dx > cameraX + eyeBound and cameraX < float(endX) - eyeBound and dx >= 0):
     cameraX += dx;
 
   if (x + dx < cameraX + radius - screenWidth and dx < 0):
@@ -124,7 +122,7 @@ method update*(self: Player, dt: float) {.base.} =
     self.position.x += dx
   # z limits
   var minZ = -radius;
-  var maxZ = screenHeight - radius;
+  var maxZ = groundLength - radius;
   if z + dz > maxZ and dz > 0: self.position.z = maxZ
   elif z + dz < minZ and dz < 0: self.position.z = minZ
   else:
@@ -149,7 +147,7 @@ method update*(self: Player, dt: float) {.base.} =
     blue = uint8(100 + 110 * ((playerFuel - 2000) / 1000.0))
   var color = Color(r: red, g: green, b: blue, a: 255)
 
-  if self.particles.len < 50:
+  if self.particles.len < 100:
     var p = self.getParticle(color)
     self.particles.add(p)
 
@@ -157,7 +155,7 @@ method update*(self: Player, dt: float) {.base.} =
     var p = self.particles[i]
 
     p.position.x += rand(-4.0..4.0)
-    p.position.y += 10 + self.velocity.y * dt
+    p.position.y += 2 + self.velocity.y * dt
 
     p.position.z += rand(-4.0..4.0)
 
@@ -170,12 +168,10 @@ method update*(self: Player, dt: float) {.base.} =
     self.particles[i] = p
   if dir.x != 0:
     self.lastDirection = dir.x
-  var rotX = dx / self.scale
+  var rotX = dx
   if rotX == 0:
     rotX = 5 * self.lastDirection
   self.rotation -= rotx
-  # change player scale depending on y postion
-  self.scale = min(1.5, max(1, playerFuel / 1000))
   # update flame
 
 proc draw(self: Particle, pos: Vector3, color: Color) =
