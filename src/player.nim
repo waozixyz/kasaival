@@ -108,7 +108,7 @@ method update*(self: Player, dt: float) {.base.} =
 
   # x limit, move screen at edges
   #var eyeBound = 200 + screenWidth / (radius * self.scale * 2)
-  var eyeBound = (screenWidth * 0.3) * (1.0 - z / 1200.0)
+  var eyeBound = screenWidth * 0.2
 
 
   if (x + dx < cameraX - eyeBound and cameraX > 0 and dx <= 0) or (x + dx > cameraX + eyeBound and cameraX < float(endX) - eyeBound and dx >= 0):

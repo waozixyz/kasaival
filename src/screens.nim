@@ -15,6 +15,7 @@ const
   screenWidth* = 800
   screenHeight* = 600
   groundLength* = 400
+  groundHeight* = 500
   startFuel* = 200
   gravity* = 9.81
   startCameraX* = 1000

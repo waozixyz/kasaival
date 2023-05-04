@@ -32,29 +32,28 @@ method init*(self: Arcade) =
   self.player.init()
   # The width and height of the ground plane
   self.camera = Camera3D()
-  self.camera.fovy = 35
+  self.camera.fovy = 45
   self.camera.projection = CameraProjection.Perspective
-  self.camera.position = Vector3(x: cameraX, y: screenHeight * 0.5, z: groundLength * 2)
-  self.camera.target = Vector3(x: cameraX, y: 0, z: 0)
+  self.camera.position = Vector3(x: cameraX, y: cameraY + screenHeight * 0.5, z: groundLength * 2)
+  self.camera.target = Vector3(x: cameraX, y: cameraY, z: 100)
   self.camera.up = Vector3(x: 0.0, y: 1.0, z: 0.0)
 
 proc checkTileCollision(self: Arcade, dt: float) =
   # check tile collision with player
-  var playerPosition = self.player.position
-  var playerRadius = self.player.getRadius() 
+  var player = self.player
 
   # Iterate through visible tiles and check for collision with the player
   for i, tile in self.ground.tiles:
     let
-      tileMinX = tile.center.x - tile.radius
-      tileMaxX = tile.center.x + tile.radius
-      tileMinZ = tile.center.z - tile.radius
-      tileMaxZ = tile.center.z - tile.radius
-      playerMinX = playerPosition.x - playerRadius
-      playerMaxX = playerPosition.x + playerRadius
-      playerMinZ = playerPosition.z - playerRadius
-      playerMaxZ = playerPosition.z + playerRadius
-
+      tileMinX = tile.position.x - tile.size.x
+      tileMaxX = tile.position.x + tile.size.x
+      tileMinZ = tile.position.z - tile.size.z
+      tileMaxZ = tile.position.z - tile.size.z
+      playerMinX = player.position.x - player.radius
+      playerMaxX = player.position.x + player.radius
+      playerMinZ = player.position.z - player.radius
+      playerMaxZ = player.position.z + player.radius
+      
     if playerMinX < tileMaxX and playerMaxX > tileMinX and playerMinZ < tileMaxZ and playerMaxZ > tileMinZ:
       # Set burn timer for tile if player collides with it
       self.ground.tiles[i].burnTimer = 2
@@ -83,7 +82,9 @@ method restartGame(self: Arcade): void {.base} =
 method update*(self: Arcade, dt: float) =
   windPower += dt
   self.camera.position.x = cameraX
+  self.camera.position.y = cameraY + screenHeight * 0.5
   self.camera.target.x = cameraX
+  self.camera.target.y = cameraY
   if isKeyPressed(M):
     isMute = not isMute
 
@@ -106,7 +107,7 @@ method update*(self: Arcade, dt: float) =
   # Update gaia
   self.sky.update(dt)
   self.ground.update(dt)
-  self.checkTileCollision(dt)
+  #self.checkTileCollision(dt)
 
   # Update entities
   self.player.update(dt)
