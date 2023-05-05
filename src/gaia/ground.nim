@@ -3,7 +3,7 @@ import raylib, ../screens, ../levels, std/random, ../utils, plant
 type
   Tile* = object
     hp*: float = 100
-    size*: float
+    size: float
     orgSize*: float
     position*: Vector3
     burnTimer*: float = 0.0
@@ -13,7 +13,6 @@ type
     growProbability: float
     capacity: int = 1
     plants*: seq[Plant]
-    rotation: float = 0.0
 
   Ground* = ref object of RootObj
     grow*: seq[PlantNames]
@@ -42,7 +41,6 @@ method addPlant(self: Ground, i: int, randRow: bool) {.base.} =
 method init*(self: Ground, level: Level) {.base.} =
   randomize()
 
-
   endX = -level.tileSize
   for ti, terrain in level.terrains:
     var
@@ -66,7 +64,6 @@ method init*(self: Ground, level: Level) {.base.} =
           tile.position = Vector3(x: x, y: y, z: z)
           tile.size = size
           tile.orgSize = size
-          tile.rotation = rand(0.0..360.0)
           self.grow = level.grow
           tile.orgColor = tile.color 
           self.tiles.add(tile)
@@ -80,9 +77,8 @@ method init*(self: Ground, level: Level) {.base.} =
 
 method update*(self: Ground, dt: float) {.base.} =
   # loop through tiles
-  for i, tile in self.tiles:      
-    # update rotation based on wind
-    self.tiles[i].rotation = rand(0.0.. windPower)
+  for i, tile in self.tiles:
+    if tile.hp <= 0: continue
     # tile color logic
     var currentColor = tile.color
     var originalColor = tile.orgColor
@@ -132,12 +128,13 @@ method update*(self: Ground, dt: float) {.base.} =
    
 
 proc isTileVisible*(tile: Tile): bool =
-  result = tile.position.x < cameraX + screenWidth * 0.6 and tile.position.x > cameraX - screenWidth * 0.6 and tile.position.y < cameraY + screenHeight * 0.5 and tile.position.y > cameraY - screenHeight * 0.2
+  result = tile.position.x < cameraX + screenWidth * 0.6 and tile.position.x > cameraX - screenWidth * 0.6 and tile.position.y < cameraY + screenHeight * 0.5 and tile.position.y > cameraY - screenHeight * 0.3
 
 method draw*(self: Ground) {.base.} =
   for tile in self.tiles:
-    if tile.isTileVisible:
+    if tile.isTileVisible and tile.hp >= 0:
       #drawCylinder(tile.position, tile.radius, tile.radius, tile.radius, 9, uint8ToColor(tile.color, 255))
       drawCube(tile.position, Vector3(x: tile.size, y: tile.size, z: tile.size), uint8ToColor(tile.color, 255))
+      drawCubeWires(tile.position, Vector3(x: tile.orgSize, y: tile.orgSize, z: tile.orgSize), uint8ToColor(tile.color, 255))
     #for plant in tile.plants:
     #  plant.draw()

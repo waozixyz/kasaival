@@ -59,7 +59,8 @@ proc checkTileCollision(self: Arcade, dt: float) =
   var grounded = false
   # Iterate through visible tiles and check for collision with the player
   for i, tile in self.ground.tiles:
-    if playerIsColliding(player.position, player.radius, tile.position, tile.size):
+    if tile.hp <= 0: continue
+    if playerIsColliding(player.position, player.radius, tile.position, tile.orgSize):
       # Set burn timer for tile if player collides with it
       self.ground.tiles[i].burnTimer = 2
       let c = self.ground.tiles[i].color

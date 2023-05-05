@@ -123,7 +123,8 @@ method update*(self: Player, dt: float) {.base.} =
   elif z + dz < minZ and dz < 0: self.position.z = minZ
   else:
     self.position.z += dz
-
+    
+  cameraY = self.position.y
   var 
     red: uint8
     green: uint8
