@@ -70,7 +70,7 @@ method init*(self: Ground, level: Level) {.base.} =
           self.grow = level.grow
           tile.orgColor = tile.color 
           self.tiles.add(tile)
-
+        
           x += size
         y -= size
       z += size
@@ -112,7 +112,7 @@ method update*(self: Ground, dt: float) {.base.} =
       echo tile.hp, " ", self.tiles[i].size 
 
     self.tiles[i].size = tile.orgSize * (tile.hp / 100)
-    # loop through plants
+    # loop through PlantStates
     #for j, plant in tile.plants:
     #  self.tiles[i].plants[j].update(dt)
     #  if plant.state == PlantStates.Dead:

@@ -2,7 +2,7 @@ import raylib, screens, std/math, std/random, utils
 
 
 type
-  PlayerState = enum
+  PlayerState* = enum
     Grounded = 0, Jumping, Falling, Frozen
   Particle* = object
     position*: Vector3
@@ -13,7 +13,7 @@ type
   Player* = ref object of RootObj
     rotation: float = 0.0
     position*: Vector3
-    velocity: Vector3
+    velocity*: Vector3
     xp*: float = 0.0
     speed: float = 30
     radius*: float = 9.0
@@ -21,7 +21,7 @@ type
     particles*: seq[Particle]
     lastDirection: float = 1.0
     jumpForce: float = 20.0
-    state: PlayerState = Grounded
+    state*: PlayerState = Grounded
 
 const
   keyRight: array[0..1, KeyboardKey] = [Right, KeyboardKey(D)]
@@ -94,10 +94,6 @@ method update*(self: Player, dt: float) {.base.} =
     if self.state == Falling or self.state == Jumping:
       self.velocity.y -= gravity 
 
-    if self.position.y <= radius and self.state == Falling:
-      self.velocity.y = 0
-      self.position.y = radius
-      self.state = Grounded
     self.position.y += self.velocity.y * dt
     dir = getDirection(x, z)
     playerFuel -= (abs(dir.x) + abs(dir.z)) * self.speed * dt / 1000

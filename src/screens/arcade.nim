@@ -56,7 +56,7 @@ proc playerIsColliding(playerPos: Vector3, playerSize: float, objPos: Vector3, o
 proc checkTileCollision(self: Arcade, dt: float) =
   # check tile collision with player
   var player = self.player
-
+  var grounded = false
   # Iterate through visible tiles and check for collision with the player
   for i, tile in self.ground.tiles:
     if playerIsColliding(player.position, player.radius, tile.position, tile.size):
@@ -69,14 +69,19 @@ proc checkTileCollision(self: Arcade, dt: float) =
         bf *= 2
       if oc[2] > 150:
         bf *= 10
-      #playerFuel += (c[1]  - (c[2] + oc[2]) * bf) / 1000 * dt
-
+      playerFuel += (c[1]  - (c[2] + oc[2]) * bf) / 1000 * dt
+      grounded = true
       if tile.plants.len == 0: continue
       
       for j, p in tile.plants:
         self.ground.tiles[i].plants[j].burnTimer = 2
 
+  if grounded:
+    player.state = PlayerState.Grounded
+    player.velocity.y = 0.0
 
+  else:
+    player.state = PlayerState.Falling
 method restartGame(self: Arcade): void {.base} =
   # reset game state
   playerFuel = startFuel
