@@ -1,4 +1,4 @@
-import raylib, ../screens, ../player, ../gaia/ground, ../levels, ../gaia/sky, ../gaia/plant, std/math, ../ui/hud
+import raylib, ../screens, ../player, ../gaia/ground, ../levels, ../gaia/sky, ../ui/hud, ../utils
 
 type
   Arcade* = ref object of Screen
@@ -55,7 +55,6 @@ proc playerIsColliding(playerPos: Vector3, playerSize: float, objPos: Vector3, o
 proc checkTileCollision(self: Arcade, dt: float) =
   # check tile collision with player
   var player = self.player
-  var grounded = false
   # Iterate through visible tiles and check for collision with the player
   for i, tile in self.ground.tiles:
     if tile.hp <= 0: continue
@@ -71,15 +70,8 @@ proc checkTileCollision(self: Arcade, dt: float) =
       if oc[2] > 150:
         bf *= 10
       playerFuel += (c[1]  - (c[2] + oc[2]) * bf) / 1000 * dt
-      grounded = true
       #self.ground.tiles[i].plant.burnTimer = 2
 
-  if grounded:
-    player.state = PlayerState.Grounded
-    player.velocity.y = 0.0
-
-  else:
-    player.state = PlayerState.Falling
 method restartGame(self: Arcade): void {.base} =
   # reset game state
   playerFuel = startFuel
@@ -87,14 +79,16 @@ method restartGame(self: Arcade): void {.base} =
   gameOver = false
 
 method update*(self: Arcade, dt: float) =
-  if self.player.position.x > screenWidth * 0.5:
+  if self.player.position.x > screenWidth * 0.5 and self.player.position.x < groundWidth - screenWidth * 0.5:
     cameraX = self.player.position.x
+  
   cameraY = self.player.position.y
   self.camera.position.x = cameraX
   self.camera.position.y = screenHeight * 0.5 + cameraY
   self.camera.position.z = groundLength * 2
   self.camera.target = self.player.position
   self.camera.target.z = 0.0
+
   if isKeyPressed(M):
     isMute = not isMute
 

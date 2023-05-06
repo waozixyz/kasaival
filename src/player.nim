@@ -3,7 +3,7 @@ import raylib, screens, std/math, std/random, utils
 
 type
   PlayerState* = enum
-    Grounded = 0, Jumping, Falling, Frozen
+    Grounded = 0, Frozen
   Particle* = object
     position*: Vector3
     lifetime: float = 20
@@ -81,32 +81,18 @@ method update*(self: Player, dt: float) {.base.} =
   let z = self.position.z
 
   var dir = Vector3()
-  const jumpHeight = 200.0
-
-  if self.state != Frozen:
-    if self.state == Grounded and isKeyDown(Space):
-      self.state = Jumping
-      self.velocity.y = jumpHeight
-
-    if self.velocity.y < 0:
-      self.state = Falling
-
-    if self.state == Falling or self.state == Jumping:
-      self.velocity.y -= gravity 
-
-    self.position.y += self.velocity.y * dt
-    dir = getDirection(x, z)
-    playerFuel -= (abs(dir.x) + abs(dir.z)) * self.speed * dt / 1000
-
-  # get velocity of player
+  dir = getDirection(x, z)
   var dx = (dir.x * self.speed * radius) * dt
   var dz = (dir.z * self.speed * radius) * dt
-  if self.position.x + dx > 0 or dx > 0:
-    self.position.x += dx
-  echo self.position.z
-  if (self.position.z + dz > 0 or dz > 0) and (self.position.z + dz < groundLength or dz < 0):
-    self.position.z += dz
-    
+  
+  if self.state != Frozen:
+    playerFuel -= (abs(dir.x) + abs(dir.z)) * self.speed * dt / 1000
+    # get velocity of player
+    if (self.position.x + dx > 0 or dx > 0) and (self.position.x + dx < groundWidth or dx < 0):
+      self.position.x += dx
+    if (self.position.z + dz > 0 or dz > 0) and (self.position.z + dz < groundLength or dz < 0):
+      self.position.z += dz
+    echo self.position.x
   var 
     red: uint8
     green: uint8

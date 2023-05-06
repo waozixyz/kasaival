@@ -52,36 +52,20 @@ method init*(self: Ground, level: Level) {.base.} =
     ]
     numColors = float(colors.len) - 1.0
     ratioDenom = groundWidth / numColors
-    randomTileColorFactor = 0.2
-    randomHeightFactor = 0.2
+    randomFactor = 0.2
   while z < groundLength:
     let size = level.tileSize
-    var y = float(screenHeight)
+    var y = 0.0
     while y > -groundHeight:
       var x = 0.0
       while x < groundWidth:
-        var yThreshold = 0.0
-  
-        # Gradual part at the 
-        let caveX = groundWidth - screenWidth * 0.5
-
-        # Gradual part at the end
-        if x > caveX:
-            var ratio = (x - caveX) / (groundWidth - caveX) + rand(0.0..randomHeightFactor)
-            if ratio > 1: ratio = 1
-            if ratio < 0: ratio = 0
-            yThreshold = lerp(0.0, float(screenHeight), ratio)
-
-        if y > yThreshold: 
-          x += size
-          continue
 
         var tile = Tile()
         let
           gradientIndex = int(x / groundWidth * numColors)
           color1 = colors[gradientIndex]
           color2 = colors[gradientIndex + 1]
-        var ratio = (x mod ratioDenom) / ratioDenom + rand(-randomTileColorFactor..randomTileColorFactor)
+        var ratio = (x mod ratioDenom) / ratioDenom + rand(-randomFactor..randomFactor)
         if ratio > 1: ratio = 1
         if ratio < 0: ratio = 0
         for i in 0..2:
