@@ -48,11 +48,11 @@ proc checkTileCollision(self: Arcade, dt: float) =
       playerFuel += (tile.fertility / 100) * 0.1
       var bf = 1.0
       if tile.color[2] > 120:
-        bf *= 5.0
+        bf *= 2.0
       if tile.color[2] > 140:
-        bf *= 10.0
+        bf *= 4.0
       if tile.color[2] > 180:
-        bf *= 80.0
+        bf *= 8.0
       playerFuel -= (tile.color[2] / 255) * 0.1 * bf
       #self.ground.tiles[i].plant.burnTimer = 2
 

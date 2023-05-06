@@ -92,36 +92,44 @@ method update*(self: Ground, dt: float) {.base.} =
     # tile color logic
     if tile.burnTimer > 0:
       if tile.fertility > 0:
-          tile.fertility -= 1
+          tile.fertility -= 2 * dt * 60
+      tile.fertility = clamp(tile.fertility, 0, 100)
       # darken the colors while burning
-      tile.color[0] *= 15 
-      tile.color[0] += tile.fertility * 50
+
+      tile.color[0] += (tile.fertility / 100) * 50
       if tile.color[0] > 255:
         tile.color[0] = 255.0
+
+      tile.color[1] -= 10
+      if tile.color[1] < max(0, tile.orgColor[1] - 80):
+        tile.color[1] = max(0, tile.orgColor[1] - 80)
+
+      tile.color[2] -= 10
+      if tile.color[2] < max(0, tile.orgColor[2] - 80):
+        tile.color[2] = max(0, tile.orgColor[2] - 80)
       # decrement timer
       tile.burnTimer -= dt * 60 * 10
-    else:
-      # calculate the differences between the current color and the original color
-      let
-        diffR = tile.color[0] - tile.orgColor[0]
-        diffG = tile.color[1] - tile.orgColor[1]
-        diffB = tile.color[2] - tile.orgColor[2]
+    # calculate the differences between the current color and the original color
+    let
+      diffR = tile.color[0] - tile.orgColor[0]
+      diffG = tile.color[1] - tile.orgColor[1]
+      diffB = tile.color[2] - tile.orgColor[2]
 
-      # update the current color based on the differences
-      if diffR > 0:
-        tile.color[0] = max(tile.orgColor[0], tile.color[0] - 120 * dt)
-      elif diffR < 0:
-        tile.color[0] = min(tile.orgColor[0], tile.color[0] + 120 * dt)
+    # update the current color based on the differences
+    if diffR > 0:
+      tile.color[0] = max(tile.orgColor[0], tile.color[0] - 120 * dt)
+    elif diffR < 0:
+      tile.color[0] = min(tile.orgColor[0], tile.color[0] + 120 * dt)
 
-      if diffG < 0:
-        tile.color[1] = min(tile.orgColor[1], tile.color[1] + 60 * dt)
-      elif diffG > 0:
-        tile.color[1] = max(tile.orgColor[1], tile.color[1] - 60 * dt)
+    if diffG < 0:
+      tile.color[1] = min(tile.orgColor[1], tile.color[1] + 60 * dt)
+    elif diffG > 0:
+      tile.color[1] = max(tile.orgColor[1], tile.color[1] - 60 * dt)
 
-      if diffB < 0:
-          tile.color[2] = min(tile.orgColor[2], tile.color[2] + 40 * dt)
-      elif diffB > 0:
-          tile.color[2] = max(tile.orgColor[2], tile.color[2] - 40 * dt)
+    if diffB < 0:
+        tile.color[2] = min(tile.orgColor[2], tile.color[2] + 40 * dt)
+    elif diffB > 0:
+        tile.color[2] = max(tile.orgColor[2], tile.color[2] - 40 * dt)
 
     
     # update tile
@@ -154,10 +162,10 @@ method draw*(self: Ground) {.base.} =
       #drawCylinder(tile.position, tile.radius, tile.radius, tile.radius, 9, uint8ToColor(tile.color, 255))
       #if tile.alpha >= 200:
       var color = uint8ToColor(tile.color, 255)
-      var fertility = tile.fertility
-      if fertility > 100:
-        fertility = 100
+      var fertility = clamp(tile.fertility, 0, 100)
       color.g = float2uint8(float(color.g) * (fertility / 100))
+      if color.g < uint8(max(20, tile.orgColor[1] - 80)):
+        color.g = uint8(max(20, tile.orgColor[1] - 80))
       drawCube(tile.position, fillVector3(tile.size), color)
 
       #for plant in tile.plants:
