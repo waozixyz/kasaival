@@ -4,8 +4,7 @@ type
   Tile* = object
     hp*: float = 100
     difficulty: float = 1
-    size: float
-    orgSize*: float
+    size*: float
     position*: Vector3
     burnTimer*: float = 0.0
     color*: array[0..2, float]
@@ -36,6 +35,8 @@ method init*(self: Ground, level: Level) {.base.} =
   var z = 0.0
   let
     colors = @[
+      [0, 0, 60],   # dark gray
+      [55, 50, 120],   # dark blue
       [6, 9, 85],   # Deep dark blue
       [25, 50, 150],   # dark blue
       [58, 120, 200],  # Lighter blue
@@ -45,23 +46,42 @@ method init*(self: Ground, level: Level) {.base.} =
       [96, 92, 61],    # Swampy brown-green
       [126, 100, 79],  # Green-brown
       [128, 128, 128],  # gray
-      [80, 80, 80]  # dark gray
+      [80, 80, 80],  # dark gray
+      [30, 30, 39],   # black
+
     ]
     numColors = float(colors.len) - 1.0
     ratioDenom = groundWidth / numColors
-    randomFactor = 0.2
+    randomTileColorFactor = 0.2
+    randomHeightFactor = 0.2
   while z < groundLength:
     let size = level.tileSize
-    var y = 0.0
+    var y = float(screenHeight)
     while y > -groundHeight:
       var x = 0.0
       while x < groundWidth:
+        var yThreshold = 0.0
+  
+        # Gradual part at the 
+        let caveX = groundWidth - screenWidth * 0.5
+
+        # Gradual part at the end
+        if x > caveX:
+            var ratio = (x - caveX) / (groundWidth - caveX) + rand(0.0..randomHeightFactor)
+            if ratio > 1: ratio = 1
+            if ratio < 0: ratio = 0
+            yThreshold = lerp(0.0, float(screenHeight), ratio)
+
+        if y > yThreshold: 
+          x += size
+          continue
+
         var tile = Tile()
         let
           gradientIndex = int(x / groundWidth * numColors)
           color1 = colors[gradientIndex]
           color2 = colors[gradientIndex + 1]
-        var ratio = (x mod ratioDenom) / ratioDenom + rand(-randomFactor..randomFactor)
+        var ratio = (x mod ratioDenom) / ratioDenom + rand(-randomTileColorFactor..randomTileColorFactor)
         if ratio > 1: ratio = 1
         if ratio < 0: ratio = 0
         for i in 0..2:
@@ -69,7 +89,6 @@ method init*(self: Ground, level: Level) {.base.} =
 
         tile.position = Vector3(x: x, y: y, z: z)
         tile.size = size
-        tile.orgSize = size
         tile.orgColor = tile.color 
         self.tiles.add(tile)
         x += size
@@ -81,19 +100,12 @@ method init*(self: Ground, level: Level) {.base.} =
 method update*(self: Ground, dt: float) {.base.} =
   # loop through tiles
   for i, tile in self.tiles:
-    if tile.dead: continue
-    if tile.hp <= 0: 
-      if self.tiles[i].size >= 0:
-        self.tiles[i].size -= 5
-      else:
-        self.tiles[i].dead = true
     # tile color logic
     var currentColor = tile.color
     var originalColor = tile.orgColor
     var burnTimer = tile.burnTimer
 
     if burnTimer > 0:
-      self.tiles[i].hp -= dt * 60 * 0.1
       # darken the colors while burning
       currentColor[0] = min(255 - originalColor[0], currentColor[0] + 320 * dt)
       currentColor[1] = max(originalColor[1] * 0.8, currentColor[1] - 120 * dt)
@@ -134,15 +146,14 @@ method update*(self: Ground, dt: float) {.base.} =
    
 
 proc isTileVisible*(tile: Tile): bool =
-  result = tile.position.x < screenWidth * 0.6 and tile.position.x > screenWidth * 0.6 and tile.position.y < screenHeight * 0.5 and tile.position.y > - screenHeight * 0.3
+  result = (tile.position.x > cameraX - screenWidth * 0.5 and tile.position.x < cameraX + screenWidth * 0.5 and tile.position.y < cameraY + screenHeight)
 
 method draw*(self: Ground) {.base.} =
   for tile in self.tiles:
-    if tile.dead: continue
-    if tile.position.x < cameraX - screenWidth * 0.5 or tile.position.x > cameraX + screenWidth * 0.5: continue
-    #drawCylinder(tile.position, tile.radius, tile.radius, tile.radius, 9, uint8ToColor(tile.color, 255))
-    #if tile.alpha >= 200:
-    drawCube(tile.position, Vector3(x: tile.size, y: tile.size, z: tile.size), uint8ToColor(tile.color, 255))
+    if tile.isTileVisible(): 
+      #drawCylinder(tile.position, tile.radius, tile.radius, tile.radius, 9, uint8ToColor(tile.color, 255))
+      #if tile.alpha >= 200:
+      drawCube(tile.position, fillVector3(tile.size), uint8ToColor(tile.color, 255))
 
-    #for plant in tile.plants:
-    #  plant.draw()
+      #for plant in tile.plants:
+      #  plant.draw()

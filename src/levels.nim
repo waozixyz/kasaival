@@ -11,5 +11,5 @@ type
 
 proc initDaisy*(): Level =
   result.music = "StrangerThings.ogg"
-  result.tileSize = 32.0
+  result.tileSize = 18.0
   result.grow = @[Oak]

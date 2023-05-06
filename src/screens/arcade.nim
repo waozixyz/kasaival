@@ -60,7 +60,7 @@ proc checkTileCollision(self: Arcade, dt: float) =
   for i, tile in self.ground.tiles:
     if tile.hp <= 0: continue
 
-    if playerIsColliding(player.position, player.radius, tile.position, tile.orgSize):
+    if playerIsColliding(player.position, player.radius, tile.position, tile.size):
       # Set burn timer for tile if player collides with it
       self.ground.tiles[i].burnTimer = 2
       let c = self.ground.tiles[i].color
@@ -87,9 +87,11 @@ method restartGame(self: Arcade): void {.base} =
   gameOver = false
 
 method update*(self: Arcade, dt: float) =
-  cameraX = self.player.position.x
+  if self.player.position.x > screenWidth * 0.5:
+    cameraX = self.player.position.x
+  cameraY = self.player.position.y
   self.camera.position.x = cameraX
-  self.camera.position.y = 200
+  self.camera.position.y = screenHeight * 0.5 + cameraY
   self.camera.position.z = groundLength * 2
   self.camera.target = self.player.position
   self.camera.target.z = 0.0

@@ -15,7 +15,7 @@ type
     position*: Vector3
     velocity*: Vector3
     xp*: float = 0.0
-    speed: float = 30
+    speed: float = 90.0
     radius*: float = 9.0
     lifetime: float = 30
     particles*: seq[Particle]
@@ -101,8 +101,11 @@ method update*(self: Player, dt: float) {.base.} =
   # get velocity of player
   var dx = (dir.x * self.speed * radius) * dt
   var dz = (dir.z * self.speed * radius) * dt
-  self.position.x += dx
-  self.position.z += dz
+  if self.position.x + dx > 0 or dx > 0:
+    self.position.x += dx
+  echo self.position.z
+  if (self.position.z + dz > 0 or dz > 0) and (self.position.z + dz < groundLength or dz < 0):
+    self.position.z += dz
     
   var 
     red: uint8

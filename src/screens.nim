@@ -30,6 +30,7 @@ var
   windPower* = 0.0
   playerFuel*: float = startFuel
   cameraX* = 0.0
+  cameraY* = 0.0
 
 type
   Screen* = ref object of RootObj

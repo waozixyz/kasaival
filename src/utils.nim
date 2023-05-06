@@ -27,4 +27,7 @@ proc lerp*(a, b, t: float): float =
 
 
 proc uniform*(a, b: float): float =
-  return (b - a) * rand(0.0..1.0) + a
+  result = (b - a) * rand(0.0..1.0) + a
+
+proc fillVector3*(a: float): Vector3 =
+  result = Vector3(x: a, y: a, z: a)
