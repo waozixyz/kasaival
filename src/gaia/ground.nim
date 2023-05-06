@@ -9,7 +9,7 @@ type
     burnTimer*: float = 0.0
     color*: array[0..2, float]
     orgColor*: array[0..2, float]
-    fertility: float
+    fertility*: float = 100.0
     growProbability: float
     alpha*: float = 255.0
     plant*: Plant
@@ -42,7 +42,8 @@ method init*(self: Ground, level: Level) {.base.} =
       [58, 120, 200],  # Lighter blue
       [252, 212, 94],  # Yellow
       [97, 155, 65],   # Green-yellow
-      [45, 74, 32],    # Jungle green
+      [60, 120, 42],   # Green
+      [45, 104, 32],    # Jungle green
       [96, 92, 61],    # Swampy brown-green
       [126, 100, 79],  # Green-brown
       [128, 128, 128],  # gray
@@ -74,6 +75,9 @@ method init*(self: Ground, level: Level) {.base.} =
         tile.position = Vector3(x: x, y: y, z: z)
         tile.size = size
         tile.orgColor = tile.color 
+        tile.fertility = tile.color[1]
+        if tile.fertility < 0:
+          tile.fertility = 0
         self.tiles.add(tile)
         x += size
       y -= size
@@ -83,33 +87,45 @@ method init*(self: Ground, level: Level) {.base.} =
 
 method update*(self: Ground, dt: float) {.base.} =
   # loop through tiles
-  for i, tile in self.tiles:
+  for i in 0..self.tiles.len - 1:
+    var tile = self.tiles[i]
     # tile color logic
-    var currentColor = tile.color
-    var originalColor = tile.orgColor
-    var burnTimer = tile.burnTimer
-
-    if burnTimer > 0:
+    if tile.burnTimer > 0:
+      if tile.fertility > 0:
+          tile.fertility -= 1
       # darken the colors while burning
-      currentColor[0] = min(255 - originalColor[0], currentColor[0] + 320 * dt)
-      currentColor[1] = max(originalColor[1] * 0.8, currentColor[1] - 120 * dt)
-      currentColor[2] = max(originalColor[2] * 0.6, currentColor[2] - 200 * dt)
-      originalColor[1] = originalColor[1] * (tile.hp / 100)
+      tile.color[0] *= 15 
+      tile.color[0] += tile.fertility * 50
+      if tile.color[0] > 255:
+        tile.color[0] = 255.0
       # decrement timer
-      burnTimer -= 5.0 * dt
+      tile.burnTimer -= dt * 60 * 10
     else:
-      # bring the color back to original if not burning anymore
-      if currentColor[0] > originalColor[0]:
-        currentColor[0] = max(originalColor[0], currentColor[0] - 120 * dt)
-      elif currentColor[1] < originalColor[1]:
-        currentColor[1] += 60 * dt
-      elif currentColor[2] < originalColor[2]:
-        currentColor[2] += 40 * dt
+      # calculate the differences between the current color and the original color
+      let
+        diffR = tile.color[0] - tile.orgColor[0]
+        diffG = tile.color[1] - tile.orgColor[1]
+        diffB = tile.color[2] - tile.orgColor[2]
+
+      # update the current color based on the differences
+      if diffR > 0:
+        tile.color[0] = max(tile.orgColor[0], tile.color[0] - 120 * dt)
+      elif diffR < 0:
+        tile.color[0] = min(tile.orgColor[0], tile.color[0] + 120 * dt)
+
+      if diffG < 0:
+        tile.color[1] = min(tile.orgColor[1], tile.color[1] + 60 * dt)
+      elif diffG > 0:
+        tile.color[1] = max(tile.orgColor[1], tile.color[1] - 60 * dt)
+
+      if diffB < 0:
+          tile.color[2] = min(tile.orgColor[2], tile.color[2] + 40 * dt)
+      elif diffB > 0:
+          tile.color[2] = max(tile.orgColor[2], tile.color[2] - 40 * dt)
+
     
-    # update tile color and timer
-    self.tiles[i].color = currentColor
-    self.tiles[i].orgColor = originalColor
-    self.tiles[i].burnTimer = burnTimer
+    # update tile
+    self.tiles[i] = tile
     # loop through PlantStates
     #for j, plant in tile.plants:
     #  self.tiles[i].plants[j].update(dt)
@@ -130,14 +146,19 @@ method update*(self: Ground, dt: float) {.base.} =
    
 
 proc isTileVisible*(tile: Tile): bool =
-  result = (tile.position.x > cameraX - screenWidth * 0.5 and tile.position.x < cameraX + screenWidth * 0.5 and tile.position.y < cameraY + screenHeight)
+  result = (tile.position.x > camera.position.x - screenWidth * 0.5 and tile.position.x < camera.position.x + screenWidth * 0.5 and tile.position.y < camera.position.y + screenHeight)
 
 method draw*(self: Ground) {.base.} =
   for tile in self.tiles:
     if tile.isTileVisible(): 
       #drawCylinder(tile.position, tile.radius, tile.radius, tile.radius, 9, uint8ToColor(tile.color, 255))
       #if tile.alpha >= 200:
-      drawCube(tile.position, fillVector3(tile.size), uint8ToColor(tile.color, 255))
+      var color = uint8ToColor(tile.color, 255)
+      var fertility = tile.fertility
+      if fertility > 100:
+        fertility = 100
+      color.g = float2uint8(float(color.g) * (fertility / 100))
+      drawCube(tile.position, fillVector3(tile.size), color)
 
       #for plant in tile.plants:
       #  plant.draw()

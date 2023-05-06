@@ -15,8 +15,8 @@ type
     position*: Vector3
     velocity*: Vector3
     xp*: float = 0.0
-    speed: float = 90.0
-    radius*: float = 9.0
+    speed: float = 30.0
+    radius*: float = 6.0
     lifetime: float = 30
     particles*: seq[Particle]
     lastDirection: float = 1.0
@@ -29,13 +29,7 @@ const
   keyUp: array[0..1, KeyboardKey] = [Up, KeyboardKey(W)]
   keyDown: array[0..1, KeyboardKey] = [Down, KeyboardKey(S)]
 
-proc getAngle(diff: Vector3): Vector3 =
-  var angle = arctan2(diff.x, diff.z)
-  if (angle < 0):
-    angle += PI * 2.0
-  return Vector3(x: sin(angle), y: 0, z: cos(angle))
-
-proc getDirection(x: float, z: float): Vector3 =
+proc getDirection(self: Player): Vector3 =
   var dir = Vector3()
   for key in keyRight:
     if (isKeyDown(key)):
@@ -50,49 +44,18 @@ proc getDirection(x: float, z: float): Vector3 =
     if (isKeyDown(key)):
       dir.z = 1;
   
-
   if (dir.z == 0 and dir.x == 0):
     # check mouse press
     if (isMouseButtonDown(Left)):
-      var diff = Vector3(x: mouse.x - x, y: 0, z: mouse.y - z)
-      dir = getAngle(diff)
+      var mouseRay = getMouseRay(mouse, camera);
+      var collision = getRayCollisionBox(mouseRay, getBoundingBox(self.position, self.radius))
+      dir.x = collision.normal.x
+      dir.z = -(collision.normal.y + 0.5) + (collision.normal.z + 0.5)
+
 
   return dir
 
-method init*(self: Player) {.base.} =
-  randomize()
-  self.position = Vector3(x: groundWidth * 0.5, y: 0.0, z: groundLength * 0.5)
-
-proc getRadius*(self: Player):float =
-  return self.radius
-
-proc getParticle*(self: Player, color: Color): Particle =
-  return Particle(
-    radius: self.radius,
-    lifetime: self.lifetime,
-    position: self.position,
-    rotation: self.rotation,
-    color: color,
-  )
-
-method update*(self: Player, dt: float) {.base.} =
-  let radius = self.getRadius()
-  let x = self.position.x
-  let z = self.position.z
-
-  var dir = Vector3()
-  dir = getDirection(x, z)
-  var dx = (dir.x * self.speed * radius) * dt
-  var dz = (dir.z * self.speed * radius) * dt
-  
-  if self.state != Frozen:
-    playerFuel -= (abs(dir.x) + abs(dir.z)) * self.speed * dt / 1000
-    # get velocity of player
-    if (self.position.x + dx > 0 or dx > 0) and (self.position.x + dx < groundWidth or dx < 0):
-      self.position.x += dx
-    if (self.position.z + dz > 0 or dz > 0) and (self.position.z + dz < groundLength or dz < 0):
-      self.position.z += dz
-    echo self.position.x
+proc getFlameColor(): Color =
   var 
     red: uint8
     green: uint8
@@ -110,26 +73,51 @@ method update*(self: Player, dt: float) {.base.} =
     red = uint8(10 + 110 * ((playerFuel - 2000) / 1000.0))
     green = 20
     blue = uint8(100 + 110 * ((playerFuel - 2000) / 1000.0))
-  var color = Color(r: red, g: green, b: blue, a: 255)
+  result = Color(r: red, g: green, b: blue, a: 255)
 
+proc getParticle*(self: Player, color: Color): Particle =
+  return Particle(
+    radius: self.radius,
+    lifetime: self.lifetime,
+    position: self.position,
+    rotation: self.rotation,
+    color: color,
+  )
+method init*(self: Player) {.base.} =
+  randomize()
+  self.position = Vector3(x: groundWidth * 0.5, y: self.radius * 2, z: groundLength * 0.5)
+
+method update*(self: Player, dt: float) {.base.} =
+  var dir = Vector3()
+  dir = self.getDirection()
+  var dx = (dir.x * self.speed * self.radius) * dt
+  var dz = (dir.z * self.speed * self.radius) * dt
+  var diameter = self.radius * 2
+  if self.state != Frozen:
+    playerFuel -= (abs(dir.x) + abs(dir.z)) * self.speed * dt / 1000
+    # get velocity of player
+    if (self.position.x + dx - diameter > 0 or dx > 0) and (self.position.x + dx + diameter < groundWidth or dx < 0):
+      self.position.x += dx
+    if (self.position.z + dz - diameter > 0 or dz > 0) and (self.position.z + dz + diameter + 6 < groundLength or dz < 0):
+      self.position.z += dz
+  
   if self.particles.len < 100:
-    var p = self.getParticle(color)
+    var p = self.getParticle( getFlameColor())
     self.particles.add(p)
-
+  
   for i, p in self.particles:
     var p = self.particles[i]
 
     p.position.x += rand(-4.0..4.0)
-    p.position.y += 2 + self.velocity.y * dt
+    p.position.y += self.radius * 0.5 + self.velocity.y * dt
 
     p.position.z += rand(-4.0..4.0)
 
     p.radius *= 0.94
-    p.color.a = uint8(float32(p.color.a) * 0.9)
-    p.lifetime -= dt * 50
-    p.rotation += 20
+    p.color.a = float2uint8(float32(p.color.a) * 0.9)
+    p.lifetime -= 3.0
     if p.lifetime <= 0:
-      p = self.getParticle(color)
+      p = self.getParticle( getFlameColor())
     self.particles[i] = p
   if dir.x != 0:
     self.lastDirection = dir.x
@@ -139,9 +127,9 @@ method update*(self: Player, dt: float) {.base.} =
   self.rotation -= rotx
   # update flame
 
-proc draw(self: Particle, pos: Vector3, color: Color) =
+proc draw(self: Particle, color: Color) =
   # draw rectangle
-  drawCylinder(pos, self.radius, self.radius, self.radius,  6, color)
+  drawSphere(self.position, self.radius * 2, color)
 
 proc jitterColor(color: Color, jitter: float): Color =
   result.r = float2uint8(float32(color.r) + rand(-jitter..jitter))
@@ -151,4 +139,4 @@ proc jitterColor(color: Color, jitter: float): Color =
 
 method draw*(self: Player) {.base.} =
   for p in self.particles:
-    p.draw(p.position, jitterColor(p.color, 5.0))
+    p.draw(jitterColor(p.color, 5.0))

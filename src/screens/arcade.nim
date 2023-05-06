@@ -2,7 +2,6 @@ import raylib, ../screens, ../player, ../gaia/ground, ../levels, ../gaia/sky, ..
 
 type
   Arcade* = ref object of Screen
-    camera: Camera3D
     player: Player
     ground*: Ground
     level: Level
@@ -31,45 +30,30 @@ method init*(self: Arcade) =
   self.player = Player()
   self.player.init()
   # The width and height of the ground plane
-  self.camera = Camera3D()
-  self.camera.fovy = 45
-  self.camera.projection = CameraProjection.Perspective
-  self.camera.up = Vector3(x: 0.0, y: 1.0, z: 0.0)
+  camera = Camera3D()
+  camera.fovy = 45
+  camera.projection = CameraProjection.Perspective
+  camera.up = Vector3(x: 0.0, y: 1.0, z: 0.0)
 
-proc playerIsColliding(playerPos: Vector3, playerSize: float, objPos: Vector3, objSize: float): bool =
-  let
-    objRadius = objSize / 2.0
-    playerRadius = playerSize / 2.0
-
-  result = (
-    playerPos.x - playerRadius < objPos.x + objRadius and 
-    playerPos.x + playerRadius > objPos.x - objRadius and 
-    playerPos.z - playerRadius < objPos.z + objRadius and 
-    playerPos.z + playerRadius > objPos.z - objRadius and
-    playerPos.y - playerRadius < objPos.y + objRadius and 
-    playerPos.y + playerRadius > objPos.y 
-  )
-
-  
 
 proc checkTileCollision(self: Arcade, dt: float) =
   # check tile collision with player
   var player = self.player
   # Iterate through visible tiles and check for collision with the player
   for i, tile in self.ground.tiles:
-    if tile.hp <= 0: continue
-
-    if playerIsColliding(player.position, player.radius, tile.position, tile.size):
+    if not tile.isTileVisible(): continue
+    if checkCollisionBoxes(getBoundingBox(player.position, player.radius), getBoundingBox(tile.position, tile.size)):
       # Set burn timer for tile if player collides with it
-      self.ground.tiles[i].burnTimer = 2
-      let c = self.ground.tiles[i].color
-      let oc = self.ground.tiles[i].orgColor
-      var bf = 4.0
-      if oc[2] > 100:
-        bf *= 2
-      if oc[2] > 150:
-        bf *= 10
-      playerFuel += (c[1]  - (c[2] + oc[2]) * bf) / 1000 * dt
+      self.ground.tiles[i].burnTimer = 200
+      playerFuel += (tile.fertility / 100) * 0.1
+      var bf = 1.0
+      if tile.color[2] > 120:
+        bf *= 5.0
+      if tile.color[2] > 140:
+        bf *= 10.0
+      if tile.color[2] > 180:
+        bf *= 80.0
+      playerFuel -= (tile.color[2] / 255) * 0.1 * bf
       #self.ground.tiles[i].plant.burnTimer = 2
 
 method restartGame(self: Arcade): void {.base} =
@@ -78,17 +62,17 @@ method restartGame(self: Arcade): void {.base} =
   self.init()
   gameOver = false
 
-method update*(self: Arcade, dt: float) =
-  if self.player.position.x > screenWidth * 0.5 and self.player.position.x < groundWidth - screenWidth * 0.5:
-    cameraX = self.player.position.x
-  
-  cameraY = self.player.position.y
-  self.camera.position.x = cameraX
-  self.camera.position.y = screenHeight * 0.5 + cameraY
-  self.camera.position.z = groundLength * 2
-  self.camera.target = self.player.position
-  self.camera.target.z = 0.0
 
+
+method update*(self: Arcade, dt: float) =
+  # update camera
+  camera.position.x = self.player.position.x  
+  camera.position.y = screenHeight * 0.5 + self.player.position.y
+  camera.position.z = groundLength * 2
+
+  camera.target = self.player.position
+  
+  camera.target.z = 0.0
   if isKeyPressed(M):
     isMute = not isMute
 
@@ -120,7 +104,7 @@ method update*(self: Arcade, dt: float) =
 method draw*(self: Arcade) =
   # draw background
   self.sky.draw()
-  beginMode3D(self.camera)
+  beginMode3D(camera)
   # draw entities
   self.ground.draw()
   self.player.draw()

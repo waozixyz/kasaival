@@ -9,7 +9,11 @@ proc getCustomColorSchema*(cs: array[0..5, float]): array[0..2, float] =
             rand(min(cs[4], cs[5])..max(cs[4], cs[5]))]
 
 proc float2uint8*(num: float32): uint8 =
-  result = min(max(uint8(num), 0), 255)
+  if num > 255:
+    result = 255
+  if num < 0:
+    result = 0
+  result = uint8(num)
   
 proc uint8ToColor*(color: array[0..2, float], alpha: float): Color =
   result =  Color(
@@ -31,3 +35,27 @@ proc uniform*(a, b: float): float =
 
 proc fillVector3*(a: float): Vector3 =
   result = Vector3(x: a, y: a, z: a)
+
+proc getBoundingBox*(position: Vector3, radius: float): BoundingBox =
+  result = BoundingBox(min: Vector3(
+    x: position.x - radius,
+    y: position.y - radius,
+    z: position.z - radius
+  ),
+  max: Vector3(
+    x: position.x + radius,
+    y: position.y + radius,
+    z: position.z + radius
+  ))
+
+proc getBoundingBox*(position: Vector3, size: Vector3): BoundingBox =
+  result = BoundingBox(min: Vector3(
+    x: position.x - size.x,
+    y: position.y - size.y,
+    z: position.z - size.z
+  ),
+  max: Vector3(
+    x: position.x + size.x,
+    y: position.y + size.y,
+    z: position.z + size.z
+  ))

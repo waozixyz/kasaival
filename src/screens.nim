@@ -15,7 +15,7 @@ const
   screenWidth* = 800
   screenHeight* = 600
   groundLength* = 300
-  groundHeight* = 200
+  groundHeight* = 100
   groundWidth* = 6000
   startFuel* = 200
   gravity* = 9.81
@@ -23,14 +23,12 @@ const
 var
   gameOver* = false
   mouse* = Vector2()
-  prevMouse* = Vector2()
+  camera* = Camera3D()
   currentScreen*: GameScreen = ArcadeScreen
   mouseCursor* = 0
   isMute* = true
   windPower* = 0.0
   playerFuel*: float = startFuel
-  cameraX* = 0.0
-  cameraY* = 0.0
 
 type
   Screen* = ref object of RootObj
