@@ -11,6 +11,7 @@ type
     orgColor: array[0..2, float]
 
   Plant* = object 
+    init* = false
     state* = Growing
     position: Vector3
     size: Vector3 = Vector3(x: 10, y: 16, z: 10)
@@ -106,7 +107,7 @@ method init*(self: var Plant, position: Vector3, randomRow: bool) {.base.} =
     var growToRow = rand(0..self.maxRow)
     while self.currentRow < growToRow:
       self.grow()
-
+  self.init = true
 method shrink*(self: var Plant) {.base.} =
   if self.currentRow == 0:
     self.state = Dead

@@ -12,7 +12,7 @@ type
     fertility*: float = 100.0
     growProbability: float
     alpha*: float = 255.0
-    plant*: Plant
+    plants*: seq[Plant]
     dead: bool = false
 
   Ground* = ref object of RootObj
@@ -20,25 +20,22 @@ type
     tiles*: seq[Tile]
 
 
-method addPlant(self: Ground, i: int, randRow: bool) {.base.} =
+proc getPlant(self: Ground, tile: Tile, randRow: bool): Plant =
   var plant = Plant()
-  let tile = self.tiles[i]
   let x = tile.position.x - tile.size
   let y = 0.0
   let z = rand(tile.position.z - tile.size..tile.position.z + tile.size)
-
   plant.init(Vector3(x: x, y: y, z: z), randRow)
-  self.tiles[i].plant = plant
+  return plant
 
 method init*(self: Ground, level: Level) {.base.} =
   randomize()
   var z = 0.0
   let
     colors = @[
-      [0, 0, 60],   # dark gray
-      [55, 50, 120],   # dark blue
       [6, 9, 85],   # Deep dark blue
       [25, 50, 150],   # dark blue
+      [58, 80, 180],  # Lighter blue
       [58, 120, 200],  # Lighter blue
       [252, 212, 94],  # Yellow
       [97, 155, 65],   # Green-yellow
@@ -48,7 +45,6 @@ method init*(self: Ground, level: Level) {.base.} =
       [126, 100, 79],  # Green-brown
       [128, 128, 128],  # gray
       [80, 80, 80],  # dark gray
-      [30, 30, 39],   # black
 
     ]
     numColors = float(colors.len) - 1.0
@@ -75,9 +71,18 @@ method init*(self: Ground, level: Level) {.base.} =
         tile.position = Vector3(x: x, y: y, z: z)
         tile.size = size
         tile.orgColor = tile.color 
-        tile.fertility = tile.color[1]
-        if tile.fertility < 0:
-          tile.fertility = 0
+        tile.fertility = tile.color[1] * 1.5 - tile.color[0] * 0.5
+
+        if tile.color[2] < 50:
+          tile.fertility += tile.color[2]
+        else:
+          tile.fertility -= tile.color[2] * 0.5
+        
+        tile.fertility = max(20, tile.fertility)
+
+        if tile.fertility > 120:
+          var p = self.getPlant(tile, true)
+          #tile.plants.add(p)
         self.tiles.add(tile)
         x += size
       y -= size
@@ -133,10 +138,11 @@ method update*(self: Ground, dt: float) {.base.} =
 
     
     # update tile
-    self.tiles[i] = tile
     # loop through PlantStates
-    #for j, plant in tile.plants:
-    #  self.tiles[i].plants[j].update(dt)
+    if tile.plants.len > 0:
+      while i in 0..tile.plants.len:
+        var plant = tile.plants[i]
+        plant.update(dt)
     #  if plant.state == PlantStates.Dead:
     #    # remove dead plant from list
     #    self.tiles[i].plants.delete(j)
@@ -151,7 +157,8 @@ method update*(self: Ground, dt: float) {.base.} =
     # reset fertility and add new plant
     #self.tiles[i].fertility = 0.0
     #self.addPlant(i, false)
-   
+    self.tiles[i] = tile
+
 
 proc isTileVisible*(tile: Tile): bool =
   result = (tile.position.x > camera.position.x - screenWidth * 0.5 and tile.position.x < camera.position.x + screenWidth * 0.5 and tile.position.y < camera.position.y + screenHeight)
@@ -163,10 +170,11 @@ method draw*(self: Ground) {.base.} =
       #if tile.alpha >= 200:
       var color = uint8ToColor(tile.color, 255)
       var fertility = clamp(tile.fertility, 0, 100)
-      color.g = float2uint8(float(color.g) * (fertility / 100))
-      if color.g < uint8(max(20, tile.orgColor[1] - 80)):
-        color.g = uint8(max(20, tile.orgColor[1] - 80))
+      color.r = float2uint8(float(color.r) * (clamp(fertility, 30, 50) / 50))
+      color.g = float2uint8(float(color.g) * (clamp(fertility, 30, 50) / 50))
+      color.b = float2uint8(float(color.b) * (clamp(fertility, 30, 50) / 50))
       drawCube(tile.position, fillVector3(tile.size), color)
 
-      #for plant in tile.plants:
-      #  plant.draw()
+    if tile.plants.len > 0:
+      for plant in tile.plants:
+        plant.draw()
