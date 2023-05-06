@@ -69,8 +69,8 @@ proc main =
   target = loadRenderTexture(screenWidth, screenHeight)
 
   try:    
-    when not defined(emscripten):
-      initAudioDevice()
+    #when not defined(emscripten):
+    #  initAudioDevice()
 
     # init current screen
     getCurrentScreen()

@@ -1,8 +1,9 @@
-import raylib, ../screens, ../levels, std/random, ../utils, plant
+import raylib, ../screens, ../levels, std/random, std/math, ../utils, plant
 
 type
   Tile* = object
     hp*: float = 100
+    difficulty: float = 1
     size: float
     orgSize*: float
     position*: Vector3
@@ -11,22 +12,14 @@ type
     orgColor*: array[0..2, float]
     fertility: float
     growProbability: float
-    capacity: int = 1
-    plants*: seq[Plant]
+    alpha*: float = 255.0
+    plant*: Plant
+    dead: bool = false
 
   Ground* = ref object of RootObj
     grow*: seq[PlantNames]
     tiles*: seq[Tile]
 
-proc getColorDifference(c1: float, c2: float, s: float): float =
-  result = c1 * (1 - s) + c2 * s
-
-proc getColor(s: float, t1: Terrain, t2: Terrain): array[0..2, float] =
-  var c1 = getCustomColorSchema(t1.cs)
-  var c2 = getCustomColorSchema(t2.cs)
-  result = [getColorDifference(c1[0], c2[0], s),
-            getColorDifference(c1[1], c2[1], s),
-            getColorDifference(c1[2], c2[2], s)]
 
 method addPlant(self: Ground, i: int, randRow: bool) {.base.} =
   var plant = Plant()
@@ -36,60 +29,76 @@ method addPlant(self: Ground, i: int, randRow: bool) {.base.} =
   let z = rand(tile.position.z - tile.size..tile.position.z + tile.size)
 
   plant.init(Vector3(x: x, y: y, z: z), randRow)
-  self.tiles[i].plants.add(plant)
+  self.tiles[i].plant = plant
 
 method init*(self: Ground, level: Level) {.base.} =
   randomize()
+  var z = 0.0
+  let
+    colors = @[
+      [6, 9, 85],   # Deep dark blue
+      [25, 50, 150],   # dark blue
+      [58, 120, 200],  # Lighter blue
+      [252, 212, 94],  # Yellow
+      [97, 155, 65],   # Green-yellow
+      [45, 74, 32],    # Jungle green
+      [96, 92, 61],    # Swampy brown-green
+      [126, 100, 79],  # Green-brown
+      [128, 128, 128],  # gray
+      [80, 80, 80]  # dark gray
+    ]
+    numColors = float(colors.len) - 1.0
+    ratioDenom = groundWidth / numColors
+    randomFactor = 0.2
+  while z < groundLength:
+    let size = level.tileSize
+    var y = 0.0
+    while y > -groundHeight:
+      var x = 0.0
+      while x < groundWidth:
+        var tile = Tile()
+        let
+          gradientIndex = int(x / groundWidth * numColors)
+          color1 = colors[gradientIndex]
+          color2 = colors[gradientIndex + 1]
+        var ratio = (x mod ratioDenom) / ratioDenom + rand(-randomFactor..randomFactor)
+        if ratio > 1: ratio = 1
+        if ratio < 0: ratio = 0
+        for i in 0..2:
+          tile.color[i] = lerp(float(color1[i]), float(color2[i]), ratio) 
 
-  endX = -level.tileSize
-  for ti, terrain in level.terrains:
-    var
-      terrainWidth = float(terrain.tiles) * level.tileSize
-      z = 0.0
-    while z < groundLength:
-      let size = level.tileSize
-      var y = 0.0
-      while y > -groundHeight:
-        var x = endX
-        while x < endX + terrainWidth:
-          var
-            i = clamp((x - endX) / terrainWidth, 0, 1)
-            tile = Tile()
-          tile.color = getColor(i, terrain, level.terrains[ti + 1])
-            
-          tile.growProbability = (tile.color[1] - (tile.color[0] + tile.color[1] * 0.5 )) / 100.0
-          if tile.growProbability > 0.5:
-            tile.fertility = rand(0.0..1.1)
+        tile.position = Vector3(x: x, y: y, z: z)
+        tile.size = size
+        tile.orgSize = size
+        tile.orgColor = tile.color 
+        self.tiles.add(tile)
+        x += size
+      y -= size
+    z += size
 
-          tile.position = Vector3(x: x, y: y, z: z)
-          tile.size = size
-          tile.orgSize = size
-          self.grow = level.grow
-          tile.orgColor = tile.color 
-          self.tiles.add(tile)
-        
-          x += size
-        y -= size
-      z += size
-
-    endX += terrainWidth
 
 
 method update*(self: Ground, dt: float) {.base.} =
   # loop through tiles
   for i, tile in self.tiles:
-    if tile.hp <= 0: continue
+    if tile.dead: continue
+    if tile.hp <= 0: 
+      if self.tiles[i].size >= 0:
+        self.tiles[i].size -= 5
+      else:
+        self.tiles[i].dead = true
     # tile color logic
     var currentColor = tile.color
     var originalColor = tile.orgColor
     var burnTimer = tile.burnTimer
 
     if burnTimer > 0:
-      self.tiles[i].hp -= dt * 60
+      self.tiles[i].hp -= dt * 60 * 0.1
       # darken the colors while burning
       currentColor[0] = min(255 - originalColor[0], currentColor[0] + 320 * dt)
       currentColor[1] = max(originalColor[1] * 0.8, currentColor[1] - 120 * dt)
       currentColor[2] = max(originalColor[2] * 0.6, currentColor[2] - 200 * dt)
+      originalColor[1] = originalColor[1] * (tile.hp / 100)
       # decrement timer
       burnTimer -= 5.0 * dt
     else:
@@ -103,11 +112,8 @@ method update*(self: Ground, dt: float) {.base.} =
     
     # update tile color and timer
     self.tiles[i].color = currentColor
+    self.tiles[i].orgColor = originalColor
     self.tiles[i].burnTimer = burnTimer
-    if tile.hp != 100:
-      echo tile.hp, " ", self.tiles[i].size 
-
-    self.tiles[i].size = tile.orgSize * (tile.hp / 100)
     # loop through PlantStates
     #for j, plant in tile.plants:
     #  self.tiles[i].plants[j].update(dt)
@@ -128,13 +134,15 @@ method update*(self: Ground, dt: float) {.base.} =
    
 
 proc isTileVisible*(tile: Tile): bool =
-  result = tile.position.x < cameraX + screenWidth * 0.6 and tile.position.x > cameraX - screenWidth * 0.6 and tile.position.y < cameraY + screenHeight * 0.5 and tile.position.y > cameraY - screenHeight * 0.3
+  result = tile.position.x < screenWidth * 0.6 and tile.position.x > screenWidth * 0.6 and tile.position.y < screenHeight * 0.5 and tile.position.y > - screenHeight * 0.3
 
 method draw*(self: Ground) {.base.} =
   for tile in self.tiles:
-    if tile.isTileVisible and tile.hp >= 0:
-      #drawCylinder(tile.position, tile.radius, tile.radius, tile.radius, 9, uint8ToColor(tile.color, 255))
-      drawCube(tile.position, Vector3(x: tile.size, y: tile.size, z: tile.size), uint8ToColor(tile.color, 255))
-      drawCubeWires(tile.position, Vector3(x: tile.orgSize, y: tile.orgSize, z: tile.orgSize), uint8ToColor(tile.color, 255))
+    if tile.dead: continue
+    if tile.position.x < cameraX - screenWidth * 0.5 or tile.position.x > cameraX + screenWidth * 0.5: continue
+    #drawCylinder(tile.position, tile.radius, tile.radius, tile.radius, 9, uint8ToColor(tile.color, 255))
+    #if tile.alpha >= 200:
+    drawCube(tile.position, Vector3(x: tile.size, y: tile.size, z: tile.size), uint8ToColor(tile.color, 255))
+
     #for plant in tile.plants:
     #  plant.draw()

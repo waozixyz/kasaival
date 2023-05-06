@@ -14,23 +14,22 @@ const ASSET_FOLDER* = "resources"
 const
   screenWidth* = 800
   screenHeight* = 600
-  groundLength* = 400
-  groundHeight* = 500
+  groundLength* = 300
+  groundHeight* = 200
+  groundWidth* = 6000
   startFuel* = 200
   gravity* = 9.81
-  startCameraX* = 1000
 
 var
   gameOver* = false
-  cameraX* = 2000.0
-  cameraY* = 0.0
-  endX* = 0.0
   mouse* = Vector2()
+  prevMouse* = Vector2()
   currentScreen*: GameScreen = ArcadeScreen
   mouseCursor* = 0
   isMute* = true
   windPower* = 0.0
   playerFuel*: float = startFuel
+  cameraX* = 0.0
 
 type
   Screen* = ref object of RootObj

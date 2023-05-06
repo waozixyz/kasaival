@@ -15,9 +15,9 @@ method init*(self: Arcade) =
   self.level = initDaisy()
   self.id = ArcadeScreen
   # init music
-  when not defined(emscripten):
-    self.music = loadMusicStream(ASSET_FOLDER & "/music/" & self.level.music)
-    playMusicStream(self.music);
+  #when not defined(emscripten):
+  #  self.music = loadMusicStream(ASSET_FOLDER & "/music/" & self.level.music)
+  #  playMusicStream(self.music);
 
   # init ui
   self.hud = Hud()
@@ -34,8 +34,6 @@ method init*(self: Arcade) =
   self.camera = Camera3D()
   self.camera.fovy = 45
   self.camera.projection = CameraProjection.Perspective
-  self.camera.position = Vector3(x: cameraX, y: cameraY + screenHeight * 0.5, z: groundLength * 2)
-  self.camera.target = Vector3(x: cameraX, y: cameraY, z: 100)
   self.camera.up = Vector3(x: 0.0, y: 1.0, z: 0.0)
 
 proc playerIsColliding(playerPos: Vector3, playerSize: float, objPos: Vector3, objSize: float): bool =
@@ -52,6 +50,7 @@ proc playerIsColliding(playerPos: Vector3, playerSize: float, objPos: Vector3, o
     playerPos.y + playerRadius > objPos.y 
   )
 
+  
 
 proc checkTileCollision(self: Arcade, dt: float) =
   # check tile collision with player
@@ -60,6 +59,7 @@ proc checkTileCollision(self: Arcade, dt: float) =
   # Iterate through visible tiles and check for collision with the player
   for i, tile in self.ground.tiles:
     if tile.hp <= 0: continue
+
     if playerIsColliding(player.position, player.radius, tile.position, tile.orgSize):
       # Set burn timer for tile if player collides with it
       self.ground.tiles[i].burnTimer = 2
@@ -72,10 +72,7 @@ proc checkTileCollision(self: Arcade, dt: float) =
         bf *= 10
       playerFuel += (c[1]  - (c[2] + oc[2]) * bf) / 1000 * dt
       grounded = true
-      if tile.plants.len == 0: continue
-      
-      for j, p in tile.plants:
-        self.ground.tiles[i].plants[j].burnTimer = 2
+      #self.ground.tiles[i].plant.burnTimer = 2
 
   if grounded:
     player.state = PlayerState.Grounded
@@ -86,16 +83,16 @@ proc checkTileCollision(self: Arcade, dt: float) =
 method restartGame(self: Arcade): void {.base} =
   # reset game state
   playerFuel = startFuel
-  cameraX = startCameraX
   self.init()
   gameOver = false
 
 method update*(self: Arcade, dt: float) =
-  windPower += dt
+  cameraX = self.player.position.x
   self.camera.position.x = cameraX
-  self.camera.position.y = cameraY + screenHeight * 0.5
-  self.camera.target.x = cameraX
-  self.camera.target.y = cameraY
+  self.camera.position.y = 200
+  self.camera.position.z = groundLength * 2
+  self.camera.target = self.player.position
+  self.camera.target.z = 0.0
   if isKeyPressed(M):
     isMute = not isMute
 

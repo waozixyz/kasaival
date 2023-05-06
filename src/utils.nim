@@ -21,3 +21,10 @@ proc uint8ToColor*(color: array[0..2, float], alpha: float): Color =
 
 func addVectors*(a: Vector3, b: Vector3): Vector3 =
   result = Vector3(x: a.x + b.x, y: a.y + b.y, z: a.z + b.z)
+
+proc lerp*(a, b, t: float): float =
+  result = a + (b - a) * t
+
+
+proc uniform*(a, b: float): float =
+  return (b - a) * rand(0.0..1.0) + a

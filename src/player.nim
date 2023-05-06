@@ -54,14 +54,14 @@ proc getDirection(x: float, z: float): Vector3 =
   if (dir.z == 0 and dir.x == 0):
     # check mouse press
     if (isMouseButtonDown(Left)):
-      var diff = Vector3(x: mouse.x - x + cameraX, y: 0, z: mouse.y - z)
+      var diff = Vector3(x: mouse.x - x, y: 0, z: mouse.y - z)
       dir = getAngle(diff)
 
   return dir
 
 method init*(self: Player) {.base.} =
   randomize()
-  self.position = Vector3(x: cameraX, y: 2, z: groundLength * 0.5)
+  self.position = Vector3(x: groundWidth * 0.5, y: 0.0, z: groundLength * 0.5)
 
 proc getRadius*(self: Player):float =
   return self.radius
@@ -101,30 +101,9 @@ method update*(self: Player, dt: float) {.base.} =
   # get velocity of player
   var dx = (dir.x * self.speed * radius) * dt
   var dz = (dir.z * self.speed * radius) * dt
-
-  # x limit, move screen at edges
-  #var eyeBound = 200 + screenWidth / (radius * self.scale * 2)
-  var eyeBound = screenWidth * 0.2
-
-
-  if (x + dx < cameraX - eyeBound and cameraX > 0 and dx <= 0) or (x + dx > cameraX + eyeBound and cameraX < float(endX) - eyeBound and dx >= 0):
-    cameraX += dx;
-
-  if (x + dx < cameraX + radius - screenWidth and dx < 0):
-    self.position.x = cameraX + radius
-  elif (x + dx > cameraX + screenWidth - radius):
-    self.position.x = cameraX + screenWidth - radius
-  else:
-    self.position.x += dx
-  # z limits
-  var minZ = -radius;
-  var maxZ = groundLength - radius;
-  if z + dz > maxZ and dz > 0: self.position.z = maxZ
-  elif z + dz < minZ and dz < 0: self.position.z = minZ
-  else:
-    self.position.z += dz
+  self.position.x += dx
+  self.position.z += dz
     
-  cameraY = self.position.y
   var 
     red: uint8
     green: uint8

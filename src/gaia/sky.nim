@@ -13,7 +13,7 @@ method update*(self: var Sky, dt: float) {.base.} =
   discard
 
 method draw*(self: Sky) {.base.} =
-  var x = -10 - cameraX * 0.01
+  var x = -10.0
   var scale = 2.9
   drawTexture(self.planets, Vector2(x: x, y: 0), 0, scale, WHITE)
   drawTexture(self.nebula, Vector2(x: x, y: 0), 0, scale, WHITE)
