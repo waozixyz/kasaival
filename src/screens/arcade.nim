@@ -39,22 +39,30 @@ method init*(self: Arcade) =
 proc checkTileCollision(self: Arcade, dt: float) =
   # check tile collision with player
   var player = self.player
-  # Iterate through visible tiles and check for collision with the player
-  for i, tile in self.ground.tiles:
-    if not tile.isTileVisible(): continue
-    if checkCollisionBoxes(getBoundingBox(player.position, player.radius), getBoundingBox(tile.position, tile.size)):
-      # Set burn timer for tile if player collides with it
-      self.ground.tiles[i].burnTimer = 200
-      playerFuel += (tile.fertility / 100) * 0.1
-      var bf = 1.0
-      if tile.color[2] > 120:
-        bf *= 2.0
-      if tile.color[2] > 140:
-        bf *= 4.0
-      if tile.color[2] > 180:
-        bf *= 8.0
-      playerFuel -= (tile.color[2] / 255) * 0.1 * bf
-      #self.ground.tiles[i].plant.burnTimer = 2
+
+  for x in 0..self.ground.map.len - 1:
+    if not self.ground.isTileVisible(x): continue
+    for y in 0..self.ground.map[x].len - 1:
+      for z in 0..self.ground.map[x][y].len - 1:
+        var tile = self.ground.map[x][y][z]
+
+        #if not tile.isTileVisible(): continue
+        if checkCollisionBoxes(getBoundingBox(player.position, player.radius), getBoundingBox(tile.position, tile.size)):
+          if player.position.y < tile.position.y + player.radius * 2:
+            player.position.y = tile.position.y + player.radius * 2 
+          # Set burn timer for tile if player collides with it
+          tile.burnTimer = 200
+          playerFuel += (tile.fertility / 100) * 0.1
+          var bf = 1.0
+          if tile.color[2] > 120:
+            bf *= 2.0
+          if tile.color[2] > 140:
+            bf *= 4.0
+          if tile.color[2] > 180:
+            bf *= 8.0
+          # playerFuel -= (tile.color[2] / 255) * 0.1 * bf
+          #self.ground.tiles[i].plant.burnTimer = 2
+        self.ground.map[x][y][z] = tile
 
 method restartGame(self: Arcade): void {.base} =
   # reset game state
@@ -68,7 +76,7 @@ method update*(self: Arcade, dt: float) =
   # update camera
   camera.position.x = self.player.position.x  
   camera.position.y = screenHeight * 0.5 + self.player.position.y
-  camera.position.z = groundLength * 2
+  camera.position.z = groundSize.z * 2
 
   camera.target = self.player.position
   

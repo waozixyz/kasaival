@@ -21,6 +21,7 @@ type
     particles*: seq[Particle]
     lastDirection: float = 1.0
     jumpForce: float = 20.0
+    shader: Shader
     state*: PlayerState = Grounded
 
 const
@@ -85,8 +86,8 @@ proc getParticle*(self: Player, color: Color): Particle =
   )
 method init*(self: Player) {.base.} =
   randomize()
-  self.position = Vector3(x: groundWidth * 0.5, y: self.radius * 2, z: groundLength * 0.5)
-
+  self.position = Vector3(x: groundSize.x * 0.5, y: self.radius * 2, z: groundSize.z * 0.5)
+  #self.shader = load
 method update*(self: Player, dt: float) {.base.} =
   var dir = Vector3()
   dir = self.getDirection()
@@ -96,9 +97,9 @@ method update*(self: Player, dt: float) {.base.} =
   if self.state != Frozen:
     playerFuel -= (abs(dir.x) + abs(dir.z)) * self.speed * dt / 1000
     # get velocity of player
-    if (self.position.x + dx - diameter > 0 or dx > 0) and (self.position.x + dx + diameter < groundWidth or dx < 0):
+    if (self.position.x + dx - diameter > 0 or dx > 0) and (self.position.x + dx + diameter < groundSize.x or dx < 0):
       self.position.x += dx
-    if (self.position.z + dz - diameter > 0 or dz > 0) and (self.position.z + dz + diameter + 6 < groundLength or dz < 0):
+    if (self.position.z + dz - diameter > 0 or dz > 0) and (self.position.z + dz + diameter + 6 < groundSize.z or dz < 0):
       self.position.z += dz
   
   if self.particles.len < 100:

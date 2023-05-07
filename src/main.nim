@@ -75,7 +75,6 @@ proc main =
     # init current screen
     getCurrentScreen()
     current.init()
-
     # run game loop
     when defined(emscripten):
       emscriptenSetMainLoop(updateDrawFrame, 0, 1)

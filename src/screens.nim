@@ -14,13 +14,11 @@ const ASSET_FOLDER* = "resources"
 const
   screenWidth* = 800
   screenHeight* = 600
-  groundLength* = 300
-  groundHeight* = 100
-  groundWidth* = 6000
   startFuel* = 200
   gravity* = 9.81
 
 var
+  groundSize* = Vector3(x: 6000, y: 100, z: 300)
   gameOver* = false
   mouse* = Vector2()
   camera* = Camera3D()
