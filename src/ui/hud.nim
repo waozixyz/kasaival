@@ -1,4 +1,4 @@
-import raylib, ../screens, ../player, std/math
+import raylib, ../screens, ../player
 
 type
   Hud* = ref object of RootObj

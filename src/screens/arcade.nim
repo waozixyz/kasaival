@@ -1,22 +1,20 @@
-import raylib, ../screens, ../player, ../gaia/ground, ../levels, ../gaia/sky, ../ui/hud, ../utils
+import raylib, ../screens, ../player, ../gaia/ground, ../gaia/sky, ../ui/hud, ../utils
 
 type
   Arcade* = ref object of Screen
     player: Player
     ground*: Ground
-    level: Level
     sky: Sky
     music: Music
     hud: Hud
 
 method init*(self: Arcade) =
   # init level
-  self.level = initDaisy()
   self.id = ArcadeScreen
   # init music
-  #when not defined(emscripten):
-  #  self.music = loadMusicStream(ASSET_FOLDER & "/music/" & self.level.music)
-  #  playMusicStream(self.music);
+  when not defined(emscripten):
+    self.music = loadMusicStream(ASSET_FOLDER & "/music/StrangerThings.ogg")
+    playMusicStream(self.music);
 
   # init ui
   self.hud = Hud()
@@ -25,7 +23,7 @@ method init*(self: Arcade) =
   self.sky = Sky()
   self.sky.init()
   self.ground = Ground()
-  self.ground.init(self.level)
+  self.ground.init()
   # Init entities  
   self.player = Player()
   self.player.init()
@@ -38,18 +36,23 @@ method init*(self: Arcade) =
 
 proc checkTileCollision(self: Arcade, dt: float) =
   # check tile collision with player
-  var player = self.player
-
+  var playerVelocity = self.player.getVelocity(dt)
+  var tmpVel = playerVelocity
+  tmpVel.y = 0
+  let
+    playerHitbox = getBoundingBox(self.player.position, self.player.radius)
+    playerVelocityHitbox = getBoundingBox(addVectors(self.player.position, tmpVel), self.player.radius)
+    playerVelocityHeightHitbox = getBoundingBox(addVectors(self.player.position, playerVelocity), self.player.radius)
+  var grounded = false
   for x in 0..self.ground.map.len - 1:
     if not self.ground.isTileVisible(x): continue
     for y in 0..self.ground.map[x].len - 1:
       for z in 0..self.ground.map[x][y].len - 1:
         var tile = self.ground.map[x][y][z]
-
-        #if not tile.isTileVisible(): continue
-        if checkCollisionBoxes(getBoundingBox(player.position, player.radius), getBoundingBox(tile.position, tile.size)):
-          if player.position.y < tile.position.y + player.radius * 2:
-            player.position.y = tile.position.y + player.radius * 2 
+        let tileHitbox = getBoundingBox(tile.position, tile.size)
+        
+        if checkCollisionBoxes(playerHitbox, tileHitbox):
+          grounded = true
           # Set burn timer for tile if player collides with it
           tile.burnTimer = 200
           playerFuel += (tile.fertility / 100) * 0.1
@@ -60,17 +63,43 @@ proc checkTileCollision(self: Arcade, dt: float) =
             bf *= 4.0
           if tile.color[2] > 180:
             bf *= 8.0
+          #self.ground.map[x][y][z] = tile
           # playerFuel -= (tile.color[2] / 255) * 0.1 * bf
           #self.ground.tiles[i].plant.burnTimer = 2
-        self.ground.map[x][y][z] = tile
+        if checkCollisionBoxes(playerVelocityHitbox, tileHitbox):
+          # Check x-axis collision
+          if playerVelocity.x != 0:
+            if tileHitbox.min.x < playerHitbox.max.x:
+              playerVelocity.x = 0
+            elif tileHitbox.max.x > playerHitbox.min.x:
+              playerVelocity.x = 0
+    
+          # Check z-axis collision
+          if playerVelocity.z != 0:
+            if tileHitbox.min.z < playerHitbox.max.z:
+              playerVelocity.z = 0
+            if tileHitbox.max.z > playerHitbox.min.z:
+              playerVelocity.z = 0
+
+        if checkCollisionBoxes(playerVelocityHeightHitbox, tileHitbox):
+          # Check y-axis collision
+          if playerVelocity.y != 0:
+            if tileHitbox.min.y < playerHitbox.max.y:
+              playerVelocity.y = 0
+              grounded = true
+            elif tileHitbox.max.y > playerHitbox.min.y:
+              playerVelocity.y = 0
+              
+    
+      
+  self.player.velocity = playerVelocity
+  self.player.state = if grounded: Grounded else: Falling
 
 method restartGame(self: Arcade): void {.base} =
   # reset game state
   playerFuel = startFuel
   self.init()
   gameOver = false
-
-
 
 method update*(self: Arcade, dt: float) =
   # update camera

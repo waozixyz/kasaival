@@ -1,6 +1,10 @@
-import raylib, ../screens, ../levels, std/random, std/math, ../utils, plant, perlin
+import raylib, ../screens, std/random, ../utils, plant, perlin
 
 type
+  PerlinColor = object
+    value*: float
+    color*: array[0..2, int]
+    y: int
   Tile* = object
     hp*: float = 100
     difficulty: float = 1
@@ -16,13 +20,8 @@ type
     dead: bool = false
 
   Ground* = ref object of RootObj
-    grow*: seq[PlantNames]
     map*: seq[seq[seq[Tile]]]
     tileSize*: float
-
-  PerlinColor = object
-    value: float
-    color: array[0..2, int]
 
 
 proc getPlant(self: Ground, tile: Tile, randRow: bool): Plant =
@@ -37,60 +36,59 @@ proc calculateGroundSize(tileSize: float, tiles: Vector3): Vector3 =
   result = Vector3(x: tileSize * tiles.x, y: tileSize * tiles.y, z: tileSize * tiles.z)
 
 proc generatePerlinNoise(noise: Noise, x: int, y: int, z: int, offset: float): float =
-  result = clamp(noise.perlin(float(x), float(y), float(z)) + offset, 0, 0.99)
+  result = clamp(noise.perlin(float(x), float(y), float(z)) + offset, 0, 1)
 
-method init*(self: Ground, level: Level) {.base.} =
+proc getPerlinColor(tilePerlinColors: seq[PerlinColor], noiseValue: float): PerlinColor =
+  result = tilePerlinColors[0]
+  for tp in tilePerlinColors:
+    if tp.value <= noiseValue:
+      result = tp
+  echo noiseValue, " ", result  
+
+method init*(self: Ground) {.base.} =
   randomize()
   # set ground size
-  let noise = newNoise()
-  groundSize = calculateGroundSize(level.tileSize, level.tiles)
-  self.tileSize = level.tileSize
-  let
-    color_gradient = [
-      PerlinColor(value: 0.0, color: [21, 71, 108]),    # Deep water
-      PerlinColor(value: 0.2, color: [37, 111, 163]),   # Shallow water
-      PerlinColor(value: 0.3, color: [252, 212, 94]),   # Sand
-      PerlinColor(value: 0.4, color: [200, 180, 84]),   # Darker sand
-      PerlinColor(value: 0.5, color: [80, 150, 60]),   # Light Grass
-      PerlinColor(value: 0.6, color: [60, 120, 42]),    # Grass
-      PerlinColor(value: 0.7, color: [50, 83, 30]),    # Jungle
-      PerlinColor(value: 0.9, color: [107, 83, 62]),  # Rock
-      PerlinColor(value: 1.0, color: [120, 120, 120]),  # Snow
-    ]
+  let tiles = Vector3(x: 200, y: 20, z: 15)
+  let tileSize = 18.0
 
-  self.map = newSeq[newSeq[newSeq[Tile](int(level.tiles.z))](int(level.tiles.y))](int(level.tiles.x))
+  let tilePerlinColors = @[
+    PerlinColor(value: 0, color: [21, 71, 108], y: 3),    # Deep water
+    PerlinColor(value: 0.1, color: [21, 71, 108], y: 3),    # Deep water
+    PerlinColor(value: 0.2, color: [37, 111, 140], y: 4),   # Shallow water
+    PerlinColor(value: 0.3, color: [252, 212, 94], y: 5),   # Sand
+    PerlinColor(value: 0.4, color: [80, 180, 80], y: 6),   # Lighter Grass 
+    PerlinColor(value: 0.5, color: [80, 150, 80], y: 6),   # Light Grass
+    PerlinColor(value: 0.6, color: [60, 120, 42], y: 7),    # Grass
+    PerlinColor(value: 0.7, color: [50, 83, 30], y: 8),    # Jungle
+    PerlinColor(value: 0.9, color: [95, 83, 62], y: 9),  # Rock
+    PerlinColor(value: 1.0, color: [107, 100, 100], y: 20),  # Rock
+  ]
+  let noise = newNoise()
+  groundSize = calculateGroundSize(tileSize, tiles)
+  self.tileSize = tileSize
+
+  self.map = newSeq[newSeq[newSeq[Tile](int(tiles.z))](int(tiles.y))](int(tiles.x))
   for x in 0..self.map.len - 1:
-    self.map[x] = newSeq[newSeq[Tile](int(level.tiles.z))](int(level.tiles.y))
+    self.map[x] = newSeq[newSeq[Tile](int(tiles.z))](int(tiles.y))
     for y in 0..self.map[x].len - 1:
-      self.map[x][y] = newSeq[Tile](int(level.tiles.z))
-  for x in 0..int(level.tiles.x) - 1:
-    var perlinOffset = (float(x) / float(level.tiles.x)) - 0.5
-    for y in 0..int(level.tiles.y) - 1:
-      for z in 0..int(level.tiles.z) - 1:
+      self.map[x][y] = newSeq[Tile](int(tiles.z))
+  
+  for x in 0..int(tiles.x) - 1:
+    var perlinOffset = float(x) / float(tiles.x) - 0.5
+
+    for y in 0..int(tiles.y) - 1:
+      for z in 0..int(tiles.z) - 1:
         var tile = Tile()
-        let noiseValue = generatePerlinNoise(noise, x, y, z, perlinOffset)
-          
-        var
-          ratio = 0.5
-          lower_color = [120, 120, 120]
-          upper_color = [120, 120, 120]
-        for i in 0..color_gradient.len - 2:
-          if noiseValue >= color_gradient[i].value and noiseValue < color_gradient[i + 1].value:
-            lower_color = color_gradient[i].color
-            upper_color = color_gradient[i + 1].color
-            # Calculate the ratio to use for interpolation 
-            
-            ratio = (noiseValue - color_gradient[i].value) / (color_gradient[i + 1].value - color_gradient[i].value)
-            break
-        if noiseValue == 1:
-          echo lower_color, " ", upper_color, " ", ratio
+        let
+          noiseValue = generatePerlinNoise(noise, x, y, z, perlinOffset) 
+          tilePerlin = getPerlinColor(tilePerlinColors,noiseValue)
+        if tilePerlin.y < y:
+          continue
         for i in 0..2:
-          # Interpolate thes based on the noise value
-          tile.color[i] = float(lower_color[i]) * (1 - ratio) + float(upper_color[i]) * ratio
-         
+          tile.color[i] = float(tilePerlin.color[i])
         
-        tile.position = Vector3(x: float(x) * level.tileSize, y: float(y) * level.tileSize, z: float(z) * level.tileSize)
-        tile.size = level.tileSize
+        tile.position = Vector3(x: float(x) * tileSize, y: float(y) * tileSize, z: float(z) * tileSize)
+        tile.size = tileSize
         tile.orgColor = tile.color
         tile.fertility = tile.color[1] * 1.5 - tile.color[0] * 0.5
 
@@ -112,7 +110,6 @@ method update*(self: Ground, dt: float) {.base.} =
   for x in 0..self.map.len - 1:
     for y in 0..self.map[x].len - 1:
       for z in 0..self.map[x][y].len - 1:
-        break
         var tile = self.map[x][y][z]
         # tile color logic
         if tile.burnTimer > 0:
@@ -201,7 +198,9 @@ method draw*(self: Ground) {.base.} =
         #if tile.orgColor[1] - (tile.orgColor[0] + tile.orgColor[2]) * 0.5 > 0:
         #  color.g = float2uint8(float(color.g) * (clamp(fertility, 30, 50) / 50))
         #  color.b = float2uint8(float(color.b) * (clamp(fertility, 0, 40) / 50))
-        drawCube(tile.position, fillVector3(tile.size), color)
+        drawCube(tile.position, fillVector(tile.size), color)
+        color.a = 255
+        drawCubeWires(tile.position, fillVector(tile.size), color)
 
         if tile.plants.len > 0:
           for plant in tile.plants:
