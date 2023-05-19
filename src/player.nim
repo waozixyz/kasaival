@@ -99,7 +99,7 @@ proc getParticle*(self: Player, color: Color): Particle =
 
 method init*(self: Player) {.base.} =
   randomize()
-  self.position = Vector3(x: groundSize.x * 0.2, y: groundSize.y * 0.5 + self.radius * 2, z: groundSize.z * 0.5)
+  self.position = Vector3(x: groundSize.x * 0.4, y: groundSize.y * 0.5 + self.radius * 2, z: groundSize.z * 0.5)
   #self.shader = load
 
 method update*(self: Player, dt: float) {.base.} =

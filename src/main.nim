@@ -59,7 +59,8 @@ proc updateDrawFrame() {.cdecl.} =
   drawTexture(target.texture, textureRect, screenRect, Vector2( x: 0, y: 0 ), 0.0, WHITE)
 
   endDrawing()
-  
+
+
 
 proc main =
   # init raylib window
@@ -67,7 +68,6 @@ proc main =
   initWindow(screenWidth, screenHeight, "Kasaival")
   
   target = loadRenderTexture(screenWidth, screenHeight)
-
   try:    
     when not defined(emscripten):
       initAudioDevice()

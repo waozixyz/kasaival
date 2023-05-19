@@ -67,6 +67,8 @@ proc checkTileCollision(self: Arcade, dt: float) =
           # playerFuel -= (tile.color[2] / 255) * 0.1 * bf
           #self.ground.tiles[i].plant.burnTimer = 2
         if checkCollisionBoxes(playerVelocityHitbox, tileHitbox):
+          tile.burnTimer = 200
+
           # Check x-axis collision
           if playerVelocity.x != 0:
             if tileHitbox.min.x < playerHitbox.max.x:
@@ -82,6 +84,8 @@ proc checkTileCollision(self: Arcade, dt: float) =
               playerVelocity.z = 0
 
         if checkCollisionBoxes(playerVelocityHeightHitbox, tileHitbox):
+          tile.burnTimer = 200
+
           # Check y-axis collision
           if playerVelocity.y != 0:
             if tileHitbox.min.y < playerHitbox.max.y:

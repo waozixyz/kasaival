@@ -43,13 +43,12 @@ proc getPerlinColor(tilePerlinColors: seq[PerlinColor], noiseValue: float): Perl
   for tp in tilePerlinColors:
     if tp.value <= noiseValue:
       result = tp
-  echo noiseValue, " ", result  
 
 method init*(self: Ground) {.base.} =
   randomize()
   # set ground size
-  let tiles = Vector3(x: 200, y: 20, z: 15)
-  let tileSize = 18.0
+  let tiles = Vector3(x: 200, y: 20, z: 10)
+  let tileSize = 22.0
 
   let tilePerlinColors = @[
     PerlinColor(value: 0, color: [21, 71, 108], y: 3),    # Deep water
@@ -99,8 +98,8 @@ method init*(self: Ground) {.base.} =
         
         tile.fertility = max(20, tile.fertility)
 
-        if tile.fertility > 120:
-          var p = self.getPlant(tile, true)
+        #if tile.fertility > 120:
+          #var p = self.getPlant(tile, true)
           #tile.plants.add(p)
         self.map[x][y][z] = tile
 
@@ -198,10 +197,12 @@ method draw*(self: Ground) {.base.} =
         #if tile.orgColor[1] - (tile.orgColor[0] + tile.orgColor[2]) * 0.5 > 0:
         #  color.g = float2uint8(float(color.g) * (clamp(fertility, 30, 50) / 50))
         #  color.b = float2uint8(float(color.b) * (clamp(fertility, 0, 40) / 50))
+        #drawCube(tile.position, fillVector(tile.size), color)
+    
         drawCube(tile.position, fillVector(tile.size), color)
-        color.a = 255
-        drawCubeWires(tile.position, fillVector(tile.size), color)
+     
 
+        #drawCylinder(pos, tile.size * 0.5, tile.size * 0.5, 1, 6, color)
         if tile.plants.len > 0:
           for plant in tile.plants:
             plant.draw()
