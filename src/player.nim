@@ -20,7 +20,7 @@ type
     lifetime: float = 30
     particles*: seq[Particle]
     lastDirection: float = 1.0
-    jumpHeight: float = 200.5
+    jumpHeight: float = 200.0
     shader: Shader
     state*: PlayerState = Grounded
     bd*: Vector3 = Vector3()
@@ -61,7 +61,7 @@ proc getVelocity*(self: Player, dt: float): Vector3 =
     vel.x = (dir.x * self.speed * self.radius) * dt
     vel.z = (dir.z * self.speed * self.radius) * dt
     if self.state != Grounded:
-      vel.y -= 60 * dt
+      vel.y -= gravity * dt
     if self.state == Grounded and isKeyDown(Space):
       vel.y = self.jumpHeight * dt
       self.state = Jumping
@@ -99,7 +99,7 @@ proc getParticle*(self: Player, color: Color): Particle =
 
 method init*(self: Player) {.base.} =
   randomize()
-  self.position = Vector3(x: groundSize.x * 0.4, y: groundSize.y * 0.5 + self.radius * 2, z: groundSize.z * 0.5)
+  self.position = Vector3(x: groundSize.x * 0.4, y: groundSize.y + self.radius * 2, z: groundSize.z * 0.5)
   #self.shader = load
 
 method update*(self: Player, dt: float) {.base.} =

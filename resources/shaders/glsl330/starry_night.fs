@@ -23,7 +23,6 @@
 uniform vec2 iResolution;
 uniform float iTime;
 
-
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
     //get coords and direction
@@ -70,9 +69,14 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     fragColor = vec4(v * 0.01, 1.);
 }
 
+
+
 void main()
 {
     vec4 fragColor;
     mainImage(fragColor, gl_FragCoord.xy);
     gl_FragColor = fragColor;
+
+    
+    
 }

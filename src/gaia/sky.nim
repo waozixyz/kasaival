@@ -26,7 +26,7 @@ method init*(self: var Sky) {.base.} =
 
 method update*(self: var Sky, dt: float) {.base.} =
   self.seconds += dt
-  setShaderValue(self.shader, self.secondsLoc, self.seconds.float32)
+#  setShaderValue(self.shader, self.secondsLoc, self.seconds.float32)
 
 method draw*(self: Sky) {.base.} =
   beginShaderMode(self.shader)

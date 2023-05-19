@@ -12,7 +12,6 @@ method update*(self: Hud, dt: float) {.base.} =
   
 method draw*(self: Hud, player: Player) {.base.} =
   drawText("Fuel: " & $int32(playerFuel), 20, 20, 30, Maroon);
-  drawText("Day", screenWidth - 100, 20, 30, BEIGE);
   if gameOver:
     # draw semi-transparent overlay
     drawRectangle(0, 0, screenWidth, screenHeight, Color(r: 0, g: 0, b: 0, a:  200))

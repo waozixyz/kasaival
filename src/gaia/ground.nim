@@ -47,7 +47,7 @@ proc getPerlinColor(tilePerlinColors: seq[PerlinColor], noiseValue: float): Perl
 method init*(self: Ground) {.base.} =
   randomize()
   # set ground size
-  let tiles = Vector3(x: 200, y: 20, z: 10)
+  let tiles = Vector3(x: 200, y: 3, z: 10)
   let tileSize = 22.0
 
   let tilePerlinColors = @[
@@ -81,10 +81,25 @@ method init*(self: Ground) {.base.} =
         let
           noiseValue = generatePerlinNoise(noise, x, y, z, perlinOffset) 
           tilePerlin = getPerlinColor(tilePerlinColors,noiseValue)
-        if tilePerlin.y < y:
-          continue
+
+        var
+          ratio = 0.5
+          lowerColor = [120, 120, 120]
+          upperColor = [120, 120, 120]
+
+        for i in 0..tilePerlinColors.len - 2:
+          if noiseValue >= tilePerlinColors[i].value and noiseValue < tilePerlinColors[i + 1].value:
+            lowerColor = tilePerlinColors[i].color
+            upperColor = tilePerlinColors[i + 1].color
+            # Calculate the ratio to use for interpolation 
+            
+            ratio = (noiseValue - tilePerlinColors[i].value) / (tilePerlinColors[i + 1].value - tilePerlinColors[i].value)
+            break
         for i in 0..2:
-          tile.color[i] = float(tilePerlin.color[i])
+          # Interpolate thes based on the noise value
+          tile.color[i] = float(lowerColor[i]) * (1 - ratio) + float(upperColor[i]) * ratio
+         
+        
         
         tile.position = Vector3(x: float(x) * tileSize, y: float(y) * tileSize, z: float(z) * tileSize)
         tile.size = tileSize
