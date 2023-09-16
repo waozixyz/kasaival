@@ -1,5 +1,8 @@
 import os
 
+switch("passC", getenv("CFLAGS"))
+switch("passL", getenv("LDFLAGS"))
+
 const AndroidApiVersion {.intdefine.} = 29
 const AndroidNdk {.strdefine.} = "/opt/android-ndk"
 when defined(windows):
