@@ -93,8 +93,6 @@ proc checkTileCollision(self: Arcade, dt: float) =
               grounded = true
             elif tileHitbox.max.y > playerHitbox.min.y:
               playerVelocity.y = 0
-              
-    
       
   self.player.velocity = playerVelocity
   self.player.state = if grounded: Grounded else: Falling
@@ -107,10 +105,9 @@ method restartGame(self: Arcade): void {.base} =
 
 method update*(self: Arcade, dt: float) =
   # update camera
-  camera.position.x = self.player.position.x  
+  camera.position.x = self.player.position.x
   camera.position.y = screenHeight * 0.5 + self.player.position.y
   camera.position.z = groundSize.z * 2
-
   camera.target = self.player.position
   
   camera.target.z = 0.0

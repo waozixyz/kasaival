@@ -47,7 +47,7 @@ proc getPerlinColor(tilePerlinColors: seq[PerlinColor], noiseValue: float): Perl
 method init*(self: Ground) {.base.} =
   randomize()
   # set ground size
-  let tiles = Vector3(x: 200, y: 3, z: 10)
+  let tiles = Vector3(x: 200, y: 3, z: 5)
   let tileSize = 22.0
 
   let tilePerlinColors = @[
