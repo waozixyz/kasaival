@@ -7,7 +7,12 @@ proc getCustomColorSchema*(cs: array[0..5, float]): array[0..2, float] =
   result = [rand(min(cs[0], cs[1])..max(cs[0], cs[1])),
             rand(min(cs[2], cs[3])..max(cs[2], cs[3])),
             rand(min(cs[4], cs[5])..max(cs[4], cs[5]))]
-            
+
+proc clampuint8*(value: uint8, minVal: uint8 = 0, maxVal: uint8 = 255): uint8 =
+  if value < minVal: return minVal
+  elif value > maxVal: return maxVal
+  else: return value
+
 
 proc float2uint8*(num: float32): uint8 =
   if num > 255:
