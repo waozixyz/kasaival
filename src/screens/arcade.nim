@@ -8,34 +8,58 @@ type
     music: Music
     hud: Hud
 
+const
+  BURN_TIMER_VALUE = 200
+  COLOR_THRESHOLD_1 = 120
+  COLOR_THRESHOLD_2 = 140
+  COLOR_THRESHOLD_3 = 180
+
+proc checkXAxisCollision(playerVelocity: Vector3, playerHitbox: BoundingBox, tileHitbox: BoundingBox): float =
+  if playerVelocity.x != 0:
+    if tileHitbox.min.x < playerHitbox.max.x or tileHitbox.max.x > playerHitbox.min.x:
+      return 0
+  return playerVelocity.x
+
+proc checkZAxisCollision(playerVelocity: Vector3, playerHitbox: BoundingBox, tileHitbox: BoundingBox): float =
+  if playerVelocity.z != 0:
+    if tileHitbox.min.z < playerHitbox.max.z or tileHitbox.max.z > playerHitbox.min.z:
+      return 0
+  return playerVelocity.z
+
+proc checkYAxisCollision(playerVelocity: Vector3, playerHitbox: BoundingBox, tileHitbox: BoundingBox, grounded: var bool): float =
+  if playerVelocity.y != 0:
+    if tileHitbox.min.y < playerHitbox.max.y:
+      grounded = true
+      return 0
+    elif tileHitbox.max.y > playerHitbox.min.y:
+      return 0
+  return playerVelocity.y
+
 method init*(self: Arcade) =
-  # init level
   self.id = ArcadeScreen
-  # init music
+
   when not defined(emscripten):
     self.music = loadMusicStream(ASSET_FOLDER & "/music/StrangerThings.ogg")
     playMusicStream(self.music);
 
-  # init ui
   self.hud = Hud()
   self.hud.init()
-  # Init gaia
+
   self.sky = Sky()
   self.sky.init()
+
   self.ground = Ground()
   self.ground.init()
-  # Init entities  
+
   self.player = Player()
   self.player.init()
-  # The width and height of the ground plane
+
   camera = Camera3D()
-  camera.fovy = 45
+  camera.fovy = 60
   camera.projection = CameraProjection.Perspective
   camera.up = Vector3(x: 0.0, y: 1.0, z: 0.0)
 
-
 proc checkTileCollision(self: Arcade, dt: float) =
-  # check tile collision with player
   var playerVelocity = self.player.getVelocity(dt)
   var tmpVel = playerVelocity
   tmpVel.y = 0
@@ -53,7 +77,6 @@ proc checkTileCollision(self: Arcade, dt: float) =
         
         if checkCollisionBoxes(playerHitbox, tileHitbox):
           grounded = true
-          # Set burn timer for tile if player collides with it
           tile.burnTimer = 200
           playerFuel += (tile.fertility / 100) * 0.1
           var bf = 1.0
@@ -67,32 +90,13 @@ proc checkTileCollision(self: Arcade, dt: float) =
           # playerFuel -= (tile.color[2] / 255) * 0.1 * bf
           #self.ground.tiles[i].plant.burnTimer = 2
         if checkCollisionBoxes(playerVelocityHitbox, tileHitbox):
-          tile.burnTimer = 200
-
-          # Check x-axis collision
-          if playerVelocity.x != 0:
-            if tileHitbox.min.x < playerHitbox.max.x:
-              playerVelocity.x = 0
-            elif tileHitbox.max.x > playerHitbox.min.x:
-              playerVelocity.x = 0
-    
-          # Check z-axis collision
-          if playerVelocity.z != 0:
-            if tileHitbox.min.z < playerHitbox.max.z:
-              playerVelocity.z = 0
-            if tileHitbox.max.z > playerHitbox.min.z:
-              playerVelocity.z = 0
-
+          tile.burnTimer = BURN_TIMER_VALUE
+          playerVelocity.x = checkXAxisCollision(playerVelocity, playerHitbox, tileHitbox)
+          playerVelocity.z = checkZAxisCollision(playerVelocity, playerHitbox, tileHitbox)
         if checkCollisionBoxes(playerVelocityHeightHitbox, tileHitbox):
-          tile.burnTimer = 200
+          tile.burnTimer = BURN_TIMER_VALUE
+          playerVelocity.y = checkYAxisCollision(playerVelocity, playerHitbox, tileHitbox, grounded)
 
-          # Check y-axis collision
-          if playerVelocity.y != 0:
-            if tileHitbox.min.y < playerHitbox.max.y:
-              playerVelocity.y = 0
-              grounded = true
-            elif tileHitbox.max.y > playerHitbox.min.y:
-              playerVelocity.y = 0
       
   self.player.velocity = playerVelocity
   self.player.state = if grounded: Grounded else: Falling
@@ -105,12 +109,13 @@ method restartGame(self: Arcade): void {.base} =
 
 method update*(self: Arcade, dt: float) =
   # update camera
-  camera.position.x = self.player.position.x
-  camera.position.y = screenHeight * 0.5 + self.player.position.y
-  camera.position.z = groundSize.z * 2
+  camera.position.x = self.player.position.x - 20
+  camera.position.y = self.player.position.y + 2
+  camera.position.z = 200
   camera.target = self.player.position
   
   camera.target.z = 0.0
+
   if isKeyPressed(M):
     isMute = not isMute
 
