@@ -1,4 +1,4 @@
-import raylib, ../screens, std/random, ../utils, plant, perlin
+import raylib, ../screens, std/random, ../utils, plant, perlin, ../gameState, ../gameConfig
 
 type
   PerlinColor = object
@@ -48,7 +48,6 @@ method init*(self: Ground) {.base.} =
   randomize()
   # set ground size
   let tiles = Vector3(x: 200, y: 3, z: 5)
-  let tileSize = 22.0
 
   let tilePerlinColors = @[
     PerlinColor(value: 0, color: [21, 71, 108], y: 3),    # Deep water
@@ -63,7 +62,7 @@ method init*(self: Ground) {.base.} =
     PerlinColor(value: 1.0, color: [107, 100, 100], y: 20),  # Rock
   ]
   let noise = newNoise()
-  groundSize = calculateGroundSize(tileSize, tiles)
+  gGroundSize = calculateGroundSize(tileSize, tiles)
   self.tileSize = tileSize
 
   self.map = newSeq[newSeq[newSeq[Tile](int(tiles.z))](int(tiles.y))](int(tiles.x))
@@ -193,7 +192,7 @@ method update*(self: Ground, dt: float) {.base.} =
         self.map[x][y][z] = tile
 
 proc isTileVisible*(self: Ground, x: int): bool =
-  result = float(x) * self.tileSize > camera.position.x - screenWidth * 0.6 and float(x) * self.tileSize < camera.position.x + screenWidth * 0.6
+  result = float(x) * self.tileSize > gCamera.position.x - screenWidth * 0.6 and float(x) * self.tileSize < gCamera.position.x + screenWidth * 0.6
     
 
 method draw*(self: Ground) {.base.} =

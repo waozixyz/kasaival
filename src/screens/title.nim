@@ -1,4 +1,4 @@
-import raylib, ../screens
+import raylib, ../screens, ../gameConfig, ../gameState
 
 type
   Title* = ref object of Screen
@@ -10,9 +10,9 @@ method init*(self: Title) =
   self.texture = loadTexture(ASSET_FOLDER & "/images/menu.png");
   
 method update*(self: Title, dt: float) =
-  mouseCursor = 4
+  gMouseCursor = 4
   if isKeyPressed(Enter) or isGestureDetected(Tap):
-    currentScreen = ArcadeScreen
+    gCurrentScreen = ArcadeScreen
   discard
 
 method draw*(self: Title)  =

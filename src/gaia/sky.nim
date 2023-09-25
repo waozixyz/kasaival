@@ -1,4 +1,4 @@
-import raylib, ../screens
+import raylib, ../screens, ../gameConfig
 
 type
   Sky* = object

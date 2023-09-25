@@ -1,5 +1,5 @@
 import
-  raylib, screens, screens/arcade, screens/title
+  raylib, screens, screens/arcade, screens/title, gameState, gameConfig
 
 var
   target = RenderTexture2d()
@@ -7,7 +7,7 @@ var
 
 
 proc getCurrentScreen() =
-  case currentScreen
+  case gCurrentScreen
   of TitleScreen:
     current = Title()
   of ArcadeScreen:
@@ -31,17 +31,17 @@ proc updateDrawFrame() {.cdecl.} =
 
   # Update the virtual mouse position
   let mo = getMousePosition();
-  mouse.x = (float(mo.x) - (float(windowWidth) - width) * 0.5) / scale
-  mouse.y = (float(mo.y) - (float(windowHeight) - height) * 0.5) / scale
+  gMousePosition.x = (float(mo.x) - (float(windowWidth) - width) * 0.5) / scale
+  gMousePosition.y = (float(mo.y) - (float(windowHeight) - height) * 0.5) / scale
 
   # change screen if new current screen
-  if (current.id != currentScreen):
+  if (current.id != gCurrentScreen):
     current.unload()
     getCurrentScreen()
     current.init()
 
   # update current screen
-  mouseCursor = 0
+  gMouseCursor = 0
   current.update(getFrameTime())
 
   beginDrawing()
@@ -50,7 +50,7 @@ proc updateDrawFrame() {.cdecl.} =
   clearBackground(Black)
   # draw current screen
   current.draw()
-  setMouseCursor(MouseCursor(mouseCursor))
+  setMouseCursor(MouseCursor(gMouseCursor))
 
   endTextureMode()
 

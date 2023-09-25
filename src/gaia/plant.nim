@@ -1,4 +1,4 @@
-import raylib, std/random, ../utils, std/math, ../screens
+import raylib, std/random, ../utils, std/math, ../screens, ../gameState
 
 type
   PlantStates* = enum
@@ -113,7 +113,7 @@ method shrink*(self: var Plant) {.base.} =
     self.state = Dead
   for i, b in self.branches[self.currentRow]:
     self.branches[self.currentRow].delete(i)
-    playerFuel += self.branchFuel
+    gPlayerFuel += self.branchFuel
 
   dec(self.currentRow)
 

@@ -21,6 +21,7 @@ proc float2uint8*(num: float32): uint8 =
     result = 0
   else:
     result = uint8(num)
+
 proc uint8ToColor*(color: array[0..2, float], alpha: float): Color =
   result =  Color(
     r: uint8(float2uint8(color[0])),
@@ -43,7 +44,6 @@ proc lerp*(a, b, t: float): float =
 
 proc uniform*(a, b: float): float =
   result = (b - a) * rand(0.0..1.0) + a
-
 
 proc getBoundingBox*(position: Vector3, radius: float): BoundingBox =
   result = BoundingBox(min: Vector3(

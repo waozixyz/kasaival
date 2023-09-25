@@ -1,4 +1,4 @@
-import raylib, screens, std/random, utils, std/math
+import raylib, screens, std/random, utils, std/math, gameState, gameConfig
 
 type
   PlayerState* = enum
@@ -50,7 +50,7 @@ proc getDirection(self: Player): Vector3 =
     if isKeyDown(key): result.z = 1
   
   if result.z == 0 and result.x == 0 and isMouseButtonDown(Left):
-    let mouseRay = getMouseRay(mouse, camera)
+    let mouseRay = getMouseRay(gMousePosition, gCamera)
     let collision = getRayCollisionBox(mouseRay, getBoundingBox(self.position, self.radius))
     result.x = collision.normal.x
     result.z = -(collision.normal.y + 0.5) + (collision.normal.z + 0.5)
@@ -69,7 +69,6 @@ proc getVelocity*(self: Player, dt: float): Vector3 =
     result = vel
 
 proc getFlameColor(self: Player, lifetime: float): Color =
-  # Linear interpolation between base color and decay color based on lifetime
   let t = math.clamp(lifetime / self.lifetime, 0.0 .. 1.0)
   let baseColor = Color(r: 255, g: 90, b: 20, a: 255) # Reddish tone
   let decayColor = Color(r: 220, g: 200, b: 200, a: 255) # White-grayish tone
@@ -79,7 +78,7 @@ proc getFlameColor(self: Player, lifetime: float): Color =
   result.b = clampuint8(uint8(float32(baseColor.b) * t + float32(decayColor.b) * (1 - t)))
   result.a = clampuint8(float2uint8(float32(255) * PARTICLE_ALPHA_DECAY_RATE * t))
 
-proc getParticle*(self: Player, color: Color): Particle =
+proc getParticle(self: Player, color: Color): Particle =
   return Particle(
     radius: self.radius * (0.5 + rand(0.5..1.5)),
     lifetime: self.lifetime * rand(0.8..1.2),
@@ -90,7 +89,7 @@ proc getParticle*(self: Player, color: Color): Particle =
 
 method init*(self: Player) {.base.} =
   randomize()
-  self.position = Vector3(x: groundSize.x * 0.4, y: groundSize.y + self.radius * 2, z: groundSize.z * 0.5)
+  self.position = Vector3(x: gGroundSize.x * 0.4, y: gGroundSize.y + self.radius * 2, z: gGroundSize.z * 0.5)
 
 method update*(self: Player, dt: float) {.base.} =
   if self.state != Frozen:
@@ -99,9 +98,9 @@ method update*(self: Player, dt: float) {.base.} =
       vel = self.velocity
       pos = self.position
     
-    if (pos.x + vel.x - diameter > 0 or vel.x > 0) and (pos.x + vel.x + diameter < groundSize.x or vel.x < 0):
+    if (pos.x + vel.x - diameter > 0 or vel.x > 0) and (pos.x + vel.x + diameter < gGroundSize.x or vel.x < 0):
       self.position.x += vel.x
-    if (pos.z + vel.z - diameter > 0 or vel.z > 0) and (pos.z + vel.z + diameter + 6 < groundSize.z or vel.z < 0):
+    if (pos.z + vel.z - diameter > 0 or vel.z > 0) and (pos.z + vel.z + diameter < gGroundSize.z - tileSize * 0.5 or vel.z < 0):
       self.position.z += vel.z
     self.position.y += vel.y
 

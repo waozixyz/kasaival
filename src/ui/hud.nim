@@ -1,4 +1,4 @@
-import raylib, ../screens, ../player
+import raylib, ../screens, ../player, ../gameState, ../gameConfig
 
 type
   Hud* = ref object of RootObj
@@ -11,8 +11,8 @@ method update*(self: Hud, dt: float) {.base.} =
   discard
   
 method draw*(self: Hud, player: Player) {.base.} =
-  drawText("Fuel: " & $int32(playerFuel), 20, 20, 30, Maroon);
-  if gameOver:
+  drawText("Fuel: " & $int32(gPlayerFuel), 20, 20, 30, Maroon);
+  if gGameOver:
     # draw semi-transparent overlay
     drawRectangle(0, 0, screenWidth, screenHeight, Color(r: 0, g: 0, b: 0, a:  200))
     # draw Game Over text
