@@ -1,4 +1,4 @@
-import raylib, ../screens, ../player, ../gaia/ground, ../gaia/sky, ../ui/hud, ../utils, ../gameState, ../mechanics/collision
+import raylib, ../screens, ../player, ../gaia/ground, ../gaia/sky, ../ui/hud, ../gameState, ../mechanics/collision
 
 type
   Arcade* = ref object of Screen
@@ -7,8 +7,6 @@ type
     sky: Sky
     music: Music
     hud: Hud
-  Axis = enum
-    X, Y, Z
 
 method init*(self: Arcade) =
   self.id = ArcadeScreen
@@ -35,13 +33,11 @@ method init*(self: Arcade) =
   gCamera.up = Vector3(x: 0.0, y: 1.0, z: 0.0)
 
 method restartGame(self: Arcade): void {.base} =
-  # reset game state
   gPlayerFuel = startFuel
   self.init()
   gGameOver = false
 
 method update*(self: Arcade, dt: float) =
-  # update camera
   gCamera.position.x = self.player.position.x - 20
   gCamera.position.y = self.player.position.y + 2
   gCamera.position.z = 200
@@ -55,12 +51,9 @@ method update*(self: Arcade, dt: float) =
   if not gIsMute:
     updateMusicStream(self.music)
 
-  # change screen on escape button
   if isKeyPressed(Escape):
     gCurrentScreen = TitleScreen
 
-  
-  # update ui
   self.hud.update(dt)
   if gPlayerFuel <= 0:
     gGameOver = true
@@ -68,26 +61,22 @@ method update*(self: Arcade, dt: float) =
       self.restartGame()
     return
 
-  # Update gaia
   self.sky.update(dt)
   self.ground.update(dt)
 
   checkTileCollision(self.player, self.ground, dt)
 
-  # Update entities
   self.player.update(dt)
 
 
 method draw*(self: Arcade) =
-  # draw background
   self.sky.draw()
+
   beginMode3D(gCamera)
-  # draw entities
   self.ground.draw()
   self.player.draw()
   endMode3D();
   
-  # draw ui
   self.hud.draw(self.player)
 
 method unload*(self: Arcade) =

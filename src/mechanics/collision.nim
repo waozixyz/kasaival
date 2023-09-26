@@ -41,11 +41,12 @@ proc checkTileCollision*(player: Player, ground: Ground, dt: float) =
     for y in 0..ground.map[x].len - 1:
       for z in 0..ground.map[x][y].len - 1:
         var tile = ground.map[x][y][z]
-        let tileHitbox = getBoundingBox(tile.position, tile.size * 0.5)
+        let tileHitbox = getBoundingBox(tile.position, tile.size * 0.6)
         
         if checkCollisionBoxes(playerHitbox, tileHitbox):
           grounded = true
           tile.burnTimer = 200
+          echo("hello")
           gPlayerFuel += (tile.fertility / 100) * 0.1
           var bf = 1.0
           if tile.color[2] > COLOR_THRESHOLD_1:
@@ -58,13 +59,14 @@ proc checkTileCollision*(player: Player, ground: Ground, dt: float) =
           # gPlayerFuel -= (tile.color[2] / 255) * 0.1 * bf
           #self.ground.tiles[i].plant.burnTimer = 2
         if checkCollisionBoxes(playerVelocityHitbox, tileHitbox):
+          echo("weloy")
           tile.burnTimer = BURN_TIMER_VALUE
           playerVelocity.x = checkAxisCollision(playerVelocity, playerHitbox, tileHitbox, X, grounded)
           playerVelocity.z = checkAxisCollision(playerVelocity, playerHitbox, tileHitbox, Z, grounded)
         if checkCollisionBoxes(playerVelocityHeightHitbox, tileHitbox):
           tile.burnTimer = BURN_TIMER_VALUE
           playerVelocity.y = checkAxisCollision(playerVelocity, playerHitbox, tileHitbox, Y, grounded)
-
+        ground.map[x][y][z] = tile
       
   player.velocity = playerVelocity
   player.state = if grounded: Grounded else: Falling

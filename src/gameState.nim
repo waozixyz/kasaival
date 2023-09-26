@@ -18,7 +18,7 @@ const
   tileSize* = 22
 
 var
-  gGroundSize* = Vector3(x: 6000, y: 100, z: 300)
+  gGroundSize* = Vector3(x: 6000, y: 100, z: 200)
   gGameOver* = false
   gMousePosition* = Vector2()
   gCamera* = Camera3D()
