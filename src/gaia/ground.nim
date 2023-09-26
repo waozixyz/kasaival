@@ -1,4 +1,4 @@
-import raylib, ../screens, std/random, ../utils, plant, perlin, ../gameState, ../gameConfig
+import raylib, std/random, ../utils, plant, perlin, ../gameState
 
 type
   PerlinColor = object

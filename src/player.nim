@@ -1,4 +1,4 @@
-import raylib, screens, std/random, utils, std/math, gameState, gameConfig
+import raylib, std/random, utils, std/math, gameState
 
 type
   PlayerState* = enum

@@ -1,4 +1,4 @@
-import raylib, ../screens, ../gameConfig, ../gameState
+import raylib, ../screens, ../gameState
 
 type
   Title* = ref object of Screen
