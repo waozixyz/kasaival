@@ -1,4 +1,4 @@
-import raylib, std/random, ../utils, std/math, ../gameState
+import raylib, std/random, ../utils, std/math, ../state
 
 type
   PlantStates* = enum

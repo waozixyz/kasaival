@@ -1,4 +1,4 @@
-import raylib, ../gameState
+import raylib, ../state
 
 const
   STARRY_NIGHT_SHADER_PATH = "resources/shaders/glsl330/starry_night.fs"

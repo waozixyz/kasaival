@@ -1,5 +1,5 @@
 import
-  raylib, screens, screens/arcade, screens/title, gameState
+  raylib, screens, screens/arcade, screens/title, state
 
 const
   TARGET_FPS = 60

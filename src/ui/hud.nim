@@ -1,4 +1,4 @@
-import raylib, ../player, ../gameState
+import raylib, ../player, ../state
 
 type
   Hud* = ref object of RootObj
