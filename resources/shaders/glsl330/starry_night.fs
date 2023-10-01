@@ -76,7 +76,4 @@ void main()
     vec4 fragColor;
     mainImage(fragColor, gl_FragCoord.xy);
     gl_FragColor = fragColor;
-
-    
-    
 }

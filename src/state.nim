@@ -15,7 +15,8 @@ const
   screenHeight* = 600
   startFuel* = 200
   gravity* = 9.81
-  tileSize* = 22
+  tileSize* = 10
+  tilesDimensions* = Vector3(x: 100, y: 6, z: 10)
 
 var
   gGroundSize* = Vector3(x: 6000, y: 300, z: 200)

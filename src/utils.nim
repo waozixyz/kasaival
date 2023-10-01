@@ -1,5 +1,6 @@
 import raylib, std/math, std/random
 
+
 proc deg2rad*(degrees: float): float =
   result = degrees * PI / 180.0
 
@@ -12,7 +13,6 @@ proc clampuint8*(value: uint8, minVal: uint8 = 0, maxVal: uint8 = 255): uint8 =
   if value < minVal: return minVal
   elif value > maxVal: return maxVal
   else: return value
-
 
 proc float2uint8*(num: float32): uint8 =
   if num > 255:
@@ -69,3 +69,8 @@ proc getBoundingBox*(position: Vector3, size: Vector3): BoundingBox =
     z: position.z + size.z
   ))
 
+iterator grid3D*(dimensions: Vector3): Vector3 =
+  for x in 0..<dimensions.x.int:
+    for y in 0..<dimensions.y.int:
+      for z in 0..<dimensions.z.int:
+        yield Vector3(x: x.float32, y: y.float32, z: z.float32)

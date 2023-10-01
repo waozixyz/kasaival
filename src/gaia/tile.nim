@@ -1,6 +1,7 @@
 import raylib, plant, perlin, ../utils
 
 type
+  ColorArray = array[0..2, float]
   PerlinColor* = object
     value*: float
     color*: array[0..2, int]
@@ -11,16 +12,17 @@ type
     size*: float
     position*: Vector3
     burnTimer*: float = 0.0
-    color*: array[0..2, float]
-    orgColor*: array[0..2, float]
+    color*: ColorArray
+    orgColor*: ColorArray
     fertility*: float = 100.0
     growProbability: float
     alpha*: float = 255.0
     plants*: seq[Plant]
     dead*: bool = false
 
-proc generatePerlinNoise(noise: Noise, x: int, y: int, z: int, offset: float): float =
-  result = clamp(noise.perlin(float(x), float(y), float(z)) + offset, 0, 1)
+const
+  DECAY_RATE = 120
+  GROWTH_RATE = 60
 
 #proc getPlant*(self: Ground, tile: Tile, randRow: bool): Plant =
 #  var plant = Plant()
@@ -31,19 +33,19 @@ proc generatePerlinNoise(noise: Noise, x: int, y: int, z: int, offset: float): f
 #  return plant
 
 
-proc interpolateColors(lowerColor, upperColor: array[0..2, int], ratio: float): array[0..2, float] =
+proc interpolateColors(lowerColor, upperColor: array[0..2, int], ratio: float): ColorArray =
   for i in 0..2:
     result[i] = float(lowerColor[i]) * (1 - ratio) + float(upperColor[i]) * ratio
 
 proc init*(self: var Tile, x: int, y: int, z: int, tileSize: float, noise: Noise, tilePerlinColors: seq[PerlinColor]) =
-  let noiseValue = generatePerlinNoise(noise, x, y, z, float(x) / 200.0 - 0.5) 
+  let noiseValue = clamp(noise.perlin(float(x), float(y), float(z)) + float(x) / 200.0 - 0.5, 0, 1) 
   var lowerIndex = 0
   var upperIndex = 0
   for i in 0..<tilePerlinColors.len - 1:
-      if noiseValue >= tilePerlinColors[i].value and noiseValue < tilePerlinColors[i + 1].value:
-          lowerIndex = i
-          upperIndex = i + 1
-          break
+    if noiseValue >= tilePerlinColors[i].value and noiseValue < tilePerlinColors[i + 1].value:
+      lowerIndex = i
+      upperIndex = i + 1
+      break
   let ratio = (noiseValue - tilePerlinColors[lowerIndex].value) / (tilePerlinColors[upperIndex].value - tilePerlinColors[lowerIndex].value)
   self.color = interpolateColors(tilePerlinColors[lowerIndex].color, tilePerlinColors[upperIndex].color, ratio)
   self.position = Vector3(x: float(x) * tileSize, y: float(y) * tileSize, z: float(z) * tileSize)
@@ -51,10 +53,18 @@ proc init*(self: var Tile, x: int, y: int, z: int, tileSize: float, noise: Noise
   self.orgColor = self.color
   self.fertility = self.color[1] * 1.5 - self.color[0] * 0.5
   if self.color[2] < 50:
-      self.fertility += self.color[2]
+    self.fertility += self.color[2]
   else:
-      self.fertility -= self.color[2] * 0.5
+    self.fertility -= self.color[2] * 0.5
   self.fertility = max(20, self.fertility)
+
+proc updateColorComponent(currentColor, orgColor: float, rate: float, dt: float): float =
+  let diff = currentColor - orgColor
+  if diff > 0:
+    return max(orgColor, currentColor - rate * dt)
+  elif diff < 0:
+    return min(orgColor, currentColor + rate * dt)
+  return currentColor
 
 proc update*(self: var Tile, dt: float) =
   if self.burnTimer > 0:
@@ -72,44 +82,62 @@ proc update*(self: var Tile, dt: float) =
     self.color[2] = max(self.color[2], self.orgColor[2] - 80)
 
     self.burnTimer -= dt * 60 * 10
-    self.hp -= dt * 60
-    if self.hp <= 0:
-      self.dead = true
+    #self.hp -= dt * 60
+    #if self.hp <= 0:
+    # self.dead = true
   
-  let
-    diffR = self.color[0] - self.orgColor[0]
-    diffG = self.color[1] - self.orgColor[1]
-    diffB = self.color[2] - self.orgColor[2]
-  
-  if diffR > 0:
-    self.color[0] = max(self.orgColor[0], self.color[0] - 120 * dt)
-  elif diffR < 0:
-    self.color[0] = min(self.orgColor[0], self.color[0] + 120 * dt)
-
-  if diffG > 0:
-    self.color[1] = max(self.orgColor[1], self.color[1] - 60 * dt)
-  elif diffG < 0:
-    self.color[1] = min(self.orgColor[1], self.color[1] + 60 * dt)
-
-  if diffB > 0:
-    self.color[2] = max(self.orgColor[2], self.color[2] - 40 * dt)
-  elif diffB < 0:
-    self.color[2] = min(self.orgColor[2], self.color[2] + 40 * dt)
+  self.color[0] = updateColorComponent(self.color[0], self.orgColor[0], DECAY_RATE, dt)
+  self.color[1] = updateColorComponent(self.color[1], self.orgColor[1], GROWTH_RATE, dt)
+  self.color[2] = updateColorComponent(self.color[2], self.orgColor[2], GROWTH_RATE, dt)
 
 proc draw*(self: Tile) =
   let decayFactor = 1.0 - self.hp / 100.0
   
-  # Compute the decayed color for drawing, without modifying the actual tile color
-  var decayedColor: array[0..2, float]
+  var decayedColor: ColorArray
   decayedColor[0] = self.color[0] * (1.0 - decayFactor)
   decayedColor[1] = self.color[1] * (1.0 - decayFactor)
   decayedColor[2] = self.color[2] * (1.0 - decayFactor)
   
-  # Use the decayedColor for drawing
   var drawColor = uint8ToColor(decayedColor, self.alpha)
-  drawCube(self.position, fillVector(self.size), drawColor)
   
-  # Draw plants if any
+  # Get the half size for calculating triangle vertices
+  let halfSize = self.size / 2.0
+  
+  # Define vertices for the triangles
+  let topLeftFront = Vector3(x: self.position.x - halfSize, y: self.position.y + halfSize, z: self.position.z + halfSize)
+  let topRightFront = Vector3(x: self.position.x + halfSize, y: self.position.y + halfSize, z: self.position.z + halfSize)
+  let topLeftBack = Vector3(x: self.position.x - halfSize, y: self.position.y + halfSize, z: self.position.z - halfSize)
+  let topRightBack = Vector3(x: self.position.x + halfSize, y: self.position.y + halfSize, z: self.position.z - halfSize)
+  let bottomLeftFront = Vector3(x: self.position.x - halfSize, y: self.position.y - halfSize, z: self.position.z + halfSize)
+  let bottomRightFront = Vector3(x: self.position.x + halfSize, y: self.position.y - halfSize, z: self.position.z + halfSize)
+  let bottomLeftBack = Vector3(x: self.position.x - halfSize, y: self.position.y - halfSize, z: self.position.z - halfSize)
+  let bottomRightBack = Vector3(x: self.position.x + halfSize, y: self.position.y - halfSize, z: self.position.z - halfSize)
+  
+  # Draw the triangles for the sliced cube
+  # Front face
+  drawTriangle3D(topLeftFront, bottomLeftFront, bottomRightFront, drawColor)
+  drawTriangle3D(bottomRightFront, topRightFront, topLeftFront, drawColor)
+
+  # Top face
+  drawTriangle3D(topRightBack, topLeftBack, topLeftFront, drawColor)
+  drawTriangle3D(topLeftFront, topRightFront, topRightBack, drawColor)
+
+  # Left side face
+  #drawTriangle3D(topLeftFront, bottomLeftFront, topLeftBack, drawColor)
+  #drawTriangle3D(topLeftBack, bottomLeftBack, bottomLeftFront, drawColor)
+
+  # Right side face
+  #drawTriangle3D(topRightFront, bottomRightFront, topRightBack, drawColor)
+  #drawTriangle3D(topRightBack, bottomRightBack, bottomRightFront, drawColor)
+
+  # Bottom face
+  #drawTriangle3D(bottomLeftFront, bottomLeftBack, bottomRightBack, drawColor)
+  #drawTriangle3D(bottomLeftFront, bottomRightBack, bottomRightFront, drawColor)
+
+  # Back face
+  #drawTriangle3D(topLeftBack, bottomLeftBack, topRightBack, drawColor)
+  #drawTriangle3D(bottomLeftBack, bottomRightBack, topRightBack, drawColor)
+
   if self.plants.len > 0:
     for plant in self.plants:
       plant.draw()

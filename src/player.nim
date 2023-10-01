@@ -1,37 +1,33 @@
 import raylib, std/random, utils, std/math, state
 
+const
+  FIREBALL_SHADER_PATH = "resources/shaders/glsl330/fireball.fs"
+  FLAME_SHADER_PATH = "resources/shaders/glsl330/flame.fs"
+
 type
   PlayerState* = enum
     Grounded = 0, Jumping, Falling, Frozen
-
-  Particle* = object
-    position*: Vector3
-    lifetime: float = 20
-    radius*: float
-    color: Color
-    rotation: float
 
   Player* = ref object of RootObj
     rotation: float = 0.0
     position*, velocity*: Vector3
     xp*: float = 0.0
     speed: float = 30.0
-    radius*: float = 3.0
+    radius*: float = 20.0
     lifetime: float = 30
-    particles*: seq[Particle]
     lastDirection: float = 1.0
     jumpHeight: float = 200.0
-    shader: Shader
     state*: PlayerState = Grounded
     bd*: Vector3 = Vector3()
+    fireball_shader: Shader
+    flame_shader: Shader
+    seconds: float = 0.0
+    bufferAShader: Shader
+    framebuffer: RenderTexture2D
+
+
 
 const
-  PARTICLE_DECAY_RATE = 0.94
-  PARTICLE_ALPHA_DECAY_RATE = 0.9
-  PARTICLE_LIFETIME_DECAY = 3.0
-  PARTICLE_MAX_COUNT = 100
-  UPWARD_VELOCITY_MODIFIER = 0.3
-
   KEY_RIGHT = [Right, KeyboardKey(D)]
   KEY_LEFT = [Left, KeyboardKey(A)]
   KEY_UP = [Up, KeyboardKey(W)]
@@ -66,31 +62,21 @@ proc getVelocity*(self: Player, dt: float): Vector3 =
       self.state = Jumping
   
     result = vel
-
-proc getFlameColor(self: Player, lifetime: float): Color =
-  let t = math.clamp(lifetime / self.lifetime, 0.0 .. 1.0)
-  let baseColor = Color(r: 255, g: 90, b: 20, a: 255) # Reddish tone
-  let decayColor = Color(r: 220, g: 200, b: 200, a: 255) # White-grayish tone
   
-  result.r = clampuint8(uint8(float32(baseColor.r) * t + float32(decayColor.r) * (1 - t)))
-  result.g = clampuint8(uint8(float32(baseColor.g) * t + float32(decayColor.g) * (1 - t)))
-  result.b = clampuint8(uint8(float32(baseColor.b) * t + float32(decayColor.b) * (1 - t)))
-  result.a = clampuint8(float2uint8(float32(255) * PARTICLE_ALPHA_DECAY_RATE * t))
-
-proc getParticle(self: Player, color: Color): Particle =
-  return Particle(
-    radius: self.radius * (0.5 + rand(0.5..1.5)),
-    lifetime: self.lifetime * rand(0.8..1.2),
-    position: self.position,
-    rotation: self.rotation,
-    color: color,
-  )
-
 method init*(self: Player) {.base.} =
   randomize()
   self.position = Vector3(x: gGroundSize.x * 0.4, y: gGroundSize.y + self.radius * 2, z: gGroundSize.z * 0.5)
+  # Load the flame effect shader
+  self.fireball_shader = loadShader("", FIREBALL_SHADER_PATH)
+  self.flame_shader = loadShader("", FLAME_SHADER_PATH)
+  
+  if self.fireball_shader.id == 0:
+    echo "Error: Failed to load flame effect shader!"
 
+  
 method update*(self: Player, dt: float) {.base.} =
+  self.seconds += dt
+
   if self.state != Frozen:
     let
       diameter = self.radius * 2
@@ -103,26 +89,27 @@ method update*(self: Player, dt: float) {.base.} =
       self.position.z += vel.z
     self.position.y += vel.y
 
-  if self.particles.len < PARTICLE_MAX_COUNT:
-    var p = self.getParticle(self.getFlameColor(self.lifetime))
-    self.particles.add(p)
-
-  for i, p in self.particles:
-    var p = self.particles[i]
-    p.position.x += float32(rand(-2.0..2.0))
-    p.position.y += self.radius * UPWARD_VELOCITY_MODIFIER + self.velocity.y * dt
-    p.position.z += float32(rand(-2.0..2.0))
-    p.radius *= PARTICLE_DECAY_RATE
-    p.lifetime -= PARTICLE_LIFETIME_DECAY
-    if p.lifetime <= 0:
-        p = self.getParticle(self.getFlameColor(self.lifetime))
-    else:
-      p.color = self.getFlameColor(p.lifetime)
-
-    self.particles[i] = p
-
+  let iTimeLoc = getShaderLocation(self.fireball_shader, "iTime")
+  let iResolutionLoc = getShaderLocation(self.fireball_shader, "iResolution")
+  let iMouseLoc = getShaderLocation(self.fireball_shader, "iMouse")
+  setShaderValue(self.fireball_shader, iTimeLoc, self.seconds.float32)
+  setShaderValue(self.fireball_shader, iResolutionLoc, [screenWidth.float32, screenHeight.float32])
+  let mousePos = getMousePosition()
+  let mouseState = Vector4(
+      x: mousePos.x.float32,
+      y: mousePos.y.float32,
+      z: if isMouseButtonDown(MouseButton.LEFT): 1.0 else: 0.0,
+      w: if isMouseButtonDown(MouseButton.RIGHT): 1.0 else: 0.0
+  )
+  setShaderValue(self.fireball_shader, iMouseLoc, mouseState)
 
 method draw*(self: Player) {.base.} =
-  for p in self.particles:
-    drawSphere(p.position, p.radius, p.color)
+  beginBlendMode(BlendMode.Alpha);
+  beginShaderMode(self.fireball_shader)
 
+  drawSphere(self.position, self.radius * 2, RAYWHITE)
+
+  #drawCylinder(bottomPosition, self.radius, self.radius, capsuleHeight, 16, RAYWHITE)
+
+  endShaderMode()
+  endBlendMode()

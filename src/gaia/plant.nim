@@ -95,14 +95,12 @@ method init*(self: var Plant, position: Vector3, randomRow: bool) {.base.} =
 
   var angle = -90
 
-  # add the first branch at angle 90
   let c = [rand(125.0..178.0), rand(142.0..230.0), rand(76.0..120.0)]
   let branch = Branch(deg: angle, position: position, size: self.size, color: c, orgColor: c)
   self.leftBound = self.position.x
   self.rightBound = self.position.x + self.size.x
   self.branches.add(@[branch])
 
-  # grow tree to random row if necessary
   if randomRow:
     var growToRow = rand(0..self.maxRow)
     while self.currentRow < growToRow:

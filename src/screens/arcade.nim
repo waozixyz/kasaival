@@ -28,7 +28,7 @@ method init*(self: Arcade) =
   self.player.init()
 
   gCamera = Camera3D()
-  gCamera.fovy = 60
+  gCamera.fovy = 45
   gCamera.projection = CameraProjection.Perspective
   gCamera.up = Vector3(x: 0.0, y: 1.0, z: 0.0)
 
@@ -38,12 +38,12 @@ method restartGame(self: Arcade): void {.base} =
   gGameOver = false
 
 method update*(self: Arcade, dt: float) =
-  gCamera.position.x = self.player.position.x - 20
-  gCamera.position.y = self.player.position.y + 2
+  gCamera.position.x = self.player.position.x
+  gCamera.position.y = 200
   gCamera.position.z = 200
-  gCamera.target = self.player.position
-  
+  gCamera.target.x = self.player.position.x
   gCamera.target.z = 0.0
+  gCamera.target.y = 50
 
   if isKeyPressed(M):
     gIsMute = not gIsMute

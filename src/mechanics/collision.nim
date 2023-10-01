@@ -1,4 +1,4 @@
-import raylib, ../player, ../gaia/ground, ../state, ../utils
+import raylib, ../player, ../gaia/ground, ../utils
 
 type
   Axis = enum
@@ -6,9 +6,6 @@ type
 
 const
   BURN_TIMER_VALUE = 200
-  COLOR_THRESHOLD_1 = 120
-  COLOR_THRESHOLD_2 = 140
-  COLOR_THRESHOLD_3 = 180
 
 proc checkAxisCollision(playerVelocity: Vector3, playerHitbox: BoundingBox, tileHitbox: BoundingBox, axis: Axis, grounded: var bool): float =
   case axis
@@ -43,7 +40,6 @@ proc checkTileCollision*(player: Player, ground: Ground, dt: float) =
       tile.burnTimer = BURN_TIMER_VALUE
       playerVelocity.y = checkAxisCollision(playerVelocity, playerHitbox, tileHitbox, Y, grounded)
 
-              
     if checkCollisionBoxes(playerVelocityHitbox, tileHitbox):
       tile.burnTimer = BURN_TIMER_VALUE
       playerVelocity.x = checkAxisCollision(playerVelocity, playerHitbox, tileHitbox, X, grounded)
