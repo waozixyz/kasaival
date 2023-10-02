@@ -23,8 +23,8 @@ local function add(self, width, cs)
     local x
     while y < H + h do
         local row = {}
-        x = left
-        while x < right do
+        x = right
+        while x > left do
             cs = cs or self.cs
             local cs_i = 1
             -- decide which colocscheme to used based on x position of tile
@@ -46,7 +46,7 @@ local function add(self, width, cs)
             table.insert(row, Tile:init({color = c, h = h, orgColor = c, w = w, x = x, y = y, fuel = fuel, orgFuel = fuel}))
  
             i = i + 1
-            x = x + w * 0.5
+            x = x - w * 0.5
         end
         table.insert(self.grid, row)
         y = y + h * 0.5
