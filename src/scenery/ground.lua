@@ -7,8 +7,9 @@ local Tile = require "scenery.tile"
 local ems = require "ems"
 
 local ma = love.math
+local gfx = love.graphics
 
-local rows = 9
+local rows = 8
 
 local function add(self, width, cs)
     local H = push:getHeight()
@@ -54,6 +55,9 @@ local function add(self, width, cs)
     self.width = self.width + width
     -- save the last x position
     self.lastx = x
+    state.gw = self.width
+    state.gh = self.height
+
 end
 
 local function init(self, prop, height)
@@ -94,6 +98,10 @@ local function collide(self, obj)
 end
 
 local function draw(self)
+    gfx.setColor(0, 0.5, 0.1)
+    gfx.rectangle("fill", state.startx, gfx.getHeight() - state.gh, state.gw, state.gh) -- Draw a filled rectangle covering the screen
+
+
     for _, row in ipairs(self.grid) do
         for i, v in ipairs(row) do
             if ems:checkVisible(v) then

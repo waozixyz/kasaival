@@ -106,10 +106,11 @@ local function move(self, dx, dy, dt)
     elseif x + state.cx < 0 then
         x = 0
     end
-    if y > H then
-        y = H
-    elseif y < H - state.gh - self.h - 42  then
-        y = H - state.gh - self.h - 42
+
+    if y > H - self.h * self.scale then
+        y = H - self.h* self.scale
+    elseif y < H - state.gh - self.h  then
+        y = H - state.gh - self.h
     end
     self.flame:setPosition(x, y)
     self.flame:setSizes(returnTable(self.sizes))

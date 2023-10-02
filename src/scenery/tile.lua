@@ -82,45 +82,41 @@ local function burn(self, object)
     return burnedFuelAmount
 end
 
-local function getHexagonVertices(index, tile)
-    -- Calculate the x and y coordinates of the hexagon's center
-    local x = index % 2 == 0 and tile.x + tile.w / 2 or tile.x
-    local y = index % 2 == 0 and tile.y + tile.h / 2 or tile.y
-    --local x = tile.x
-    --local y = tile.y 
-    -- Calcula te the x and y offsets for the hexagon's vertices
-    local xRadius = tile.w / 4
-    local yRadius = tile.h / 4
-    local xOffsets = { -xRadius, xRadius, tile.w / 2, xRadius, -xRadius, -tile.w / 2 }
-    local yOffsets = { -yRadius, -yRadius, 0, yRadius, yRadius, 0 }
-  
-    -- Build an array of the hexagon's vertices
-    local vertices = {}
-    for i = 1, 6 do
-      table.insert(vertices, x + xOffsets[i])
-      table.insert(vertices, y + yOffsets[i])
-    end
-  
-    return unpack(vertices)
-end
-
-local function getRhombusVertices(index, tile)
-    -- Calculate the x and y coordinates of the hexagon's center
+local function getOctagonVertices(index, tile)
+    -- Calculate the x and y coordinates of the octagon's center
     local x = tile.x
-    local y = tile.y - tile.h / 4
-    -- Calcula te the x and y offsets for the hexagon's vertices
+    local y = tile.y
+    y = y + tile.h / 4
+    
+    -- Calculate the x and y offsets for the octagon's vertices based on tile width and height
     local xRadius = tile.w / 4
     local yRadius = tile.h / 4
-    local y4 = -yRadius
-    if (tile.y == state.gh) then
-        y4 = 0
-    end
-    local xOffsets = { xRadius, 0, -xRadius, 0 }
-    local yOffsets = { 0, yRadius, 0, y4 }
+
+    local xOffsets = {
+        -xRadius / 2,
+         xRadius / 2,
+         xRadius,
+         xRadius,
+         xRadius / 2,
+        -xRadius / 2,
+        -xRadius,
+        -xRadius
+    }
+    
+    local yOffsets = {
+        -yRadius,
+        -yRadius,
+        -yRadius / 2,
+         yRadius / 2,
+         yRadius,
+         yRadius,
+         yRadius / 2,
+        -yRadius / 2
+    }
   
-    -- Build an array of the hexagon's vertices
+    -- Build an array of the octagon's vertices
     local vertices = {}
-    for i = 1, 4 do
+    for i = 1, 8 do
       table.insert(vertices, x + xOffsets[i])
       table.insert(vertices, y + yOffsets[i])
     end
@@ -130,12 +126,13 @@ end
 
 local function draw(self, i)
     gfx.setColor(self.color)
-    gfx.polygon("fill", getHexagonVertices(i, self))
+    gfx.polygon("fill", getOctagonVertices(i, self))
     --gfx.setColor({0.2, 0, 0.2})
     gfx.setColor(self.color)
-    if (i % 2 == 0) then
-        gfx.polygon("fill", getRhombusVertices(i, self))
-    end
+    --if (i % 2 == 0) then
+    --    gfx.polygon("fill", getTriangleVertices(i, self, true))
+    --    gfx.polygon("fill", getTriangleVertices(i, self))
+    --end
 end
 
 -- Adjusts color of self based on orgColor

@@ -101,8 +101,6 @@ local function load_stage(self, stage_name)
     Background:init(stage.background)
     -- init Ground
     self.ground = Ground:init(stage.ground, H * .5)
-    state.gw = self.ground.width
-    state.gh = self.ground.height
     -- init head up display
     HUD:init()
     -- init Music
