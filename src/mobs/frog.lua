@@ -1,6 +1,6 @@
 local gfx = love.graphics
 local ma = love.math
-local Animation = require "utils.Animation"
+local Animation = require "utils.animation"
 local copy = require "copy"
 local state = require "state"
 

@@ -1,5 +1,5 @@
 local copy = require "copy"
-local Wind = require "weather.Wind"
+local Wind = require "weather.wind"
 local push = require "push"
 
 local ma = love.math

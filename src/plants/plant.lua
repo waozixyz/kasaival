@@ -1,5 +1,5 @@
 local grow = require "plants.grow"
-local Fire = require "ps.Fire"
+local Fire = require "ps.fire"
 
 local copy = require "copy"
 local state = require "state"

@@ -1,7 +1,7 @@
 local copy = require "copy"
 local push = require "push"
 
-local Text = require "ui.Text"
+local Text = require "ui.text"
 
 local gfx = love.graphics
 

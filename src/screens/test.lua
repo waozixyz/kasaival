@@ -2,11 +2,11 @@ local copy = require "copy"
 local push = require "push"
 local state = require "state"
 
-local Player = require "player.Player"
-local Sakura = require "plants.Sakura"
-local Typewriter = require "ui.Typewriter"
-local Batterfly = require "mobs.Batterfly"
-local Wolke = require "weather.Wolke"
+local Player = require "player.player"
+local Sakura = require "plants.sakura"
+local Typewriter = require "ui.typewriter"
+local Batterfly = require "mobs.butterfly"
+local Wolke = require "weather.wolke"
 
 local gfx = love.graphics
 local ke = love.keyboard

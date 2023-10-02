@@ -1,6 +1,6 @@
 local state = require "state"
 
-local Music = require "sys.Music"
+local Music = require "sys.music"
 
 return function(f)
     if not f then

@@ -139,5 +139,5 @@ return {
     background = background,
     music = music,
     sky = sky,
-    next = "Grassland"
+    next = "grassland"
 }

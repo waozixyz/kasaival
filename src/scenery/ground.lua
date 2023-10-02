@@ -3,7 +3,7 @@ local state = require "state"
 local utils = require "utils"
 local push = require "push"
 
-local Tile = require "scenery.Tile"
+local Tile = require "scenery.tile"
 local ems = require "ems"
 
 local ma = love.math

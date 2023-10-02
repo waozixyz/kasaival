@@ -1,6 +1,6 @@
 local utils = require "utils"
 
-local Branch = require "plants.Branch"
+local Branch = require "plants.branch"
 
 local ma = love.math
 

@@ -2,7 +2,7 @@ local copy = require "copy"
 local state = require "state"
 local utils = require "utils"
 
-local Animation = require "utils.Animation"
+local Animation = require "utils.animation"
 local Pinkel = require "ps.Pinkel"
 local Plant = require "plants.Plant"
 

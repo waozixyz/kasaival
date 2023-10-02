@@ -7,13 +7,13 @@ local spawner = require "utils.spawner"
 local ems = require "ems"
 
 -- Main components
-local Background = require "scenery.Background"
-local Ground = require "scenery.Ground"
+local Background = require "scenery.background"
+local Ground = require "scenery.ground"
 local HUD = require "ui.hud"
-local Music = require "sys.Music"
-local Plant = require "plants.Plant"
-local Player = require "player.Player"
-local Sky = require "scenery.Sky"
+local Music = require "sys.music"
+local Plant = require "plants.plant"
+local Player = require "player.player"
+local Sky = require "scenery.sky"
 -- local Weather = require "weather.Weather"
 
 -- aliases
@@ -144,7 +144,7 @@ local function load_stage(self, stage_name)
 end
 
 local function init(self)
-    load_stage(self, "Grassland")
+    load_stage(self, "grassland")
 end
 
 local function keypressed(self, ...)

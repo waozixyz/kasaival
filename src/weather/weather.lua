@@ -1,7 +1,7 @@
 local spawner = require "utils.spawner"
-local Wind = require "weather.Wind"
-local Cloud = require "weather.Cloud"
-local Sandstorm = require "ps.Sandstorm"
+local Wind = require "weather.wind"
+local Cloud = require "weather.cloud"
+local Sandstorm = require "ps.sandstorm"
 
 local ma = love.math
 local gfx = love.graphics

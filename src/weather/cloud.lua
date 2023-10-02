@@ -2,8 +2,8 @@ local copy = require "copy"
 local push = require "push"
 local state = require "state"
 
-local Rain = require "weather.Rain"
-local Wolkeps = require "ps.Wolkeps"
+local Rain = require "weather.rain"
+local Wolkeps = require "ps.wolke"
 
 local ma = love.math
 local gfx = love.graphics

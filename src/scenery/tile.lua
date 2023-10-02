@@ -19,6 +19,7 @@ local function findElement(c)
         return "water"
     end
 end
+
 local function balanceColor(current_c, target_c, max_change)
   local delta = target_c - current_c
   if delta > max_change then

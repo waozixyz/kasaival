@@ -1,14 +1,14 @@
 local suit = require "suit"
 local push = require "push"
 local lume = require "lume"
-local statBar = require "ui.statBar"
+local stats = require "ui.stats"
 local state = require "state"
 local ems = require "ems"
 
-local Cursor = require "ui.Cursor"
-local Overlay = require "ui.Overlay"
-local Music = require "sys.Music"
-local Text = require "ui.Text"
+local Cursor = require "ui.cursor"
+local Overlay = require "ui.overlay"
+local Music = require "sys.music"
+local Text = require "ui.text"
 
 local gfx = love.graphics
 
@@ -117,8 +117,8 @@ local function draw(self)
     end
 
     -- draw LifeBar
-    statBar(70, ems.player.HP, ems.player.maxHP, "HP", {0.5, 0, 0.2}, true)
-    -- statBar(220,ems.player.XP, ems.player.maxXP, "XP", {.2, 0, .5})
+    stats(70, ems.player.HP, ems.player.maxHP, "HP", {0.5, 0, 0.2}, true)
+    -- stats(220,ems.player.XP, ems.player.maxXP, "XP", {.2, 0, .5})
 end
 local function tk()
     if state.paused then

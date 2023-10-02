@@ -30,7 +30,7 @@ function love.load()
     push:setupScreen(gameWidth, gameHeight, windowWidth, windowHeight, 
         {fullscreen = fullscreen, highdpi = true, resizable = resizable}
     )
-    set_screen("Game")
+    set_screen("game")
     gfx.setDefaultFilter("nearest", "nearest")
 end
 
