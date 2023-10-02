@@ -1,8 +1,10 @@
 local copy = require "copy"
-local lyra = require "lyra"
+local state = require "state"
+local utils = require "utils"
 local push = require "push"
 
 local Tile = require "scenery.Tile"
+local ems = require "ems"
 
 local ma = love.math
 
@@ -14,7 +16,7 @@ local function add(self, width, cs)
     local w = self.height / rows
     local h = w
     local i = 0
-    local startx = self.lastx or lyra.startx
+    local startx = self.lastx or state.startx
     -- left and right bound of ground
     local left = startx - w
     local right = startx + width + w
@@ -39,7 +41,7 @@ local function add(self, width, cs)
                 cs_i = id
             end
 
-            local c = lyra.getColor(cs[cs_i])
+            local c = utils.getColor(cs[cs_i])
             local fuel = c[2] - c[3]
             table.insert(row, Tile:init({color = c, h = h, orgColor = c, w = w, x = x, y = y, fuel = fuel, orgFuel = fuel}))
  
@@ -94,7 +96,7 @@ end
 local function draw(self)
     for _, row in ipairs(self.grid) do
         for i, v in ipairs(row) do
-            if lyra:checkVisible(v) then
+            if ems:checkVisible(v) then
                 v:draw(i)
             end
         end

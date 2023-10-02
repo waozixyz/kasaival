@@ -2,7 +2,7 @@ local grow = require "plants.grow"
 local Fire = require "ps.Fire"
 
 local copy = require "copy"
-local lyra = require "lyra"
+local state = require "state"
 
 local gfx = love.graphics
 local ma = love.math

@@ -1,6 +1,6 @@
 local copy = require "copy"
 local push = require "push"
-local lyra = require "lyra"
+local state = require "state"
 
 local Rain = require "weather.Rain"
 local Wolkeps = require "ps.Wolkeps"
@@ -44,7 +44,7 @@ local function update(self, dt)
     for i, v in ipairs(self.items) do
         v:update(dt)
         -- regen entfeernrn
-        if v.y >= push:getHeight() - lyra.gh then
+        if v.y >= push:getHeight() - state.gh then
             table.remove(self.items, i)
             v:update(dt)
         end

@@ -40,9 +40,9 @@ local scenes = {
                 head = "Burn down a",
                 amount = 40,
                 tail = "cactuses",
-                fail = function(self, lyra)
-                    local a = lyra.kill_count[self.itemType]
-                    if #lyra:getItems("dog") == 0 and #lyra:getItems("cactus") < self.amount - a then
+                fail = function(self, state)
+                    local a = state.kill_count[self.itemType]
+                    if #state:getItems("dog") == 0 and #state:getItems("cactus") < self.amount - a then
                         return true
                     end
                 end

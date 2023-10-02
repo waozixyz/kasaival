@@ -1,6 +1,6 @@
 local copy = require "copy"
 local push = require "push"
-local lyra = require "lyra"
+local state = require "state"
 
 local Player = require "player.Player"
 local Sakura = require "plants.Sakura"
@@ -13,7 +13,7 @@ local ke = love.keyboard
 local ev = love.event
 
 local function init(self)
-    lyra:init()
+    state:init()
     self.Batterfly = Batterfly:init({x = 1000, y = 700})
 end
 

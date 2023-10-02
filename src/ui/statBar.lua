@@ -1,4 +1,4 @@
-local lyra = require "lyra"
+local state = require "state"
 local font = require "ui.font"
 
 local gfx = love.graphics

@@ -1,25 +1,25 @@
-local lyra = require "lyra"
+local state = require "state"
 
 local Music = require "sys.Music"
 
 return function(f)
     if not f then
-        if not lyra.paused then
-            lyra.unpause = true
-            lyra.paused = true
+        if not state.paused then
+            state.unpause = true
+            state.paused = true
         end
         if not Music:isMuted() then
             Music:mute()
-            lyra.unmute = true
+            state.unmute = true
         end
     else
-        if lyra.unmute then
+        if state.unmute then
             Music:play()
-            lyra.unmute = false
+            state.unmute = false
         end
-        if lyra.unpause then
-            lyra.paused = false
-            lyra.unpause = false
+        if state.unpause then
+            state.paused = false
+            state.unpause = false
         end
     end
 end

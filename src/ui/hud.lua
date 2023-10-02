@@ -2,7 +2,8 @@ local suit = require "suit"
 local push = require "push"
 local lume = require "lume"
 local statBar = require "ui.statBar"
-local lyra = require "lyra"
+local state = require "state"
+local ems = require "ems"
 
 local Cursor = require "ui.Cursor"
 local Overlay = require "ui.Overlay"
@@ -17,7 +18,7 @@ local function getCurrentQuestsText()
     local W = push:getWidth()
 
     local i = 1
-    for _, v in pairs(lyra:getCurrentQuests()) do
+    for _, v in pairs(state:getCurrentQuests()) do
         local size = 12
         v.text = Text:init(v.head .. " " .. v.amount .. " " .. v.tail, {size = size, y = 32 + (size + 4) * i, x = W - 20, align = "right"})
         i = i + 1
@@ -27,13 +28,13 @@ end
 local btns = {
     exit = {
         img = "exit.png",
-        fnc = function() lyra.exit = 1 end
+        fnc = function() state.exit = 1 end
     },
     pause = {
-        isOn = function() if lyra.paused then return true end end,
+        isOn = function() if state.paused then return true end end,
         on = "resume.png",
         off = "pause.png",
-        fnc = function() lyra.paused = toggle(lyra.paused) end
+        fnc = function() state.paused = toggle(state.paused) end
     },
     music = {
         isOn = function() if Music:isMuted() then return false else return true end end,
@@ -88,27 +89,27 @@ end
 
 local function draw(self)
     local W, H = push:getDimensions()
-    gfx.setColor(.2, 0, 0, 1 - lyra.player.HP / lyra.player.maxHP * 5)
+    gfx.setColor(.2, 0, 0, 1 - ems.player.HP / ems.player.maxHP * 5)
     gfx.rectangle("fill", 0, 0, W, H)
 
     -- overlays for special states
-    if lyra.restart then
+    if state.restart then
         self.gamerestart:draw()
-    elseif lyra.questFailed then
-        self.questfail:draw(lyra:getCurrentQuestHint())
-    elseif lyra.player.HP <= 0 then
+    elseif state.questFailed then
+        self.questfail:draw(state:getCurrentQuestHint())
+    elseif ems.player.HP <= 0 then
         self.gameover:draw()
-    elseif lyra.paused == true and (not lyra.exit or lyra.exit == 0) then
+    elseif state.paused == true and (not state.exit or state.exit == 0) then
         self.gamepaused:draw()
-    elseif lyra.exit == 1 or lyra.exit == 2 then
+    elseif state.exit == 1 or state.exit == 2 then
         self.gamesaving:draw()
     end
  
     -- current quests
-    if lume.count(lyra:getCurrentQuests()) > 0 then
+    if lume.count(state:getCurrentQuests()) > 0 then
         self.questHeading:draw()
     end
-    for _, v in pairs(lyra:getCurrentQuests()) do
+    for _, v in pairs(state:getCurrentQuests()) do
         if not v.text then
             getCurrentQuestsText()
         end
@@ -116,16 +117,16 @@ local function draw(self)
     end
 
     -- draw LifeBar
-    statBar(70, lyra.player.HP, lyra.player.maxHP, "HP", {0.5, 0, 0.2}, true)
-    -- statBar(220,lyra.player.XP, lyra.player.maxXP, "XP", {.2, 0, .5})
+    statBar(70, ems.player.HP, ems.player.maxHP, "HP", {0.5, 0, 0.2}, true)
+    -- statBar(220,ems.player.XP, ems.player.maxXP, "XP", {.2, 0, .5})
 end
 local function tk()
-    if lyra.paused then
-        lyra.paused = toggle(lyra.paused)
+    if state.paused then
+        state.paused = toggle(state.paused)
         return true
     end
-    if lyra.player.HP <= 0 or lyra.questFailed then
-        lyra.restart = true
+    if ems.player.HP <= 0 or state.questFailed then
+        state.restart = true
         return true
     end
     return false
@@ -145,9 +146,9 @@ local function keypressed(key)
         if key == "kp-" then Music:down() end
         if key == "n" then Music:next() end
         if key == "m" then Music:toggle() end
-        if key == "r" then lyra.restart = true end
-        if key == "p" or key == "pause" or key == "space" then lyra.paused = toggle(lyra.paused) end
-        if key == "escape" and (not lyra.exit or lyra.exit < 1) then lyra.exit = 1 end
+        if key == "r" then state.restart = true end
+        if key == "p" or key == "pause" or key == "space" then state.paused = toggle(state.paused) end
+        if key == "escape" and (not state.exit or state.exit < 1) then state.exit = 1 end
     end
 end
 
@@ -176,11 +177,11 @@ local function update(self)
     Cursor:update()
 
     -- update quest Text
-    if #lyra:getCurrentQuests() > 0 then
-        for _, v in ipairs(lyra:getCurrentQuests()) do
+    if #state:getCurrentQuests() > 0 then
+        for _, v in ipairs(state:getCurrentQuests()) do
             local amount = v.amount
             if v.questType == "kill" then
-                amount = amount - lyra:getKillCount(v.itemType)
+                amount = amount - state:getKillCount(v.itemType)
             end
             if v.text == nil then
                 getCurrentQuestsText()

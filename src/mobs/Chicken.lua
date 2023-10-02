@@ -2,7 +2,7 @@ local gfx = love.graphics
 local ma = love.math
 local Animation = require "utils.Animation"
 local copy = require "copy"
-local lyra = require "lyra"
+local state = require "state"
 
 
 
@@ -32,9 +32,9 @@ local function update(self, dt)
         self.anime.currentTime = 0
     end
 
-    if self.x < lyra.startx then
+    if self.x < state.startx then
         self.direction = 1
-    elseif self.x > lyra.ground.width + lyra.startx then
+    elseif self.x > state.gw + state.startx then
         self.direction = -1
     end
 end 

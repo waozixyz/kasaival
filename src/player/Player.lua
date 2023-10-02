@@ -1,9 +1,9 @@
 local copy = require "copy"
-local lyra = require "lyra"
+local state = require "state"
 local push = require "push"
 
-local Controller = require "player.Controller"
-local Flame = require "ps.Flame"
+local Controller = require "player.controller"
+local Flame = require "ps.flame"
 
 -- aliases
 local gfx = love.graphics
@@ -96,20 +96,20 @@ local function move(self, dx, dy, dt)
     local s = self.speed * self.scale * dt
     dx, dy = dx * s, dy * s
     local x, y = self.x + dx, self.y + dy
-    if x + lyra.cx < W / 5 and -lyra.cx > lyra.startx then
-        lyra.cx = lyra.cx - dx
-    elseif x + lyra.cx > W - (W / 5) and -lyra.cx + W < lyra.ground.width + lyra.startx then
-        lyra.cx = lyra.cx - dx
+    if x + state.cx < W / 5 and -state.cx > state.startx then
+        state.cx = state.cx - dx
+    elseif x + state.cx > W - (W / 5) and -state.cx + W < state.gw + state.startx then
+        state.cx = state.cx - dx
     end
-    if x + lyra.cx > W then
-        x = W - lyra.cx
-    elseif x + lyra.cx < 0 then
+    if x + state.cx > W then
+        x = W - state.cx
+    elseif x + state.cx < 0 then
         x = 0
     end
     if y > H then
         y = H
-    elseif y < H - lyra.ground.height - self.h - 42  then
-        y = H - lyra.ground.height - self.h - 42
+    elseif y < H - state.gh - self.h - 42  then
+        y = H - state.gh - self.h - 42
     end
     self.flame:setPosition(x, y)
     self.flame:setSizes(returnTable(self.sizes))
@@ -160,5 +160,6 @@ return {
     HP = 100,
     XP = 0,
     maxXP = 100,
-    maxHP = 100
+    maxHP = 100,
+    type = "player"
 }

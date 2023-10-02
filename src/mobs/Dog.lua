@@ -1,5 +1,6 @@
 local copy = require "copy"
-local lyra = require "lyra"
+local state = require "state"
+local utils = require "utils"
 
 local Animation = require "utils.Animation"
 local Pinkel = require "ps.Pinkel"
@@ -21,7 +22,7 @@ local function init(self, pos)
     self.anime = Animation:init(gfx.newImage("assets/mobs/dog_sprite.png"), self.w, self.h, 1)
     self.zeito = ma.random(0, 8)
     -- add color variation to dogs
-    self.color = lyra.getColor({.4, 1, .4, 1, .3, 1})
+    self.color = utils.getColor({.4, 1, .4, 1, .3, 1})
 
     --pinkelsystem initiieren
     self.ps = Pinkel()
@@ -63,7 +64,7 @@ local function draw(self)
     end
 end
 local function use_ability(self)
-    table.insert(lyra.items, Plant:init(self.ability, {x = self.x, y = self.y }))
+    table.insert(state.items, Plant:init(self.ability, {x = self.x, y = self.y }))
 end
 local function update(self, dt)
     if self.pinkelpause and not self.dying then
@@ -90,9 +91,9 @@ local function update(self, dt)
     if not self.pinkelpause and not self.dying then
         self.x = self.x + 200 * dt * self.direction
     end
-    if self.x < lyra.startx then
+    if self.x < state.startx then
         self.direction = 1
-    elseif self.x > lyra.ground.width + lyra.startx then
+    elseif self.x > state.gw + state.startx then
         self.direction = -1
     end
 end

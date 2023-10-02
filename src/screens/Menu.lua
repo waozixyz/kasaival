@@ -1,5 +1,5 @@
 local push = require "push"
-local lyra = require "lyra"
+local state = require "state"
 local Text = require "ui.Text"
 
 local gfx = love.graphics
@@ -14,7 +14,7 @@ local function init(self)
     local yellow = {1, .6, .4}
     self.subtitle = Text:init("an out of control flame trying to survive", {size = 25, y = 160})
     self.continue = Text:init("touch to start burning", {size = 50, y = 500, color = yellow} )
-    lyra:init(self.title, self.subtitle, self.continue)
+    state:init(self.title, self.subtitle, self.continue)
 end
 
 local function touch(self)
@@ -31,7 +31,7 @@ end
 
 
 local function update(self, dt, set_screen)
-    lyra:update(dt)
+    state:update(dt)
     if not self.next and self.alpha > 0 then
         self.alpha = self.alpha - dt
     end
@@ -47,7 +47,7 @@ local function draw(self)
     gfx.setColor(1, 1, 1, 1 - self.alpha)
     gfx.draw(self.img, 0, 0, 0, 1.2)
 
-    lyra:draw(.8 - self.alpha)
+    state:draw(.8 - self.alpha)
 end
 
 return {draw = draw, init = init, touch = touch, keypressed = keypressed, update = update}

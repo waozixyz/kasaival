@@ -1,11 +1,11 @@
-local lyra = require "lyra"
+local utils = require "utils"
 
 local ma = love.math
 
 local deg_to_rad = math.pi / 180
 
 local function addLeaf(x, y, w, cs)
-    return { x = x, y = y, color = lyra.getColor(cs), w = w * ma.random(8, 10) * .1, h = w * ma.random(8, 10) * .1 }
+    return { x = x, y = y, color = utils.getColor(cs), w = w * ma.random(8, 10) * .1, h = w * ma.random(8, 10) * .1 }
 end
 
 return function(self, v, angle, oh)
@@ -13,7 +13,7 @@ return function(self, v, angle, oh)
     local cs_b, cs_l = self.cs_branch, self.cs_leaf
     local w, h = v.w * self.changeW, v.h * self.changeH
     local rtn = {}
-    rtn.color = lyra.getColor(cs_b)
+    rtn.color = utils.getColor(cs_b)
     rtn.deg, rtn.w, rtn.h = angle, w, h
     local nx = math.floor(v.n[1] + math.cos(angle * deg_to_rad) * h)
     local ny = math.floor(v.n[2] + math.sin(angle * deg_to_rad) * h)
