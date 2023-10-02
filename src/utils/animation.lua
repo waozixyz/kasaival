@@ -1,5 +1,5 @@
 local gfx = love.graphics
-local copy = require "copy"
+local copy = require "utils.copy"
 
 local function spritenumber(self, add, mult)
     add, mult = add or 1, mult or 3

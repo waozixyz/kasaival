@@ -1,11 +1,34 @@
-local lume = require "lume"
-local push = require "push"
+local lume = require "utils.lume"
+local push = require "utils.push"
 local state = require "state"
+
+local Plant = require "plants.plant"
 
 local ems = {}
 
 ems.items = {}
 ems.visible_items = {}
+
+function ems:createAndAddItem(itemData, defaultPgw)
+    assert(type(itemData) == "table", "itemData must be a table")
+    assert(type(defaultPgw) == "number" or defaultPgw == nil, "defaultPgw must be a number or nil")
+
+    local props = itemData.props or {}
+    for key, value in pairs(spawner(itemData.pgw or defaultPgw)) do
+        props[key] = value
+    end
+
+    local item
+    if itemData.type == "plant" then
+        item = Plant:init(itemData.name, props)
+    elseif itemData.type == "mob" then
+        item = require("mobs." .. itemData.name):init(props)
+    else
+        error("Invalid itemData.type: " .. tostring(itemData.type))
+    end
+
+    self:addEntity(item)
+end
 
 function ems:addEntity(entity)
     table.insert(self.items, entity)

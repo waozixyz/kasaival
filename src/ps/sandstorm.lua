@@ -1,4 +1,4 @@
-local push = require "push"
+local push = require "utils.push"
 
 local gfx = love.graphics
 

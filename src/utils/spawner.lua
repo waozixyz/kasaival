@@ -1,4 +1,4 @@
-local push = require "push"
+local push = require "utils.push"
 local state = require "state"
 
 local ma = love.math

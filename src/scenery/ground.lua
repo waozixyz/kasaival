@@ -1,7 +1,7 @@
-local copy = require "copy"
+local copy = require "utils.copy"
 local state = require "state"
 local utils = require "utils"
-local push = require "push"
+local push = require "utils.push"
 
 local Tile = require "scenery.tile"
 local ems = require "ems"

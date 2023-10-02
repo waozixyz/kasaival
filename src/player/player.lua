@@ -1,6 +1,6 @@
-local copy = require "copy"
+local copy = require "utils.copy"
 local state = require "state"
-local push = require "push"
+local push = require "utils.push"
 
 local Controller = require "player.controller"
 local Flame = require "ps.flame"

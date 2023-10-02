@@ -1,7 +1,7 @@
 local grow = require "plants.grow"
 local Fire = require "ps.fire"
 
-local copy = require "copy"
+local copy = require "utils.copy"
 local state = require "state"
 
 local gfx = love.graphics

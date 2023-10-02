@@ -1,4 +1,4 @@
-local copy = require "copy"
+local copy = require "utils.copy"
 
 local gfx = love.graphics
 

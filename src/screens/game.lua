@@ -1,8 +1,8 @@
 -- library functions
-local copy = require "copy"
+local copy = require "utils.copy"
 local focus = require "sys.focus"
 local state = require "state"
-local push = require "push"
+local push = require "utils.push"
 local spawner = require "utils.spawner"
 local ems = require "ems"
 
@@ -11,7 +11,6 @@ local Background = require "scenery.background"
 local Ground = require "scenery.ground"
 local HUD = require "ui.hud"
 local Music = require "sys.music"
-local Plant = require "plants.plant"
 local Player = require "player.player"
 local Sky = require "scenery.sky"
 -- local Weather = require "weather.Weather"
@@ -20,27 +19,7 @@ local Sky = require "scenery.sky"
 local ev = love.event
 local gfx = love.graphics
 
-local function createAndAddItem(itemData, defaultPgw)
-    assert(type(itemData) == "table", "itemData must be a table")
-    assert(type(defaultPgw) == "number" or defaultPgw == nil, "defaultPgw must be a number or nil")
-
-    local props = itemData.props or {}
-    for key, value in pairs(spawner(itemData.pgw or defaultPgw)) do
-        props[key] = value
-    end
-
-    local item
-    if itemData.type == "plant" then
-        item = Plant:init(itemData.name, props)
-    elseif itemData.type == "mob" then
-        item = require("mobs." .. itemData.name):init(props)
-    else
-        error("Invalid itemData.type: " .. tostring(itemData.type))
-    end
-
-    ems:addEntity(item)
-end
-
+local Testing = true
 
 local function load_scene(self)
     if state.scenes[state.currentScene] == nil then
@@ -72,7 +51,7 @@ local function load_scene(self)
         if scene.spawn then
             for _, v in ipairs(scene.spawn) do
                 for _ = 1, v.amount do
-                    createAndAddItem(v, pgw)
+                    ems:createAndAddItem(v, pgw)
                 end
             end
         end
@@ -237,7 +216,7 @@ local function update(self, dt, set_screen)
                 for _, v in ipairs(self.spawn) do
                     v.time = v.time + dt
                     if v.time > v.interval then
-                        createAndAddItem(v)
+                        ems:createAndAddItem(v)
                         v.time = 0
                     end
                 end

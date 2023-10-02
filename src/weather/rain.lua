@@ -1,6 +1,6 @@
-local copy = require "copy"
+local copy = require "utils.copy"
 local Wind = require "weather.wind"
-local push = require "push"
+local push = require "utils.push"
 
 local ma = love.math
 local gfx = love.graphics

@@ -1,4 +1,4 @@
-local push = require("push")
+local push = require("utils.push")
 local suit = require("suit")
 local Cursor = require("ui.Cursor")
 local Saves = require("sys.Saves")
@@ -15,11 +15,11 @@ local function init(self, set_screen)
 end
 local function keypressed(self, key, set_screen)
     if key == "escape" then
-        set_screen("Menu")
+        set_screen("menu")
     elseif key == "1" or key == "2" or key == "3" or key == "4" then
-        set_screen("Game", (Saves.saveName .. key))
+        set_screen("game", (Saves.saveName .. key))
     elseif key == "return" then
-        set_screen("Game", (Saves.saveName .. "1"))
+        set_screen("game", (Saves.saveName .. "1"))
     end
 end
 
@@ -47,9 +47,9 @@ local function update(self, dt, set_screen)
             -- if button hit, set_screen
             if suit.isHit(id) then
                 if sav.file then
-                    set_screen("Game", ("saves/" .. sav.file))
+                    set_screen("game", ("saves/" .. sav.file))
                 else
-                    set_screen("Game")
+                    set_screen("game")
                 end
             end
             suit.Button("delete", {id = id .. "del"}, x + w * .25, y + h + 50, w * .5, 50)
@@ -66,7 +66,7 @@ local function update(self, dt, set_screen)
 
         suit.Button("New Game", {id = id}, x, y, w, h)
         if suit.isHit(id) then
-            set_screen("Game")
+            set_screen("game")
         end
         Cursor:update()
     end

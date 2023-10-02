@@ -1,4 +1,4 @@
-local copy = require "copy"
+local copy = require "utils.copy"
 local state = require "state"
 local utils = require "utils"
 

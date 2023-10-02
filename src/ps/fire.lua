@@ -1,8 +1,6 @@
 local gfx = love.graphics
 
 local function rtn()
-
-
     local image1 = gfx.newImage("assets/lightBlur.png")
     image1:setFilter("linear", "linear")
 

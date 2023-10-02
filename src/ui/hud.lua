@@ -1,6 +1,6 @@
 local suit = require "suit"
-local push = require "push"
-local lume = require "lume"
+local push = require "utils.push"
+local lume = require "utils.lume"
 local stats = require "ui.stats"
 local state = require "state"
 local ems = require "ems"

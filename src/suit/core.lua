@@ -1,4 +1,4 @@
-local push = require('push')
+local push = require('utils.push')
 -- This file is part of SUIT, copyright (c) 2016 Matthias Richter
 local NONE = {}
 local BASE = (...):match('(.-)[^%.]+$')

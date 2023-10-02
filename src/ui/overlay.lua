@@ -1,5 +1,5 @@
-local copy = require "copy"
-local push = require "push"
+local copy = require "utils.copy"
+local push = require "utils.push"
 
 local Text = require "ui.text"
 

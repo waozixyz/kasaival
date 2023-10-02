@@ -1,4 +1,4 @@
-local lume = require "lume"
+local lume = require "utils.lume"
 local ma = love.math
 
 local function getColor(cs)

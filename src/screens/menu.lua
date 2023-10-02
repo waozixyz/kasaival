@@ -1,4 +1,4 @@
-local push = require "push"
+local push = require "utils.push"
 local state = require "state"
 local Text = require "ui.text"
 
@@ -38,7 +38,7 @@ local function update(self, dt, set_screen)
     if self.next then
         self.alpha = self.alpha + dt
         if self.alpha > 1 then
-            set_screen("Game")
+            set_screen("game")
         end
     end
 end
