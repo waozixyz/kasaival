@@ -20,7 +20,6 @@ local function stopBoost(self)
     self.speed = self.speed / 1.5
 end
 
-
 local function collided(self, obj, burnedFuel)
     local HP = self.HP
     if burnedFuel then
@@ -45,7 +44,7 @@ end
 local function getHitbox(self)
     local w = self.w * self.scale
     local h = self.h * self.scale
-    return self.x - w * 0.5, self.x + w * 0.5, self.y - h * 0.5, self.y + h * .5
+    return self.x - w * 0.5, self.x + w * 0.5, self.y - h * 0.5, self.y + h * 0.5
 end
 
 local function draw(self)
@@ -75,10 +74,10 @@ local function init(self, prop)
     return copy(self)
 end
 
-
 local function returnTable(t)
     return t[1], t[2], t[3], t[4], t[5], t[6], t[7]
 end
+
 local function getSizes(sizes, scale)
     local rtn = sizes
     rtn[7] = rtn[6] * .7
@@ -93,25 +92,31 @@ end
 
 local function move(self, dx, dy, dt)
     local W, H = push:getDimensions()
+    local w = self.w * self.scale
+    local h = self.h * self.scale
+
     local s = self.speed * self.scale * dt
     dx, dy = dx * s, dy * s
     local x, y = self.x + dx, self.y + dy
+
     if x + state.cx < W / 5 and -state.cx > state.startx then
         state.cx = state.cx - dx
     elseif x + state.cx > W - (W / 5) and -state.cx + W < state.gw + state.startx then
         state.cx = state.cx - dx
     end
-    if x + state.cx > W then
+
+    if x > W - state.cx then
         x = W - state.cx
-    elseif x + state.cx < 0 then
-        x = 0
+    elseif x < -state.cx + w then
+        x = -state.cx + w
     end
 
-    if y > H - self.h * self.scale then
-        y = H - self.h* self.scale
+    if y > H - h then
+        y = H - h
     elseif y < H - state.gh - self.h  then
         y = H - state.gh - self.h
     end
+
     self.flame:setPosition(x, y)
     self.flame:setSizes(returnTable(self.sizes))
     self.x, self.y = x, y
@@ -152,8 +157,8 @@ return {
     element = "fire",
     getHitbox = getHitbox,
     init = init,
-    h = 12, -- height
-    w = 12, -- width
+    h = 4, -- height
+    w = 4, -- width
     bp = 0.01, -- burn power
     scale = 1,
     update = update,

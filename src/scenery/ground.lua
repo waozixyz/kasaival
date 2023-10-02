@@ -86,16 +86,22 @@ local function collide(self, obj)
     local l, r, u, d = obj:getHitbox()
 
     for _, row in ipairs(self.grid) do
-        for _, v in ipairs(row) do
-            if v.x <= r and v.x + v.w >= l and v.y - v.h <= d and v.y >= u then
+        for _, tile in ipairs(row) do
+            local tileLeft = tile.x - tile.w / 2
+            local tileRight = tile.x + tile.w / 2
+            local tileTop = tile.y - tile.h / 2
+            local tileBottom = tile.y + tile.h / 2
+
+            if tileLeft <= r and tileRight >= l and tileTop <= d and tileBottom >= u then
                 local burnedFuel = 0
-                burnedFuel = v:burn(obj)
-                v.hit = true
+                burnedFuel = tile:burn(obj)
+                tile.hit = true
                 obj:collided(nil, burnedFuel)
             end
         end
     end
 end
+
 
 local function draw(self)
     gfx.setColor(0, 0.5, 0.1)

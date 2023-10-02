@@ -127,12 +127,6 @@ end
 local function draw(self, i)
     gfx.setColor(self.color)
     gfx.polygon("fill", getOctagonVertices(i, self))
-    --gfx.setColor({0.2, 0, 0.2})
-    gfx.setColor(self.color)
-    --if (i % 2 == 0) then
-    --    gfx.polygon("fill", getTriangleVertices(i, self, true))
-    --    gfx.polygon("fill", getTriangleVertices(i, self))
-    --end
 end
 
 -- Adjusts color of self based on orgColor

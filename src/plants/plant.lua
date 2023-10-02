@@ -10,51 +10,31 @@ local ma = love.math
     
 -- default template
 local template = {
-    -- element is obvious, but used for collisions
     element = "plant",
-    -- default type of plant
     type = "tree",
-    -- special powerups, nothing is default
     special = "",
-    -- how long it takes to grow
     growTime = 1,
-    -- timer to know when to stop burning
     burnTimer = 0,
-    -- branch colorscheme
     cs_branch = {.5, .7, .2, .4, .2, .3},
-    -- leaf colorscheme
     cs_leaf = {.2, .2, .5, .6, .2, .4},
-    -- how many layers the tree will have
     maxStage = 7,
-    -- coords
     x = 600, y = 800,
-    -- scale
     scale = 1,
-    -- size of leaves
     leafSize = 1,
-    -- chance of growing a leaf, 0 - 10, 0 is to grow always
     leafChance = 0,
-    -- table of all branches, each layer in their of table
     branches = {},
-    -- table of all layer
     leaves = {},
-    -- the random angle divergence
     splitAngle = {20, 30},
     -- set the frequency of splitting up branhes
     -- generates random number from 1 - 10
     -- if > splitChance then split
     -- else do not split
     splitChance = 4,
-    -- how fast this material burns
     burnIntensity = 1,
-    -- the amount of fuel this plant provides
     fuel = 5,
-    -- add fuel per branch layer
     addFuel = 3,
-    -- the scale of how the size should change at each growth
     changeW = .9,
     changeH = .95,
-    -- used for first branch
     currentStage = 0,
     changeColor = {0, 0, 0},
     w = 12, h = 32,
