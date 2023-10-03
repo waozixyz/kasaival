@@ -5,6 +5,8 @@ in
 nixpkgs.mkShell {
   buildInputs = [
     nixpkgs.love
+    nixpkgs.zip
+    nixpkgs.nodejs
   ];
 
   shellHook = ''
