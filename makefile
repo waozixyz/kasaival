@@ -3,7 +3,7 @@ LOVE_VERSION=11.3
 NAME=Kasaival
 ITCH_ACCOUNT=waotzi
 URL="https://kasaival.rocks"
-AUTHOR="Wao Tzi"
+AUTHOR="Waotzi"
 DESCRIPTION="Survival adventure game. Out of nowhere you have come to exist. The fire is burning inside you, but you feel it diminishing. Stay alive as long as you can! Do whatever it takes to keep your flame burning!"
 
 ASSETS := $(wildcard assets/*)
