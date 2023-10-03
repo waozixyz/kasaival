@@ -1,10 +1,11 @@
 local copy = require "utils.copy"
 local state = require "state"
 local utils = require "utils"
+local ems = require "ems"
 
 local Animation = require "utils.animation"
-local Pinkel = require "ps.Pinkel"
-local Plant = require "plants.Plant"
+local Pinkel = require "ps.pinkel"
+local Plant = require "plants.plant"
 
 local gfx = love.graphics
 local ma = love.math
@@ -12,7 +13,8 @@ local ma = love.math
 local function init(self, pos)
     self.element = "earth"
     self.type = "dog"
-    self.ability = "Saguaro"
+    self.ability = "growTree"
+    self.plantToGrow = "saguaro"
     self.w, self.h = 46, 27
     self.x, self.y = pos.x, pos.y
     self.scale = 2
@@ -63,8 +65,19 @@ local function draw(self)
         gfx.draw(self.ps, self.x + 26 * self.direction * -1, self.y + 12, 0, self.direction * -1, 1, self.w * .5, self.h)
     end
 end
-local function use_ability(self)
-    table.insert(ems.items, Plant:init(self.ability, {x = self.x, y = self.y }))
+local function useAbility(self)
+    if self.ability == "growTree" then
+        local itemData = {
+            entityType = "plant", 
+            entityName = self.plantToGrow, 
+            props = {
+                x = self.x, 
+                y = self.y 
+            }
+        }
+        
+        ems:createAndAddItem(itemData)
+    end
 end
 local function update(self, dt)
     if self.pinkelpause and not self.fading then
@@ -82,7 +95,7 @@ local function update(self, dt)
     end
     if self.zeito > 11 then
         self.pinkelpause = false
-        use_ability(self)
+        useAbility(self)
         self.zeito = 0
     end
     if self.zeito > 8.2 and self.fading then

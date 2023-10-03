@@ -14,16 +14,16 @@ return function(self)
         local n = {0, self.y - h}
         if not self.twoBranch then
             local b = {deg = -90, h = h, n = n, p = p, w = w}
-            b.color = utils.getColor(self.cs_branch)
+            b.color = utils.getColor(self.csBranch)
             table.insert(row, b)
         else
             n = {ma.random(5, 10), self.y - h}
             local b1 = {deg = -100, h = h, n = n, p = p, w = w}
-            b1.color = utils.getColor(self.cs_branch)
+            b1.color = utils.getColor(self.csBranch)
             table.insert(row, b1)
             n = {ma.random(-10, -5), self.y - h}
             local b2 = {deg = -80, h = h, n = n, p = p, w = w}
-            b2.color = utils.getColor(self.cs_branch)
+            b2.color = utils.getColor(self.csBranch)
             table.insert(row, b2)
         end
         self.first = false

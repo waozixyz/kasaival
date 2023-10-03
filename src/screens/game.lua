@@ -24,45 +24,43 @@ local Testing = true
 
 local function loadScene(self)
     if state.scenes[state.currentScene] == nil then
-        self.nextStage = true
+        state.nextStage = true
     else
         local scene = state.scenes[state.currentScene]
 
-        -- current color schemes stored here
-        local cs = {}
-        do -- load last colorscheme into cs
+        local colorSchemes = {}
+        do
             if state.currentScene > 1 then
-                local pg = state.scenes[state.currentScene - 1].ground
-                if pg.cs and pg.cs[#pg.cs] then
-                    table.insert(cs, pg.cs[#pg.cs])
+                local previousGround = state.scenes[state.currentScene - 1].ground
+                if previousGround.colorSchemes and previousGround.colorSchemes[#previousGround.colorSchemes] then
+                    table.insert(colorSchemes, previousGround.colorSchemes[#previousGround.colorSchemes])
                 end
             end
             if scene.ground then
-                for _, v in ipairs(scene.ground.colorScheme) do
-                    table.insert(cs, v)
+                for _, v in ipairs(scene.ground.colorSchemes) do
+                    table.insert(colorSchemes, v)
                 end
             end
         end
         -- previous ground width used for mobs and plants
-        local pgw = state.gw or 0
+        local previousGroundWidth = state.gw or 0
         if scene.ground then
-            self.ground:add(scene.ground.add, cs)
+            self.ground:add(scene.ground.add, colorSchemes)
         end
         -- spawn plants and mobs for current Scene
         if scene.spawn then
-            for _, v in ipairs(scene.spawn) do
-                for _ = 1, v.amount do
-                    ems:createAndAddItem(v, pgw)
+            for _, item in ipairs(scene.spawn) do
+                for _ = 1, item.amount do
+                    ems:createAndAddItem(item, previousGroundWidth)
                 end
             end
         end
         -- add spawners to stage
         if scene.spawners then
-            for _, v in ipairs(scene.spawners) do
-                v.time = 0
-                v.pgw = pgw
-                v.gw = state.gw
-                table.insert(self.spawn, v)
+            for _, item in ipairs(scene.spawners) do
+                item.time = 0
+                item.pgw = previousGroundWidth
+                table.insert(self.spawn, item)
             end
         end
         --[[
@@ -103,8 +101,8 @@ local function loadStage(self, stage_name)
 
     --Weather:init(stage.weather)
 
-    self.nextStage = false
-    self.nextScene = false
+    state.nextStage = false
+    state.nextScene = false
     self.spawn = {}
     loadScene(self)
 
@@ -119,7 +117,7 @@ local function keypressed(self, ...)
 end
 
 local function scenePause(self)
-    if self.nextStage or self.nextScene or self.loadCX then
+    if state.nextStage or state.nextScene or self.loadCX then
         return true
     else return false end
 end 
@@ -134,31 +132,6 @@ local function touch(self, ...)
 
     if not isPaused() and ems.player and self.ready and not scenePause(self) then
         ems.player:touch(...)
-    end
-end
-
-local function completeQuest(self, id)
-    state:getCurrentQuests()[id] = nil
-    if #state:getCurrentQuests() <= 0 then
-        self.nextScene = true
-    end
-end
-
-local function updateQuests(self, dt)
-    for i, q in ipairs(state:getCurrentQuests()) do
-        if q.questType == "time" then
-            q.amount = q.amount - dt
-            if q.amount <= 0 then
-                completeQuest(self, i)
-            end
-        elseif q.questType == "kill" then
-            if state.killCount[q.itemType] and state.killCount[q.itemType] >= q.amount then
-                completeQuest(self, i)
-            end
-        end
-        if q.fail and q:fail(state) then
-            state.questFailed = true
-        end
     end
 end
 
@@ -178,16 +151,16 @@ local function update(self, dt, set_screen)
         Music:mute()
         set_screen("Menu")
     end
-    if self.nextStage then
+    if state.nextStage then
         loadStage(self, state.next)
     else
-        if self.nextScene then
+        if state.nextScene then
             if ems.player.x + state.cx > W - W / 5 then
                 self.loadCX = state.cx - (W / 5)
             end
             state.currentScene = state.currentScene + 1
             loadScene(self)
-            self.nextScene = false
+            state.nextScene = false
         elseif self.loadCX then
             state.cx = state.cx + (self.loadCX - state.cx) * .5
             if math.floor(self.loadCX) == math.floor(state.cx) then
@@ -199,13 +172,16 @@ local function update(self, dt, set_screen)
                 ems:update(dt)
                 self.ground:update(dt)
                 self.ground:collide(ems.player)
-                updateQuests(self, dt)
+                state:updateQuests(dt)
                 --Weather:update(dt)
                 for _, v in ipairs(self.spawn) do
                     v.time = v.time + dt
                     if v.time > v.interval then
-                        ems:createAndAddItem(v)
-                        v.time = 0
+                        local count = ems:countItemsByTypeAndName(v.entityType, v.entityName)
+                        if v.maxAmount == nil or count < v.maxAmount then
+                            ems:createAndAddItem(v)
+                            v.time = 0
+                        end
                     end
                 end
                 if not self.ready then self.ready = true end

@@ -10,7 +10,7 @@ end
 
 return function(self, v, angle, oh)
     local l = #self.branches
-    local cs_b, cs_l = self.cs_branch, self.cs_leaf
+    local cs_b, cs_l = self.csBranch, self.csLeaf
     local w, h = v.w * self.changeW, v.h * self.changeH
     local rtn = {}
     rtn.color = utils.getColor(cs_b)

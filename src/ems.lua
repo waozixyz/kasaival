@@ -15,32 +15,29 @@ function ems:createAndAddItem(itemData, defaultPgw)
     assert(type(itemData) == "table", "itemData must be a table")
     assert(type(defaultPgw) == "number" or defaultPgw == nil, "defaultPgw must be a number or nil")
 
-  
-    -- Load the JSON data for the specific plant/mob
-    local jsonData = love.filesystem.read("data/" .. itemData.type .. "s/" .. itemData.name .. ".json")
-    local data, _, err = json.decode(jsonData)
-    if not data then
-        error("Error loading " .. itemData.type .. " data: " .. err)
-    end
-
+    local item
     local props = itemData.props or {}
     for key, value in pairs(spawner(itemData.pgw or defaultPgw)) do
         props[key] = value
     end
 
-    -- Merge the loaded JSON data into props
-    for key, value in pairs(data) do
-        props[key] = value
-    end
+    -- Load the JSON data for the specific plant
+    if itemData.entityType == "plant" then
+        local jsonData = love.filesystem.read("data/" .. itemData.entityType .. "s/" .. itemData.entityName .. ".json")
+        local data, _, err = json.decode(jsonData)
+        if not data then
+            error("Error loading " .. itemData.entityType .. " data: " .. err)
+        end
 
-  
-    local item
-    if itemData.type == "plant" then
-        item = Plant:init(itemData.name, props)
-    elseif itemData.type == "mob" then
-        item = require("mobs." .. itemData.name):init(props)
+        -- Merge the loaded JSON data into props
+        for key, value in pairs(data) do
+            props[key] = value
+        end
+        item = Plant:init(props)
+    elseif itemData.entityType == "mob" then
+        item = require("mobs." .. itemData.entityName):init(props)
     else
-        error("Invalid itemData.type: " .. tostring(itemData.type))
+        error("Invalid itemData.type: " .. tostring(itemData.entityType))
     end
 
     self:addEntity(item)
@@ -79,6 +76,16 @@ function ems:addDeathCount(entity)
     state.killCount[entity.type] = state.killCount[entity.type] + 1
 end
 
+function ems:countItemsByTypeAndName(itemType, itemName)
+    local count = 0
+    for _, item in ipairs(self.items) do
+        if item.type == itemType and item.name == itemName then
+            count = count + 1
+        end
+    end
+    return count
+end
+
 function ems:update(dt)
     for i, entity in ipairs(self.items) do
         if entity.update then
@@ -88,7 +95,6 @@ function ems:update(dt)
             if not entity.recordedDeath then
                 self:addDeathCount(entity)
                 entity.recordedDeath = true
-                print('record')
                 self.player.XP = self.player.XP + 1
             end
         end

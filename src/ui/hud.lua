@@ -177,18 +177,17 @@ end
 local function update(self)
     updateButtons()
     Cursor:update()
-
     -- update quest Text
     if #state:getCurrentQuests() > 0 then
-        for _, v in ipairs(state:getCurrentQuests()) do
-            local amount = v.amount
-            if v.questType == "kill" then
-                amount = amount - state:getKillCount(v.itemType)
+        for _, q in ipairs(state:getCurrentQuests()) do
+            local amount = q.amount
+            if q.questType == "kill" then
+                amount = amount - state:getKillCount(q.entityType)
             end
-            if v.text == nil then
+            if q.text == nil then
                 getCurrentQuestsText()
             end
-            v.text:update(v.head .. " " .. math.floor(amount) .. " " .. v.tail)
+            q.text:update(q.head .. " " .. math.floor(amount) .. " " .. q.tail)
         end
     else
         print("no quest")

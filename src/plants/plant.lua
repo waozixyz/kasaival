@@ -14,12 +14,13 @@ local HEAL_COLOR_INCREMENT = {-.0013, .0007, .0007}
 -- default template
 local template = {
     element = "plant",
-    type = "tree",
+    type = "plant",
+    subtype = "tree",
     special = "",
     growTime = 1,
     burnTimer = 0,
-    cs_branch = {.5, .7, .2, .4, .2, .3},
-    cs_leaf = {.2, .2, .5, .6, .2, .4},
+    csBranch = {.5, .7, .2, .4, .2, .3},
+    csLeaf = {.2, .2, .5, .6, .2, .4},
     maxStage = 7,
     x = 600, y = 800,
     scale = 1,
@@ -52,7 +53,7 @@ local function fillSelf(self, props)
     end
 end
 
-local function init(self, name, props)
+local function init(self, props)
     -- fill with template
     fillSelf(self, template)
     
@@ -93,7 +94,7 @@ local function collided(self, obj)
         self.dp = obj.db
 
         -- Check if the plant type is "shrub", set fading to true
-        if self.type == "shrub" then
+        if self.subtype == "shrub" then
             self.fading = true
         end
 
@@ -173,7 +174,7 @@ local function draw(self)
                     end
                 end
                 px, nx = x + px, x + nx
-                gfx.setColor(getColor(self, v, self.cs_branch))
+                gfx.setColor(getColor(self, v, self.csBranch))
                 gfx.setLineWidth(v.w * self.scale)
                 gfx.line(px, py, nx, ny)
                 if leaf then
@@ -182,7 +183,7 @@ local function draw(self)
             end
         end
         for _, v in ipairs(leaves) do
-            gfx.setColor(getColor(self, v, self.cs_leaf))
+            gfx.setColor(getColor(self, v, self.csLeaf))
             gfx.ellipse("fill", v.x, v.y, v.w, v.h)
         end
     end
