@@ -84,7 +84,7 @@ local function loadStage(self, stage_name)
     state:init()
     state.current = stage_name
     state.scenes = stage.scenes
-    state.currentScene = 1
+    state.currentScene = 2
     state.cx = 0
     state.exit = 0
     state.restart = false

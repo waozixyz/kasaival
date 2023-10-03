@@ -17,7 +17,7 @@
                     "entityType": "plant",
                     "entitySubtype": "shrub",
                     "head": "Burn down",
-                    "amount": 2,
+                    "amount": 20,
                     "tail": "shrubs"
                 }
             ],
@@ -45,9 +45,9 @@
                     "questType": "kill",
                     "entityType": "plant",
                     "entitySubtype": "cactus",
-                    "head": "Burn down a",
+                    "head": "Burn down",
                     "amount": 40,
-                    "tail": "cactuses"
+                    "tail": "cacti"
                 }
             ],
             "spawn": [

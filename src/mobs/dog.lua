@@ -17,9 +17,11 @@ local function init(self, pos)
     self.plantToGrow = "saguaro"
     self.w, self.h = 46, 27
     self.x, self.y = pos.x, pos.y
-    self.scale = 2
+    self.scale = 1
     self.direction = -1
     self.fuel = 5
+    self.rounds = 0
+    self.maxRounds = ma.random(1, 3)
     self.pinkelpause = false
     self.anime = Animation:init(gfx.newImage("assets/mobs/dog_sprite.png"), self.w, self.h, 1)
     self.zeito = ma.random(0, 8)
@@ -104,11 +106,17 @@ local function update(self, dt)
     if not self.pinkelpause and not self.fading then
         self.x = self.x + 200 * dt * self.direction
     end
-    if self.x < 0 then
-        self.direction = 1
-    elseif self.x > state.gw then
-        self.direction = -1
+    if self.x < 0 or self.x > state.gw then
+        self.rounds = self.rounds + 1
+        if self.rounds < self.maxRounds then
+            self.direction = self.direction * -1
+        end
     end
+    if self.x < - self.w or self.x > state.gw + self.w then
+        self.dead = true
+    end
+    
+
 end
 
 return {init = init, draw = draw, update = update, getHitbox = getHitbox, collided = collided}
