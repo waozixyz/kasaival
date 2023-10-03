@@ -25,10 +25,10 @@ end
 local function draw(self)
     if self.images == nil then return end
     for i, v in ipairs(self.images) do
-        gfx.draw(v, state.startx + state.cx * self.scx * i / #self.images, 0, 0, self.sx, self.sy)
+        gfx.draw(v, 0 + state.cx * self.scx * i / #self.images, 0, 0, self.sx, self.sy)
     end
     for i, v in ipairs(self.images) do
-        gfx.draw(v, state.startx + state.cx * self.scx * i / #self.images + self.width, 0, 0, self.sx, self.sy)
+        gfx.draw(v, 0 + state.cx * self.scx * i / #self.images + self.width, 0, 0, self.sx, self.sy)
     end
 end
 

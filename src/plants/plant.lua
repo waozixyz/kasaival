@@ -7,6 +7,9 @@ local state = require "state"
 local gfx = love.graphics
 local ma = love.math
 
+
+local BURN_COLOR_INCREMENT = {.03, 0, -.01}
+local HEAL_COLOR_INCREMENT = {-.0013, .0007, .0007}
     
 -- default template
 local template = {
@@ -43,7 +46,7 @@ local template = {
 
 
 -- fill self with properties of plant or prop
-local function fill_self(self, props)
+local function fillSelf(self, props)
     for k, v in pairs(copy(props)) do
         self[k] = v
     end
@@ -51,18 +54,12 @@ end
 
 local function init(self, name, props)
     -- fill with template
-    fill_self(self, template)
-    -- fill with name of plant if provided
-    if name then
-        assert(type(name) == "string", "name of plant needs to be string")
-        local props = require ("plants." .. name)
-        assert(type(props) == "table", "props from name need to be a table of key values")
-        fill_self(self, props)
-    end
+    fillSelf(self, template)
+    
     -- fill with table if provided
     if props then
         assert(type(props) == "table", "props needs to be a table of key values")
-        fill_self(self, props)
+        fillSelf(self, props)
     end
 
     -- set timer value for values counting to 0
@@ -103,10 +100,10 @@ local function shrink(self)
 end
 local function burnColor(r, g, b)
     if r < .9 then
-        r = r + .03
+        r = r + BURN_COLOR_INCREMENT[1]
     end
     if b > .1 then
-        b = b - .01
+        b = b + BURN_COLOR_INCREMENT[3]
     end
     return r, g, b
 end
@@ -114,13 +111,13 @@ end
 local function healColor(r1, g1, b1, cs)
     local r2, g2, b2 = cs[2], cs[3], cs[5]
     if r1 > r2 then
-        r1 = r1 - .0013
+        r1 = r1 + HEAL_COLOR_INCREMENT[1]
     end
     if g1 < g2 then
-        g1 = g1 + .0007
+        g1 = g1 + HEAL_COLOR_INCREMENT[2]
     end
     if b1 < b2 then
-        b1 = b1 + .0007
+        b1 = b1 + HEAL_COLOR_INCREMENT[3]
     end
     return r1, g1, b1
 end

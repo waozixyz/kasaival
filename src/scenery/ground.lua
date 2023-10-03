@@ -11,13 +11,31 @@ local gfx = love.graphics
 
 local rows = 8
 
+local function averageColor(color1, color2)
+    return {
+        (color1[1] + color2[1]) / 2,
+        (color1[2] + color2[2]) / 2,
+        (color1[3] + color2[3]) / 2,
+        1 -- alpha value
+    }
+end
+
 local function add(self, width, cs)
     local H = push:getHeight()
     local y = H - self.height
     local w = self.height / rows
     local h = w
     local i = 0
-    local startx = self.lastx or state.startx
+    local startx = self.lastx or 0
+    
+    local newColor = utils.getColor(cs[1])
+
+    if #self.bgColor == 0 then
+        self.bgColor = newColor
+    else
+        self.bgColor = averageColor(self.bgColor, newColor)
+    end
+    
     -- left and right bound of ground
     local left = startx - w
     local right = startx + width + w
@@ -28,7 +46,7 @@ local function add(self, width, cs)
         while x > left do
             cs = cs or self.cs
             local cs_i = 1
-            -- decide which colocscheme to used based on x position of tile
+            -- decide which colorscheme to used based on x position of tile
             if type(cs[cs_i]) == "table" then
                 local id = #cs * (x - left) / (right - left) + 1
                 local r = id - math.floor(id)
@@ -78,8 +96,13 @@ local function init(self, prop, height)
             add(self, prop.width)
         end
     end
-    
+
+
     return copy(self)
+end
+
+local function isOverlapping(l1, r1, u1, d1, l2, r2, u2, d2)
+    return l1 <= r2 and l2 <= r1 and u1 <= d2 and u2 <= d1
 end
 
 local function collide(self, obj)
@@ -92,7 +115,7 @@ local function collide(self, obj)
             local tileTop = tile.y - tile.h / 2
             local tileBottom = tile.y + tile.h / 2
 
-            if tileLeft <= r and tileRight >= l and tileTop <= d and tileBottom >= u then
+            if isOverlapping(l, r, u, d, tileLeft, tileRight, tileTop, tileBottom) then
                 local burnedFuel = 0
                 burnedFuel = tile:burn(obj)
                 tile.hit = true
@@ -104,8 +127,9 @@ end
 
 
 local function draw(self)
-    gfx.setColor(0, 0.5, 0.1)
-    gfx.rectangle("fill", state.startx, gfx.getHeight() - state.gh, state.gw, state.gh) -- Draw a filled rectangle covering the screen
+    local H = push:getHeight()
+    gfx.setColor(self.bgColor)
+    gfx.rectangle("fill", 0, H - state.gh, state.gw, state.gh) -- Draw a filled rectangle covering the screen
 
 
     for _, row in ipairs(self.grid) do
@@ -123,4 +147,13 @@ local function update(self, dt)
         end
     end
 end
-return {collide = collide, draw = draw, grid = {}, init = init, update = update, add = add, width = 0}
+return {
+    collide = collide,
+    draw = draw, 
+    grid = {},
+    bgColor = {},
+    init = init,
+    update = update,
+    add = add,
+    width = 0
+}

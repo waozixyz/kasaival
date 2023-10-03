@@ -64,7 +64,7 @@ local function draw(self)
     end
 end
 local function use_ability(self)
-    table.insert(state.items, Plant:init(self.ability, {x = self.x, y = self.y }))
+    table.insert(ems.items, Plant:init(self.ability, {x = self.x, y = self.y }))
 end
 local function update(self, dt)
     if self.pinkelpause and not self.dying then
@@ -91,9 +91,9 @@ local function update(self, dt)
     if not self.pinkelpause and not self.dying then
         self.x = self.x + 200 * dt * self.direction
     end
-    if self.x < state.startx then
+    if self.x < 0 then
         self.direction = 1
-    elseif self.x > state.gw + state.startx then
+    elseif self.x > state.gw then
         self.direction = -1
     end
 end

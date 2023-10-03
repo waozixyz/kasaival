@@ -99,9 +99,9 @@ local function move(self, dx, dy, dt)
     dx, dy = dx * s, dy * s
     local x, y = self.x + dx, self.y + dy
 
-    if x + state.cx < W / 5 and -state.cx > state.startx then
+    if x + state.cx < W / 5 and -state.cx > 0 then
         state.cx = state.cx - dx
-    elseif x + state.cx > W - (W / 5) and -state.cx + W < state.gw + state.startx then
+    elseif x + state.cx > W - (W / 5) and -state.cx + W < state.gw then
         state.cx = state.cx - dx
     end
 

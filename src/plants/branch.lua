@@ -2,7 +2,7 @@ local utils = require "utils"
 
 local ma = love.math
 
-local deg_to_rad = math.pi / 180
+local degToRad = math.pi / 180
 
 local function addLeaf(x, y, w, cs)
     return { x = x, y = y, color = utils.getColor(cs), w = w * ma.random(8, 10) * .1, h = w * ma.random(8, 10) * .1 }
@@ -15,12 +15,12 @@ return function(self, v, angle, oh)
     local rtn = {}
     rtn.color = utils.getColor(cs_b)
     rtn.deg, rtn.w, rtn.h = angle, w, h
-    local nx = math.floor(v.n[1] + math.cos(angle * deg_to_rad) * h)
-    local ny = math.floor(v.n[2] + math.sin(angle * deg_to_rad) * h)
+    local nx = math.floor(v.n[1] + math.cos(angle * degToRad) * h)
+    local ny = math.floor(v.n[2] + math.sin(angle * degToRad) * h)
     rtn.n = {nx, ny}
     rtn.p = v.n
-    local grow_leaf = ma.random(0, 10)
-    if l > 2 and grow_leaf > self.leafChance  then
+    local growLeaf = ma.random(0, 10)
+    if l > 2 and growLeaf > self.leafChance  then
         rtn.leaf = addLeaf(ma.random(-w, w), ma.random(-2, 2), w * self.leafSize, cs_l)
     end
     -- add special variable of original height

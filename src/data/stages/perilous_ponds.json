@@ -1,0 +1,36 @@
+{
+    "weather": {
+        "dry": true
+    },
+    "scenes": [],
+    "width": 9000,
+    "background": {
+        "name": "desert",
+        "sy": 0.6,
+        "scx": 0.3
+    },
+    "ground": {
+        "cs": [
+            [0.2, 0.27, 0.2, 0.3, 0.87, 0.93],
+            [0.2, 0.2, 0.98, 0.99, 0.9, 0.98],
+            [0, 0.1, 0.74, 0.76, 0.95, 0.99],
+            [0.01, 0.062, 0.29, 0.31, 0.53, 0.55]
+        ]
+    },
+    "music": [
+        {
+            "author": "Insydnis",
+            "title": "The Desert of Dreams",
+            "ext": "mp3"
+        },
+        {
+            "author": "Spring",
+            "title": "Simple Desert",
+            "ext": "ogg"
+        }
+    ],
+    "sky": {
+        "y": 0
+    },
+    "next": "Grassland"
+}

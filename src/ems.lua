@@ -1,23 +1,39 @@
 local lume = require "utils.lume"
 local push = require "utils.push"
 local state = require "state"
+local spawner = require "utils.spawner"
+local json = require "dkjson"
 
 local Plant = require "plants.plant"
 
 local ems = {}
 
 ems.items = {}
-ems.visible_items = {}
+ems.visibleItems = {}
 
 function ems:createAndAddItem(itemData, defaultPgw)
     assert(type(itemData) == "table", "itemData must be a table")
     assert(type(defaultPgw) == "number" or defaultPgw == nil, "defaultPgw must be a number or nil")
+
+  
+    -- Load the JSON data for the specific plant/mob
+    local jsonData = love.filesystem.read("data/" .. itemData.type .. "s/" .. itemData.name .. ".json")
+    local data, _, err = json.decode(jsonData)
+    if not data then
+        error("Error loading " .. itemData.type .. " data: " .. err)
+    end
 
     local props = itemData.props or {}
     for key, value in pairs(spawner(itemData.pgw or defaultPgw)) do
         props[key] = value
     end
 
+    -- Merge the loaded JSON data into props
+    for key, value in pairs(data) do
+        props[key] = value
+    end
+
+  
     local item
     if itemData.type == "plant" then
         item = Plant:init(itemData.name, props)
@@ -47,13 +63,20 @@ function ems:removeEntity(entity)
 end
 
 function ems:checkCollision(o1, o2)
-    if o1.getHitbox and o2.getHitbox and o1.collided and o2.collided then
+    if o1 and o2 and o1.getHitbox and o2.getHitbox and o1.collided and o2.collided then
         local l1, r1, u1, d1 = o1:getHitbox()
         local l2, r2, u2, d2 = o2:getHitbox()
         if l1 <= r2 and r1 >= l2 and u1 <= d2 and d1 >= u2 then
             o1:collided(o2, o2:collided(o1))
         end
     end
+end
+
+function ems:addDeathCount(entity)
+    if not state.killCount[entity.type] then
+        state.killCount[entity.type] = 0
+    end
+    state.killCount[entity.type] = state.killCount[entity.type] + 1
 end
 
 function ems:update(dt)
@@ -63,7 +86,7 @@ function ems:update(dt)
         end
         if entity.dying or entity.dead then
             if not entity.recordedDeath then
-                addDeathCount(self, v)
+                self:addDeathCount(entity)
                 entity.recordedDeath = true
 
                 self.player.XP = self.player.XP + 1
@@ -74,34 +97,36 @@ function ems:update(dt)
         end
         if self.player then
             local o1 = self.player
-            for _, o2 in ipairs(self.visible_items) do
+            for _, o2 in ipairs(self.visibleItems) do
                 if o1 ~= o2 then
-                    checkCollision(o1, o2)
+                    self:checkCollision(o1, o2)
                 end
             end
         end
     end
 end
 
+
 function ems:checkVisible(entity)
     local W = push:getWidth()
-    local extraSpace = 200
-    return entity.x + state.cx < W + entity.w + extraSpace and entity.x + state.cx > -entity.w - extraSpace
+    local w = entity.w + 200
+    if entity.x + state.cx < W + w and entity.x + state.cx > -w then return true else return false end
 end
 
-function ems:sort_for_draw()
-    local visible = {}
+function ems:sortForDraw()
+    local rtn = {}
     for _, entity in ipairs(self.items) do
-        if self:checkVisible(entity) then
-            table.insert(visible, entity)
+        if ems:checkVisible(entity) then
+            table.insert(rtn, entity)
         end
     end
-    return lume.sort(visible, "y")
+    
+    return lume.sort(rtn, "y")
 end
 
 function ems:draw(...)
-    self.visible_items = self:sort_for_draw()
-    for _, entity in ipairs(self.visible_items) do
+    self.visibleItems = self:sortForDraw()
+    for _, entity in ipairs(self.visibleItems) do
         if entity.draw then
             entity:draw(...)
         end

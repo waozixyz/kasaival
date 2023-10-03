@@ -1,18 +1,15 @@
 local function init(self, ...)
-    self.items = {}
     self.cx = 0
     self.gh = 600
-    self.gw = 3000
-    self.startx = -100
+    self.gw = 0
     self.scenes = {}
     self.currentScene = 1
     self.next = nil
-    self.kill_count = {}
+    self.killCount = {}
 
     for _, v in ipairs({...}) do
         table.insert(self.items, v)
     end
-    self.visible_items = self.items
     return self
 end
 
@@ -29,10 +26,10 @@ local function getCurrentQuestHint(self)
 end
 
 local function getKillCount(self, item)
-    if not self.kill_count[item] then
-        self.kill_count[item] = 0
+    if not self.killCount[item] then
+        self.killCount[item] = 0
     end
-    return self.kill_count[item]
+    return self.killCount[item]
 end
 
 local function getItems(self, name)

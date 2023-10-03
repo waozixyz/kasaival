@@ -32,9 +32,9 @@ local function update(self, dt)
         self.anime.currentTime = 0
     end
 
-    if self.x < state.startx then
+    if self.x < 0 then
         self.direction = 1
-    elseif self.x > state.gw + state.startx then
+    elseif self.x > state.gw then
         self.direction = -1
     end
 end 

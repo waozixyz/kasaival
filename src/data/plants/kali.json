@@ -1,0 +1,17 @@
+{
+  "type": "shrub",
+  "cs_branch": [0.4, 0.5, 0.6, 0.7, 0.1, 0.2],
+  "changeColor": [-0.1, -0.3, -0.2],
+  "growTime": 2,
+  "maxStage": 5,
+  "w": 22,
+  "h": 22,
+  "splitChance": 0,
+  "leafChance": 10,
+  "twoBranch": true,
+  "startSpilt": true,
+  "splitAngle": [40, 60],
+  "burnIntensity": 1,
+  "fuel": 4,
+  "addFuel": 2
+}
