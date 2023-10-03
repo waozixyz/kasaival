@@ -145,18 +145,18 @@ local function completeQuest(self, id)
 end
 
 local function updateQuests(self, dt)
-    for i, v in ipairs(state:getCurrentQuests()) do
-        if v.questType == "time" then
-            v.amount = v.amount - dt
-            if v.amount <= 0 then
+    for i, q in ipairs(state:getCurrentQuests()) do
+        if q.questType == "time" then
+            q.amount = q.amount - dt
+            if q.amount <= 0 then
                 completeQuest(self, i)
             end
-        elseif v.questType == "kill" then
-            if state.killCount[v.itemType] and state.killCount[v.itemType] >= v.amount then
+        elseif q.questType == "kill" then
+            if state.killCount[q.itemType] and state.killCount[q.itemType] >= q.amount then
                 completeQuest(self, i)
             end
         end
-        if v.fail and v:fail(state) then
+        if q.fail and q:fail(state) then
             state.questFailed = true
         end
     end

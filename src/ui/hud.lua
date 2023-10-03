@@ -9,8 +9,10 @@ local Cursor = require "ui.cursor"
 local Overlay = require "ui.overlay"
 local Music = require "sys.music"
 local Text = require "ui.text"
+local font = require "ui.font"
 
 local gfx = love.graphics
+
 
 local function toggle(val) if val then return false else return true end end
 
@@ -19,7 +21,7 @@ local function getCurrentQuestsText()
 
     local i = 1
     for _, v in pairs(state:getCurrentQuests()) do
-        local size = 12
+        local size = 24
         v.text = Text:init(v.head .. " " .. v.amount .. " " .. v.tail, {size = size, y = 32 + (size + 4) * i, x = W - 20, align = "right"})
         i = i + 1
     end

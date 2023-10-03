@@ -4,8 +4,8 @@ local font = require "ui.font"
 local gfx = love.graphics
 
 return function(y, v, maxV, txt, color, showMax)
-    local w, h = 100, 15
-    local x, y = 20, y or 90
+    local w, h = 150, 30
+    local x, y = 20, y or 120
 
     gfx.setColor(0, 0, 0)
     gfx.rectangle("fill", x, y, w, h)
@@ -19,5 +19,5 @@ return function(y, v, maxV, txt, color, showMax)
         text = text .. "/" .. math.floor(maxV)
     end
     text = text .. " " .. txt
-    gfx.printf(text, x, y, w, "center")
+    gfx.printf(text, x, y + h / 4, w, "center")
 end

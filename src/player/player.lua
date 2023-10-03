@@ -159,7 +159,7 @@ return {
     init = init,
     h = 4, -- height
     w = 4, -- width
-    bp = 0.01, -- burn power
+    burnPower = 0.01, -- burn power
     scale = 1,
     update = update,
     burnRate = .2,

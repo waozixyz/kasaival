@@ -82,7 +82,7 @@ end
 local function collided(self, obj)
     local burnedFuel = 0
     if obj.element == "fire" then
-        local f = self.fuel - obj.bp * self.burnIntensity
+        local f = self.fuel - obj.burnPower * self.burnIntensity
         if f < 0 then f = 0 end
         burnedFuel = self.fuel - f
         self.fuel = f
@@ -91,6 +91,16 @@ local function collided(self, obj)
             self.fire:setEmissionRate(20)
         end
         self.dp = obj.db
+
+        -- Check if the plant type is "shrub", set fading to true
+        if self.type == "shrub" then
+            self.fading = true
+        end
+
+        -- If the burned fuel is more than 40% of the original fuel, set fading to true
+        if burnedFuel >= 0.4 * self.fuel then
+            self.fading = true
+        end
     end
     return burnedFuel
 end
@@ -217,7 +227,10 @@ local function update(self, dt)
         end
         self.burning = true
         self.burnTimer = self.burnTimer - dt
-    else self.burning = false self.dying = true end
+    else
+        self.burning = false
+        self.fading = true
+    end
 
     -- have this seperate in case the tree is dead but particles need to die
     if self.burning then
@@ -232,7 +245,7 @@ local function update(self, dt)
         self.fire:update(dt)
         if self.fire:getCount() <= 0 then
             self.fire = nil
-            if self.dying then
+            if self.fading then
                 self.dead = true
             end
         end

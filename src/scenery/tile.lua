@@ -73,7 +73,7 @@ local function burn(self, object)
     end
 
     -- Subtract the fuel consumed by the 'object' (with more descriptive naming)
-    local remainingFuel = self.fuel - object.bp
+    local remainingFuel = self.fuel - object.burnPower
     self.fuel = remainingFuel >= 0 and remainingFuel or 0
 
     -- Update the color and return the amount of burned fuel

@@ -1,3 +1,3 @@
 return function(size)
-    return love.graphics.newFont("assets/fonts/hintedSymbola.ttf", size or 12)
+    return love.graphics.newFont("assets/fonts/blooop.ttf", size or 14)
 end

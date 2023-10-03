@@ -41,7 +41,7 @@ local function collided(self, obj)
         local r, g, b = self.color[1],self.color[2], self.color[3]
         r, g, b = r + .1, g - .1, b - .1
         self.color = {r, g, b}
-        self.dying = true
+        self.fading = true
         if self.zeito < 7.8 or self.zeito > 8.2 then
             self.zeito = 7.8
         end
@@ -54,11 +54,11 @@ local function draw(self)
     
     gfx.setColor(self.color)
     local add = 1
-    if self.dying then add = add + 6 end
+    if self.fading then add = add + 6 end
     if self.pinkelpause then add = add + 3 end
     gfx.draw(self.anime.spriteSheet, self.anime.quads[self.anime:spritenumber(add)], self.x, self.y, 0, sx, sy, self.w * .5, self.h)
 
-    if self.pinkelpause and not self.dying then
+    if self.pinkelpause and not self.fading then
         gfx.setColor(1, 1, 1)
         gfx.draw(self.ps, self.x + 26 * self.direction * -1, self.y + 12, 0, self.direction * -1, 1, self.w * .5, self.h)
     end
@@ -67,7 +67,7 @@ local function use_ability(self)
     table.insert(ems.items, Plant:init(self.ability, {x = self.x, y = self.y }))
 end
 local function update(self, dt)
-    if self.pinkelpause and not self.dying then
+    if self.pinkelpause and not self.fading then
         self.ps:update(dt)
     end
 
@@ -85,10 +85,10 @@ local function update(self, dt)
         use_ability(self)
         self.zeito = 0
     end
-    if self.zeito > 8.2 and self.dying then
+    if self.zeito > 8.2 and self.fading then
         self.dead = true
     end
-    if not self.pinkelpause and not self.dying then
+    if not self.pinkelpause and not self.fading then
         self.x = self.x + 200 * dt * self.direction
     end
     if self.x < 0 then

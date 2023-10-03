@@ -84,11 +84,11 @@ function ems:update(dt)
         if entity.update then
             entity:update(dt)
         end
-        if entity.dying or entity.dead then
+        if entity.fading or entity.dead then
             if not entity.recordedDeath then
                 self:addDeathCount(entity)
                 entity.recordedDeath = true
-
+                print('record')
                 self.player.XP = self.player.XP + 1
             end
         end
