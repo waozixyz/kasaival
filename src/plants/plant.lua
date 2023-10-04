@@ -1,17 +1,16 @@
 local grow = require "plants.grow"
 local Fire = require "ps.fire"
-
 local copy = require "utils.copy"
 local state = require "state"
 
 local gfx = love.graphics
 local ma = love.math
 
-
+-- Constants
 local BURN_COLOR_INCREMENT = {.03, 0, -.01}
 local HEAL_COLOR_INCREMENT = {-.0013, .0007, .0007}
     
--- default template
+-- Default template for the plant
 local template = {
     element = "plant",
     type = "plant",
@@ -29,7 +28,7 @@ local template = {
     branches = {},
     leaves = {},
     splitAngle = {20, 30},
-    -- set the frequency of splitting up branhes
+    -- set the frequency of splitting up branches
     -- generates random number from 1 - 10
     -- if > splitChance then split
     -- else do not split
@@ -46,70 +45,13 @@ local template = {
  }
 
 
--- fill self with properties of plant or prop
+-- Helper Functions
 local function fillSelf(self, props)
     for k, v in pairs(copy(props)) do
         self[k] = v
     end
 end
 
-local function init(self, props)
-    -- fill with template
-    fillSelf(self, template)
-    
-    -- fill with table if provided
-    if props then
-        assert(type(props) == "table", "props needs to be a table of key values")
-        fillSelf(self, props)
-    end
-    print(self.maxStage)
-    print(self.growTime)
-    -- set timer value for values counting to 0
-    self.growTimer = self.growTime
-
-    if self.randStage then
-        self.currentStage = ma.random(0, self.maxStage)
-    end
-    if self.currentStage == 0 then
-        self.first = true
-    else
-        for _ = #self.branches, self.currentStage do
-            table.insert(self.branches, grow(self))
-        end
-    end
-    -- return the new plant
-    return copy(self)
-end
-
-local function collided(self, obj)
-    local burnedFuel = 0
-    if obj.element == "fire" then
-        local f = self.fuel - obj.burnPower * self.burnIntensity
-        if f < 0 then f = 0 end
-        burnedFuel = self.fuel - f
-        self.fuel = f
-        self.burnTimer = 4
-        if self.fire then
-            self.fire:setEmissionRate(20)
-        end
-        self.dp = obj.db
-
-        -- Check if the plant type is "shrub", set fading to true
-        if self.subtype == "shrub" then
-            self.fading = true
-        end
-
-        -- If the burned fuel is more than 40% of the original fuel, set fading to true
-        if burnedFuel >= 0.4 * self.fuel then
-            self.fading = true
-        end
-    end
-    return burnedFuel
-end
-
-local function shrink(self)
-    table.remove(self.branches, #self.branches)
-end
 local function burnColor(r, g, b)
     if r < .9 then
         r = r + BURN_COLOR_INCREMENT[1]
@@ -154,6 +96,59 @@ local function getColor(self, v, cs)
         b = b + cc[3] * growth
     end
     return r, g, b, a
+end
+
+
+local function init(self, props)
+    -- fill with template
+    fillSelf(self, template)
+    
+    -- fill with table if provided
+    if props then
+        assert(type(props) == "table", "props needs to be a table of key values")
+        fillSelf(self, props)
+    end
+
+    -- set timer value for values counting to 0
+    self.growTimer = self.growTime
+
+    if self.randStage then
+        self.currentStage = ma.random(0, self.maxStage)
+    end
+    if self.currentStage == 0 then
+        self.first = true
+    else
+        for _ = #self.branches, self.currentStage do
+            table.insert(self.branches, grow(self))
+        end
+    end
+    -- return the new plant
+    return copy(self)
+end
+
+local function collided(self, obj)
+    local burnedFuel = 0
+    if obj.element == "fire" then
+        local f = self.fuel - obj.burnPower * self.burnIntensity
+        if f < 0 then f = 0 end
+        burnedFuel = self.fuel - f
+        self.fuel = f
+        self.burnTimer = 4
+        if self.fire then
+            self.fire:setEmissionRate(20)
+        end
+        self.dp = obj.db
+
+        -- Check if the plant type is "shrub", set fading to true
+        if self.subtype == "shrub" then
+            self.fading = true
+        end
+    end
+    return burnedFuel
+end
+
+local function shrink(self)
+    table.remove(self.branches, #self.branches)
 end
 
 local function draw(self)
@@ -226,6 +221,7 @@ local function update(self, dt)
             self.growTimer = self.growTimer - dt * self.burnIntensity
         else
             shrink(self)
+            self.growTimer = self.growTime
         end
         self.burning = true
         self.burnTimer = self.burnTimer - dt
