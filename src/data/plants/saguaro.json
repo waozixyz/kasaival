@@ -11,7 +11,7 @@
   "splitChance": 4,
   "leafSize": 0.7,
   "leafChance": 4,
-  "startSpilt": true,
+  "startSpilt": false,
   "fuel": 5,
   "addFuel": 3
 }

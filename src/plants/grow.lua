@@ -38,7 +38,7 @@ return function(self)
             if split > self.splitChance or #prev < 3 and self.startSplit then
                 local sa = self.splitAngle
                 --- CACTUS
-                if self.type == "cactus" then
+                if self.subtype == "cactus" then
                     table.insert(row, Branch(self, v, -90))
                     local rd = v.deg + ma.random(30, 40) * ma.random(-1, 1)
                     local oh = v.h
@@ -52,7 +52,7 @@ return function(self)
                 end
             else
                 --CACTUS
-                if self.type == "cactus" then
+                if self.subtype == "cactus" then
                     table.insert(row, Branch(self, v, -90))
                 else -- TREE
                     table.insert(row, Branch(self, v, v.deg + ma.random(-10, 10)))

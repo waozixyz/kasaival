@@ -62,7 +62,8 @@ local function init(self, props)
         assert(type(props) == "table", "props needs to be a table of key values")
         fillSelf(self, props)
     end
-
+    print(self.maxStage)
+    print(self.growTime)
     -- set timer value for values counting to 0
     self.growTimer = self.growTime
 
