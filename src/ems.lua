@@ -17,10 +17,11 @@ function ems:createAndAddItem(itemData, defaultPgw)
 
     local item
     local props = itemData.props or {}
-    for key, value in pairs(spawner(itemData.pgw or defaultPgw)) do
-        props[key] = value
+    if defaultPgw or itemData.pgw then
+        for key, value in pairs(spawner(itemData.pgw or defaultPgw)) do
+            props[key] = value
+        end
     end
-
     -- Load the JSON data for the specific plant
     if itemData.entityType == "plant" then
         local jsonData = love.filesystem.read("data/" .. itemData.entityType .. "s/" .. itemData.entityName .. ".json")
