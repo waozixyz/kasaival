@@ -14,7 +14,6 @@ ems.visibleItems = {}
 function ems:createAndAddItem(itemData, defaultPgw)
     assert(type(itemData) == "table", "itemData must be a table")
     assert(type(defaultPgw) == "number" or defaultPgw == nil, "defaultPgw must be a number or nil")
-
     local item
     local props = itemData.props or {}
     if defaultPgw or itemData.pgw then

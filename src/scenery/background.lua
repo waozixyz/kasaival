@@ -1,39 +1,49 @@
 local state = require "state"
-
 local fi = love.filesystem
 local gfx = love.graphics
 
 local function init(self, data)
-    if data == nil then return self end
-    -- load scale for x and y
+    if not data then return self end
+    
     self.sx, self.sy = data.sx or 1, data.sy or 1
-    -- change state.cx by this scale
     self.scx = data.scx or .5
-    -- get folder path for assets used
+
+    if not data.name then
+        print("Error: No name provided for asset!")
+        return self
+    end
+
     local path = "assets/scenery/" .. data.name .. "/"
     local items = fi.getDirectoryItems(path)
-    -- load each item into self.images table
+    
     self.images = {}
     for _, v in ipairs(items) do
-        table.insert(self.images, gfx.newImage(path .. v))
+        local image = gfx.newImage(path .. v)
+        if image then
+            table.insert(self.images, image)
+        else
+            print("Error loading image:", v)
+        end
     end
-    self.width = self.images[1]:getWidth()
+
+    if #self.images > 0 then
+        self.width = self.images[1]:getWidth()
+    end
 
     return self
 end
 
 local function draw(self)
-    if self.images == nil then return end
-    for i, v in ipairs(self.images) do
-        gfx.draw(v, 0 + state.cx * self.scx * i / #self.images, 0, 0, self.sx, self.sy)
+    if not self.images then return end
+
+    local function computeXPosition(i)
+        return 0 + state.cx * self.scx * i / #self.images
     end
+
     for i, v in ipairs(self.images) do
-        gfx.draw(v, 0 + state.cx * self.scx * i / #self.images + self.width, 0, 0, self.sx, self.sy)
+        gfx.draw(v, computeXPosition(i), 0, 0, self.sx, self.sy)
+        gfx.draw(v, computeXPosition(i) + self.width, 0, 0, self.sx, self.sy)
     end
 end
 
-local function update(self, dt)
-
-end
-
-return {init = init, draw = draw, update = update}
+return {init = init, draw = draw}

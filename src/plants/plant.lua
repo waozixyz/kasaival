@@ -8,7 +8,7 @@ local ma = love.math
 
 -- Constants
 local BURN_COLOR_INCREMENT = {.03, 0, -.01}
-local HEAL_COLOR_INCREMENT = {-.0013, .0007, .0007}
+--local HEAL_COLOR_INCREMENT = {-.0013, .0007, .0007}
     
 -- Default template for the plant
 local template = {
@@ -81,8 +81,8 @@ local function getColor(self, v, cs)
     local r, g, b, a = v.color[1], v.color[2], v.color[3], v.color[4]
     if self.burning then
         r, g, b = burnColor(r, g, b)
-    else 
-        r, g, b = healColor(r, g, b, cs)
+    -- else 
+    --    r, g, b = healColor(r, g, b, cs)
     end
     -- save this as permanent change
     v.color = {r, g, b}
@@ -134,15 +134,9 @@ local function collided(self, obj)
         burnedFuel = self.fuel - f
         self.fuel = f
         self.burnTimer = 4
-        if self.fire then
-            self.fire:setEmissionRate(20)
-        end
+        self.fading = true
+        self.burning = true
         self.dp = obj.db
-
-        -- Check if the plant type is "shrub", set fading to true
-        if self.subtype == "shrub" then
-            self.fading = true
-        end
     end
     return burnedFuel
 end
@@ -204,10 +198,39 @@ local function getHeight(self)
         return 0
     end
 end
-
+local MAX_EMISSION_RATE = 10
 local function update(self, dt)
     local l = #self.branches
-    if (l > 0 or self.first) and self.burnTimer <= 0 then
+
+    -- If it's burning
+    if self.burning then
+        -- Shrink logic
+        if self.growTimer > 0 then
+            self.growTimer = self.growTimer - dt * self.burnIntensity
+        else
+            shrink(self)
+            self.growTimer = self.growTime
+        end
+
+        -- Fire particle logic
+        if not self.fire and l > 0 then
+            self.fire = Fire()
+            self.fire:setPosition(self.x, self.y)
+            self.fire:setSpeed(getHeight(self) * .5)
+        end
+        if self.fire then
+            self.fire:update(dt)
+        end
+
+        if l <= 0 then
+            if self.fire then
+                self.fire:setEmissionRate(0)
+            end
+        end
+
+    -- If it's not burning (and not faded)
+    elseif l > 0 or self.first then
+        -- Growth logic
         if l < self.maxStage then
             self.growTimer = self.growTimer + dt
             if self.growTimer >= self.growTime then
@@ -215,40 +238,22 @@ local function update(self, dt)
                 self.growTimer = 0
             end
         end
-        self.burning = false
-    elseif l > 0 then
-        if self.growTimer > 0 then
-            self.growTimer = self.growTimer - dt * self.burnIntensity
-        else
-            shrink(self)
-            self.growTimer = self.growTime
-        end
-        self.burning = true
-        self.burnTimer = self.burnTimer - dt
-    else
-        self.burning = false
-        self.fading = true
-    end
 
-    -- have this seperate in case the tree is dead but particles need to die
-    if self.burning then
-        if not self.fire and l > 0 then
-            self.fire = Fire()
-            self.fire:setPosition(self.x, self.y)
-            self.fire:setSpeed(getHeight(self) * .5)
-        end
-        self.fire:update(dt)
-    elseif self.fire then
-        self.fire:setEmissionRate(0)
-        self.fire:update(dt)
-        if self.fire:getCount() <= 0 then
-            self.fire = nil
-            if self.fading then
-                self.dead = true
+        if self.fire then
+            self.fire:setEmissionRate(0)
+            self.fire:update(dt)
+            if self.fire:getCount() <= 0 then
+                self.fire = nil
             end
         end
     end
+
+    -- Handle the case when the tree has completely faded
+    if l <= 0 and self.fire and self.fire:getCount() <= 0 then
+        self.dead = true
+    end
 end
+
 
 
 return {
