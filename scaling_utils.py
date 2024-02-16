@@ -15,29 +15,24 @@ class ScreenScaler:
         self.offset_x, self.offset_y = self.calculate_offsets()
 
     def calculate_scale_factors(self):
-        # Calculate scale factors based on current mode (windowed or fullscreen)
         scale_width = self.screen_width / self.virtual_width
         scale_height = self.screen_height / self.virtual_height
-        # Apply scaling only if necessary
         return min(scale_width, scale_height) if self.screen_width != self.virtual_width or self.screen_height != self.virtual_height else 1
 
     def calculate_offsets(self):
-        # Calculate offsets only if scaling is applied
         if self.scale_factor > 1:
             offset_x = (self.screen_width - (self.virtual_width * self.scale_factor)) / 2
-            offset_y = (self.screen_height - (self.virtual_height * self.scale_factor)) / 2
+            offset_y = (self.screen_height - (self.virtual_height * self.scale_factor)) 
         else:
             offset_x, offset_y = 0, 0
         return offset_x, offset_y
 
     def convert_coordinates(self, x, y):
-        # Convert screen coordinates to virtual coordinates, considering scaling
         virtual_x = (x - self.offset_x) / self.scale_factor
         virtual_y = (y - self.offset_y) / self.scale_factor
         return int(virtual_x), int(virtual_y)
 
     def scale_surface(self, virtual_screen):
-        # Scale the virtual screen to the actual screen size, if necessary
         if self.scale_factor > 1:
             return pygame.transform.scale(virtual_screen, (int(self.virtual_width * self.scale_factor), int(self.virtual_height * self.scale_factor)))
         else:

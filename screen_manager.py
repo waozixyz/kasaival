@@ -17,4 +17,8 @@ class ScreenManager:
     def render(self, surface):
         if self.active_screen:
             self.active_screen.render(surface)
-            
+     
+    def draw_extra_space(self, window, scalar):
+            if self.active_screen:
+                self.active_screen.draw_extra_space(window, scalar)
+     
