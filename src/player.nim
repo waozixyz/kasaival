@@ -45,7 +45,7 @@ proc getDirection(self: Player): Vector3 =
     if isKeyDown(key): result.z = 1
   
   if result.z == 0 and result.x == 0 and isMouseButtonDown(Left):
-    let mouseRay = getMouseRay(gMousePosition, gCamera)
+    let mouseRay = getScreenToWorldRay(gMousePosition, gCamera)
     let collision = getRayCollisionBox(mouseRay, getBoundingBox(self.position, self.radius))
     result.x = collision.normal.x
     result.z = -(collision.normal.y + 0.5) + (collision.normal.z + 0.5)
