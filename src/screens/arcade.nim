@@ -1,4 +1,4 @@
-import raylib, ../screens, ../player, ../gaia/ground, ../gaia/sky, ../ui/hud, ../state, ../mechanics/collision
+import raylib, ../screens, ../entities/player, ../world/ground, ../world/sky, ../ui/hud, ../state, ../mechanics/collision
 
 type
   Arcade* = ref object of Screen

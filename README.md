@@ -29,11 +29,11 @@ Kasaival is a survival game where you play as a fiery flame in a new world of sc
 
 ## Developers
 
-- Waotzi - Lead Developer and Designer
+- Waozi - Lead Developer and Designer
 
 ## Links
 
-- [itch.io Release](https://waotzi.itch.io/kasaival)
+- [itch.io Release](https://waozi.itch.io/kasaival)
 
 ## Build Instructions
 

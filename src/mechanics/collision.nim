@@ -1,4 +1,4 @@
-import raylib, ../player, ../gaia/ground, ../utils
+import raylib, ../entities/player, ../world/ground, ../utils
 
 type
   Axis = enum
@@ -23,9 +23,9 @@ proc checkAxisCollision(playerVelocity: Vector3, playerHitbox: BoundingBox, tile
   of Z:
     if playerVelocity.z == 0 or not (tileHitbox.min.z < playerHitbox.max.z and tileHitbox.max.z > playerHitbox.min.z):
       return playerVelocity.z
-
 proc checkTileCollision*(player: Player, ground: Ground, dt: float) =
-  var playerVelocity = player.getVelocity(dt)
+  player.updateVelocity(dt)
+  var playerVelocity = player.velocity
   var tmpVel = playerVelocity
   tmpVel.y = 0
   let

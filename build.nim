@@ -1,5 +1,8 @@
 import os, osproc, parseopt
 
+const
+  itchUsername = "waozi"
+
 proc copyStaticToPublic() =
   let staticDir = "static"
   let publicDir = "public"
@@ -12,47 +15,66 @@ proc copyStaticToPublic() =
     echo "Copying ", f, " to ", destFile
     copyFile(f, destFile)
 
+proc buildForWeb(upload: bool, runProgram: bool): bool =
+  echo "Building for web..."
+  let webBuildCmd = "nim c -d:release -d:emscripten src/main.nim"
+  let buildResult = execCmd(webBuildCmd)
+  if buildResult != 0:
+    echo "Web build failed"
+    return false
+
+  if upload:
+    let publicZip = "public.zip"
+    echo "Zipping public folder..."
+    let zipCmd = "zip -r " & publicZip & " public"
+    discard execCmd(zipCmd)
+    let uploadCmd = "butler push " & publicZip & " " & itchUsername & "/kasaival:html5"
+    echo "Uploading to itch.io..."
+    discard execCmd(uploadCmd)
+    os.removeFile(publicZip)
+  if runProgram:
+    let serverCmd = "ran public"
+    let serverProc = startProcess(serverCmd)
+    discard serverProc.waitForExit()
+  return true
+
+proc buildForDesktop(upload: bool, runProgram: bool): bool =
+  echo "Building for desktop..."
+  let desktopBuildCmd = "nim c -d:release src/main.nim"
+  let buildResult = execCmd(desktopBuildCmd)
+  if buildResult != 0:
+    echo "Desktop build failed"
+    return false
+
+  let exeFile = "src/main"
+  if upload:
+    let exeZip = "main.zip"
+    echo "Zipping executable..."
+    let zipCmd = "zip " & exeZip & " " & exeFile
+    discard execCmd(zipCmd)
+    let uploadCmd = "butler push " & exeZip & " " & itchUsername & "/kasaival:linux"
+    echo "Uploading to itch.io..."
+    discard execCmd(uploadCmd)
+    os.removeFile(exeZip)
+  if runProgram:
+    let runCmd = "./" & exeFile
+    let runProc = startProcess(runCmd)
+    discard runProc.waitForExit()
+  return true
+
 proc buildProject(buildType: string, runProgram: bool, upload: bool) =
+  var buildSuccess = false
   case buildType
   of "web":
-    echo "Building for web..."
-    let webBuildCmd = "nim c -d:release -d:emscripten src/main.nim"
-    discard execCmd(webBuildCmd)
-    if upload:
-      let publicZip = "public.zip"
-      echo "Zipping public folder..."
-      let zipCmd = "zip -r " & publicZip & " public"
-      discard execCmd(zipCmd)
-      let uploadCmd = "butler push " & publicZip & " waotzi/kasaival:html5"
-      echo "Uploading to itch.io..."
-      discard execCmd(uploadCmd)
-      os.removeFile(publicZip)
-    if runProgram:
-      let serverCmd = "ran public"
-      discard execCmd(serverCmd)
+    buildSuccess = buildForWeb(upload, runProgram)
   of "desktop":
-    echo "Building for desktop..."
-    let desktopBuildCmd = if runProgram:
-      "nim c -r -d:release src/main.nim"
-    else:
-      "nim c -d:release src/main.nim"
-    discard execCmd(desktopBuildCmd)
-    let exeFile = "src/main"  
-    if upload:
-      let exeZip = "main.zip"
-      echo "Zipping executable..."
-      let zipCmd = "zip " & exeZip & " " & exeFile
-      discard execCmd(zipCmd)
-      let uploadCmd = "butler push " & exeZip & " waotzi/kasaival:linux"
-      echo "Uploading to itch.io..."
-      discard execCmd(uploadCmd)
-      os.removeFile(exeZip)
-    
-    if runProgram:
-      let runCmd = "./" & exeFile
-      discard execCmd(runCmd)
+    buildSuccess = buildForDesktop(upload, runProgram)
   else:
     echo "Invalid build type"
+  
+  if not buildSuccess:
+    echo "Build failed. Skipping run and upload steps."
+    quit(1)
 
 proc parseArgs() =
   var buildType = "desktop"
@@ -74,11 +96,9 @@ proc parseArgs() =
     copyStaticToPublic()
     buildProject("web", false, true)
     buildProject("desktop", false, true)
-    return
-  
-  if buildType == "web":
-    copyStaticToPublic()
-
-  buildProject(buildType, runProgram, false)
+  else:
+    if buildType == "web":
+      copyStaticToPublic()
+    buildProject(buildType, runProgram, false)
 
 parseArgs()

@@ -6,7 +6,7 @@
 uniform sampler2D iChannel0;
 uniform float iTime;
 uniform vec2 iResolution;
-
+uniform vec2 playerPosition;
 
 float sdCircle(vec2 p, float r) {
     return length(p) - r;
@@ -39,20 +39,22 @@ float fbm(vec2 p) {
     }
     return v;
 }
-
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-	vec2 p = (fragCoord * 2. - iResolution.xy) / iResolution.y;
+    vec2 p = (fragCoord * 2. - iResolution.xy) / iResolution.y;
     
-	vec2 r = vec2(fbm(p + vec2(0,  OFF)) - fbm(p + vec2( 0, -OFF)), 
-                 -fbm(p + vec2(OFF,  0)) + fbm(p + vec2(-OFF,  0))) * 0.01;	
-  r += vec2(0.002, 0.0045);
+    // Offset p by the player's position
+    p -= (playerPosition * 2. - iResolution.xy) / iResolution.y;
+    
+    vec2 r = vec2(fbm(p + vec2(0,  OFF)) - fbm(p + vec2( 0, -OFF)), 
+                 -fbm(p + vec2(OFF,  0)) + fbm(p + vec2(-OFF,  0))) * 0.01;    
+    r += vec2(0.002, 0.0045);
 
-  vec2 uv = fragCoord / iResolution.xy;
-	float dCircle = sdCircle(p, 0.1); 
-	vec3 col = pow(texture(iChannel0, uv - r).rgb, vec3(1.15))
+    vec2 uv = fragCoord / iResolution.xy;
+    float dCircle = sdCircle(p, 0.1); 
+    vec3 col = pow(texture(iChannel0, uv - r).rgb, vec3(1.15))
              + vec3(smoothstep(0.01, -0.01, abs(dCircle) - 0.007)) * vec3(1., 0.6, 0.25);
-	col = clamp(col, 0., 1.);
-  fragColor = vec4(col, 1.);
+    col = clamp(col, 0., 1.);
+    fragColor = vec4(col, 1.);
 }
 
 
