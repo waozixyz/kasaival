@@ -39,7 +39,7 @@ fn main() {
     rl.init_audio_device()
 
     mut game_state := &state.State{
-        screen: &screens.Title{}
+        screen: &screens.Game{}
     }
     mut camera := rl.Camera2D{}
     game_state.screen.load(mut game_state)
