@@ -32,12 +32,10 @@ int main(void) {
     InitAudioDevice();
     
     State game_state = {0};
-    game_state.screen = (Screen*)&TitleScreen;  // Cast to non-const Screen*
+    set_screen(&game_state, &GameScreen);
     
     Camera2D camera = {0};
-    
-    game_state.screen->load(game_state.screen, &game_state);
-    
+        
     int key_timeout = 0;
     SetTargetFPS(60);
     

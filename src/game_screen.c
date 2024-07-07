@@ -22,7 +22,7 @@ const Screen GameScreen = {
 
 static void load_stage(Game* self, State* game_state) {
     self->stage = create_shrubland();
-    stage_load(&self->stage);
+    stage_load(&self->stage, game_state);
     
     char music_path[256];
     snprintf(music_path, sizeof(music_path), "resources/music/%s", self->stage.music);

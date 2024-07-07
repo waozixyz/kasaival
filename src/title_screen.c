@@ -15,7 +15,7 @@ const Screen TitleScreen = {
 // Title screen functions
 void title_load(Title* self, State* game_state) {
     (void)game_state;
-    self->background = LoadTexture("resources/menu.jpg");
+    // self->background = LoadTexture("resources/menu.jpg"); // TODO: fix background
 }
 
 void title_update(Title* self, State* game_state) {

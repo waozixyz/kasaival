@@ -64,12 +64,11 @@ static void dog_load(Entity* entity, int x, int y) {
     self->x = x;
     self->base.y = y;
     
-    AnimationState states[] = {
-        {"walk", 3},
-        {"pee", 3},
-        {"burn", 6}
-    };
-    animation_load(&self->anime, "dog", states, 3, 6, self->w, self->h, 7);
+    const char* state_names[] = {"walk", "pee", "burn"};
+    int state_frames[] = {3, 3, 6};
+    int state_count = 3;
+    
+    animation_load(&self->anime, "dog", state_names, state_frames, state_count, 6, self->w, self->h, 7);
     
     self->walk_time = 5;
     self->pee_time = 3;
