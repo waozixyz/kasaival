@@ -21,9 +21,7 @@ void title_load(Title* self, State* game_state) {
 void title_update(Title* self, State* game_state) {
     (void)self;
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) || GetKeyPressed() > 0) {
-        Carousel* carousel = malloc(sizeof(Carousel));
-        carousel_load(carousel, game_state);
-        set_screen(game_state, (Screen*)carousel);
+        set_screen(game_state, &CarouselScreen, sizeof(Carousel));
     }
 }
 

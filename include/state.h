@@ -4,6 +4,7 @@
 
 #include <raylib.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include "config.h"
 
 typedef struct State State;
@@ -16,7 +17,8 @@ typedef struct Screen {
 } Screen;
 
 struct State {
-    Screen* screen;
+    void* current_screen;
+    const Screen* screen_vtable;
     bool exit;
     bool mute;
     bool pause;
@@ -27,7 +29,8 @@ struct State {
     int score;
     Vector2 mouse;
 };
-
-void set_screen(State* game_state, Screen* screen);
+void set_screen(State* game_state, const Screen* screen, size_t screen_size);
+State* create_state(void);
+void free_state(State* game_state);
 
 #endif // STATE_H

@@ -22,7 +22,7 @@ typedef struct {
 
 typedef struct {
     Screen base;
-    Stage stage;
+    Stage* stage;
     Entity* entities;
     int entity_count;
     Z_Order* entity_order;
@@ -35,8 +35,6 @@ typedef struct {
     HUD hud;
     float elapsed;
 } Game;
-
-
 
 typedef struct {
     Screen base;

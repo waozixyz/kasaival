@@ -22,6 +22,7 @@ typedef struct {
     float timer;
 } Spawner;
 
+
 typedef struct {
     char path[256];
     float cx;
@@ -39,7 +40,8 @@ typedef struct {
     int bg_count;
 } Stage;
 
-Stage create_shrubland(void);
+Stage* create_shrubland(void);
+Stage* create_empty_stage(void); 
 void stage_load(Stage* stage, State* game_state);
 
 #endif // STAGES_H

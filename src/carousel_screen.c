@@ -21,6 +21,7 @@ const Screen CarouselScreen = {
     (void (*)(void*))carousel_unload
 };
 
+
 // Carousel screen functions
 void carousel_load(Carousel* self, State* game_state) {
     game_state->cx = 0;
@@ -46,9 +47,7 @@ static void get_key_action(int i, State* game_state) {
         case 0:
         case 1:
             {
-                Game* game = malloc(sizeof(Game));
-                game_load(game, game_state);
-                set_screen(game_state, (Screen*)game);
+                set_screen(game_state, &GameScreen, sizeof(Game));
             }
             break;
         default:

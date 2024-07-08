@@ -19,40 +19,58 @@ const Screen GameScreen = {
     (void (*)(void*))game_unload
 };
 
-
 static void load_stage(Game* self, State* game_state) {
-    self->stage = create_shrubland();
-    stage_load(&self->stage, game_state);
+    if (self == NULL) {
+        TraceLog(LOG_ERROR, "Invalid Game pointer in load_stage");
+        return;
+    }
+
+    Stage* new_stage = create_shrubland();
+
+    if (new_stage == NULL) {
+        TraceLog(LOG_ERROR, "FAILED TO CREATE STAGE");
+        return;
+    }
+
+    // If there's an existing stage, free it first
+    if (self->stage != NULL) {
+        MemFree(self->stage);
+    }
+
+    // Assign the new stage
+    self->stage = new_stage;
+
+    stage_load(self->stage, game_state);
     
-    char music_path[256];
-    snprintf(music_path, sizeof(music_path), "resources/music/%s", self->stage.music);
+    /*char music_path[256];
+    snprintf(music_path, sizeof(music_path), "resources/music/%s", self->stage->music);
     self->music = LoadMusicStream(music_path);
-    PlayMusicStream(self->music);
+    PlayMusicStream(self->music);*/ // TODO: add music
     
     game_state->gw = 0;
 
-    for (int i = 0; i < self->stage.scene_count; i++) {
-        game_state->gw += self->stage.scenes[i].width;
+    for (int i = 0; i < self->stage->scene_count; i++) {
+        game_state->gw += self->stage->scenes[i].width;
     }
     
     game_state->start_x = (int)(-game_state->gw * 0.5 + GAME_WIDTH * 0.5);
     
-    for (int i = 0; i < self->stage.spawner_count; i++) {
-        self->stage.spawners[i].start_x += game_state->start_x;
-        self->stage.spawners[i].end_x += game_state->start_x;
+    for (int i = 0; i < self->stage->spawner_count; i++) {
+        self->stage->spawners[i].start_x += game_state->start_x;
+        self->stage->spawners[i].end_x += game_state->start_x;
     }
 
     ground_init(&self->ground);
     float x = game_state->start_x;
  
-    for (int i = 0; i < self->stage.scene_count - 1; i++) {
-        int direction = (i < self->stage.scene_count * 0.5) ? 1 : 0;
-        Color colors[2] = {self->stage.scenes[i].color, self->stage.scenes[i + 1].color};
+    for (int i = 0; i < self->stage->scene_count - 1; i++) {
+        int direction = (i < self->stage->scene_count * 0.5) ? 1 : 0;
+        Color colors[2] = {self->stage->scenes[i].color, self->stage->scenes[i + 1].color};
         int gradient[2][3] = {
             {colors[0].r, colors[0].g, colors[0].b},
             {colors[1].r, colors[1].g, colors[1].b}
         };
-        x = ground_add_section(&self->ground, x, self->stage.scenes[i].width, gradient, direction);
+        x = ground_add_section(&self->ground, x, self->stage->scenes[i].width, gradient, direction);
     }
 
 
@@ -124,8 +142,8 @@ void game_load(Game* self, State* game_state) {
     sky_load(&self->sky);
 
     background_init(&self->background);
-    for (int i = 0; i < self->stage.bg_count; i++) {
-        const BGItem* bg = &self->stage.bg[i];
+    for (int i = 0; i < self->stage->bg_count; i++) {
+        const BGItem* bg = &self->stage->bg[i];
         Texture2D texture = LoadTexture(bg->path);
         background_add(&self->background, texture, bg->cx, bg->x, bg->y);
     }
@@ -143,22 +161,23 @@ void game_load(Game* self, State* game_state) {
     hud_load(&self->hud);
 }
 void game_update(Game* self, State* game_state) {
+
     float delta = GetFrameTime();
     self->elapsed += delta;
 
     if (!game_state->mute) {
         UpdateMusicStream(self->music);
     }
-
+    
     if (!game_state->pause) {
         // Update spawners
-        for (int i = 0; i < self->stage.spawner_count; i++) {
-            self->stage.spawners[i].timer += delta;
-            if (self->stage.spawners[i].timer >= self->stage.spawners[i].interval) {
-                add_entity(self, self->stage.spawners[i].name, self->stage.spawners[i].start_x, self->stage.spawners[i].end_x);
-                self->stage.spawners[i].timer = 0;
+        /*for (int i = 0; i < self->stage->spawner_count; i++) {
+            self->stage->spawners[i].timer += delta;
+            if (self->stage->spawners[i].timer >= self->stage->spawners[i].interval) {
+                add_entity(self, self->stage->spawners[i].name, self->stage->spawners[i].start_x, self->stage->spawners[i].end_x);
+                self->stage->spawners[i].timer = 0;
             }
-        }
+        }*/
 
         // Update background, sky, and ground
         background_update(&self->background, game_state);
@@ -202,11 +221,13 @@ void game_update(Game* self, State* game_state) {
         // Sort entity order
         qsort(self->entity_order, self->entity_order_count, sizeof(Z_Order), compare_z_order);
     }
+    
 
+    
     hud_update(&self->hud, game_state);
 
     if (game_state->exit) {
-        set_screen(game_state, &TitleScreen);
+        set_screen(game_state, &TitleScreen, sizeof(Title));
         game_state->exit = false;
     }
 }
