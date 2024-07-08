@@ -40,8 +40,8 @@ static void load_stage(Game* self, State* game_state) {
     // Assign the new stage
     self->stage = new_stage;
 
-    stage_load(self->stage, game_state);
-    
+
+    // Load music
     /*char music_path[256];
     snprintf(music_path, sizeof(music_path), "resources/music/%s", self->stage->music);
     self->music = LoadMusicStream(music_path);
