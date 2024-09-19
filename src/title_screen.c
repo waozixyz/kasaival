@@ -21,7 +21,7 @@ void title_load(Title* self, State* game_state) {
 void title_update(Title* self, State* game_state) {
     (void)self;
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) || GetKeyPressed() > 0) {
-        set_screen(game_state, &CarouselScreen, sizeof(Carousel));
+        set_screen(game_state, &GameScreen, sizeof(Game));
     }
 }
 
