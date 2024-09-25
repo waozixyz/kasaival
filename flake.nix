@@ -11,7 +11,34 @@
       let
         pkgs = import nixpkgs {
           inherit system;
-          overlays = [ self.overlays.default ];
+          overlays = [
+            (final: prev: {
+              customRaylib = prev.raylib.overrideAttrs (oldAttrs: {
+                patches = (oldAttrs.patches or []) ++ [
+                  (final.writeText "enable-jpeg.patch" ''
+                    diff --git a/src/config.h b/src/config.h
+                    index xxxxxxx..yyyyyyy 100644
+                    --- a/src/config.h
+                    +++ b/src/config.h
+                    @@ -44,7 +44,7 @@
+                     #define SUPPORT_FILEFORMAT_PNG      1
+                     //#define SUPPORT_FILEFORMAT_BMP      1
+                     //#define SUPPORT_FILEFORMAT_TGA      1
+                    -//#define SUPPORT_FILEFORMAT_JPG      1
+                    +#define SUPPORT_FILEFORMAT_JPG      1
+                     #define SUPPORT_FILEFORMAT_GIF      1
+                     #define SUPPORT_FILEFORMAT_QOI      1
+                     //#define SUPPORT_FILEFORMAT_PSD      1
+                  '')
+                ];
+                buildInputs = oldAttrs.buildInputs ++ [ final.libjpeg ];
+                cmakeFlags = oldAttrs.cmakeFlags ++ [
+                  "-DUSE_EXTERNAL_GLFW=ON"
+                  "-DBUILD_EXAMPLES=OFF"
+                ];
+              });
+            })
+          ];
         };
       in
       {
@@ -39,31 +66,4 @@
         '';
       }
     );
-
-  overlays.default = final: prev: {
-    customRaylib = prev.raylib.overrideAttrs (oldAttrs: {
-      patches = (oldAttrs.patches or []) ++ [
-        (final.writeText "enable-jpeg.patch" ''
-          diff --git a/src/config.h b/src/config.h
-          index xxxxxxx..yyyyyyy 100644
-          --- a/src/config.h
-          +++ b/src/config.h
-          @@ -44,7 +44,7 @@
-           #define SUPPORT_FILEFORMAT_PNG      1
-           //#define SUPPORT_FILEFORMAT_BMP      1
-           //#define SUPPORT_FILEFORMAT_TGA      1
-          -//#define SUPPORT_FILEFORMAT_JPG      1
-          +#define SUPPORT_FILEFORMAT_JPG      1
-           #define SUPPORT_FILEFORMAT_GIF      1
-           #define SUPPORT_FILEFORMAT_QOI      1
-           //#define SUPPORT_FILEFORMAT_PSD      1
-        '')
-      ];
-      buildInputs = oldAttrs.buildInputs ++ [ final.libjpeg ];
-      cmakeFlags = oldAttrs.cmakeFlags ++ [
-        "-DUSE_EXTERNAL_GLFW=ON"
-        "-DBUILD_EXAMPLES=OFF"
-      ];
-    });
-  };
 }
